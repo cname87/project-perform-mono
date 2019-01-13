@@ -1,0 +1,47 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"typescript.surveys.enabled": false,
+		"cSpell.enabledLanguageIds": [
+			"asciidoc",
+			"c",
+			"cpp",
+			"csharp",
+			"css",
+			"go",
+			"handlebars",
+			"html",
+			"jade",
+			"javascript",
+			"javascriptreact",
+			"json",
+			"latex",
+			"less",
+			"markdown",
+			"php",
+			"plaintext",
+			"pub",
+			"python",
+			"restructuredtext",
+			"rust",
+			"scss",
+			"text",
+			"typescript",
+			"typescriptreact",
+			"yml"
+		],
+		"cSpell.words": [
+			"daemonized",
+			"proxyquired",
+			"redumped",
+			"tsscmp",
+			"unindent",
+			"uuidv",
+			"wtfnode"
+		]
+	}
+}

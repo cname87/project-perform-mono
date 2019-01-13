@@ -1,0 +1,19 @@
+{
+    "cache": true,
+    "include": [
+      "**/**/*.js",
+      "**/**/*.ts"
+    ],
+    "exclude": [
+    ],
+    "extensions": [
+        ".ts"
+    ],
+    "report-dir": "./coverage",
+    "reporter": [
+        "html",
+        "text",
+        "text-summary"
+    ],
+    "source-map": true
+}

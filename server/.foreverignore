@@ -1,0 +1,10 @@
+# syntax should be the same as .gitignore
+
+# I couldn't get !**/*.js working - maybe ! not supported?
+# **/*
+# !**/*.js
+ 
+# ignore all files ending in .log. .html, .css
+**/*.log
+**/*.html
+**/*.css

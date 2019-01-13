@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "../dist",
+        "baseUrl": ".",
+        "paths": {
+            "*": [
+                "../node_modules/*",
+                "./types/*"
+            ]
+        },
+
+        "checkJs": false,
+        "allowJs": true,
+        "alwaysStrict": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "preserveConstEnums": true,
+        "strict": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        "lib": [ 
+            "esnext",
+            "dom"
+        ],
+        "experimentalDecorators": true,
+    },
+    "include": [
+        "./**/*"
+    ],
+    "exclude": [
+        "./public/**/*",
+    ]
+}
