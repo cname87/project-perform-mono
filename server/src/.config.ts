@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * This module sets all configuration parameters for the
  * server application.
@@ -17,14 +15,14 @@ const appRoot = appRootObject.toString();
 
 // tslint:disable:ordered-imports
 import * as START_SERVER from './server/startserver';
-import * as SERVER from './server/server';
+import * as SERVER from './server/serverOps';
 import * as RUN_SERVER from './server/runServer';
+// shared request handler functions
+import * as HANDLERS from './middlewares/handlers';
 // a configured morgan http(s) server logger
 import * as SERVER_LOGGER from './middlewares/serverlogger';
 // an express error handler middleware
 import * as ERROR_HANDLER from './middlewares/errorhandler';
-// shared request handler functions
-import * as HANDLERS from './middlewares/handlers';
 // a configured winston general logger
 import * as LOGGER from './utils/logger';
 // a utility to dump errors to the logger
@@ -34,20 +32,7 @@ import * as DATABASE from './database/database';
 import * as EXT_DB_SERVICE from './database/extDatabaseService';
 
 /* list of controllers */
-import * as INDEX_CONTROLLER from './controllers/index';
-import * as BUNDLE_CONTROLLER from './controllers/bundle';
-import * as CLIENT_CONTROLLER from './controllers/client/client';
-import * as STYLESHEETS_CONTROLLER from './controllers/client/stylesheets';
-import * as SCRIPTS_CONTROLLER from './controllers/client/scripts';
-import * as VIEWS_CONTROLLER from './controllers/client/views';
-import * as TESTS_CONTROLLER from './controllers/tests/tests';
-import * as HANG_TEST_CONTROLLER from './controllers/tests/hang';
-import * as COOKIE_TEST_CONTROLLER from './controllers/tests/cookie';
-import * as SESSION_TEST_CONTROLLER from './controllers/tests/session';
-import * as MISC_TESTS_CONTROLLER from './controllers/tests/misc';
-import * as FAIL_TESTS_CONTROLLER from './controllers/tests/fail';
-import * as USERS_CONTROLLER from './controllers/users';
-import * as ADMIN_CONTROLLER from './controllers/admin';
+import * as ROOT_CONTROLLER from './controllers/root';
 
 /* list of models */
 import * as USERSMODEL from './models/users';
@@ -79,27 +64,14 @@ export const config: IConfig = {
   START_SERVER,
   SERVER,
   RUN_SERVER,
+  HANDLERS,
   SERVER_LOGGER,
   ERROR_HANDLER,
-  HANDLERS,
   LOGGER,
   DUMPERROR,
   DATABASE,
   EXT_DB_SERVICE,
-  INDEX_CONTROLLER,
-  BUNDLE_CONTROLLER,
-  CLIENT_CONTROLLER,
-  STYLESHEETS_CONTROLLER,
-  SCRIPTS_CONTROLLER,
-  VIEWS_CONTROLLER,
-  TESTS_CONTROLLER,
-  HANG_TEST_CONTROLLER,
-  COOKIE_TEST_CONTROLLER,
-  SESSION_TEST_CONTROLLER,
-  MISC_TESTS_CONTROLLER,
-  FAIL_TESTS_CONTROLLER,
-  USERS_CONTROLLER,
-  ADMIN_CONTROLLER,
+  ROOT_CONTROLLER,
   USERSMODEL,
   TESTSMODEL,
 
@@ -118,6 +90,21 @@ export const config: IConfig = {
   ROOT_PATH: appRoot,
 
   /***********************************************************************/
+  /* Angular app parameters                                              */
+  /***********************************************************************/
+
+  /**
+   * This section sets parameters used by the Angular app.
+   */
+
+  APP_PATH: path.join(
+    appRoot,
+    'app-test-angular',
+    'dist',
+    'angular-tour-of-heroes',
+  ),
+
+  /***********************************************************************/
   /* HTTP/S server parameters                                            */
   /***********************************************************************/
 
@@ -126,8 +113,8 @@ export const config: IConfig = {
   // true for https with http on port 80 being redirected
   HTTPS_ON: true,
   // https credentials
-  HTTPS_KEY: path.join(appRoot, 'certs', 'nodeKeyAndCert.pem'),
-  HTTPS_CERT: path.join(appRoot, 'certs', 'nodeKeyAndCert.pem'),
+  HTTPS_KEY: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
+  HTTPS_CERT: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
   // cookieparser key
   COOKIE_KEY: 'cookie_key',
   // sets url path that points to the static server
@@ -177,7 +164,7 @@ export const config: IConfig = {
     'loadmocha.html',
   ),
   // path to favicon
-  FAVICON: path.join(appRoot, 'dist', 'public', 'favicon.ico'),
+  FAVICON: path.join(appRoot, 'app-test-angular', 'src', 'favicon.ico'),
   // path to uploads directory
   UPLOADS: path.join(appRoot, 'uploads'),
   // response time out in ms used by timeout() in production
@@ -241,9 +228,9 @@ export const config: IConfig = {
   AUTH_SOURCE: 'admin',
   SSL_ON: 'true',
   /* mongoDB connection options object */
-  DB_CA: path.join(appRoot, 'certs', 'rootCA.crt'),
-  DB_KEY: path.join(appRoot, 'certs', 'nodeKeyAndCert.pem'),
-  DB_CERT: path.join(appRoot, 'certs', 'nodeKeyAndCert.pem'),
+  DB_CA: path.join(appRoot, 'server', 'certs', 'rootCA.crt'),
+  DB_KEY: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
+  DB_CERT: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
   SSL_VALIDATE: true,
   // session store key
   SESSION_KEY: 'session secret key',

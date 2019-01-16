@@ -3,9 +3,7 @@
   "include": [
     "./**/*"
   ],
-  "exclude": [
-  ],
   "compilerOptions": {
-    "outDir": "../dist",
+    "outDir": "../../dist/database",
   },
 }

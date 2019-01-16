@@ -1,6 +1,4 @@
-﻿'use strict';
-
-/**
+﻿/**
  * This application runs a http(s) server with a database backend.
  * It creates a controllers object listing the supported base controllers.
  * It creates a handles object listing the supported handlers.
@@ -49,20 +47,7 @@ const runServer = config.RUN_SERVER;
 const { database } = config.DATABASE;
 const { handlers } = config.HANDLERS;
 const errorHandler = config.ERROR_HANDLER;
-const { router: controllerIndex } = config.INDEX_CONTROLLER;
-const { router: stylesheets } = config.STYLESHEETS_CONTROLLER;
-const { router: scripts } = config.SCRIPTS_CONTROLLER;
-const { router: viewsController } = config.VIEWS_CONTROLLER;
-const { router: usersController } = config.USERS_CONTROLLER;
-const { router: clientController } = config.CLIENT_CONTROLLER;
-const { router: adminController } = config.ADMIN_CONTROLLER;
-const { router: testsController } = config.TESTS_CONTROLLER;
-const { router: hangTestController } = config.HANG_TEST_CONTROLLER;
-const { router: cookieTestController } = config.COOKIE_TEST_CONTROLLER;
-const { router: sessionTestController } = config.SESSION_TEST_CONTROLLER;
-const { router: miscTestsController } = config.MISC_TESTS_CONTROLLER;
-const { router: failTestsController } = config.FAIL_TESTS_CONTROLLER;
-const { router: bundleController } = config.BUNDLE_CONTROLLER;
+const { router: controllerRoot } = config.ROOT_CONTROLLER;
 const { createModel: usersModels } = config.USERSMODEL;
 const { createModel: testsModels } = config.TESTSMODEL;
 
@@ -132,20 +117,7 @@ function load() {
     [key: string]: express.Router;
   }
   const controllers: IRouters = {};
-  controllers.index = controllerIndex;
-  controllers.stylesheets = stylesheets;
-  controllers.scripts = scripts;
-  controllers.views = viewsController;
-  controllers.users = usersController;
-  controllers.client = clientController;
-  controllers.admin = adminController;
-  controllers.tests = testsController;
-  controllers.hang = hangTestController;
-  controllers.cookie = cookieTestController;
-  controllers.session = sessionTestController;
-  controllers.misc = miscTestsController;
-  controllers.fail = failTestsController;
-  controllers.bundle = bundleController;
+  controllers.root = controllerRoot;
 
   /* handlers used by controllers */
   /**
@@ -156,13 +128,8 @@ function load() {
     [key: string]: () => {};
   }
   const handles: IHandlers = {};
-  handles.returnFile = handlers.returnFile;
-  handles.returnPug = handlers.returnPug;
-  handles.setVar = handlers.setVar;
-  handles.raiseEvent = handlers.raiseEvent;
-  handles.getUrlPathFile = handlers.getUrlPathFile;
-  handles.authenticate = handlers.authenticate;
   /* server error handler */
+  handles.returnFile = handlers.returnFile;
   handles.errorHandler = errorHandler;
 
   /**

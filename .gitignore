@@ -1,6 +1,6 @@
 
-# ignore all files and directories in .nyc_output/
-/.nyc_output
+# ignore all files and directories in server/.nyc_output/
+server/.nyc_output/
 # ignore all files and directories in all 'coverage/' diectories
 coverage/
 # ignore all files and directories in all 'logs/' directories
@@ -11,9 +11,6 @@ node_modules/
 public/
 # ignore all files and directories in all dist/ directories
 dist/
-# ignore all files and directories in the uploads/ directory
-/uploads/
-# alllow configuration files as no keys therein
 # NB: Always ignore config files with credentials etc
 # ignore certs files with secrets */
 certs/

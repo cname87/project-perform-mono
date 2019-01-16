@@ -101,9 +101,9 @@
                 "source-map-support/register",
             ],
             "args": [
-                "${workspaceFolder}/dist/index.js",
+                "${workspaceFolder}/server/dist/index.js",
             ],
-            "outFiles": [ "${workspaceFolder}/dist/**/*.js" ],
+            "outFiles": [ "${workspaceFolder}/server/dist/**/*.js" ],
             "env": {
                 "NODE_ENV": "development",
                 "DEBUG": "MM* PP* SY*",

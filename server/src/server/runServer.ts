@@ -159,12 +159,12 @@ export async function runServer(app: express.Application) {
   );
 
   /* present the index page for a request to / */
-  app.use('/', controllers.index);
+  app.use('/', controllers.root);
 
   /* handle all errors passed down via the error handling functionality */
   app.use(handles.errorHandler.notFound);
   app.use(handles.errorHandler.assignCode);
   app.use(handles.errorHandler.logError);
-  app.use(handles.errorHandler.sendErrorResponse);
+  // app.use(handles.errorHandler.sendErrorResponse);
   app.use(handles.errorHandler.throwError);
 }
