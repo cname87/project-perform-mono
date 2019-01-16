@@ -21,7 +21,7 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import favicon from 'serve-favicon';
+// import favicon from 'serve-favicon';
 import urlParser from 'url';
 import util from 'util';
 import uuidv1 from 'uuid/v1';
@@ -67,8 +67,8 @@ export async function runServer(app: express.Application) {
   }
   app.use(assignId);
 
-  /* serve favicon file (before logger) */
-  app.use(favicon(config.FAVICON));
+  // /* serve favicon file (before logger) */
+  // app.use(favicon(config.FAVICON));
 
   /* log simple format to default stdout */
   app.use(serverLogger.logConsole);
@@ -141,22 +141,12 @@ export async function runServer(app: express.Application) {
     next();
   });
 
-  /* set up a static server */
-  /* maxAge determines how long the client caches the file */
-  /* setHeaders tells the browser to prompt to download any file
-   * that is in the configured download directory */
+  // serve angular front end files from root path
   const staticServerOptions = {
     maxAge: '1d',
-    setHeaders: (res: any, path: string) => {
-      if (path.indexOf(config.STATIC_SERVER_DOWNLOAD_PATH) === 0) {
-        res.attachment(path);
-      }
-    },
+    redirect: false,
   };
-  app.use(
-    config.STATIC_SERVER_URL,
-    express.static(config.STATIC_SERVER_PATH, staticServerOptions),
-  );
+  app.use('/', express.static(config.APP_PATH, staticServerOptions));
 
   /* present the index page for a request to / */
   app.use('/', controllers.root);

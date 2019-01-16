@@ -15,24 +15,8 @@ import path from 'path';
 
 export const router = express.Router();
 
-/* get the index.html page */
-router.get('/', (req, res, next) => {
-  debug(modulename + ": running '/' handler");
-
-  const pathFile = 'index.html';
-
-  debug(modulename + ": getting '" + pathFile + "' file");
-  res.locals.filepath = path.join(req.app.locals.config.APP_PATH, pathFile);
-  req.app.locals.handles.returnFile(req, res, next);
-});
-
-/* get the file referenced in req.path from the configured directory */
-router.get('*', (req, res, next) => {
-  debug(modulename + ": running '*' handler");
-
-  const pathFile = req.path;
-
-  debug(modulename + ": getting '" + pathFile + "' file");
-  res.locals.filepath = path.join(req.app.locals.config.APP_PATH, pathFile);
-  req.app.locals.handles.returnFile(req, res, next);
+/* send anything not found on static server to angular app to enable refreshing of internal pages */
+router.get('*', (req, res, _next) => {
+  const filepath = path.join(req.app.locals.config.APP_PATH, 'index.html');
+  res.sendFile(filepath);
 });
