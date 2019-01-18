@@ -86,7 +86,7 @@ function makeLogger(config: any): winston.Logger {
     }
   }
 
-  const myFormat = printf((info) => {
+  const myFormat = printf(info => {
     return (
       `${info.timestamp} [${info.label}] ` + `${info.level}: ${info.message}`
     );

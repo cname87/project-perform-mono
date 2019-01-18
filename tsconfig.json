@@ -2,8 +2,9 @@
   "include": [
   ],
   "exclude": [
-    "./**/*.*"
+    "./**/*.*" // overridden in tsconfig in subdirectories
   ],
+  "compileOnSave": false,
   "compilerOptions": {
     "outDir": "./dist/top",
     "target": "esnext",
@@ -12,14 +13,6 @@
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,
-    // "baseUrl": ".",
-    // "paths": {
-    //     "*": [
-    //         "./node_modules/*",
-    //     ]
-    // },
-    "checkJs": false,
-    "allowJs": true,
     "alwaysStrict": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
@@ -32,6 +25,8 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
+    "importHelpers": true,
+    "baseUrl": "./",
     "lib": [
         "esnext",
         "dom"

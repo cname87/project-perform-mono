@@ -19,7 +19,6 @@ import * as DUMPERROR from '../../utils/dumperror';
 import * as DATABASE from './database';
 import * as EXT_DB_SERVICE from './extDatabaseService';
 
-
 interface IConfig {
   readonly LOGGER: {
     Logger: typeof LOGGER.Logger;
@@ -85,5 +84,4 @@ export const config: IConfig = {
   DB_KEY: '../certs/nodeKeyAndCert.pem',
   DB_CERT: '../certs/nodeKeyAndCert.pem',
   SSL_VALIDATE: true,
-
 };

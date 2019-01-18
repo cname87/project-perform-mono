@@ -95,9 +95,9 @@ process.once('unhandledRejection', unhandledRejection);
 
 /**
  * Called to set up a database connection.
- * @param {{[x: string]: Object}} objects
+ * @param  objects
  * The database connection is returned in objects['dbConnection'].
- * @returns {Promise}
+ * @returns
  * Returns a promise.
  * If the connection is successful, then objects['dbConnection']
  * will contain the database connection instance.
@@ -111,7 +111,6 @@ function load() {
   /* generate the controllers object */
   /**
    * @description The controllers - routers that direct incoming urls.
-   * @type {Object.<string,  express.Router>}
    */
   interface IRouters {
     [key: string]: express.Router;
@@ -122,7 +121,6 @@ function load() {
   /* handlers used by controllers */
   /**
    * @description The handlers - functions that take actions.
-   * @type {Object.<string, Function>}
    */
   interface IHandlers {
     [key: string]: () => {};
@@ -139,7 +137,6 @@ function load() {
    * (iii) objects/variables needed across requests.
    * app.locals is passed to run the application and is also passed on
    * to downstream functions.
-   * @type {Object.<string, Object>}
    */
 
   const appLocals: IObjects = {

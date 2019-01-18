@@ -7,9 +7,9 @@
  * The user account running node must have permission
  * to start and stop the Windows service.
  * It provides the following functions:
- * @function startDB
+ * startDB
  * Attempts to start a MongoDB database.
- * @function shutdownDB
+ * shutdownDB
  * Attempts to stop a MongoDB database.
  */
 

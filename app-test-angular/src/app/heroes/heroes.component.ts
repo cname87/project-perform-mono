@@ -6,7 +6,7 @@ import { HeroService } from '../hero.service';
 @Component({
   selector: 'app-heroes',
   templateUrl: './heroes.component.html',
-  styleUrls: ['./heroes.component.css']
+  styleUrls: ['./heroes.component.css'],
 })
 export class HeroesComponent implements OnInit {
   heroes: Hero[];
@@ -26,6 +26,7 @@ export class HeroesComponent implements OnInit {
     if (!name) {
       return;
     }
+    // tslint:disable-next-line: no-object-literal-type-assertion
     this.heroService.addHero({ name } as Hero).subscribe(hero => {
       this.heroes.push(hero);
     });

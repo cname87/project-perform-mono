@@ -47,13 +47,11 @@ export class Database {
   public closeStore: (...params: any) => any;
   public createSession: (...params: any) => any;
 
-
   constructor(
     readonly config: IConfig,
     readonly logger: winston.Logger,
     readonly dumpError: any,
   ) {
-
     this.connectToDB = connectToDB;
     this.createModel = createModel;
     this.createStore = createStore;
@@ -67,7 +65,6 @@ export class Database {
     })();
   }
 }
-
 
 /**
  * Reads the MongoDB url connection string from the configuration file.

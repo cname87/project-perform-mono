@@ -165,8 +165,8 @@ function setVar(req: any, res: any) {
  * A response is sent with a status of 200.
  * Note: There is no checking of the request body data.
  * Note: Does not call next() so acts as a function.
- * @param {*} req http request.
- * @param {*} res http response.
+ * @param req http request.
+ * @param res http response.
  */
 
 function raiseEvent(req: any, _res: any) {

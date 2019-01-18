@@ -8,9 +8,8 @@ describe('HeroSearchComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ HeroSearchComponent ]
-    })
-    .compileComponents();
+      declarations: [HeroSearchComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

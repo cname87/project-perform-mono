@@ -3,11 +3,11 @@
 /**
  * This module holds the http(s) server operations.
  * It provides the following functions:
- * @function setupServer
+ * setupServer
  * Creates a http/https server with supplied options.
- * @function listenServer
+ * listenServer
  * Sets the supplied server listening on a supplied port.
- * @function stopServer
+ * stopServer
  * Stops the supplied server.
  */
 
@@ -54,11 +54,11 @@ export class Server {
 /**
  * @description
  * Sets up a configured http(s) server.
- * @param {object} serverType
+ * @param serverType
  * http or https object.
- * @param {object} serverOptions
+ * @param serverOptions
  * An object holding server configuration options.
- * @param {object} app
+ * @param app
  * Express app object.
  * @returns
  * It returns a http(s) server object.
@@ -95,12 +95,12 @@ function setupServer(
  * Will prompt a supplied number of times (default 3)
  * at a supplied interval (default 5s) if the supplied
  * port is occupied.
- * @param {number} serverPort
+ * @param serverPort
  * The port that the server will listen on.
- * @param {number} listenTries @default 3
+ * listenTries 3
  * The total number of listen tries made.
  * Retries are only made if the port is occupied.
- * @param {number} listenTimeout @default 5
+ * listenTimeout 5
  * The time in seconds allowed between each retry.
  * @returns
  * Returns a promise.
@@ -251,12 +251,12 @@ async function stopServer(this: any) {
 /**
  * Called to pass in configuration data.
  * Also optionally passes in a logger and an error logging function.
- * @param {string} name
+ * @param name
  * can be used to identify the server, e.g. 'http' or 'https'
- * @param {*} logger
+ * @param logger
  * A winston logger supporting logger.error('text').
  * Defaults to Console, i.e. console.error replaces logger.error.
- * @param {function} dumpError
+ * @param dumpError
  * A utility that takes an Error object as argument and logs it.
  * Defaults to console.error.
  */

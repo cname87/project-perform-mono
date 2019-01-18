@@ -10,7 +10,7 @@ debug(`Starting ${modulename}`);
 import { config } from './.config';
 
 /* internal module dependencies */
-const { Database }= config.DATABASE;
+const { Database } = config.DATABASE;
 
 /* Create the single instances of the general logger & dumpError
  * utilities, and the server logger middleware.
@@ -21,7 +21,6 @@ const { Logger } = config.LOGGER;
 const logger = Logger.getInstance(config);
 const { DumpError } = config.DUMPERROR;
 const dumpError = DumpError.getInstance(logger);
-
 
 // connect to the database
 async function runDatabaseApp() {
@@ -37,7 +36,6 @@ async function runDatabaseApp() {
     /* deal with error in caller */
     return err;
   }
-
 }
 
 runDatabaseApp();
