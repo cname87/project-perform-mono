@@ -99,13 +99,14 @@ export const config: IConfig = {
 
   APP_PATH: path.join(
     appRoot,
+    '..',
     'app-test-angular',
     'dist',
     'angular-tour-of-heroes',
   ),
 
   /***********************************************************************/
-  /* HTTP/S server parameters                                            */
+  /* HTTP/S server parameters         F                                   */
   /***********************************************************************/
 
   // port to be listened on
@@ -113,8 +114,8 @@ export const config: IConfig = {
   // true for https with http on port 80 being redirected
   HTTPS_ON: true,
   // https credentials
-  HTTPS_KEY: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
-  HTTPS_CERT: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
+  HTTPS_KEY: path.join(appRoot, 'certs', 'nodeKeyAndCert.pem'),
+  HTTPS_CERT: path.join(appRoot, 'certs', 'nodeKeyAndCert.pem'),
   // cookieparser key
   COOKIE_KEY: 'cookie_key',
   // sets url path that points to the static server
@@ -228,9 +229,9 @@ export const config: IConfig = {
   AUTH_SOURCE: 'admin',
   SSL_ON: 'true',
   /* mongoDB connection options object */
-  DB_CA: path.join(appRoot, 'server', 'certs', 'rootCA.crt'),
-  DB_KEY: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
-  DB_CERT: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
+  DB_CA: path.join(appRoot, 'certs', 'rootCA.crt'),
+  DB_KEY: path.join(appRoot, 'certs', 'nodeKeyAndCert.pem'),
+  DB_CERT: path.join(appRoot, 'certs', 'nodeKeyAndCert.pem'),
   SSL_VALIDATE: true,
   // session store key
   SESSION_KEY: 'session secret key',
@@ -265,7 +266,12 @@ export const config: IConfig = {
   /* The logs directory referenced in the various log files
    * must exist. */
   // forever log when run as a daemon
-  MONITOR_FOREVER_LOG: path.join(appRoot, 'logs', 'monitorForever.log'),
+  MONITOR_FOREVER_LOG: path.join(
+    appRoot,
+    'server',
+    'logs',
+    'monitorForever.log',
+  ),
   // child stdout log
   MONITOR_OUT_LOG: path.join(appRoot, 'logs', 'monitorOut.log'),
   // child stderr log

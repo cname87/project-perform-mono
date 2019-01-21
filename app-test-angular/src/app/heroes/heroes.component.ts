@@ -18,7 +18,7 @@ export class HeroesComponent implements OnInit {
   }
 
   getHeroes(): void {
-    this.heroService.getHeroes().subscribe(heroes => (this.heroes = heroes));
+    this.heroService.getHeroes().subscribe((heroes) => (this.heroes = heroes));
   }
 
   add(name: string): void {
@@ -27,13 +27,13 @@ export class HeroesComponent implements OnInit {
       return;
     }
     // tslint:disable-next-line: no-object-literal-type-assertion
-    this.heroService.addHero({ name } as Hero).subscribe(hero => {
+    this.heroService.addHero({ name } as Hero).subscribe((hero) => {
       this.heroes.push(hero);
     });
   }
 
   delete(hero: Hero): void {
-    this.heroes = this.heroes.filter(h => h !== hero);
+    this.heroes = this.heroes.filter((h) => h !== hero);
     this.heroService.deleteHero(hero).subscribe();
   }
 }

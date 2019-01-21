@@ -103,7 +103,7 @@ describe('monitor', function() {
         spyDebug = sinon.spy(monitor, 'debug');
         spyLoggerError = sinon.spy(monitor.logger, 'error');
         spyDumpError = sinon.spy(monitor, 'dumpError');
-    
+
         /* spy on console.error (as node may send warnings there) */
         spyConsoleError = sinon.spy(console, 'error');
 

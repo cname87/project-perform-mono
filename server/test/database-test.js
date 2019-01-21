@@ -107,7 +107,9 @@ describe('Database connection', function() {
 
                     } else {
 
-                        return mongoose.createConnection(url, connectOptions);
+                        const temp =  mongoose.createConnection(url, connectOptions);
+                        console.log(temp);
+                        return temp;
 
                     }
 
@@ -126,6 +128,7 @@ describe('Database connection', function() {
             },
 
         }).database;
+
         database.configDatabase(config);
 
         /* connect and test */

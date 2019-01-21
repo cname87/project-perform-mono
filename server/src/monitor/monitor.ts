@@ -225,7 +225,7 @@ async function start(): Promise<void> {
   });
 
   /* only watch restarts emit this event */
-  child.on('watch:restart', info => {
+  child.on('watch:restart', (info) => {
     debug(
       modulename +
         ': forever restarting script because ' +

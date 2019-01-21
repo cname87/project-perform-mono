@@ -4,12 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         // Mocha server
         {
             "type": "node",
             "request": "launch",
             "name": "Mocha Server Tests",
-            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "program": "${workspaceFolder}/server/node_modules/mocha/bin/_mocha",
             "args": [
               "--recursive",
               "--timeout", "0",
@@ -18,7 +19,7 @@
               "--globals", "__core-js_shared__, argsIn",
               // argsIn: windows-service-controller has an undefined variable.  (I fixed in my files).
               // __core-js_shared__: When browser opens a pug page during client tests.
-              "${workspaceFolder}/test/**/!(client)", /* tests files in test/ but not in client/** but does not test /test/dir/file */
+              "${workspaceFolder}/server/test/**/!(client-test).js", /* tests files in test/ but not in test/client/ */
             ],
             "env": {
                 "NODE_ENV": "development",
@@ -41,9 +42,12 @@
             "type": "node",
             "request": "launch",
             "name": "Mocha Server with Istanbul Tests",
-            "program": "${workspaceFolder}/node_modules/nyc/bin/nyc",
+            "program": "${workspaceFolder}/server/node_modules/nyc/bin/nyc",
             "args": [
-                "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+              "--reporter=text",
+              "--reporter=html",
+              "--report-dir", "./server/coverage",
+              "${workspaceFolder}/server/node_modules/mocha/bin/_mocha",
                 "--recursive",
                 "--timeout", "0",
                 "--colors",
@@ -51,7 +55,7 @@
                 "--globals", "__core-js_shared__, argsIn",
                 // argsIn: windows-service-controller has an undefined variable.  (I fixed in my files).
                 // __core-js_shared__: When browser opens a pug page during client tests.
-                "${workspaceFolder}/test/**/*.js",
+                "${workspaceFolder}/server/test/**/!(client-test).js",
             ],
             "env": {
                 "NODE_ENV": "development",
@@ -69,11 +73,11 @@
             "autoAttachChildProcesses": true,
             "preLaunchTask": "Taskkill node.exe", // kill any previously failed node runs
         },
-        // Current file
+        // Current .js file
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch the currently opened file",
+            "name": "Launch the currently opened .js file",
             "program": "${file}",
             "env": {
                 "NODE_ENV": "development",
@@ -90,6 +94,41 @@
             ],
             "autoAttachChildProcesses": true,
         },
+        // Current .ts file
+        {
+          "type": "node",
+          "request": "launch",
+          "name": "Launch the currently opened .ts file",
+          "runtimeExecutable": "node",
+          "runtimeArgs": [
+            "--require", "ts-node/register",
+            "--require", "source-map-support/register",
+          ],
+          "args": [
+              "${file}",
+          ],
+          "env": {
+            "NODE_ENV": "development",
+            "DEBUG": "MM* PP* SY*",
+            "DEBUG_COLORS": "true",
+            // You have to use environment variables to set ts-node options */
+            "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json",
+            "TS_NODE_FILES": "true",  // include to avoid compile errors
+            // "TS_NODE_IGNORE_DIAGNOSTICS": "true",  // doesn't appear to have any effect
+            // "TS_NODE_SKIP_IGNORE": "true",
+              // "TS_NODE_PRETTY": "true",
+          },
+          "outputCapture": "std",
+          "console": "integratedTerminal",
+          "internalConsoleOptions": "neverOpen",
+          "skipFiles": [
+              "${workspaceFolder}/node_modules/**/*.js",
+              "<node_internals>/**/*.js",
+              "<node_internals>/**/*",
+          ],
+          "autoAttachChildProcesses": true,
+          "sourceMaps": true,
+        },
         // Index.js
         {
             "type": "node",
@@ -97,13 +136,10 @@
             "name": "Launch index.js",
             "runtimeExecutable": "node",
             "runtimeArgs": [
-                "--require",
-                "source-map-support/register",
             ],
             "args": [
                 "${workspaceFolder}/server/dist/index.js",
             ],
-            "outFiles": [ "${workspaceFolder}/server/dist/**/*.js" ],
             "env": {
                 "NODE_ENV": "development",
                 "DEBUG": "MM* PP* SY*",
@@ -118,7 +154,6 @@
                 "<node_internals>/**/*",
             ],
             "autoAttachChildProcesses": true,
-            "sourceMaps": true,
         },
         // Monitor.js
         {
@@ -127,13 +162,10 @@
             "name": "Launch monitor.js",
             "runtimeExecutable": "node",
             "runtimeArgs": [
-                "--require",
-                "source-map-support/register",
             ],
             "args": [
-                "${workspaceFolder}/dist/monitor/monitor.js"
+                "${workspaceFolder}/server/dist/monitor/monitor.js"
             ],
-            "outFiles": [ "${workspaceFolder}/dist/**/*.js" ],
             "env": {
                 "NODE_ENV": "development",
                 "DEBUG":  "MM* PP* SY*",
@@ -148,7 +180,6 @@
                 "<node_internals>/**/*",
             ],
             "autoAttachChildProcesses": true,
-            "sourceMaps": true,
         },
         // localhost
         {
@@ -179,7 +210,7 @@
           "type": "node",
           "request": "launch",
           "name": "Mocha Client Tests",
-          "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+          "program": "${workspaceFolder}/server/node_modules/mocha/bin/_mocha",
           "args": [
                 // mocha options
               "--recursive",
@@ -189,7 +220,7 @@
               "--globals", "__core-js_shared__, argsIn",
               // argsIn: windows-service-controller has an undefined variable.  (I fixed in my files).
               // __core-js_shared__: When browser opens a pug page during client tests.
-              "${workspaceFolder}/test/client/**/*.js",
+              "${workspaceFolder}/server/test/client/**/*.js",
             ],
             "env": {
                 "NODE_ENV": "development",
@@ -214,9 +245,9 @@
           "type": "node",
           "request": "launch",
           "name": "Mocha Client Tests with Istanbul",
-          "program": "${workspaceFolder}/node_modules/nyc/bin/nyc",
+          "program": "${workspaceFolder}/server/node_modules/nyc/bin/nyc",
           "args": [
-              "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+              "${workspaceFolder}/server/node_modules/mocha/bin/_mocha",
               // mocha options
               "--timeout", "0",
               "--colors",
@@ -274,7 +305,7 @@
             "type": "node",
             "request": "launch",
             "name": "NPM index.js",
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/server",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script", "index:debug", "--silent"
@@ -297,20 +328,5 @@
             "autoAttachChildProcesses": true,
             "sourceMaps": true,
         },
-    ],
-    "compounds": [
-        // NOT IN USE: Server client-fired and browser-side tests together
-        {
-          /* Not needed or usable once client-fired test file calls Chrome */
-          /* This runs the server-side client test (which expects a client browser to fire the tests,
-            * and then calls Chrome to run the clent-side tests.
-            * A task in the Moncha Browser Tests configuraton checks the server is up before running the
-            * client-side browser tests */
-          "name": "NOT IN USE: Mocha Client and Browser",
-          "configurations": [
-              "Mocha Client Tests",
-              "Mocha Browser Tests"
-            ]
-        }
-    ],
+    ]
 }

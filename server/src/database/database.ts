@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * This module returns a database object with methods/API to carry
  * out basic MongoDB database operations.
@@ -180,8 +178,8 @@ async function connectToDB(this: any, tryStartDB = true) {
       }
 
       /* try again with flag set to not try start the database */
-      await this.connectToDB(false);
-      return;
+      const dbConnection = await this.connectToDB(false);
+      return dbConnection;
     } else {
       this.logger.error(modulename + ': database connection error');
       this.dumpError(err);

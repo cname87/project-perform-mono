@@ -1,6 +1,6 @@
 
-# ignore all files and directories in server/.nyc_output/
-server/.nyc_output/
+# ignore all files and directories in .nyc_output
+.nyc_output/
 # ignore all files and directories in all 'coverage/' diectories
 coverage/
 # ignore all files and directories in all 'logs/' directories
@@ -11,16 +11,10 @@ node_modules/
 public/
 # ignore all files and directories in all dist/ directories
 dist/
-# NB: Always ignore config files with credentials etc
-# ignore certs files with secrets */
+# ignore all files and directories in all dist/ directories
 certs/
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# NB: Always ignore config files with credentials etc
 
 # If files are not being ignored then they may have been previously added
 # try git rm --cached <filename>, or git rm -r --cached <dirname> to get git

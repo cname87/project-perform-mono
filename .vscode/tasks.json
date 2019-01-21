@@ -1,95 +1,64 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Taskkill node.exe",
-            "type": "shell",
-            "windows": {
-                "command": ".\\utils\\taskkillNode.bat"
-            },
-            "group": "test",
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Shut MongoDB service",
-            "type": "shell",
-            "windows": {
-                "command": ".\\utils\\mongoServiceShutdown.bat"
-            },
-            "group": "test",
-            "presentation": {
-                "reveal": "never",
-                "panel": "new"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Start MongoDB service",
-            "type": "shell",
-            "windows": {
-                "command": ".\\utils\\mongoServiceStart.bat"
-            },
-            "group": "test",
-            "presentation": {
-                "reveal": "never",
-                "panel": "new"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Delay.js",
-            "type": "process",
-            "command": "node",
-            "args": [
-                "${workspaceFolder}/utils/isServerUp.js"
-            ],
-            "options": {
-                "env": {
-                    "NODE_ENV": "development",
-                    "DEBUG": "MM* PP* SY*",
-                    "DEBUG_COLORS": "true"
-                }
-            },
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "npm build",
-            "type": "npm",
-            "script": "build",
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
-            "type": "typescript",
-            "tsconfig": "tsconfig.json",
-            "option": "watch",
-            "problemMatcher": [
-                "$tsc-watch"
-            ]
-        },
-        {
-            "type": "npm",
-            "script": "copy:client",
-            "problemMatcher": []
-        },
-        {
-            "type": "npm",
-            "script": "build:client",
-            "problemMatcher": []
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Taskkill node.exe",
+      "type": "shell",
+      "windows": {
+        "command": "${workspaceFolder}/server/utils-build/taskkillNode.bat"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Is Server Up?",
+      "type": "process",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/server/utils-build/isServerUp.js"
+      ],
+      "options": {
+        "env": {
+          "NODE_ENV": "development",
+          "DEBUG": "MM* PP* SY*",
+          "DEBUG_COLORS": "true"
         }
-    ]
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build server",
+      "type": "shell"
+      ,
+      "command": "npm",
+      "args": [
+        "run",
+        "--prefix",
+        "${workspaceRoot}\\server",
+        "build"
+      ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "options": {
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+  ]
 }
