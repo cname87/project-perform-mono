@@ -1,5 +1,3 @@
-'use strict';
-
 /*
  * This module creates a test database model.
  */

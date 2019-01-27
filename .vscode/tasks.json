@@ -39,8 +39,7 @@
     },
     {
       "label": "Build server",
-      "type": "shell"
-      ,
+      "type": "shell",
       "command": "npm",
       "args": [
         "run",
@@ -53,12 +52,33 @@
         "kind": "build",
         "isDefault": true
       },
-      "options": {
-      },
+      "options": {},
       "presentation": {
         "reveal": "always",
         "panel": "shared"
       }
     },
+    {
+      "label": "Compile server",
+      "type": "npm",
+      "script": "compile",
+      "path": "server/",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Run tsc",
+      "type": "npm",
+      "script": "tsc",
+      "path": "server/",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
   ]
 }

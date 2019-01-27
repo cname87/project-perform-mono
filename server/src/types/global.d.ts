@@ -5,13 +5,14 @@ declare module 'tsscmp';
 declare module 'windows-service-controller';
 declare module 'flatted/cjs';
 
-/* added to allow a custom event.once() be used in index.js */
+/* added to allow a custom event type be used */
 declare namespace NodeJS {
   interface Process {
     once(
       event: 'thrownException',
       listener: (err: Error) => Promise<void>,
     ): this;
+    emit(event: 'thrownException', err: Error): boolean;
   }
 }
 

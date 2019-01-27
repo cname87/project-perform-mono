@@ -56,7 +56,6 @@ describe('Database connection', function() {
 
             return function debug(message) {
 
-                // @ts-ignore
                 debug.enabled = debugEnabled;
                 require('debug')(prefix)(message);
 

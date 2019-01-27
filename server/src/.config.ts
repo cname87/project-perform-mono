@@ -34,6 +34,9 @@ import * as EXT_DB_SERVICE from './database/extDatabaseService';
 /* list of controllers */
 import * as ROOT_CONTROLLER from './controllers/root';
 
+/* import fail test controller */
+import * as FAIL_CONTROLLER from './controllers/fail';
+
 /* list of models */
 import * as USERSMODEL from './models/users';
 import * as TESTSMODEL from './models/tests';
@@ -72,6 +75,7 @@ export const config: IConfig = {
   DATABASE,
   EXT_DB_SERVICE,
   ROOT_CONTROLLER,
+  FAIL_CONTROLLER,
   USERSMODEL,
   TESTSMODEL,
 
@@ -86,7 +90,7 @@ export const config: IConfig = {
 
   /* ok to start server if database fails to start? */
   IS_NO_DB_OK: false,
-  /* sets the root for all file paths */
+  /* sets the root for all file paths - used to get files */
   ROOT_PATH: appRoot,
 
   /***********************************************************************/
@@ -118,14 +122,6 @@ export const config: IConfig = {
   HTTPS_CERT: path.join(appRoot, 'certs', 'nodeKeyAndCert.pem'),
   // cookieparser key
   COOKIE_KEY: 'cookie_key',
-  // sets url path that points to the static server
-  STATIC_SERVER_URL: '/public',
-  // path to static server directory
-  STATIC_SERVER_PATH: path.join(appRoot, 'dist', 'public'),
-  // path to static server download directory
-  get STATIC_SERVER_DOWNLOAD_PATH() {
-    return path.join(this.STATIC_SERVER_PATH, 'download');
-  },
   /* number of times a server will attempt to listen on an occupied port
    * a number from 0 to 10 */
   SVR_LISTEN_TRIES: 3,
@@ -145,33 +141,11 @@ export const config: IConfig = {
   // 'development' or 'production'
   ENV: 'development',
   // path to the views directory
-  PATH_VIEWS: path.join(appRoot, 'client', 'dist', 'views'),
-  // file name of index view template
-  INDEX_VIEW: 'index.pug',
-  // file name of the test template file
-  BUNDLE_TEST_VIEW: 'appTest1.pug',
-  // file name of the user view template
-  USER_VIEW: 'user.pug',
-  // path to the stylesheets directory
-  PATH_STYLESHEETS: path.join(appRoot, 'client', 'dist', 'stylesheets'),
-  // path to the scripts directory
-  PATH_SCRIPTS: path.join(appRoot, 'client', 'dist', 'scripts'),
-  // path to run the server tests
-  RUN_CLIENT_TESTS: path.join(
-    appRoot,
-    'client',
-    'test',
-    'run',
-    'loadmocha.html',
-  ),
+  PATH_VIEWS: path.join(appRoot, 'src', 'views'),
+  // path to static server for server tests
+  STATIC_TEST_PATH: path.join(appRoot, 'test', 'client', 'browser'),
   // path to favicon
   FAVICON: path.join(appRoot, 'app-test-angular', 'src', 'favicon.ico'),
-  // path to uploads directory
-  UPLOADS: path.join(appRoot, 'uploads'),
-  // response time out in ms used by timeout() in production
-  HANG_CLEAR_PROD: 5000,
-  // response time out in ms used by timeout() in development
-  HANG_CLEAR_DEV: 5000,
 
   /***********************************************************************/
   /* Winston logger parameters                                           */
@@ -262,7 +236,9 @@ export const config: IConfig = {
   // directory to be watched by forever
   WATCH_DIR: appRoot,
   // true for forever to start node executable in debug mode
-  IS_MONITOR_DEBUG: true,
+  get IS_MONITOR_DEBUG() {
+    return this.ENV === 'development' ? true : false;
+  },
   /* The logs directory referenced in the various log files
    * must exist. */
   // forever log when run as a daemon

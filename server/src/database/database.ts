@@ -73,7 +73,7 @@ export const database = new Database();
  * Reads the MongoDB url connection string from the configuration file.
  */
 
-function getMongoUrl(config: any) {
+function getMongoUrl(isCloud: any, config: any) {
   /* mongoDB server connection url and connect options */
   const user = encodeURIComponent(config.DB_USER);
   const password = encodeURIComponent(config.DB_PASSWORD);
@@ -83,9 +83,9 @@ function getMongoUrl(config: any) {
   const authSource = config.AUTH_SOURCE;
   const sslOn = config.SSL_ON;
   const db = config.DB_NAME;
-  return format(
+
+  const local = format(
     'mongodb://%s:%s@%s:%s/%s' + '?authMechanism=%s&authSource=%s&ssl=%s',
-    // eslint-disable-next-line indent
     user,
     password,
     host,
@@ -95,20 +95,24 @@ function getMongoUrl(config: any) {
     authSource,
     sslOn,
   );
+
+  const cloud =
+    '***REMOVED***/test?retryWrites=true';
+
+  return isCloud ? cloud : local;
 }
 
 /**
  * Reads the MongoDB connection options object from the configuration file.
  */
 
-function getConnectionOptions(config: any) {
+function getConnectionOptions(isCloud: any, config: any) {
   /* read the certificate authority */
   const ca = [fs.readFileSync(config.DB_CA)];
   /* read the private key and public cert (both stored in the same file) */
   const key = [fs.readFileSync(config.DB_KEY)];
   const cert = key;
-  /** @type {Object.<string, Object>} */
-  return {
+  const local = {
     // if not connected, return errors immediately
     bufferMaxEntries: 0,
     sslCA: ca,
@@ -118,6 +122,9 @@ function getConnectionOptions(config: any) {
     // prevents mongoose deprecation warning
     useNewUrlParser: true,
   };
+  const cloud = {};
+
+  return isCloud ? cloud : local;
 }
 
 /**
@@ -138,12 +145,12 @@ function getConnectionOptions(config: any) {
  * Default is true.
  */
 
-async function connectToDB(this: any, tryStartDB = true) {
+async function connectToDB(this: any, tryStartDB = false) {
   debug(modulename + ': running connectToDB');
 
   /* get base connection url and options */
-  const url = getMongoUrl(this.config);
-  const connectOptions: any = getConnectionOptions(this.config);
+  const url = getMongoUrl(true, this.config);
+  const connectOptions: any = getConnectionOptions(true, this.config);
 
   try {
     const dbConnection = await mongoose.createConnection(url, connectOptions);
@@ -250,8 +257,8 @@ async function createStore(this: any) {
   const localConfig = this.config;
 
   /* get base connection url and options */
-  const url = getMongoUrl(this.config);
-  const connectOptions = getConnectionOptions(this.config);
+  const url = getMongoUrl(true, this.config);
+  const connectOptions = getConnectionOptions(true, this.config);
   let store: any = {};
 
   try {

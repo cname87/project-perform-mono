@@ -12,7 +12,7 @@ describe('monitor', function() {
     const { config } = require('../dist/.config');
 
     const util = require('util');
-    const sleep = util.promisify(setTimeout);
+    const setImmediatePromise = util.promisify(setImmediate);
 
     const chai = require('chai');
     const sinon = require('sinon');
@@ -25,12 +25,12 @@ describe('monitor', function() {
     });
 
     /* variables used throughout */
-    let monitor = {};
-    let monitorConfig = {};
-    let start = function() {};
-    let exit = function(signal) {};
-    let uncaughtException = function(err) {};
-    let unhandledRejection = function(reason, promise) {};
+    let monitor;
+    let monitorConfig;
+    let start;
+    let exit;
+    let uncaughtException;
+    let unhandledRejection;
     let spyDebug;
     let spyLoggerError;
     let spyDumpError;
@@ -70,7 +70,9 @@ describe('monitor', function() {
             const response = await checkMonitorDebugOnce(spyDebug, spyDebugString, checkDebugCount);
             /* true if spyDebugString was last seen by spyDebug */
             if (response === true) {
-                return true;
+              /* allow an event cycle */
+              await setImmediatePromise();
+              return true;
             }
 
         }
@@ -93,11 +95,17 @@ describe('monitor', function() {
         monitor = require(monitorPath);
 
         /* capture monitor exports for all tests */
-        monitorConfig = monitor.config;
         start = monitor.testStart;
         exit = monitor.testExit;
         uncaughtException = monitor.testUncaughtException;
         unhandledRejection = monitor.testUnhandledRejection;
+        /* create a copy of config that you can edit */
+        monitorConfig = {};
+        for (let key in monitor.config) {
+          if (monitor.config.hasOwnProperty(key)) {
+            monitorConfig[key] = monitor.config[key];
+          }
+        };
 
         /* spy on monitor functions */
         spyDebug = sinon.spy(monitor, 'debug');
@@ -200,7 +208,9 @@ describe('monitor', function() {
         });
 
         /* allow close and restart */
-        spyDebugString = "\\monitor.js: Monitor received confirmation: Server is running";
+        const maxRetries = monitorConfig.MAX_STARTS - 1;
+        /* NOTE: Check for restart script not server up script to avoid timing errors */
+        spyDebugString = `\\monitor.js: forever restarting script - restart number: 1 of ${maxRetries}`;
         await checkMonitorDebug(spyDebug, spyDebugString);
         child = monitor.child;
 
@@ -210,12 +220,7 @@ describe('monitor', function() {
         expect(spyLoggerError.called).to.be.true;
         expect(spyDumpError.notCalled).to.be.true;
 
-        const maxRetries = monitorConfig.MAX_STARTS - 1;
-        expect(spyDebug
-            .calledWith('\\monitor.js: ' +
-            'forever restarting script ' +
-            `- restart number: 1 of ${maxRetries}`))
-            .to.be.true;
+        expect(spyDebug.calledWith(`\\monitor.js: forever restarting script - restart number: 1 of ${maxRetries}`)).to.be.true;
 
         /* send a second crash */
         child.send({
@@ -225,6 +230,8 @@ describe('monitor', function() {
         /* monitor will not restart server and will close */
         spyDebugString = "\\monitor.js: child exited with code '4294967284'";
         await checkMonitorDebug(spyDebug, spyDebugString);
+
+//         await sleep(500);
 
         /* check no errors */
         expect(spyConsoleError.notCalled).to.be.true;

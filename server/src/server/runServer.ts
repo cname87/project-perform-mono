@@ -67,7 +67,7 @@ export async function runServer(app: express.Application) {
   }
   app.use(assignId);
 
-  // /* serve favicon file (before logger) */
+  /* serve favicon file (before logger) */
   // app.use(favicon(config.FAVICON));
 
   /* log simple format to default stdout */
@@ -88,73 +88,74 @@ export async function runServer(app: express.Application) {
   /* parse cookies to req.cookies / req.signedCookies */
   app.use(cookieParser(config.COOKIE_KEY));
 
-  app.use((_req, res, next) => {
-    /* used to hold the filepath to the file to be returned */
-    res.locals.filepath = '';
-    /* used to hold the data in a query ?data=<data> */
-    res.locals.setVar = '';
-    /* sent with pug views in return file handler */
-    res.locals.templateView = {
-      image: '',
-      message: '',
-      reqPath: '',
-      title: '',
-      /* all other properties = undefined */
-    };
-    /* simulated users database */
-    res.locals.users = {
-      1: {
-        userId: 113,
-        // tslint:disable-next-line:object-literal-sort-keys
-        name: 'testName',
-        password: 'testPassword',
-        email: 'test@test.com',
-      },
-      2: {
-        userId: 124,
-        // tslint:disable-next-line:object-literal-sort-keys
-        name: '',
-        password: 'test2Password',
-        email: 'test2@test.com',
-      },
-    };
-    /* identified user */
-    res.locals.user = {};
+  if (app.get('env') === 'development') {
+    /* debug log basic information from the request */
+    app.use(function debugRequest(req, _res, next) {
+      debug('\n' + modulename + ': *** Request received ***\n');
+      debug(modulename + ': req.url: ' + req.url);
+      debug(modulename + ': re.baseUrl: ' + req.baseUrl);
+      debug(modulename + ': req.originalUrl: ' + req.originalUrl);
+      debug(modulename + ': req.method: ' + req.method);
+      debug(
+        modulename +
+          ': url query string: ' +
+          urlParser.parse(req.originalUrl).search,
+      );
+      debug(modulename + ': body query string: ' + util.inspect(req.query));
+      debug(modulename + 'body: ' + util.inspect(req.body));
+      debug(
+        modulename + ': signed cookies: ' + util.inspect(req.signedCookies),
+      );
+      next();
+    });
+  }
 
-    next();
-  });
+  /* enable test functionality in dev mode or if set by a test */
+  if (app.get('env') === 'development' || app.get('test')) {
+    /* serve server test files from a static server mounted on /testServer */
+    const staticTestOptions = {
+      redirect: false,
+    };
 
-  /* debug log basic information from the request */
-  app.use(function debugRequest(req, _res, next) {
-    debug('\n' + modulename + ': *** Request received ***\n');
-    debug(modulename + ': req.url: ' + req.url);
-    debug(modulename + ': re.baseUrl: ' + req.baseUrl);
-    debug(modulename + ': req.originalUrl: ' + req.originalUrl);
-    debug(modulename + ': req.method: ' + req.method);
-    debug(
-      modulename +
-        ': url query string: ' +
-        urlParser.parse(req.originalUrl).search,
+    app.use(
+      '/testServer',
+      express.static(config.STATIC_TEST_PATH, staticTestOptions),
     );
-    debug(modulename + ': body query string: ' + util.inspect(req.query));
-    debug(modulename + ': signed cookies: ' + util.inspect(req.signedCookies));
-    next();
-  });
 
-  // serve angular front end files from root path
-  const staticServerOptions = {
+    /* use fail controller to test errorhandling */
+    app.use('/testServer/fail', (req, res, next) => {
+      debug(modulename + ': calling .../fail controller');
+      controllers.fail(req, res, next);
+    });
+
+    /* respond to posted raiseEvents from test pages */
+    app.post('/raiseEvent', handles['raiseEvent']);
+  }
+
+  /* serve the angular files */
+  const staticAppOptions = {
     maxAge: '1d',
     redirect: false,
   };
-  app.use('/', express.static(config.APP_PATH, staticServerOptions));
+  app.use(express.static(config.APP_PATH, staticAppOptions));
 
-  /* present the index page for a request to / */
-  app.use('/', controllers.root);
+  /* present the angular index.html page for anything not routed by angular */
+  app.use(
+    '/',
+    /* skip dummyurl for server test purposes */
+    (req, res, next) => {
+      if (req.path.slice(0, 9) !== '/dummyurl') {
+        controllers.root(req, res, next);
+      } else {
+        next();
+      }
+    },
+  );
 
   /* handle all errors passed down via the error handling functionality */
   app.use(handles.errorHandler.notFound);
   app.use(handles.errorHandler.assignCode);
   app.use(handles.errorHandler.logError);
-  // app.use(handles.errorHandler.sendErrorResponse);
+  app.use(handles.errorHandler.sendErrorResponse);
   app.use(handles.errorHandler.throwError);
 }

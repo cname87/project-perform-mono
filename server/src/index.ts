@@ -48,6 +48,7 @@ const { database } = config.DATABASE;
 const { handlers } = config.HANDLERS;
 const errorHandler = config.ERROR_HANDLER;
 const { router: controllerRoot } = config.ROOT_CONTROLLER;
+const { router: controllerFail } = config.FAIL_CONTROLLER;
 const { createModel: usersModels } = config.USERSMODEL;
 const { createModel: testsModels } = config.TESTSMODEL;
 
@@ -117,6 +118,7 @@ function load() {
   }
   const controllers: IRouters = {};
   controllers.root = controllerRoot;
+  controllers.fail = controllerFail;
 
   /* handlers used by controllers */
   /**
@@ -126,8 +128,8 @@ function load() {
     [key: string]: () => {};
   }
   const handles: IHandlers = {};
+  handles.raiseEvent = handlers.raiseEvent;
   /* server error handler */
-  handles.returnFile = handlers.returnFile;
   handles.errorHandler = errorHandler;
 
   /**
