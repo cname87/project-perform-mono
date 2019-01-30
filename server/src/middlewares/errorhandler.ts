@@ -126,6 +126,7 @@ export function sendErrorResponse(err: any, req: any, res: any, next: any) {
     res.render(
       path.join(config.PATH_VIEWS, 'error'),
       {
+        title: 'ERROR',
         message: msg,
         originalUrl: origUrl,
         stack: stk,

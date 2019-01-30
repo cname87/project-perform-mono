@@ -3,7 +3,8 @@
      // overridden in tsconfig in subdirectories
   ],
   "exclude": [
-    "./**/*.*" // overridden in tsconfig in subdirectories
+
+    // overridden in tsconfig in subdirectories
   ],
   "compileOnSave": false,
   "compilerOptions": {

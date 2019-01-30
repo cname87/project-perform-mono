@@ -222,6 +222,43 @@
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
     },
+    // database index.ts
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch database index.ts ",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--require",
+        "ts-node/register",
+        "--require",
+        "source-map-support/register",
+      ],
+      "args": [
+        "${workspaceFolder}/database/src/index.ts"
+      ],
+      "env": {
+        "NODE_ENV": "development",
+        "DEBUG": "MM* PP* SY*",
+        "DEBUG_COLORS": "true",
+        // You have to use environment variables to set ts-node options */
+        "TS_NODE_PROJECT": "${workspaceFolder}/database/tsconfig.json",
+        "TS_NODE_FILES": "true", // include to avoid compile errors
+        // "TS_NODE_IGNORE_DIAGNOSTICS": "true",  // doesn't appear to have any effect
+        // "TS_NODE_SKIP_IGNORE": "true",
+        // "TS_NODE_PRETTY": "true",
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "${workspaceFolder}/database/node_modules/**/*.js",
+        "<node_internals>/**/*.js",
+        "<node_internals>/**/*",
+      ],
+      "autoAttachChildProcesses": true,
+      "sourceMaps": true,
+    },
     // localhost
     {
       // starts Chrome and connect to the home page
