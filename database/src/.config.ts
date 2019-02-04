@@ -52,6 +52,9 @@ export const filepaths: IFilepaths = {
   DATABASE,
 };
 
+/* export service types */
+export type dumpErrorFunction = DUMPERROR.dumpErrorInstance;
+
 /**
  * The Mongoose createConnection url configuration object.
  * This method returns the uri parameter in Mongoose.createConnection(uri options) that connects to a MongoDB database server.

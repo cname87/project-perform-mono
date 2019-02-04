@@ -1,4 +1,3 @@
-'use strict';
 /**
  * This module provides a error logging service.
  * It uses the winston logger utility.
@@ -13,20 +12,17 @@ debug(`Starting ${modulename}`);
  * Usage:
  *
  * Add...
- * import { DumpError } from '<path to>dumperror';
- * dumpError = new DumpError(config);
+ * const { DumpError } = <path to file>.dumperror;
+ * const dumpError = DumpError.getInstance(logger);
  *
- * where 'config' is a javascript object containing required logger
- * configuration parameters - see the 'Winston logger parameters' section in
- * .config.js.
+ * where 'logger' is optional.
+ * - Use a winston logger with a logger.error function.
+ * - If blank then console will be passed to use console.error.
  *
- * This module can be required in the main application module and the
- * dumpError object passed downstream.
  * Also once this module is imported then all subsequent imports get the same
- * object, irrespective of the config parameter passed in.  Thus you can
+ * object, irrespective of the logger parameter passed in.  Thus you can
  * set up DumpError in the main module and add...
- * dumpError = new DumpError(); in other modules,
- * i.e. with no dependency on the configuration file.
+ * dumpError = DumpError.getInstance(); in other modules,
  *
  * Note: The property 'dumped' is set to true on an object
  * that is passed in to prevent an error object that has
@@ -36,20 +32,31 @@ debug(`Starting ${modulename}`);
 /* external dependencies */
 import winston from 'winston';
 
-type dumpErrorInstance = (err: IErr) => void;
+interface IDumpErr extends Error {
+  dumped?: boolean;
+  status?: string | number;
+  code?: number;
+}
+
+export type dumpErrorInstance = (err: IDumpErr | string) => void;
 
 export class DumpError {
-  public static instance: any;
-  public static dump: (err: any) => void;
-  public static getInstance(initialLogger?: winston.Logger): dumpErrorInstance {
-    if (!DumpError.instance && initialLogger) {
-      DumpError.instance = new DumpError(initialLogger);
+
+  public static instance: dumpErrorInstance;
+
+  public static dump: (err: string) => void;
+
+  public static getInstance(
+    initialLogger: winston.Logger | Console = console,
+  ): dumpErrorInstance {
+    if (!DumpError.instance) {
+      DumpError.instance = new DumpError(initialLogger) as dumpErrorInstance;
     }
     return DumpError.instance;
   }
 
-  public constructor(initialLogger?: winston.Logger) {
-    if (!DumpError.instance && initialLogger) {
+  public constructor(initialLogger: winston.Logger | Console = console) {
+    if (!DumpError.instance) {
       DumpError.dump = initialLogger.error;
       DumpError.instance = dumpError;
     }
@@ -58,7 +65,7 @@ export class DumpError {
   }
 }
 
-function dumpError(err: IErr) {
+function dumpError(err: IDumpErr | string) {
   debug(modulename + ': running dumpError');
 
   if (err && typeof err === 'object') {
@@ -71,7 +78,7 @@ function dumpError(err: IErr) {
       DumpError.dump('Error Message: \n' + err.message + '\n');
     } else {
       /* if no message property just dump the object */
-      DumpError.dump(err);
+      DumpError.dump(err.toString());
     }
 
     if (err.status) {

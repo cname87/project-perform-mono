@@ -18,6 +18,9 @@ import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
+/* import dumpError function type */
+import { dumpErrorFunction } from './.config';
+
 /* external dependencies */
 import connectMongodbSession from 'connect-mongodb-session';
 // import connectMongo from 'connect-mongodb-session';
@@ -37,9 +40,6 @@ export interface ISessionOptions {
 }
 const dummy = expressSession();
 type reqHandler = typeof dummy;
-
-/* dumpError type as used by functions below */
-type dumpErrorType = (err: IErr) => void;
 
 /**
  * The class constructor for the exported database object.
@@ -73,7 +73,7 @@ export class Database {
     readonly connectionOptions: mongoose.ConnectionOptions,
     readonly sessionOptions: ISessionOptions,
     readonly logger: winston.Logger | Console = console,
-    readonly dumpError: dumpErrorType | Console['error'] = console.error,
+    readonly dumpError: dumpErrorFunction | Console['error'] = console.error,
   ) {
     this.closeConnection = closeConnection;
     this.createModel = createModel;
@@ -105,7 +105,7 @@ async function connectToDB(
   uri: string,
   options: mongoose.ConnectionOptions,
   logger: winston.Logger | Console,
-  dumpError: dumpErrorType | Console['error'],
+  dumpError: dumpErrorFunction | Console['error'],
 ): Promise<Connection> {
   debug(modulename + ': running connectToDB');
 
