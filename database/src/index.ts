@@ -43,6 +43,7 @@ export async function runDatabaseApp() {
   logger.info('\n*** CONNECTING TO THE DATABASE ***\n');
 
   try {
+    throw new Error('test');
     const connectionUrl = getMongoUri();
     const connectOptions = getConnectionOptions();
     const sessionOptions = getSessionOptions();
@@ -54,7 +55,7 @@ export async function runDatabaseApp() {
       dumpError,
     );
     /* must await database connection from promise */
-    database.dbConnection = await database.dbConnection;
+    database.dbConnection = await database.dbConnectionPromise;
     /* return database instance */
     return database;
   } catch (err) {

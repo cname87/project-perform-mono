@@ -30,10 +30,11 @@ import { format } from 'util';
  * Allows for easy file location changes.
  */
 
+// tslint:disable: no-var-requires
 // a utility to dump errors to the logger
-import * as DUMPERROR from '../../utils/dumperror';
+import * as DUMPERROR from '../../src/utils/dumperror';
 // a configured winston general logger
-import * as LOGGER from '../../utils/logger';
+import * as LOGGER from '../../src/utils/logger';
 // Database class
 import * as DATABASE from './database';
 
@@ -65,13 +66,13 @@ export function getMongoUri(): string {
   const user = encodeURIComponent('cname87');
   const password = encodeURIComponent('performMongo_1');
   const host = 'perform-9troj.azure.mongodb.net';
-  const db = '/test';
+  const db = 'test';
   const ssl = 'true';
   const authSource = 'admin';
   const authMechanism = 'DEFAULT';
 
   return format(
-    '%s://%s:%s@%s%s?ssl=%s&authSource=%s&authMechanism=%s',
+    '%s://%s:%s@%s/%s?ssl=%s&authSource=%s&authMechanism=%s',
     scheme,
     user,
     password,

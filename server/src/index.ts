@@ -41,14 +41,18 @@ let app: express.Application = {} as any;
 /* event emitter needed by Mocha before server up */
 export const event: EventEmitter = new EventEmitter();
 
-/* internal module dependencies */
+/* server */
 const startServer = config.START_SERVER;
 const runServer = config.RUN_SERVER;
+/* database */
 const { database } = config.DATABASE;
+/* middleware */
 const { handlers } = config.HANDLERS;
 const errorHandler = config.ERROR_HANDLER;
+/* route controllers */
 const { router: controllerRoot } = config.ROOT_CONTROLLER;
 const { router: controllerFail } = config.FAIL_CONTROLLER;
+/* database models */
 const { createModel: usersModels } = config.USERSMODEL;
 const { createModel: testsModels } = config.TESTSMODEL;
 

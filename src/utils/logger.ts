@@ -1,8 +1,6 @@
-'use strict';
-
 /**
  * This module provides a Winston logger service.
- * It uses the file paths specified in the supplied
+ * It uses the file paths specified in the imported
  * configuration file.
  */
 
@@ -11,34 +9,26 @@ import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
+/* import configuration file */
+import { loggerConfig } from './.config';
+
 /* external dependencies */
-/* external dependencies */
-import * as appRootObject from 'app-root-path';
-const appRoot = appRootObject.toString();
-import * as path from 'path';
+import * as fs from 'fs';
 import * as winston from 'winston';
 const { createLogger, format, transports } = winston;
 const { combine, timestamp, label, printf } = format;
-import * as fs from 'fs';
 
 /**
  * Usage:
  *
  * Add...
  * import { Logger } from '<path to>logger';
- * logger = Logger.getInstance(config);
+ * logger = Logger.getInstance();
  *
- * where 'config' is a javascript object containing required logger
- * configuration parameters - see the 'Winston logger parameters' section in
- * .config.js.
+ * Set the log files paths in .config.js (which must be in the same directory as this file).
  *
- * This module can be required in the main application module and the
- * logger object passed downstream.
- * Also once this module is imported then all subsequent imports get the same
- * object, irrespective of the config parameter passed in.  Thus you can
- * set up Logger in the main module and add...
- * logger = Logger.getInstance(); in other modules,
- * i.e. with no dependency on the configuration file.
+ * Once this module is imported then all subsequent imports get the same
+ * object.
  *
  * Then...
  * Use logger.info('text') to log 'text' to the info file,
@@ -49,19 +39,19 @@ import * as fs from 'fs';
  * format is <timestamp> [PP] <info/error> <message>
  */
 
-// log file paths used to set up the logger
-const defaultInfoLog = path.join(appRoot, 'logs', 'info.log');
-const defaultErrorLog = path.join(appRoot, 'logs', 'error.log');
+/* log file paths */
+const defaultInfoLog = loggerConfig.INFO_LOG;
+const defaultErrorLog = loggerConfig.ERROR_LOG;
 
 export class Logger {
-  public static instance: any;
+  public static instance: winston.Logger;
 
   public static getInstance(
     infoLog: string = defaultInfoLog,
     errorLog: string = defaultErrorLog,
   ): winston.Logger {
     if (!Logger.instance) {
-      Logger.instance = new Logger(infoLog, errorLog);
+      Logger.instance = new Logger(infoLog, errorLog) as winston.Logger;
     }
     return Logger.instance;
   }
@@ -97,11 +87,8 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
     }
   }
 
-  // tslint:disable-next-line: arrow-parens
   const myFormat = printf((info) => {
-    return (
-      `${info.timestamp} [${info.label}] ` + `${info.level}: ${info.message}`
-    );
+    return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
   });
 
   const myLevels = {
@@ -161,7 +148,7 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
     },
   };
 
-  const logger = createLogger({
+  const logger: winston.Logger = createLogger({
     levels: myLevels.levels,
     transports: [
       new transports.File(options.errorFile),

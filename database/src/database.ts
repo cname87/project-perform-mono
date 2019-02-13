@@ -8,9 +8,6 @@
  * The database object provides the following methods:
  * closeConnection: Closes a supplied connection to the MongoDB server.
  * createModel: Returns a mongoose model based on supplied parameters.
- * createStore: Returns a mongo session store.
- * closeStore: Closes a supplied mongo session store.
- * createSession:  Returns an Express/Mongo sessionstore.
  */
 
 const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));
@@ -22,13 +19,7 @@ debug(`Starting ${modulename}`);
 import { dumpErrorFunction } from './.config';
 
 /* external dependencies */
-import connectMongodbSession from 'connect-mongodb-session';
-// import connectMongo from 'connect-mongodb-session';
-import expressSession from 'express-session';
-/* get the connect-mongodb-session constructor */
-const MongoStore = connectMongodbSession(expressSession);
-import { MongoClientOptions } from 'mongodb';
-import mongoose, { Connection } from 'mongoose';
+import mongoose, { Connection, Model, Schema } from 'mongoose';
 import winston = require('winston');
 
 /* session creation options needed by createStore */
@@ -38,15 +29,15 @@ export interface ISessionOptions {
   SESSION_EXPIRES: number;
   SESSION_COLLECTION: string;
 }
-const dummy = expressSession();
-type reqHandler = typeof dummy;
 
 /**
  * The class constructor for the exported database object.
  */
 export class Database {
-  /* initially a promise, later resolved */
-  public dbConnection: Promise<mongoose.Connection> | mongoose.Connection;
+  /* the connection is initially a promise */
+  public dbConnectionPromise: Promise<Connection>;
+  /* the connection promise resolved externally and result stored here */
+  public dbConnection: Connection | null = null;
   public closeConnection: (
     this: Database,
     dbConnection: Connection,
@@ -54,19 +45,10 @@ export class Database {
   public createModel: (
     this: Database,
     ModelName: string,
-    modelSchema: mongoose.Schema,
+    modelSchema: Schema,
     dbCollectionName: string,
     dbConnection: Connection,
-  ) => mongoose.Model<mongoose.Document, {}>;
-  public createStore: (this: Database) => Promise<typeof MongoStore>;
-  public closeStore: (
-    this: Database,
-    dbStore: typeof MongoStore,
-  ) => Promise<typeof MongoStore>;
-  public createSession: (
-    sessionStore: typeof MongoStore,
-    cookieKey: string,
-  ) => reqHandler;
+  ) => Model<mongoose.Document, {}>;
 
   constructor(
     readonly connectionUrl: string,
@@ -77,10 +59,7 @@ export class Database {
   ) {
     this.closeConnection = closeConnection;
     this.createModel = createModel;
-    this.createStore = createStore;
-    this.closeStore = closeStore;
-    this.createSession = createSession;
-    this.dbConnection = connectToDB(
+    this.dbConnectionPromise = connectToDB(
       connectionUrl,
       connectionOptions,
       logger,
@@ -189,138 +168,17 @@ function createModel(
   debug(modulename + ': running createModel');
 
   /* id the database collection, define its schema and its model */
-  const Schema = new mongoose.Schema(modelSchema, {
+  const DbSchema = new mongoose.Schema(modelSchema, {
     collection: dbCollectionName,
   });
 
   try {
-    const Model = dbConnection.model(ModelName, Schema);
-    debug(modulename + `: mongoose model \'${Model.modelName}\' created`);
-    return Model;
+    const DbModel = dbConnection.model(ModelName, DbSchema);
+    debug(modulename + `: mongoose model \'${DbModel.modelName}\' created`);
+    return DbModel;
   } catch (err) {
     this.logger.error(modulename + ': database model creation error');
     this.dumpError(err);
     throw err;
   }
-}
-
-/**
- * Creates an Mongo session store using connect-mongoDB-session.
- * Note: It creates a database connection which must be closed
- * to allow node exit.
- * Note: It appears that a new store is created each time you run
- * this (even though the server parameters are identical). You
- * have to close each one separately.
- * @params
- * this: Accesses logger and dumpError.
- * @returns
- * Returns a Mongo session store.
- * @throws
- * Throws an error if the store creation attempt fails.
- */
-
-async function createStore(this: Database): Promise<typeof MongoStore> {
-  debug(modulename + ': running createStore');
-
-  /* get base connection url and options */
-  const url = this.connectionUrl;
-  const connectOptions = this.connectionOptions;
-  const sessionOptions = this.sessionOptions;
-
-  try {
-    return await new Promise((resolve, reject) => {
-      const store = new MongoStore({
-        collection: sessionOptions.SESSION_COLLECTION,
-        /* appear to be differences between mongo and mongoose connection type definitions i.e. sslValidate => cast */
-        connectionOptions: connectOptions as MongoClientOptions,
-        databaseName: sessionOptions.DB_NAME,
-        expires: sessionOptions.SESSION_EXPIRES,
-        idField: '_id',
-        uri: url,
-      });
-
-      store.on('connected', () => {
-        resolve(store);
-      });
-
-      store.on('error', (err: Error) => {
-        reject(err);
-      });
-    });
-  } catch (err) {
-    /* note certain types of connection errors can require
-    a CTRL+C to close node */
-    this.logger.error(modulename + ': mongo store creation error');
-    this.dumpError(err);
-    throw err;
-  }
-}
-
-/**
- * Closes a MongoStore connection.
- * @params
- * dbStore: The MongoStore connection to be closed, i.e.
- * a connect-mongoDB-session store with a client.close function.
- * @returns
- * It returns the input MongoStore (whose client.isConnected
- * function should now return false).
- * @throws
- * It logs and returns (not throws) an error if the underlying
- * store.close() throws an error.
- */
-async function closeStore(
-  this: Database,
-  dbStore: typeof MongoStore,
-): Promise<typeof MongoStore> {
-  debug(modulename + ': running closeStore');
-
-  try {
-    await dbStore.client.close();
-    debug(modulename + ': MongoStore connection closed');
-    return dbStore;
-  } catch (err) {
-    const message = ': MongoStore connection close error';
-    this.logger.error(modulename + message);
-    this.dumpError(err);
-    return err;
-  }
-}
-
-/**
- * This method takes a Mongo store (created using createStore) and a
- * secret used to generate signed cookies and returns an express-session
- * used to store information across http requests.
- * @params
- * sessionStore: Mongo store to persist session information.
- * cookieKey: The secret key used to sign cookies.
- * @returns
- * An object used by the Express app to manage http session state.
- */
-
-function createSession(
-  sessionStore: typeof MongoStore,
-  cookieKey: string,
-): reqHandler {
-  debug(modulename + ': running createSession');
-
-  const expires = new Date(60 * 60 * 24 * 7 * 1e3 + Date.now());
-  return expressSession({
-    cookie: {
-      expires,
-      httpOnly: false,
-      path: '/',
-      secure: true,
-      signed: true,
-    },
-    resave: false,
-    /* resets expires on each cookie receipt */
-    rolling: true,
-    saveUninitialized: false,
-    secret: cookieKey,
-    /* provided by connect-mongodb-session, or other store */
-    store: sessionStore,
-
-    /* deletes persisted session when you delete req.session */
-    unset: 'destroy',
-  });
 }

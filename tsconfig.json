@@ -1,14 +1,14 @@
 {
   "include": [
     // overridden in tsconfig in subdirectories
-    "./utils/*.ts"
+    "./src/utils/*.ts"
   ],
   "exclude": [
     // overridden in tsconfig in subdirectories
   ],
   "compileOnSave": false,
   "compilerOptions": {
-    // "outDir": "./dist/top",
+    "outDir": "./dist/",
     "target": "esnext",
     "module": "commonjs",
     "esModuleInterop": true,

@@ -76,6 +76,110 @@
       "autoAttachChildProcesses": true,
       "preLaunchTask": "Taskkill node.exe", // kill any previously failed node runs
     },
+    // Mocha database
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Database Tests",
+      "runtimeExecutable":  "${workspaceFolder}/database/node_modules/node/bin/node",
+      "runtimeArgs": [
+        "--nolazy",
+      ],
+      "args": [
+        "${workspaceFolder}/database/node_modules/mocha/bin/_mocha",
+        "--require", "ts-node/register/",
+        "--require", "source-map-support/register",
+        "--recursive",
+        "--timeout", "0",
+        "--colors",
+        "--check-leaks",
+        // "--globals", "__core-js_shared__, __extends, __assign, __rest, __decorate, __param, __metadata, __awaiter, __generator, __exportStar, __values, __read, __spread, __await, __asyncGenerator, __asyncDelegator, __asyncValues, __makeTemplateObject, __importStar, __importDefault",
+        // __core-js_shared__: When browser opens a pug page during client tests.
+        // Others introduced with typescript etc (?).
+        "${workspaceFolder}/database/test/database.test.ts",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/database/dist/*.js"
+      ],
+      "cwd": "${workspaceFolder}/database",
+      "env": {
+        "NODE_ENV": "development",
+        "DEBUG": "MM* PP* SY*", // comment out to remove debug output
+        "DEBUG_COLORS": "true",
+        // You have to use environment variables to set ts-node options */
+        "TS_NODE_PROJECT": "${workspaceFolder}/database/tsconfig.json",
+        "TS_NODE_FILES": "true", // include to avoid compile errors
+        // "TS_NODE_IGNORE_DIAGNOSTICS": "true",  // doesn't appear to have any effect
+        // "TS_NODE_SKIP_IGNORE": "true",
+        // "TS_NODE_PRETTY": "true",
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal", // allows you use CTRL+C to exit
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "${workspaceFolder}/database/node_modules/**/*.js",
+        "<node_internals>/**/*.js",
+        "<node_internals>/**/*",
+      ],
+      "autoAttachChildProcesses": true,
+      "sourceMaps": true,
+      "smartStep": true,
+      "restart": false, // set false when using ts-node
+      "protocol": "inspector",
+    },
+    // Mocha database with Istanbul coverage
+    // Note: Istanbul breaks breakpoint functionality
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Database with Istanbul Tests",
+      "runtimeExecutable":  "${workspaceFolder}/database/node_modules/node/bin/node",
+      "runtimeArgs": [
+        "--nolazy",
+      ],
+      "args": [
+        "${workspaceFolder}/database/node_modules/nyc/bin/nyc",
+        "${workspaceFolder}/database/node_modules/mocha/bin/_mocha",
+        "--require", "ts-node/register/",
+        "--require", "source-map-support/register",
+        "--recursive",
+        "--timeout", "0",
+        "--colors",
+        "--check-leaks",
+        // "--globals", "__core-js_shared__, __extends, __assign, __rest, __decorate, __param, __metadata, __awaiter, __generator, __exportStar, __values, __read, __spread, __await, __asyncGenerator, __asyncDelegator, __asyncValues, __makeTemplateObject, __importStar, __importDefault",
+        // __core-js_shared__: When browser opens a pug page during client tests.
+        // Others introduced with typescript etc (?).
+        "${workspaceFolder}/database/test/index.test.ts",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/database/dist/**/*.js"
+      ],
+      "cwd": "${workspaceFolder}/database",
+      "env": {
+        "NODE_ENV": "development",
+        "DEBUG": "MM* PP* SY*", // comment out to remove debug output
+        "DEBUG_COLORS": "true",
+        // You have to use environment variables to set ts-node options */
+        "TS_NODE_PROJECT": "${workspaceFolder}/database/tsconfig.json",
+        "TS_NODE_FILES": "true", // include to avoid compile errors
+        // "TS_NODE_IGNORE_DIAGNOSTICS": "true",  // doesn't appear to have any effect
+        // "TS_NODE_SKIP_IGNORE": "true",
+        // "TS_NODE_PRETTY": "true",
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal", // allows you use CTRL+C to exit
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "${workspaceFolder}/database/node_modules/**/*.js",
+        "<node_internals>/**/*.js",
+        "<node_internals>/**/*",
+      ],
+      "autoAttachChildProcesses": true,
+      "sourceMaps": true,
+      "smartStep": false, // set false for ts-node
+      "restart": true,
+      "protocol": "inspector",
+    },
     // Current .js file
     {
       "type": "node",
@@ -222,11 +326,39 @@
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
     },
-    // database index.ts
+    // database index.js (via index.ts)
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch database index.ts ",
+      "name": "Launch database index.js (via index.ts)",
+      "protocol": "inspector",
+      "program": "${workspaceFolder}/database/src/index.ts",
+      "env": {
+        "NODE_ENV": "development",
+        "DEBUG": "MM* PP* SY*",
+        "DEBUG_COLORS": "true",
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "${workspaceFolder}/database/node_modules/**/*.js",
+        "<node_internals>/**/*.js",
+        "<node_internals>/**/*",
+      ],
+      "autoAttachChildProcesses": true,
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/database/dist/**/*.js",
+      ],
+      "smartStep": false,
+    },
+    // database index.ts (via ts-node)
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch database index.ts (via ts-node)",
+      "protocol": "inspector",
       "runtimeExecutable": "node",
       "runtimeArgs": [
         "--require",
@@ -244,9 +376,9 @@
         // You have to use environment variables to set ts-node options */
         "TS_NODE_PROJECT": "${workspaceFolder}/database/tsconfig.json",
         "TS_NODE_FILES": "true", // include to avoid compile errors
-        // "TS_NODE_IGNORE_DIAGNOSTICS": "true",  // doesn't appear to have any effect
-        // "TS_NODE_SKIP_IGNORE": "true",
-        // "TS_NODE_PRETTY": "true",
+        "TS_NODE_IGNORE_DIAGNOSTICS": "true",  // doesn't appear to have any effect
+        "TS_NODE_SKIP_IGNORE": "true",
+        "TS_NODE_PRETTY": "true",
       },
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -258,6 +390,10 @@
       ],
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
+      "outFiles": [
+        // "${workspaceFolder}/database/dist/**/*.js",
+      ],
+      "smartStep": false,
     },
     // localhost
     {
@@ -445,7 +581,7 @@
       "name": "Mocha Client and Browser",
       "configurations": [
           "Mocha Client Tests",
-          "Mocha Browser Tests"
+          "Mocha Browser Tests",
         ]
     }
 ],

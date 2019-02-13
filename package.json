@@ -13,29 +13,38 @@
     "type": "git",
     "url": "C:\\Users\\syoung\\Dropbox\\Software\\MEAN\\projects\\project_perform"
   },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "echo \"Error: no start file in this project\" && exit 1",
+    "delDist": "ts-node ./utils-build/delDistDir.ts ./dist",
+    "tsc": "tsc --project ./",
+    "compile": "npm run delDist && npm run tsc",
+    "tslint": "tslint --config ./tslint.json --project ./tsconfig.json",
+    "prettierBase": "prettier",
+    "prettierCheck": "npm run prettierBase -- --list-different \"./src/utils/*.{ts,tsx}\"",
+    "prettierWrite": "npm run prettierBase -- --write \"./src/utils/*.{ts,tsx}\"",
+    "build": "npm run compile && npm run prettierWrite && npm run tslint"
+  },
   "dependencies": {
-    "@types/node": "^10.12.19",
     "app-root-path": "^2.1.0",
     "debug": "^4.1.1",
     "node": "^11.8.0",
-    "prettier": "^1.16.1",
-    "tslint-no-unused-expression-chai": "^0.1.4",
-    "typescript": "^3.2.4",
     "winston": "^3.2.0"
   },
   "devDependencies": {
     "@types/app-root-path": "^1.2.4",
     "@types/debug": "0.0.31",
+    "@types/node": "^10.12.19",
     "@types/shelljs": "^0.8.2",
     "@types/winston": "^2.4.4",
-    "pug-cli": "^1.0.0-alpha6",
+    "prettier": "^1.16.1",
     "shelljs": "^0.8.3",
+    "source-map-support": "^0.5.10",
     "ts-node": "^7.0.1",
     "tslint": "^5.12.1",
     "tslint-eslint-rules": "^5.4.0",
-    "tslint-microsoft-contrib": "^6.0.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tslint-microsoft-contrib": "^6.0.0",
+    "tslint-no-unused-expression-chai": "^0.1.4",
+    "typescript": "^3.2.4"
   }
 }

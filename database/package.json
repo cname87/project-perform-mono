@@ -1,15 +1,20 @@
 {
-  "name": "perform-database",
+  "name": "project_perform_database",
   "version": "1.0.0",
-  "description": "Project perform database",
-  "main": "./dist/database/src/index.js",
-  "keywords": [
-    "database"
-  ],
-  "author": "Seán Young",
+  "description": "Project Perform database application",
+  "keywords": [],
+  "bugs": {
+    "email": "cname87@yahoo.com"
+  },
   "license": "MIT",
+  "author": "Seán Young <cname87@yahoo.com>",
+  "main": "./src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "C:\\Users\\syoung\\Dropbox\\Software\\MEAN\\projects\\project_perform"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "",
     "start": "node ./dist/database/src/index.js",
     "delDist": "ts-node ../utils-build/delDistDir.ts ./database/dist",
     "tsc": "tsc --project ./",
@@ -21,22 +26,29 @@
     "build": "npm run compile && npm run prettierWrite && npm run tslint"
   },
   "dependencies": {
-    "connect-mongodb-session": "^2.0.8",
     "debug": "^4.1.1",
-    "express-session": "^1.15.6",
-    "mongoose": "^5.4.9",
+    "mongoose": "^5.4.10",
     "node": "^11.9.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@types/connect-mongodb-session": "0.0.0",
+    "@types/chai": "^4.1.7",
     "@types/debug": "0.0.31",
-    "@types/express-session": "^1.15.11",
-    "@types/mongodb": "^3.1.19",
+    "@types/mocha": "^5.2.5",
     "@types/mongoose": "^5.3.12",
     "@types/node": "^10.12.21",
-    "mongodb": "^3.1.13",
+    "@types/proxyquire": "^1.3.28",
+    "@types/sinon": "^7.0.5",
+    "@types/sinon-chai": "^3.2.2",
+    "app-root-path": "^2.1.0",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "mocha-sinon": "^2.1.0",
+    "nyc": "^13.2.0",
     "prettier": "^1.16.4",
+    "proxyquire": "^2.1.0",
+    "sinon": "^7.2.3",
+    "sinon-chai": "^3.3.0",
     "ts-node": "^8.0.2",
     "tslint": "^5.12.1",
     "typescript": "^3.3.1"
