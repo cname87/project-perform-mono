@@ -148,7 +148,7 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
     },
   };
 
-  const logger: winston.Logger = createLogger({
+  const loggerObject: winston.Logger = createLogger({
     levels: myLevels.levels,
     transports: [
       new transports.File(options.errorFile),
@@ -159,8 +159,9 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
   /* add console.log only if development environment */
   /* using config setting which sets environment in runServer */
   if (process.env.NODE_ENV !== 'production') {
-    logger.add(new transports.Console(options.console));
+    loggerObject.add(new transports.Console(options.console));
   }
 
+  const logger = Object.create(loggerObject);
   return logger;
 }

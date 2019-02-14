@@ -43,7 +43,6 @@ export async function runDatabaseApp() {
   logger.info('\n*** CONNECTING TO THE DATABASE ***\n');
 
   try {
-    throw new Error('test');
     const connectionUrl = getMongoUri();
     const connectOptions = getConnectionOptions();
     const sessionOptions = getSessionOptions();

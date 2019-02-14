@@ -351,7 +351,7 @@
       "outFiles": [
         "${workspaceFolder}/database/dist/**/*.js",
       ],
-      "smartStep": false,
+      "smartStep": true,
     },
     // database index.ts (via ts-node)
     {
@@ -390,9 +390,6 @@
       ],
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
-      "outFiles": [
-        // "${workspaceFolder}/database/dist/**/*.js",
-      ],
       "smartStep": false,
     },
     // localhost

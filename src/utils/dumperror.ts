@@ -41,25 +41,29 @@ interface IDumpErr extends Error {
 export type dumpErrorInstance = (err: IDumpErr | string) => void;
 
 export class DumpError {
+
+  /* holds the singleton instance */
   public static instance: dumpErrorInstance;
 
-  public static dump: (err: string) => void;
+  /* the function that dumps the error - logger.error or console.error */
+  public static dump: (err: any) => void;
 
-  public static getInstance(
-    initialLogger: winston.Logger | Console = console,
-  ): dumpErrorInstance {
+  /* creates new instance if one does not exist */
+  public static getInstance(initialLogger?: winston.Logger): dumpErrorInstance {
     if (!DumpError.instance) {
       DumpError.instance = new DumpError(initialLogger) as dumpErrorInstance;
     }
     return DumpError.instance;
   }
 
-  public constructor(initialLogger: winston.Logger | Console = console) {
+  /* instantiates if necessary and sets dump to logger.error or console.error */
+  public constructor(initialLogger?: winston.Logger) {
     if (!DumpError.instance) {
-      DumpError.dump = initialLogger.error;
+      DumpError.dump = initialLogger
+        ? initialLogger.error.bind(initialLogger)
+        : (DumpError.dump = console.error);
       DumpError.instance = dumpError;
     }
-
     return DumpError.instance;
   }
 }
