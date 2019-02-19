@@ -41,7 +41,6 @@ interface IDumpErr extends Error {
 export type dumpErrorInstance = (err: IDumpErr | string) => void;
 
 export class DumpError {
-
   /* holds the singleton instance */
   public static instance: dumpErrorInstance;
 

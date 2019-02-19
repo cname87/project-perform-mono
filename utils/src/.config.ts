@@ -9,9 +9,7 @@ import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
-import * as appRootObject from 'app-root-path';
-const appRoot = appRootObject.toString();
-import path from 'path';
+import * as path from 'path';
 
 /***********************************************************************/
 /* Winston logger parameters                                           */
@@ -24,6 +22,6 @@ import path from 'path';
 
 export const loggerConfig = {
   // log file paths used to set up the logger
-  INFO_LOG: path.join(appRoot, '/logs/nfo.log'),
-  ERROR_LOG: path.join(appRoot, '/logs/error.log'),
+  INFO_LOG: path.join(__dirname, '../logs/info.log'),
+  ERROR_LOG: path.join(__dirname, '../logs/error.log'),
 };

@@ -1,14 +1,7 @@
 /**
- * This module exports a function.
+ * This module exports a function that connects to an online MongoDB database.
+ * See function detail below.
  *
- * @returns The function returns a Database instance.
- *
- * The database instance includes...
- * An established connection to a database on a MongoDB server.
- * Utility database methods including createModel & createStore.
- * See database module for database instance detail.
- *
- * @throws Throws an error if the database set up fails.
  */
 
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
@@ -17,14 +10,20 @@ export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
 /* import configuration file */
-import {
-  filepaths,
-  getConnectionOptions,
-  getMongoUri,
-  getSessionOptions,
-} from './.config';
+import { filepaths, getConnectionOptions, getMongoUri } from './.config';
 
-/* connect to the database */
+/**
+ * This function connects to a MongoDB online database.
+ *
+ * @returns The function returns a Database instance.
+ *
+ * The database instance includes...
+ * A promise to an established connection to a database on a MongoDB server.
+ * Utility database methods.
+ * See database module for database instance detail.
+ *
+ * @throws Throws an error if the database set up fails.
+ */
 export async function runDatabaseApp() {
   debug(modulename + ': running runDatabaseApp');
 
@@ -45,11 +44,9 @@ export async function runDatabaseApp() {
   try {
     const connectionUrl = getMongoUri();
     const connectOptions = getConnectionOptions();
-    const sessionOptions = getSessionOptions();
     const database = new Database(
       connectionUrl,
       connectOptions,
-      sessionOptions,
       logger,
       dumpError,
     );
@@ -58,10 +55,8 @@ export async function runDatabaseApp() {
     /* return database instance */
     return database;
   } catch (err) {
-    logger.error(modulename + ': database setup error');
+    logger.error(modulename + ': database failed to setup');
     dumpError(err);
     throw err;
   }
 }
-
-runDatabaseApp();

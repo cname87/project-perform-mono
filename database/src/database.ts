@@ -1,13 +1,19 @@
 /**
  * This module returns a database object with a database connection promise and methods to carry out database operations.
- * The database is a MongoDB server.
+ *
+ * The database connection is to a MongoDB server.
+ *
  * The database object is instantiated with the following parameters:
  * - mongoose.createConnection uri and options parameters.
  * - options Logger and dumpError parameters.
  *
+ * The database object provides the following properties:
+ * - dbConnectionPromise - a promise that resolves to a mongoose connection object.
+ * - dbConnection: null - used to store dbConnection when externally resolved from dBConnectionPromise.
+ *
  * The database object provides the following methods:
- * closeConnection: Closes a supplied connection to the MongoDB server.
- * createModel: Returns a mongoose model based on supplied parameters.
+ * - closeConnection: Closes a supplied connection to the MongoDB server.
+ * - createModel: Returns a mongoose model based on supplied parameters.
  */
 
 const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));
@@ -18,17 +24,16 @@ debug(`Starting ${modulename}`);
 /* import dumpError function type */
 import { dumpErrorFunction } from './.config';
 
-/* external dependencies */
-import mongoose, { Connection, Model, Schema } from 'mongoose';
-import winston = require('winston');
-
-/* session creation options needed by createStore */
-export interface ISessionOptions {
-  DB_NAME: string;
-  SESSION_KEY: string;
-  SESSION_EXPIRES: number;
-  SESSION_COLLECTION: string;
-}
+/* external type dependencies */
+import mongoose, {
+  Connection,
+  ConnectionOptions,
+  Document,
+  Model,
+  Schema,
+  SchemaDefinition,
+} from 'mongoose';
+import { Logger } from 'winston';
 
 /**
  * The class constructor for the exported database object.
@@ -36,8 +41,8 @@ export interface ISessionOptions {
 export class Database {
   /* the connection is initially a promise */
   public dbConnectionPromise: Promise<Connection>;
-  /* the connection promise resolved externally and result stored here */
-  public dbConnection: Connection | null = null;
+  /* the connection promise is resolved externally and the result is stored here */
+  public dbConnection: Connection;
   public closeConnection: (
     this: Database,
     dbConnection: Connection,
@@ -45,20 +50,23 @@ export class Database {
   public createModel: (
     this: Database,
     ModelName: string,
-    modelSchema: Schema,
+    modelSchema: SchemaDefinition,
     dbCollectionName: string,
     dbConnection: Connection,
-  ) => Model<mongoose.Document, {}>;
+  ) => Model<Document, {}>;
+
+  /* dbConnection stores dummy until external resolves dbConnection promise and stores in dbConnection */
+  private dummyConnection: any = {};
 
   constructor(
     readonly connectionUrl: string,
-    readonly connectionOptions: mongoose.ConnectionOptions,
-    readonly sessionOptions: ISessionOptions,
-    readonly logger: winston.Logger | Console = console,
+    readonly connectionOptions: ConnectionOptions,
+    readonly logger: Logger | Console = console,
     readonly dumpError: dumpErrorFunction | Console['error'] = console.error,
   ) {
     this.closeConnection = closeConnection;
     this.createModel = createModel;
+    this.dbConnection = this.dummyConnection as Connection;
     this.dbConnectionPromise = connectToDB(
       connectionUrl,
       connectionOptions,
@@ -73,17 +81,17 @@ export class Database {
  * If debug is enabled it also prints stats (to debug) on the configured
  * database.
  * @params
- * uri: mongoose connection uri.
- * options: mongoose connection options.
- * logger: logger function.
- * dumpError: dumpError function.
+ * - uri: mongoose connection uri.
+ * - options: mongoose connection options.
+ * - logger: logger function.
+ * - dumpError: dumpError function.
  * @returns Returns a promise to a Mongoose database connection object.
  * @throws Throws an error if the connection attempt fails.
  */
 async function connectToDB(
   uri: string,
-  options: mongoose.ConnectionOptions,
-  logger: winston.Logger | Console,
+  options: ConnectionOptions,
+  logger: Logger | Console,
   dumpError: dumpErrorFunction | Console['error'],
 ): Promise<Connection> {
   debug(modulename + ': running connectToDB');
@@ -117,7 +125,7 @@ async function connectToDB(
  * Closes a MongoDB database connection.
  * Logs an error if thrown.
  * @params
- * dbConnection: The database connection to be closed, i.e.
+ * - dbConnection: The database connection to be closed, i.e.
  * a Mongoose or MongoDB connection with a close function.
  * @returns
  * It returns the connection in line with the underlying
@@ -148,11 +156,11 @@ async function closeConnection(
  * Creates a Mongoose model based on a supplied database
  * connection instance, schema, and collection.
  * @params
- * this: Accesses logger and dumpError.
- * ModelName: The name to give the created model.
- * modelSchema: The schema to use in the model.
- * dbCollectionName: The name of the collection to use.
- * dbConnection: The connection to the database to use.
+ * - this: Accesses logger and dumpError.
+ * - ModelName: The name to give the created model.
+ * - modelSchema: The schema definition to use in the model.
+ * - dbCollectionName: The name of the collection to use.
+ * - dbConnection: The connection to the database to use.
  * @returns
  * Returns a Mongoose database model object
  * @throws
@@ -161,14 +169,14 @@ async function closeConnection(
 function createModel(
   this: Database,
   ModelName: string,
-  modelSchema: mongoose.Schema,
+  modelSchema: SchemaDefinition,
   dbCollectionName: string,
   dbConnection: Connection,
-): mongoose.Model<mongoose.Document, {}> {
+): Model<Document, {}> {
   debug(modulename + ': running createModel');
 
   /* id the database collection, define its schema and its model */
-  const DbSchema = new mongoose.Schema(modelSchema, {
+  const DbSchema = new Schema(modelSchema, {
     collection: dbCollectionName,
   });
 

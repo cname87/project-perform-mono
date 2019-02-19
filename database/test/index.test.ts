@@ -1,8 +1,11 @@
-/* import for types */
-import 'mocha';
+const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));
+import debugFunction from 'debug';
+const debug = debugFunction(`PP_${modulename}`);
+debug(`Starting ${modulename}`);
 
-/* set up sinon & chai */
+/* set up mocha, sinon & chai */
 import chai = require('chai');
+import 'mocha';
 import sinon = require('sinon');
 import sinonChai = require('sinon-chai');
 chai.use(sinonChai);
@@ -11,23 +14,24 @@ sinon.assert.expose(chai.assert, {
   prefix: '',
 });
 
-/* other external dependencies */
-import { Connection } from 'mongoose';
-
 /* internal dependencies */
-import { Database } from '../src/database';
 import { runDatabaseApp } from '../src/index';
 
-/* common variables */
-let database: Database;
+describe('index database connection', () => {
+  debug(`Running ${modulename} describe index database connection`);
 
-before('before', async () => {
-  database = await runDatabaseApp();
-});
+  it('has readystate = 1', async () => {
+    debug(`Running ${modulename} it has readystate = 1`);
 
-describe('describe', () => {
-  it('it', () => {
-    expect(database.dbConnection).to.not.eql(undefined);
-    database.closeConnection(database.dbConnection as Connection);
+    /* create database connection */
+    const database = await runDatabaseApp();
+
+    /* test for an open database connection */
+    database.dbConnection
+      ? expect(database.dbConnection.readyState).to.eql(1)
+      : expect.fail(true, false, 'no dbConnection object');
+
+    /* close database connection */
+    database.closeConnection(database.dbConnection);
   });
 });

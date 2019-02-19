@@ -1,19 +1,14 @@
 /**
  * This module sets all configuration parameters for the
  * database component.
+ *
  * It must be stored in the database directory alongside the index.js file.
- * Their are three configuration items:
- * - filepaths - module file paths
- * - getMongoUrl() - returns database connection uri
+ * Their are 4 configuration items:
+ * - filepaths - module file paths.
+ * - internal module types (dumpError) needed by other modules.
+ * - getMongoUrl() - returns database connection uri.
  * - getConnectionOptions - returns database connection options object.
  */
-
-/* Note:
-This file assumes one database server.
-If you wish to configure a second database server, e.g. a local database for when a cloud server is not available then..
-- Add getMongoUrl2() and getConnectionOptions2() with the setup for the second server.
-- When required manually rename the files and export the appropriate files.
-*/
 
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
@@ -21,7 +16,7 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-import * as mongoose from 'mongoose';
+import { ConnectionOptions } from 'mongoose';
 import { format } from 'util';
 
 /**
@@ -30,34 +25,32 @@ import { format } from 'util';
  * Allows for easy file location changes.
  */
 
-// tslint:disable: no-var-requires
 // a utility to dump errors to the logger
-import * as DUMPERROR from '../../src/utils/dumperror';
+import * as DUMPERROR from '../../utils/src/dumperror';
 // a configured winston general logger
-import * as LOGGER from '../../src/utils/logger';
+import * as LOGGER from '../../utils/src/logger';
 // Database class
 import * as DATABASE from './database';
 
 export interface IFilepaths {
-  readonly LOGGER: {
-    Logger: typeof LOGGER.Logger;
-  };
+  readonly DATABASE: typeof DATABASE;
   readonly DUMPERROR: {
     DumpError: typeof DUMPERROR.DumpError;
   };
-  readonly DATABASE: typeof DATABASE;
+  readonly LOGGER: {
+    Logger: typeof LOGGER.Logger;
+  };
 }
 export const filepaths: IFilepaths = {
-  LOGGER,
-  DUMPERROR,
   DATABASE,
+  DUMPERROR,
+  LOGGER,
 };
 
-/* export service types */
+/* export types needed in other modules */
 export type dumpErrorFunction = DUMPERROR.dumpErrorInstance;
-
+export type Database = DATABASE.Database;
 /**
- * The Mongoose createConnection url configuration object.
  * This method returns the uri parameter in Mongoose.createConnection(uri options) that connects to a MongoDB database server.
  */
 export function getMongoUri(): string {
@@ -85,29 +78,13 @@ export function getMongoUri(): string {
 }
 
 /**
- * The Mongoose createConnection connection options configuration object.
  * This method returns the options parameter in Mongoose.createConnection(uri options) that connects to a MongoDB database server.
  */
-export function getConnectionOptions(): mongoose.ConnectionOptions {
+export function getConnectionOptions(): ConnectionOptions {
   return {
     // if not connected, return errors immediately
     bufferMaxEntries: 0,
     // prevents mongoose deprecation warning
     useNewUrlParser: true,
-  };
-}
-
-/**
- * This method returns some options used in database createStore() that creates a session store.
- */
-
-export function getSessionOptions(): DATABASE.ISessionOptions {
-  return {
-    DB_NAME: '/test/',
-    // session store key
-    SESSION_KEY: 'session secret key',
-    // session store time to live
-    SESSION_EXPIRES: 14 * 24 * 60 * 60 * 1000, // 2 weeks
-    SESSION_COLLECTION: 'sessions',
   };
 }
