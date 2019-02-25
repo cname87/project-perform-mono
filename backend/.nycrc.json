@@ -1,0 +1,49 @@
+{
+    "all": true,
+    "branches": 0,
+    "cache": true,
+    "check-coverage": true,
+    "exclude": [
+      "**/*.d.ts",
+      "node_modules/**",
+      "test/**",
+      "utils-build/**/*.*"
+    ],
+    "exclude-after-remap": false,
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "functions": 0,
+    "include": [
+        "**/*.ts"
+    ],
+    "lines": 60,
+    "per-file": true,
+    "produce-source-map": true,
+    "report-dir": "./coverage",
+    "reporter": [
+        "html",
+        "text"
+    ],
+    "statements": 0,
+    "watermarks": {
+        "branches": [
+            60,
+            80
+        ],
+        "functions": [
+            60,
+            80
+        ],
+        "lines": [
+            60,
+            80
+        ],
+        "statements": [
+            60,
+            80
+        ]
+    }
+}
+

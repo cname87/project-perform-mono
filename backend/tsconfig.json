@@ -1,0 +1,53 @@
+{
+  "include": [
+    "**/src/**/*.ts"
+  ],
+  "exclude": [
+    "**/test/*"
+  ],
+  "compileOnSave": false,
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "baseUrl": ".",
+    "declaration": true,
+    "declarationMap": true,
+    "diagnostics": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "extendedDiagnostics": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "esnext.array",
+      "esnext.asynciterable",
+      "esnext.intl",
+      "esnext.symbol",
+      "scripthost",
+    ],
+    "listEmittedFiles": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "strict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "esnext",
+    "traceResolution": true,
+
+
+
+  },
+}

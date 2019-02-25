@@ -160,6 +160,89 @@
       "sourceMaps": true,
       "smartStep": false, // false as it may skip some ts files
     },
+    // Mocha utils
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Utils Tests",
+      "protocol": "inspector",
+      "runtimeExecutable":  "${workspaceFolder}/utils/node_modules/node/bin/node",
+      "args": [
+        "${workspaceFolder}/utils/node_modules/mocha/bin/_mocha",
+        "--require", "ts-node/register",
+        "--require", "source-map-support/register",
+        "--recursive",
+        "--timeout", "0",
+        "--colors",
+        "--check-leaks",
+        "${workspaceFolder}/utils/test/**/*.test.ts",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/utils/dist/*.js"
+      ],
+      "cwd": "${workspaceFolder}/utils",
+      "env": {
+        "NODE_ENV": "development",
+        "DEBUG": "MM* PP* SY*", // comment out to remove debug output
+        "DEBUG_COLORS": "true",
+        // You have to use environment variables to set ts-node options */
+        "TS_NODE_PROJECT": "${workspaceFolder}/utils/tsconfig.json",
+        "TS_NODE_FILES": "true", // include to avoid compile errors
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal", // allows you use CTRL+C to exit
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "${workspaceFolder}/utils/node_modules/**/*.js",
+        "<node_internals>/**/*.js",
+        "<node_internals>/**/*",
+      ],
+      "autoAttachChildProcesses": true,
+      "sourceMaps": true,
+      "smartStep": false, // false as it may skip some ts files
+    },
+    // Mocha utils with Istanbul coverage
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Utils with Istanbul Tests",
+      "protocol": "inspector",
+      "runtimeExecutable":  "${workspaceFolder}/utils/node_modules/node/bin/node",
+      "args": [
+        "${workspaceFolder}/utils/node_modules/nyc/bin/nyc",
+        "${workspaceFolder}/utils/node_modules/mocha/bin/_mocha",
+        "--require", "ts-node/register/",
+        "--require", "source-map-support/register",
+        "--recursive",
+        "--timeout", "0",
+        "--colors",
+        "--check-leaks",
+        "${workspaceFolder}/utils/test/**/*.test.ts",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/utils/dist/**/*.js"
+      ],
+      "cwd": "${workspaceFolder}/utils",
+      "env": {
+        "NODE_ENV": "development",
+        "DEBUG": "MM* PP* SY*", // comment out to remove debug output
+        "DEBUG_COLORS": "true",
+        // You have to use environment variables to set ts-node options */
+        "TS_NODE_PROJECT": "${workspaceFolder}/utils/tsconfig.json",
+        "TS_NODE_FILES": "true", // include to avoid compile errors
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal", // allows you use CTRL+C to exit
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "${workspaceFolder}/utils/node_modules/**/*.js",
+        "<node_internals>/**/*.js",
+        "<node_internals>/**/*",
+      ],
+      "autoAttachChildProcesses": true,
+      "sourceMaps": true,
+      "smartStep": false, // false as it may skip some ts files
+    },
     // Current .js file
     {
       "type": "node",
@@ -189,7 +272,7 @@
       "runtimeExecutable": "node",
       "runtimeArgs": [],
       "args": [
-        "${workspaceFolder}/server/dist/index.js",
+        "${workspaceFolder}/server/dist/server/src/index.js",
       ],
       "env": {
         "NODE_ENV": "development",
@@ -219,6 +302,7 @@
         "--require",
         "source-map-support/register",
       ],
+      "cwd": "${workspaceFolder}/server",
       "args": [
         "${workspaceFolder}/server/src/index.ts"
       ],
@@ -331,8 +415,9 @@
       "sourceMaps": true,
       "outFiles": [
         "${workspaceFolder}/database/dist/**/*.js",
+        "${workspaceFolder}/utils/dist/**/*.js",
       ],
-      "smartStep": true,
+      "smartStep": false,
     },
     // database index.ts (via ts-node)
     {
