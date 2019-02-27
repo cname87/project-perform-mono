@@ -10,7 +10,7 @@ export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
 /* import configuration file */
-import { filepaths, getConnectionOptions, getMongoUri } from './.config';
+import { filepaths, getConnectionOptions, getMongoUri } from './configDatabase';
 
 /**
  * This function connects to a MongoDB online database.

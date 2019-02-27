@@ -22,7 +22,7 @@ const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
 /* import dumpError function type */
-import { dumpErrorFunction } from './.config';
+import { dumpErrorFunction } from './configDatabase';
 
 /* external type dependencies */
 import mongoose, {

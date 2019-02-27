@@ -10,7 +10,7 @@
       "type": "node",
       "request": "launch",
       "name": "Mocha Server Tests",
-      "program": "${workspaceFolder}/server/node_modules/mocha/bin/_mocha",
+      "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
       "args": [
         "--recursive",
         "--timeout", "0",
@@ -20,7 +20,7 @@
         // argsIn: windows-service-controller has an undefined variable.  (I fixed in my files).
         // __core-js_shared__: When browser opens a pug page during client tests.
         // Others introduced with typescript etc (?).
-        "${workspaceFolder}/server/test/*.js",
+        "${workspaceFolder}/backend/server/test/*.js",
       ],
       "env": {
         "NODE_ENV": "development",
@@ -31,7 +31,7 @@
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/server/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*.js",
         "<node_internals>/**/*.js",
         "<node_internals>/**/*",
       ],
@@ -81,36 +81,36 @@
       "type": "node",
       "request": "launch",
       "name": "Mocha Database Tests",
+      "stopOnEntry": true,
       "protocol": "inspector",
-      "runtimeExecutable":  "${workspaceFolder}/database/node_modules/node/bin/node",
+      "runtimeExecutable":  "${workspaceFolder}/backend/node_modules/node/bin/node",
       "args": [
-        "${workspaceFolder}/database/node_modules/mocha/bin/_mocha",
+        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
         "--require", "ts-node/register",
         "--require", "source-map-support/register",
         "--recursive",
         "--timeout", "0",
         "--colors",
         "--check-leaks",
-        "${workspaceFolder}/database/test/**/*.test.ts",
+        "${workspaceFolder}/backend/database/test/**/*.test.ts",
       ],
       "outFiles": [
-        "${workspaceFolder}/database/dist/*.js"
+        "${workspaceFolder}/backend/database/dist/*.js"
       ],
-      "cwd": "${workspaceFolder}/database",
+      "cwd": "${workspaceFolder}/backend/database",
       "env": {
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*", // comment out to remove debug output
         "DEBUG_COLORS": "true",
         // You have to use environment variables to set ts-node options */
-        "TS_NODE_PROJECT": "${workspaceFolder}/database/tsconfig.json",
+        "TS_NODE_PROJECT": "${workspaceFolder}/backend/tsconfig.json",
         "TS_NODE_FILES": "true", // include to avoid compile errors
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/database/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -124,36 +124,35 @@
       "request": "launch",
       "name": "Mocha Database with Istanbul Tests",
       "protocol": "inspector",
-      "runtimeExecutable":  "${workspaceFolder}/database/node_modules/node/bin/node",
+      "runtimeExecutable":  "${workspaceFolder}/backend/node_modules/node/bin/node",
       "args": [
-        "${workspaceFolder}/database/node_modules/nyc/bin/nyc",
-        "${workspaceFolder}/database/node_modules/mocha/bin/_mocha",
+        "${workspaceFolder}/backend/node_modules/nyc/bin/nyc",
+        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
         "--require", "ts-node/register/",
         "--require", "source-map-support/register",
         "--recursive",
         "--timeout", "0",
         "--colors",
         "--check-leaks",
-        "${workspaceFolder}/database/test/**/*.test.ts",
+        "${workspaceFolder}/backend/database/test/**/*.test.ts",
       ],
       "outFiles": [
-        "${workspaceFolder}/database/dist/**/*.js"
+        "${workspaceFolder}/backend/database/dist/**/*.js"
       ],
-      "cwd": "${workspaceFolder}/database",
+      "cwd": "${workspaceFolder}/backend/database",
       "env": {
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*", // comment out to remove debug output
         "DEBUG_COLORS": "true",
         // You have to use environment variables to set ts-node options */
-        "TS_NODE_PROJECT": "${workspaceFolder}/database/tsconfig.json",
+        "TS_NODE_PROJECT": "${workspaceFolder}/backend/tsconfig.json",
         "TS_NODE_FILES": "true", // include to avoid compile errors
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/database/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -166,35 +165,34 @@
       "request": "launch",
       "name": "Mocha Utils Tests",
       "protocol": "inspector",
-      "runtimeExecutable":  "${workspaceFolder}/utils/node_modules/node/bin/node",
+      "runtimeExecutable":  "${workspaceFolder}/backend/node_modules/node/bin/node",
       "args": [
-        "${workspaceFolder}/utils/node_modules/mocha/bin/_mocha",
+        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
         "--require", "ts-node/register",
         "--require", "source-map-support/register",
         "--recursive",
         "--timeout", "0",
         "--colors",
         "--check-leaks",
-        "${workspaceFolder}/utils/test/**/*.test.ts",
+        "${workspaceFolder}/backend/utils/test/**/*.test.ts",
       ],
       "outFiles": [
-        "${workspaceFolder}/utils/dist/*.js"
+        "${workspaceFolder}/backend/utils/dist/*.js"
       ],
-      "cwd": "${workspaceFolder}/utils",
+      "cwd": "${workspaceFolder}/backend/utils",
       "env": {
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*", // comment out to remove debug output
         "DEBUG_COLORS": "true",
         // You have to use environment variables to set ts-node options */
-        "TS_NODE_PROJECT": "${workspaceFolder}/utils/tsconfig.json",
+        "TS_NODE_PROJECT": "${workspaceFolder}/backend/tsconfig.json",
         "TS_NODE_FILES": "true", // include to avoid compile errors
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/utils/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -207,36 +205,35 @@
       "request": "launch",
       "name": "Mocha Utils with Istanbul Tests",
       "protocol": "inspector",
-      "runtimeExecutable":  "${workspaceFolder}/utils/node_modules/node/bin/node",
+      "runtimeExecutable":  "${workspaceFolder}/backend/node_modules/node/bin/node",
       "args": [
-        "${workspaceFolder}/utils/node_modules/nyc/bin/nyc",
-        "${workspaceFolder}/utils/node_modules/mocha/bin/_mocha",
+        "${workspaceFolder}/backend/node_modules/nyc/bin/nyc",
+        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
         "--require", "ts-node/register/",
         "--require", "source-map-support/register",
         "--recursive",
         "--timeout", "0",
         "--colors",
         "--check-leaks",
-        "${workspaceFolder}/utils/test/**/*.test.ts",
+        "${workspaceFolder}/backend/utils/test/**/*.test.ts",
       ],
       "outFiles": [
-        "${workspaceFolder}/utils/dist/**/*.js"
+        "${workspaceFolder}/backend/dist/**/*.js"
       ],
-      "cwd": "${workspaceFolder}/utils",
+      "cwd": "${workspaceFolder}/backend/utils",
       "env": {
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*", // comment out to remove debug output
         "DEBUG_COLORS": "true",
         // You have to use environment variables to set ts-node options */
-        "TS_NODE_PROJECT": "${workspaceFolder}/utils/tsconfig.json",
+        "TS_NODE_PROJECT": "${workspaceFolder}/backend/tsconfig.json",
         "TS_NODE_FILES": "true", // include to avoid compile errors
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/utils/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -258,8 +255,7 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/server/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -283,8 +279,7 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/server/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "sourceMaps": true,
@@ -321,8 +316,7 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/server/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -347,8 +341,7 @@
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/server/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -383,8 +376,7 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/server/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -396,8 +388,8 @@
       "request": "launch",
       "name": "Launch database index.js (via index.ts)",
       "protocol": "inspector",
-      "program": "${workspaceFolder}/database/src/index.ts",
-      "cwd":  "${workspaceFolder}/database/",
+      "program": "${workspaceFolder}/backend/database/src/index.ts",
+      "cwd":  "${workspaceFolder}/backend",
       "env": {
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*",
@@ -407,15 +399,13 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/database/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
       "outFiles": [
-        "${workspaceFolder}/database/dist/**/*.js",
-        "${workspaceFolder}/utils/dist/**/*.js",
+        "${workspaceFolder}/backend/dist/**/*.js",
       ],
       "smartStep": false,
     },
@@ -425,29 +415,28 @@
       "request": "launch",
       "name": "Launch database index.ts (via ts-node)",
       "protocol": "inspector",
-      "runtimeExecutable":  "${workspaceFolder}/database/node_modules/node/bin/node",
+      "runtimeExecutable":  "${workspaceFolder}/backend/node_modules/node/bin/node",
       "runtimeArgs": [
         "--require", "ts-node/register",
         "--require", "source-map-support/register",
       ],
       "args": [
-        "${workspaceFolder}/database/src/index.ts"
+        "${workspaceFolder}/backend/database/src/index.ts"
       ],
-      "cwd":  "${workspaceFolder}/database/",
+      "cwd":  "${workspaceFolder}/backend/database",
       "env": {
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*",
         "DEBUG_COLORS": "true",
         // You have to use environment variables to set ts-node options */
-        "TS_NODE_PROJECT": "${workspaceFolder}/database/tsconfig.json",
+        "TS_NODE_PROJECT": "${workspaceFolder}/backend/tsconfig.json",
         "TS_NODE_FILES": "true", // include to avoid compile errors
       },
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/database/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -513,8 +502,7 @@
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/server/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -554,8 +542,7 @@
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/server/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,
@@ -623,8 +610,7 @@
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/node_modules/**/*.js",
-        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
         "<node_internals>/**/*",
       ],
       "autoAttachChildProcesses": true,

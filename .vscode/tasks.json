@@ -7,7 +7,7 @@
       "label": "Taskkill node.exe",
       "type": "shell",
       "windows": {
-        "command": "${workspaceFolder}/server/utils-build/taskkillNode.bat"
+        "command": "${workspaceFolder}/backend/utils/utils-build/taskkillNode.bat"
       },
       "group": "test",
       "presentation": {

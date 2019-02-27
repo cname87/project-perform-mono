@@ -1,17 +1,27 @@
 {
+  "files": [
+    "./database/src/configDatabase.ts",
+    "./database/src/database.ts",
+    "./database/src/index.ts",
+  ],
   "include": [
-    "**/src/**/*.ts"
+    "**/src/**/*.ts",
   ],
   "exclude": [
-    "**/test/*"
+    "**/test/*",
+    "node_modules",
   ],
   "compileOnSave": false,
   "compilerOptions": {
+    // list directory options first
+    "outDir": "./dist",
+    "rootDir": ".",
+    //
     "alwaysStrict": true,
     "baseUrl": ".",
-    "declaration": true,
-    "declarationMap": true,
-    "diagnostics": true,
+    // "declaration": true, // generates declaration .d.ts files
+    // "declarationMap": true, // generates map files for declaration files
+    // "diagnostics": true,
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -37,7 +47,7 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "./dist/",
+    "showConfig": true,
     "sourceMap": true,
     "strict": true,
     "strictBindCallApply": true,
@@ -45,9 +55,6 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "esnext",
-    "traceResolution": true,
-
-
-
+    // "traceResolution": true,
   },
 }

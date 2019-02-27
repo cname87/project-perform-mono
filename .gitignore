@@ -1,5 +1,5 @@
 
-# ignore all files and directories in .nyc_output
+# ignore all files and directories in all .nyc_output directories
 .nyc_output/
 # ignore all files and directories in all 'coverage/' diectories
 coverage/

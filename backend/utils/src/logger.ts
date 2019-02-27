@@ -10,7 +10,7 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* import configuration file */
-import { loggerConfig } from './.config';
+import { loggerConfig } from './configUtils';
 
 /* external dependencies */
 import * as fs from 'fs';

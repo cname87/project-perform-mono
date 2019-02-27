@@ -3,6 +3,9 @@ import debugFunction = require('debug');
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
+/* dummy import to avoid vscode error (?) 'Cannot find __filename' */
+import 'basic-auth';
+
 /* set up mocha, sinon & chai */
 import chai = require('chai');
 import 'mocha';
@@ -25,7 +28,11 @@ const sleep = util.promisify(setTimeout);
 import intercept = require('intercept-stdout');
 
 /* configuration file expected in application root directory */
-import { loggerConfig } from '../src/.config';
+import { loggerConfig } from '../src/configUtils';
+const copyLoggerConfig = {
+  INFO_LOG: loggerConfig.INFO_LOG,
+  ERROR_LOG: loggerConfig.ERROR_LOG,
+};
 
 /* paths for proxyquire */
 const loggerPath = '../src/logger';
@@ -45,8 +52,18 @@ describe('dumpError tests', () => {
     debug(`Running ${modulename}: before - Set up`);
 
     /* set up env variable and test log files */
-    loggerConfig.INFO_LOG = path.join(appRoot, 'logs', 'dumpInfoTest.log');
-    loggerConfig.ERROR_LOG = path.join(appRoot, 'logs', 'dumpErrorTest.log');
+    loggerConfig.INFO_LOG = path.join(
+      appRoot,
+      'utils',
+      'logs',
+      'dumpInfoTest.log',
+    );
+    loggerConfig.ERROR_LOG = path.join(
+      appRoot,
+      'utils',
+      'logs',
+      'dumpErrorTest.log',
+    );
 
     /* files only deleted when all hard links closed,
      * i.e. when programme closes */
@@ -67,8 +84,8 @@ describe('dumpError tests', () => {
     fs.writeFileSync(loggerConfig.ERROR_LOG, '');
   });
 
-  after('Delete test log files', () => {
-    debug(`Running ${modulename}: after - Delete test log files`);
+  after('Delete test log files & reset loggerConfig', () => {
+    debug(`Running ${modulename}: after - Delete test log files & reset loggerConfig`);
 
     /* files only deleted when all hard links closed,
      * i.e. when programme closes */
@@ -83,6 +100,11 @@ describe('dumpError tests', () => {
     } catch (err) {
       /* ok - file didn't exist */
     }
+
+    /* reset loggerConfig */
+    loggerConfig.INFO_LOG = copyLoggerConfig.INFO_LOG;
+    loggerConfig.ERROR_LOG = copyLoggerConfig.ERROR_LOG;
+
   });
 
   it('should log to files and console.log', async function runTest() {

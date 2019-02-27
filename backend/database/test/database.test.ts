@@ -23,7 +23,7 @@ import path = require('path');
 import proxyquireObject = require('proxyquire');
 const proxyquire = proxyquireObject.noPreserveCache();
 
-const indexPath = path.join(appRoot, 'src', 'index');
+const indexPath = path.join(appRoot, 'database', 'src', 'index');
 
 /* internal dependencies */
 import {
@@ -31,7 +31,7 @@ import {
   filepaths,
   getConnectionOptions,
   getMongoUri,
-} from '../src/.config';
+} from '../src/configDatabase';
 
 describe('Database connection', () => {
   debug(`Running ${modulename} describe - Database.connection`);
@@ -186,7 +186,7 @@ describe('Database connection', () => {
 
     /* try connect to database */
     const getDatabase = proxyquire(indexPath, {
-      './.config': configStub,
+      './configDatabase': configStub,
     });
 
     try {

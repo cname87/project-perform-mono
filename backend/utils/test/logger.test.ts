@@ -3,6 +3,9 @@ import debugFunction = require('debug');
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
+/* dummy import to avoid vscode error (?) 'Cannot find __filename' */
+import 'basic-auth';
+
 /* set up mocha, sinon & chai */
 import chai = require('chai');
 import 'mocha';
@@ -25,7 +28,11 @@ const sleep = util.promisify(setTimeout);
 import intercept = require('intercept-stdout');
 
 /* configuration file expected in application root directory */
-import { loggerConfig } from '../src/.config';
+import { loggerConfig } from '../src/configUtils';
+const copyLoggerConfig = {
+  INFO_LOG: loggerConfig.INFO_LOG,
+  ERROR_LOG: loggerConfig.ERROR_LOG,
+};
 
 /* paths for proxyquire */
 const loggerPath = '../src/logger';
@@ -33,8 +40,8 @@ const loggerPath = '../src/logger';
 describe('logger', () => {
   debug(`Running ${modulename}: describe - logger`);
 
-  after('Delete test log files', () => {
-    debug(`Running ${modulename}: after - Delete test log files`);
+  after('Delete test log files & reset loggerConfig', () => {
+    debug(`Running ${modulename}: after - Delete test log files & reset loggerConfig`);
 
     /* files only deleted when all hard links closed,
      * i.e. when programme closes */
@@ -49,6 +56,42 @@ describe('logger', () => {
     } catch (err) {
       /* ok - file didn't exist */
     }
+
+    /* reset loggerConfig */
+    loggerConfig.INFO_LOG = copyLoggerConfig.INFO_LOG;
+    loggerConfig.ERROR_LOG = copyLoggerConfig.ERROR_LOG;
+  });
+
+  it('logs to standard files', async () => {
+    debug(
+      `Running ${modulename}: it - logs to the standard files`,
+    );
+
+    /* use proxyquire to reload Logger */
+    const { Logger } = proxyquire(loggerPath, {});
+    const logger = Logger.getInstance();
+
+    /* log at error level */
+    logger.error('LOGGER_ERROR');
+
+    /* read both log files */
+    let infoLog = fs.readFileSync(loggerConfig.INFO_LOG).toString();
+    let errorLog = fs.readFileSync(loggerConfig.ERROR_LOG).toString();
+
+    /* allow logger print to file */
+    await sleep(100);
+
+    /* both files have output */
+    infoLog = fs
+      .readFileSync(loggerConfig.INFO_LOG)
+      .toString()
+      .slice(-14);
+    errorLog = fs
+      .readFileSync(loggerConfig.ERROR_LOG)
+      .toString()
+      .slice(-14);
+    expect(infoLog === 'LOGGER_ERROR\r\n', 'info log file addition').to.be.true;
+    expect(errorLog === 'LOGGER_ERROR\r\n', 'error log file entry').to.be.true;
   });
 
   it('creates and logs to files - development', async () => {
@@ -58,8 +101,18 @@ describe('logger', () => {
 
     /* set up test log files */
     // it is assumed process.env.NODE_ENV = 'development'
-    loggerConfig.INFO_LOG = path.join(appRoot, 'logs', 'loggerInfoTest.log');
-    loggerConfig.ERROR_LOG = path.join(appRoot, 'logs', 'loggerErrorTest.log');
+    loggerConfig.INFO_LOG = path.join(
+      appRoot,
+      'utils',
+      'logs',
+      'loggerInfoTest.log',
+    );
+    loggerConfig.ERROR_LOG = path.join(
+      appRoot,
+      'utils',
+      'logs',
+      'loggerErrorTest.log',
+    );
 
     /* delete the test log files */
     try {
@@ -135,8 +188,18 @@ describe('logger', () => {
 
     /* set up env variable and test log files */
     process.env.NODE_ENV = 'production';
-    loggerConfig.INFO_LOG = path.join(appRoot, 'logs', 'loggerInfoTest.log');
-    loggerConfig.ERROR_LOG = path.join(appRoot, 'logs', 'loggerErrorTest.log');
+    loggerConfig.INFO_LOG = path.join(
+      appRoot,
+      'utils',
+      'logs',
+      'loggerInfoTest.log',
+    );
+    loggerConfig.ERROR_LOG = path.join(
+      appRoot,
+      'utils',
+      'logs',
+      'loggerErrorTest.log',
+    );
 
     /* NOTE: test log files already exist from 1st test */
 
@@ -208,8 +271,8 @@ describe('logger', () => {
     );
 
     /* set up env variable and test log files */
-    loggerConfig.INFO_LOG = path.join(appRoot, 'logs', 'loggerInfoTest.log');
-    loggerConfig.ERROR_LOG = path.join(appRoot, 'logs', 'loggerErrorTest.log');
+    loggerConfig.INFO_LOG = path.join(appRoot, 'utils', 'logs', 'loggerInfoTest.log');
+    loggerConfig.ERROR_LOG = path.join(appRoot, 'utils', 'logs', 'loggerErrorTest.log');
 
     /* NOTE: no need to delete the test log files as the stub
      * will throw an error */

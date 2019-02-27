@@ -6,8 +6,8 @@
     "exclude": [
       "**/*.d.ts",
       "node_modules/**",
-      "test/**",
-      "utils-build/**/*.*"
+      "**/test/**/*.*",
+      "**/utils-build/**/*.*"
     ],
     "exclude-after-remap": false,
     "extension": [
