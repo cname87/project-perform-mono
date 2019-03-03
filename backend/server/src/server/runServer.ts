@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * This module runs a http(s) server.
  * The base controllers, handlers and an object containing the database

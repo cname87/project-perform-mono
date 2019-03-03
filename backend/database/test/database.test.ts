@@ -26,6 +26,7 @@ const proxyquire = proxyquireObject.noPreserveCache();
 const indexPath = path.join(appRoot, 'database', 'src', 'index');
 
 /* internal dependencies */
+import 'dotenv/config';
 import {
   Database,
   filepaths,

@@ -8,14 +8,11 @@ describe('Database model operations', function() {
 
     const path = require('path');
     const appRoot = require('app-root-path').toString();
-    const databasePath = '../dist/database/database';
-    const extDatabaseServicePath = '../dist/database/extDatabaseService';
-    const { config } = require(path.join(appRoot, 'dist', '.config'));
-    let { database } = config.DATABASE;
+    const { config } = require(path.join(appRoot, 'dist', 'server', 'src','configServer'));
+    let databaseIndex = config.DATABASE;
     const { createModel } = config.TESTSMODEL;
     const chai = require('chai');
     const expect = chai.expect;
-    const proxyquire = require('proxyquire');
     let dbConnection = {};
     const models = {};
     const docContent1 = {
@@ -27,11 +24,13 @@ describe('Database model operations', function() {
         test2: 'test22',
     };
 
+    let database;
+
     before(async function() {
 
-        database.configDatabase(config);
         /* connection created here is used for all tests */
-        dbConnection = await database.connectToDB();
+        database = await databaseIndex.runDatabaseApp();
+        dbConnection = database.dbConnection
 
     });
 
@@ -118,29 +117,6 @@ describe('Database model operations', function() {
 
         /* close dbConnection before db shutdown or mocha won't exit */
         await database.closeConnection(dbConnection);
-
-        /* simulate a shut database server by mongoose createConnection
-         * failure (to avoid having to shut down and restart the
-         * database server which is slow */
-        database = proxyquire(databasePath, {
-            ['./extDatabaseService']: {
-
-                startDB: () => {
-
-                    return;
-
-                },
-
-            },
-            'mongoose': {
-                createConnection: () => {
-
-                    throw new Error('Test error');
-
-                },
-            },
-        }).database;
-        database.configDatabase(config);
 
         try {
 

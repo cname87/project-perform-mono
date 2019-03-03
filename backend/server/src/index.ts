@@ -22,8 +22,11 @@ import debugFunction from 'debug';
 export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-/* import configuration file */
-import { config } from './.config';
+/* import configuration files */
+import { config } from './configServer';
+// tslint:disable-next-line: ordered-imports
+import * as dotenv from 'dotenv';
+dotenv.config({ path: config.ENV_FILE });
 
 /* external dependencies */
 import { strict } from 'assert';
@@ -62,7 +65,7 @@ const { createModel: testsModels } = config.TESTSMODEL;
  * Also, other modules can create new instances later without the parameter
  * and they will receive the same instance. */
 const { Logger } = config.LOGGER;
-const logger = Logger.getInstance(config);
+const logger = Logger.getInstance();
 const { DumpError } = config.DUMPERROR;
 const dumpError = DumpError.getInstance(logger);
 const { ServerLogger } = config.SERVER_LOGGER;
@@ -219,12 +222,11 @@ async function runApp() {
       logger.error(modulename + ': database failed to connect');
     }
   } catch (err) {
-    logger.error(modulename + ': database start up error - exiting');
+    /* log error but proceed */
+    logger.error(modulename + ': database start up error - continuing');
     dumpError(err);
-    await closeAll();
-    debug(modulename + ': will exit with code -5');
-    process.exitCode = -5;
   }
+
   /* call the http server if db connected or not needed
    * otherwise exit */
   if (obj.dbConnection.readyState === 1 || obj.config.IS_NO_DB_OK) {

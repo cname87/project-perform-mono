@@ -25,7 +25,7 @@ const { combine, timestamp, label, printf } = format;
  * import { Logger } from '<path to>logger';
  * logger = Logger.getInstance();
  *
- * Set the log files paths in .config.js (which must be in the same directory as this file).
+ * Set the log files paths in configUtils.ts (which must be in the same directory as this file).
  *
  * Once this module is imported then all subsequent imports get the same
  * object.

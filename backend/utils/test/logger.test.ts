@@ -41,7 +41,9 @@ describe('logger', () => {
   debug(`Running ${modulename}: describe - logger`);
 
   after('Delete test log files & reset loggerConfig', () => {
-    debug(`Running ${modulename}: after - Delete test log files & reset loggerConfig`);
+    debug(
+      `Running ${modulename}: after - Delete test log files & reset loggerConfig`,
+    );
 
     /* files only deleted when all hard links closed,
      * i.e. when programme closes */
@@ -63,9 +65,7 @@ describe('logger', () => {
   });
 
   it('logs to standard files', async () => {
-    debug(
-      `Running ${modulename}: it - logs to the standard files`,
-    );
+    debug(`Running ${modulename}: it - logs to the standard files`);
 
     /* use proxyquire to reload Logger */
     const { Logger } = proxyquire(loggerPath, {});
@@ -271,8 +271,18 @@ describe('logger', () => {
     );
 
     /* set up env variable and test log files */
-    loggerConfig.INFO_LOG = path.join(appRoot, 'utils', 'logs', 'loggerInfoTest.log');
-    loggerConfig.ERROR_LOG = path.join(appRoot, 'utils', 'logs', 'loggerErrorTest.log');
+    loggerConfig.INFO_LOG = path.join(
+      appRoot,
+      'utils',
+      'logs',
+      'loggerInfoTest.log',
+    );
+    loggerConfig.ERROR_LOG = path.join(
+      appRoot,
+      'utils',
+      'logs',
+      'loggerErrorTest.log',
+    );
 
     /* NOTE: no need to delete the test log files as the stub
      * will throw an error */

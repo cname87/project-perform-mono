@@ -16,6 +16,9 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
+import * as appRootObject from 'app-root-path';
+import * as path from 'path';
+const appRoot = appRootObject.toString();
 import { ConnectionOptions } from 'mongoose';
 import { format } from 'util';
 
@@ -40,11 +43,13 @@ export interface IFilepaths {
   readonly LOGGER: {
     Logger: typeof LOGGER.Logger;
   };
+  readonly ENV_FILE: string;
 }
 export const filepaths: IFilepaths = {
   DATABASE,
   DUMPERROR,
   LOGGER,
+  ENV_FILE: path.join(appRoot, '.env'),
 };
 
 /* export types needed in other modules */
@@ -56,10 +61,10 @@ export type Database = DATABASE.Database;
 export function getMongoUri(): string {
   /* mongoDB server connection url and connect options */
   const scheme = 'mongodb+srv';
-  const user = encodeURIComponent('cname87');
-  const password = encodeURIComponent('performMongo_1');
-  const host = 'perform-9troj.azure.mongodb.net';
-  const db = 'test';
+  const user = encodeURIComponent(process.env.DB_USER as string);
+  const password = encodeURIComponent(process.env.DB_PASSWORD as string);
+  const host = process.env.DB_HOST as string;
+  const db = process.env.DB_DATABASE as string;
   const ssl = 'true';
   const authSource = 'admin';
   const authMechanism = 'DEFAULT';

@@ -7,11 +7,11 @@ debug(`Starting ${modulename}`);
 describe('Application tests', function() {
   const path = require('path');
   const appRoot = require('app-root-path').toString();
-  const indexPath = '../dist/index';
-  const { config } = require(path.join(appRoot, 'dist', '.config'));
+  const indexPath = '../../dist/server/src/index';
+  const { config } = require(path.join(appRoot, 'dist', 'server', 'src','configServer'));
 
   const { Logger } = config.LOGGER;
-  const logger = Logger.getInstance(config);
+  const logger = Logger.getInstance();
   const { DumpError } = config.DUMPERROR;
   const dumpError = DumpError.getInstance(logger);
 
@@ -45,7 +45,7 @@ describe('Application tests', function() {
     url: 'https://localhost:1337/',
     key: fs.readFileSync(config.HTTPS_KEY),
     cert: fs.readFileSync(config.HTTPS_CERT),
-    ca: fs.readFileSync(config.DB_CA),
+    ca: fs.readFileSync(config.rootCA),
   };
 
   const serverIsUp = () => {
@@ -160,7 +160,7 @@ describe('Application tests', function() {
             spyDebug(message);
           };
         },
-        './.config': config,
+        './configServer': config,
       });
     };
 
@@ -296,12 +296,12 @@ describe('Application tests', function() {
   });
 
   it(
-    'Tests a server start with database fail, ' + 'and database is required',
+    'Tests a server start with database fail, and database is required',
     async function() {
       /* stub so connectDB throws an error */
       const databaseRestore = config.DATABASE;
       config.DATABASE = {
-        connectToDB: () => {
+        runDatabaseApp: () => {
           throw new Error('Test error');
         },
       };
@@ -322,7 +322,7 @@ describe('Application tests', function() {
 
       expect(spyConsoleError.notCalled).to.be.true;
 
-      expect(spyDumpError.notCalled).to.be.true;
+      expect(spyDumpError.called).to.be.true;
 
       expect(
         spyLoggerError
@@ -333,7 +333,7 @@ describe('Application tests', function() {
   );
 
   it(
-    'Tests a server start with database fail, ' + 'and database not required',
+    'Tests a server start with database fail, and database not required',
     async function() {
       /* allow server start with no database */
       config.IS_NO_DB_OK = true;
@@ -342,8 +342,8 @@ describe('Application tests', function() {
        * this means the dbConnection object will equal an error */
       const databaseRestore = config.DATABASE;
       config.DATABASE = {
-        connectToDB: () => {
-          return new Error('Test error');
+        runDatabaseApp: () => {
+          throw new Error('Test error');
         },
       };
 
@@ -374,13 +374,13 @@ describe('Application tests', function() {
 
       expect(
         spyLoggerError.lastCall.calledWith(
-          '\\index.js: ' + 'database failed to connect',
+          '\\index.js: database start up error - continuing',
         ),
       ).to.be.true;
 
       expect(spyConsoleError.notCalled).to.be.true;
 
-      expect(spyDumpError.notCalled).to.be.true;
+      expect(spyDumpError.called).to.be.true;
     },
   );
 

@@ -85,7 +85,9 @@ describe('dumpError tests', () => {
   });
 
   after('Delete test log files & reset loggerConfig', () => {
-    debug(`Running ${modulename}: after - Delete test log files & reset loggerConfig`);
+    debug(
+      `Running ${modulename}: after - Delete test log files & reset loggerConfig`,
+    );
 
     /* files only deleted when all hard links closed,
      * i.e. when programme closes */
@@ -104,7 +106,6 @@ describe('dumpError tests', () => {
     /* reset loggerConfig */
     loggerConfig.INFO_LOG = copyLoggerConfig.INFO_LOG;
     loggerConfig.ERROR_LOG = copyLoggerConfig.ERROR_LOG;
-
   });
 
   it('should log to files and console.log', async function runTest() {

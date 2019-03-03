@@ -36,7 +36,7 @@ let browserInstance;
 /* awaits that index.ts has run and fired the completion event */
 function awaitIndex() {
   return new Promise(async (resolve) => {
-    const index = await require('../dist/index');
+    const index = await require('../../dist/server/src/index');
     /* Note: You need index.ts to export 'event' before connectToDB as
      * mocha gets control and executes the next line then, and 'index.event'
      * needs to be defined by that line */

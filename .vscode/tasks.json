@@ -21,7 +21,7 @@
       "type": "process",
       "command": "node",
       "args": [
-        "${workspaceFolder}/server/utils-build/isServerUp.js"
+        "${workspaceFolder}/backend/dist/server/src/server/isServerUp.js"
       ],
       "options": {
         "env": {
@@ -44,7 +44,7 @@
       "args": [
         "run",
         "--prefix",
-        "${workspaceRoot}\\server",
+        "${workspaceRoot}/backend",
         "build"
       ],
       "problemMatcher": [],
@@ -62,7 +62,7 @@
       "label": "Compile server",
       "type": "npm",
       "script": "compile",
-      "path": "server/",
+      "path": "backend/",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -73,7 +73,7 @@
       "label": "Run tsc",
       "type": "npm",
       "script": "tsc",
-      "path": "server/",
+      "path": "backend/",
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",

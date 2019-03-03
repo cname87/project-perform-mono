@@ -22,7 +22,7 @@ export const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* configuration file expected in directory above */
-import { config } from '../.config';
+import { config } from '../configServer';
 export { config };
 
 /* external dependencies */
@@ -32,7 +32,7 @@ import * as forever from 'forever-monitor';
  * Note: the same logger will be used by index and all other module */
 debug(modulename + ': loading loggers');
 const { Logger } = config.LOGGER;
-export const logger = Logger.getInstance(config);
+export const logger = Logger.getInstance();
 const { DumpError } = config.DUMPERROR;
 export const dumpError = DumpError.getInstance(logger);
 

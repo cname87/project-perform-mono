@@ -11,6 +11,9 @@ debug(`Starting ${modulename}`);
 
 /* import configuration file */
 import { filepaths, getConnectionOptions, getMongoUri } from './configDatabase';
+// tslint:disable-next-line: ordered-imports
+import * as dotenv from 'dotenv';
+dotenv.config({ path: filepaths.ENV_FILE });
 
 /**
  * This function connects to a MongoDB online database.

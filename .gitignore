@@ -1,7 +1,7 @@
 
 # ignore all files and directories in all .nyc_output directories
 .nyc_output/
-# ignore all files and directories in all 'coverage/' diectories
+# ignore all files and directories in all 'coverage/' directories
 coverage/
 # ignore all files and directories in all 'logs/' directories
 logs/
@@ -13,8 +13,10 @@ public/
 dist/
 # ignore all files and directories in all dist/ directories
 certs/
+# ignore all .env files
+.env
 
-# NB: Always ignore config files with credentials etc
+# NB: Always ignore config files with credentials i.e. certs directory and .env file.
 
 # If files are not being ignored then they may have been previously added
 # try git rm --cached <filename>, or git rm -r --cached <dirname> to get git

@@ -8,8 +8,8 @@ describe('monitor', function() {
 
     debug(modulename + ':\n\n *** describe server monitor starts here ***\n\n');
 
-    const monitorPath = '../dist/monitor/monitor';
-    const { config } = require('../dist/.config');
+    const monitorPath = '../../dist/server/src/monitor/monitor';
+    const { config } = require('../../dist/server/src/configServer');
 
     const util = require('util');
     const setImmediatePromise = util.promisify(setImmediate);
