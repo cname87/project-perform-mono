@@ -3,7 +3,7 @@
  * It uses the winston logger utility.
  */
 
-const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));
+const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
@@ -12,7 +12,7 @@ debug(`Starting ${modulename}`);
  * Usage:
  *
  * Add...
- * const { DumpError } = <path to file>.dumperror;
+ * const { DumpError } = <path to file>.dumpError;
  * const dumpError = DumpError.getInstance(logger);
  *
  * where 'logger' is optional.

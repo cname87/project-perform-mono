@@ -85,6 +85,6 @@ describe('file retrieval', function() {
             console.log('response status: ' + response.status);
             chai.expect(response.status).to.eql(200);
 
-        });
+    });
 
 });

@@ -3,12 +3,14 @@
     "./database/src/configDatabase.ts",
     "./database/src/database.ts",
     "./database/src/index.ts",
+    "./models/src/tests.ts",
   ],
   "include": [
     "**/src/**/*.ts",
+    "**/test/*.test.ts",
   ],
   "exclude": [
-    "**/test/*",
+    // "**/test/*.test.ts",
     "node_modules",
   ],
   "compileOnSave": false,

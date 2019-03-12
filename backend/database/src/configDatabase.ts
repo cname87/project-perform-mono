@@ -29,7 +29,7 @@ import { format } from 'util';
  */
 
 // a utility to dump errors to the logger
-import * as DUMPERROR from '../../utils/src/dumperror';
+import * as DUMPERROR from '../../utils/src/dumpError';
 // a configured winston general logger
 import * as LOGGER from '../../utils/src/logger';
 // Database class

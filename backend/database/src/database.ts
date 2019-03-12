@@ -16,7 +16,7 @@
  * - createModel: Returns a mongoose model based on supplied parameters.
  */
 
-const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));
+const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);

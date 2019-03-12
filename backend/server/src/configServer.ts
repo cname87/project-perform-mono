@@ -26,7 +26,7 @@ import * as ERROR_HANDLER from './middlewares/errorhandler';
 // a configured winston general logger
 import * as LOGGER from '../../utils/src/logger';
 // a utility to dump errors to the logger
-import * as DUMPERROR from '../../utils/src/dumperror';
+import * as DUMPERROR from '../../utils/src/dumpError';
 // database files
 import * as DATABASE from '../../database/src/index';
 
@@ -37,8 +37,8 @@ import * as ROOT_CONTROLLER from './controllers/root';
 import * as FAIL_CONTROLLER from './controllers/fail';
 
 /* list of models */
-import * as USERSMODEL from './models/users';
-import * as TESTSMODEL from './models/tests';
+import * as USERSMODEL from '../../models/src/users';
+import * as TESTSMODEL from '../../models/src/tests';
 
 interface IConfig {
   readonly LOGGER: {
@@ -115,7 +115,7 @@ export const config: IConfig = {
   // true for https with http on port 80 being redirected
   HTTPS_ON: true,
   // https credentials
-  rootCA: path.join(appRoot, 'server', 'certs', 'rootCA.crt'),
+  ROOT_CA: path.join(appRoot, 'server', 'certs', 'rootCA.crt'),
   HTTPS_KEY: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
   HTTPS_CERT: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
   // cookieparser key

@@ -5,6 +5,7 @@
 import '/testServer/testroot.js';
 import '/testServer/page-test.js';
 import '/testServer/file-test.js';
+import '/testServer/app-test.js';
 import '/testServer/errors-test.js';
 
 mocha.checkLeaks();

@@ -16,7 +16,7 @@
     ],
     "functions": 0,
     "include": [
-        "**/*.ts"
+      "**/*.ts"
     ],
     "lines": 60,
     "per-file": true,

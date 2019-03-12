@@ -89,7 +89,7 @@
         "${workspaceFolder}/backend/database/test/**/*.test.ts",
       ],
       "outFiles": [
-        "${workspaceFolder}/backend/database/dist/*.js"
+        "${workspaceFolder}/backend/dist/database/*.js"
       ],
       "cwd": "${workspaceFolder}/backend/database",
       "env": {
@@ -130,7 +130,7 @@
         "${workspaceFolder}/backend/database/test/**/*.test.ts",
       ],
       "outFiles": [
-        "${workspaceFolder}/backend/database/dist/**/*.js"
+        "${workspaceFolder}/backend/dist/database/**/*.js"
       ],
       "cwd": "${workspaceFolder}/backend/database",
       "env": {
@@ -170,7 +170,7 @@
         "${workspaceFolder}/backend/utils/test/**/*.test.ts",
       ],
       "outFiles": [
-        "${workspaceFolder}/backend/utils/dist/*.js"
+        "${workspaceFolder}/backend/dist/utils/*.js"
       ],
       "cwd": "${workspaceFolder}/backend/utils",
       "env": {
@@ -211,7 +211,7 @@
         "${workspaceFolder}/backend/utils/test/**/*.test.ts",
       ],
       "outFiles": [
-        "${workspaceFolder}/backend/dist/**/*.js"
+        "${workspaceFolder}/backend/dist/utils/**/*.js"
       ],
       "cwd": "${workspaceFolder}/backend/utils",
       "env": {
@@ -233,6 +233,89 @@
       "sourceMaps": true,
       "smartStep": false, // false as it may skip some ts files
     },
+    // Mocha Backend *.test.ts
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Backend *.test.ts Tests",
+      // "protocol": "inspector",
+      "stopOnEntry": true,
+      "runtimeExecutable":  "${workspaceFolder}/backend/node_modules/node/bin/node",
+      "args": [
+        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
+        "--require", "ts-node/register",
+        "--require", "source-map-support/register",
+        // "--recursive",
+        "--timeout", "0",
+        "--colors",
+        "--check-leaks",
+        "${workspaceFolder}/backend/models/test/models.test.ts",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/backend/dist/**/*.js",
+
+      ],
+      "cwd": "${workspaceFolder}/backend/models",
+      "env": {
+        "NODE_ENV": "development",
+        "DEBUG": "MM* PP* SY*", // comment out to remove debug output
+        "DEBUG_COLORS": "true",
+        // You have to use environment variables to set ts-node options */
+        "TS_NODE_PROJECT": "${workspaceFolder}/backend/tsconfig.json",
+        "TS_NODE_FILES": "true", // include to avoid compile errors
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal", // allows you use CTRL+C to exit
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "${workspaceFolder}/backend/node_modules/**/*",
+        "<node_internals>/**/*",
+      ],
+      "autoAttachChildProcesses": true,
+      "sourceMaps": true,
+      "smartStep": true,
+    },
+    // Mocha Backend *.test.ts with Istanbul coverage
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Backend *.test.ts with Istanbul coverage",
+      // "protocol": "inspector",
+      "runtimeExecutable":  "${workspaceFolder}/backend/node_modules/node/bin/node",
+      "args": [
+        "${workspaceFolder}/backend/node_modules/nyc/bin/nyc",
+        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
+        "--require", "ts-node/register/",
+        "--require", "source-map-support/register",
+        "--recursive",
+        "--timeout", "0",
+        "--colors",
+        "--check-leaks",
+        "${workspaceFolder}/backend/**/test/*.test.ts",
+      ],
+      "outFiles": [
+        "${workspaceFolder}/backend/dist/**/src/*.js"
+      ],
+      "cwd": "${workspaceFolder}/backend/",
+      "env": {
+        "NODE_ENV": "development",
+        "DEBUG": "MM* PP* SY*", // comment out to remove debug output
+        "DEBUG_COLORS": "true",
+        // You have to use environment variables to set ts-node options */
+        "TS_NODE_PROJECT": "${workspaceFolder}/backend/tsconfig.json",
+        "TS_NODE_FILES": "true", // include to avoid compile errors
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal", // allows you use CTRL+C to exit
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "${workspaceFolder}/backend/node_modules/**/*.*",
+        "<node_internals>/**/*.*",
+      ],
+      "autoAttachChildProcesses": true,
+      "sourceMaps": true,
+      "smartStep": false, // false as it may skip some ts files
+    },    
     // Current .js file
     {
       "type": "node",

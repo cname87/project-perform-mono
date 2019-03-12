@@ -1,7 +1,5 @@
 /**
- * This module handles all browser requests.
- * It passes the root / request to the index.html file built by the Angular app.
- * It passes all other requests to the Angular app dist directory
+ * This module passes all requests to the index.html file built by the Angular app.
  */
 
 const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));

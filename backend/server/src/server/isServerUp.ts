@@ -31,7 +31,7 @@ const options = {
   url: 'https://localhost:1337/',
   key: fs.readFileSync(config.HTTPS_KEY),
   cert: fs.readFileSync(config.HTTPS_CERT),
-  ca: fs.readFileSync(config.DB_CA),
+  ca: fs.readFileSync(config.ROOT_CA),
 };
 const serverIsUp = () => {
   let response;

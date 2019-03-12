@@ -2,16 +2,22 @@
  * This module creates a test database model.
  */
 
-const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));
+const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-export function createModel(dbConnection: any, database: any) {
+import { Connection, Document, Model, SchemaDefinition } from 'mongoose';
+import { Database } from './configModels';
+
+export function createModel(
+  dbConnection: Connection,
+  database: Database,
+): Model<Document> {
   debug(modulename + ': running createModel');
 
   /* set up schema, collection, and model name */
-  const schema = {
+  const schema: SchemaDefinition = {
     test1: String,
     test2: String,
   };

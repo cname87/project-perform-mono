@@ -100,7 +100,12 @@
             ]
           }
         }
-      }
+      },
+      "cli": {
+        "warnings": {
+          "typescriptMismatch": false
+        }
+      },
     },
     "angular-tour-of-heroes-e2e": {
       "root": "e2e/",
@@ -131,5 +136,5 @@
       }
     }
   },
-  "defaultProject": "angular-tour-of-heroes"
+  "defaultProject": "angular-tour-of-heroes",
 }

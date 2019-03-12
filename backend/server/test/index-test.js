@@ -45,7 +45,7 @@ describe('Application tests', function() {
     url: 'https://localhost:1337/',
     key: fs.readFileSync(config.HTTPS_KEY),
     cert: fs.readFileSync(config.HTTPS_CERT),
-    ca: fs.readFileSync(config.rootCA),
+    ca: fs.readFileSync(config.ROOT_CA),
   };
 
   const serverIsUp = () => {
