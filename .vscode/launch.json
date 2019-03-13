@@ -234,7 +234,7 @@
     // Client-fired server tests
     {
       /* This runs the server-side mocha client test file to test the server-side behaviour during client-side fired tests. */
-      /* If not commented out in the js file it kicks off the browser tests that fire the client-side tests.  Otherwise you can load loadmocha.html manually. */
+      /* If not commented out in the js file it kicks off the browser tests that fire the client-side tests.  Otherwise you can load loadmocha.html manually. Or if you need debug of the browser-side then set up a launch configuration to load loadmocha.html. */
       "type": "node",
       "request": "launch",
       "name": "Mocha Client Tests",
