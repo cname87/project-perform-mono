@@ -39,6 +39,22 @@
       },
       "problemMatcher": []
     },
+    // npm delete nyc file
+    {
+      "label": "npm delete nyc file",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "--prefix",
+        "${workspaceRoot}/backend",
+        "delNyc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
     // npm build backend
     {
       "label": "npm build backend",

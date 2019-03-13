@@ -39,7 +39,7 @@
       "args": [
         "--reporter=text",
         "--reporter=html",
-        "--report-dir", "${workspaceFolder}/backend/coverage",
+        "--report-dir", "${workspaceFolder}/backend/coverage/all",
         "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
         "--config", "${workspaceFolder}/backend/.mocharc.json",
         "${workspaceFolder}/backend/dist/**/test/*.test.js",
@@ -59,7 +59,8 @@
         "${workspaceFolder}/backend/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
-      "preLaunchTask": "Taskkill node.exe", // kill any previously failed node runs
+      "preLaunchTask": "Taskkill node.exe", // kill any failed node runs
+      "postDebugTask": "npm delete nyc file", // delete .nyc_report
     },
     // Current .js file
     {
@@ -272,13 +273,9 @@
       "args": [
         "--reporter=text",
         "--reporter=html",
-        "--report-dir",
-        "./backend/coverage/client",
+        "--report-dir", "${workspaceFolder}/backend/coverage/client",
         "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
-        // mocha options
-        "--recursive",
-        "--timeout", "0",
-        "--colors",
+        "--config", "${workspaceFolder}/backend/.mocharc.json",
         "${workspaceFolder}/backend/server/test/client-test.js",
       ],
       "env": {
@@ -296,6 +293,7 @@
       ],
       "autoAttachChildProcesses": true,
       "preLaunchTask": "Taskkill node.exe", // can't use in compound calls
+      "postDebugTask": "npm delete nyc file", // delete .nyc_report
     },
   ],
 }
