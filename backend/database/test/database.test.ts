@@ -23,16 +23,19 @@ import path = require('path');
 import proxyquireObject = require('proxyquire');
 const proxyquire = proxyquireObject.noPreserveCache();
 
-const indexPath = path.join(appRoot, 'database', 'src', 'index');
+const indexPath = path.join(appRoot, 'dist', 'database', 'src', 'index');
 
 /* internal dependencies */
-import 'dotenv/config';
+// import 'dotenv/config';
 import {
   Database,
   filepaths,
   getConnectionOptions,
   getMongoUri,
 } from '../src/configDatabase';
+// tslint:disable-next-line: ordered-imports
+import * as dotenv from 'dotenv';
+dotenv.config({ path: filepaths.ENV_FILE });
 
 describe('Database connection', () => {
   debug(`Running ${modulename} describe - Database.connection`);
@@ -90,8 +93,9 @@ describe('Database connection', () => {
     database = await getDatabase.runDatabaseApp();
 
     if (true) {
-      expect(spyDebug.lastCall.lastArg).to.eql(
-        '\\index.ts: running runDatabaseApp',
+      /* slice off /index.js: as it might be index.ts depending on run mechanism */
+      expect(spyDebug.lastCall.lastArg.slice(-22)).to.eql(
+        'running runDatabaseApp',
       );
     }
   });

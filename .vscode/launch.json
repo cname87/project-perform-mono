@@ -23,8 +23,9 @@
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/node_modules/**/*.*",
-        "<node_internals>/**/*.*",
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
+        "${workspaceFolder}/backend/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
       "preLaunchTask": "Taskkill node.exe", // kill any previously failed node runs
@@ -52,8 +53,9 @@
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
-        "${workspaceFolder}/backend/node_modules/**/*.*",
-        "<node_internals>/**/*.*",
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
+        "${workspaceFolder}/backend/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
       "preLaunchTask": "Taskkill node.exe", // kill any previously failed node runs
@@ -62,11 +64,11 @@
     {
     "type": "node",
     "request": "launch",
-    "name": "Mocha Test",
+    "name": "Mocha Backend debug using .js",
     "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
     "args": [
       "--config", "${workspaceFolder}/backend/.mocharc.json",
-      "${workspaceFolder}/backend/dist/models/test/models.test.js",
+      "${workspaceFolder}/backend/dist/**/test/*.test.js",
     ],
     "env": {
       "NODE_ENV": "development",
@@ -83,8 +85,39 @@
     ],
     "autoAttachChildProcesses": true,
     "preLaunchTask": "Taskkill node.exe", // kill any previously failed node runs
-  },
-    // Mocha Backend debug .test.ts
+    },
+    // Mocha Backend using .js with istanbul
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mocha Backend using .js with istanbul",
+      "program": "${workspaceFolder}/backend/node_modules/nyc/bin/nyc",
+      "args": [
+        "--reporter=text",
+        "--reporter=html",
+        "--report-dir", "${workspaceFolder}/backend/coverage",
+        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
+        "--config", "${workspaceFolder}/backend/.mocharc.json",
+        "${workspaceFolder}/backend/dist/**/test/*.test.js",
+        "${workspaceFolder}/backend/server/test/*.js",
+      ],
+      "env": {
+        "NODE_ENV": "development",
+        "DEBUG": "MM* PP* SY*", // comment out to remove debug output
+        "DEBUG_COLORS": "true"
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal", // allows you use CTRL+C to exit
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
+        "${workspaceFolder}/backend/node_modules/**/*.js",
+      ],
+      "autoAttachChildProcesses": true,
+      "preLaunchTask": "Taskkill node.exe", // kill any previously failed node runs
+    },
+    // Mocha Backend debug using .test.ts
     {
       /**
       If debug is required: 
@@ -94,7 +127,7 @@
       */ 
       "type": "node",
       "request": "launch",
-      "name": "Mocha Backend *.test.ts Tests",
+      "name": "Mocha Backend debug using .test.ts",
       "protocol": "inspector",
       "stopOnEntry": true,
       "runtimeExecutable":  "${workspaceFolder}/backend/node_modules/node/bin/node",
@@ -103,8 +136,8 @@
         "--require", "ts-node/register",
         "--require", "source-map-support/register",
         "--config", "${workspaceFolder}/backend/.mocharc.json",
-        // "${workspaceFolder}/backend/xxx/test/xxx.test.ts"
-        "${workspaceFolder}/backend/models/test/models.test.ts",
+        // Change to "${workspaceFolder}/backend/xxx/test/xxx.test.ts"
+        "${workspaceFolder}/backend/**/test/*.test.ts",
       ],
       "outFiles": [
         "${workspaceFolder}/backend/dist/**/src/*.js",
@@ -125,7 +158,6 @@
         "<node_internals>/**/*.js",
         "${workspaceFolder}/backend/node_modules/**/*",
         "${workspaceFolder}/backend/node_modules/**/*.js",
-
       ],
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
@@ -439,8 +471,7 @@
     // Client-fired server tests
     {
       /* This runs the server-side mocha client test file to test the server-side behaviour during client-side fired tests. */
-      /* It expects the browser client to run a series of matching client-side tests. */
-      /* If not commented out in the js fle it kicks off the browser tests.  Otherwise you can run the browser-side tests below, (or load loadmocha.html manually). */
+      /* If not commented out in the js file it kicks off the browser tests that fire the client-side tests.  Otherwise you can load loadmocha.html manually. */
       "type": "node",
       "request": "launch",
       "name": "Mocha Client Tests",
@@ -469,9 +500,7 @@
     },
     // Client-fired server tests with Istanbul
     {
-      /* This runs the server-side mocha client test file and istanbul coverage to test the server-side behaviour during client-side tests. */
-      /* It expects the browser client to run a series of matching client-side tests. */
-      /* If not commented out in the js fle it kicks off the browser tests. */
+      /* see above */
       "type": "node",
       "request": "launch",
       "name": "Mocha Client Tests with Istanbul",
@@ -503,54 +532,5 @@
       "autoAttachChildProcesses": true,
       // "preLaunchTask": "Taskkill node.exe", // can't use in compound calls
     },
-    // Browser-side tests - obsolete
-    {
-      /* This runs client-side tests from Chrome, i.e. it loads loadmocha.html
-       * which calls client-side tests.
-       * The server must be started in advance of running this.
-       * The mocha server-side test must be run in advance of this or otherwise some test will cause the server to crash and the remaining tests will fail. */
-      /* NOTE: Not needed or usable if client-fired test file calls Chrome */
-      /* 28-Feb-19: client-fired test file calls Chrome */
-      "name": "Mocha Browser Tests - Obsolete",
-      "type": "chrome",
-      "request": "launch",
-      "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-      "runtimeArgs": [
-        "--incognito", // clear cache
-        "--start-maximized",
-        "--new-window",
-        "--disable-popup-blocking", // necessary for window.open() to work
-      ],
-      "userDataDir": true,
-      "url": "https://localhost:1337/testServer/loadmocha.html",
-      // tell vscode where to find scripts on the server
-      "pathMapping": {
-        "/": "${workspaceFolder}/app-test-angular/dist/angular-tour-of-heroes",
-        "/testServer": "${workspaceFolder}/server/test/client/browser",
-      },
-      /* use .scripts in debug console to check */
-      "sourceMapPathOverrides": {
-        "webpack:///./*": "${workspaceFolder}/app-test-angular/*",
-      },
-      "smartStep": true,
-      "disableNetworkCache": true,
-      "showAsyncStacks": true,
-      "sourceMaps": true,
-      "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
-    },
   ],
-  "compounds": [
-    // Server client-fired and browser-side tests together
-    {
-      /* NOTE: Not needed or usable if client-fired test file calls Chrome */
-      /* 28-Feb-19: client-fired test file calls Chrome */
-      /* This runs the server-side client test (which expects a client browser to fire the tests), and then calls Chrome to run the clent-side tests.
-      * A task in the Moncha Browser Tests configuraton checks the server is up before running the client-side browser tests */
-      "name": "Mocha Client and Browser",
-      "configurations": [
-          "Mocha Client Tests",
-          "Mocha Browser Tests - Obsolete",
-        ]
-    }
-],
 }
