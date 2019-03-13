@@ -1,0 +1,7 @@
+{
+  "timeout": 0,
+  "color": true,
+  "check-leaks": true,
+  "global": "__core-js_shared__",
+  "ui": "bdd"
+}

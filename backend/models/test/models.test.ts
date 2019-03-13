@@ -9,15 +9,15 @@ import 'mocha';
 const expect = chai.expect;
 
 /* external dependencies */
-import appRootObject = require('app-root-path');
-const appRoot = appRootObject.toString();
 import { Document, Model } from 'mongoose';
-import path = require('path');
-import proxyquire = require('proxyquire');
 
 /* database type */
+import { runDatabaseApp } from '../../database/src/index';
 import { Database, test } from '../src/configModels';
-console.log(test);
+import { createModel as createModelTests } from '../src/tests';
+import { createModel as createModelUsers } from '../src/users';
+
+console.log(test); // *** remove but keep istanbul coverage somehow
 
 describe('Database models operations', () => {
   let database: Database;
@@ -31,14 +31,7 @@ describe('Database models operations', () => {
 
   before(async () => {
     /* connection created here is used for all tests */
-    const databaseIndexPath = path.join(appRoot, 'database', 'src', 'index');
-    const { runDatabaseApp } = proxyquire(databaseIndexPath, {});
     database = await runDatabaseApp();
-
-    const testsModelsPath = path.join(appRoot, 'models', 'src', 'tests');
-
-    /* use proxyquire to allow istanbul coverage work */
-    const { createModel } = proxyquire(testsModelsPath, {});
 
     docContent1 = {
       test1: 'test11',
@@ -49,7 +42,7 @@ describe('Database models operations', () => {
       test2: 'test22',
     };
 
-    modelTests = createModel(database.dbConnection, database);
+    modelTests = createModelTests(database.dbConnection, database);
   });
 
   after(async () => {
@@ -64,9 +57,7 @@ describe('Database models operations', () => {
   });
 
   it('Creates the users model', async () => {
-    const usersModelsPath = path.join(appRoot, 'models', 'src', 'users');
-    const { createModel } = proxyquire(usersModelsPath, {});
-    const modelUsers = createModel(database.dbConnection, database);
+    const modelUsers = createModelUsers(database.dbConnection, database);
     expect(modelUsers.collection.name, 'Should return the model').to.eql(
       'users',
     );
