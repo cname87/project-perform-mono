@@ -1,10 +1,10 @@
 {
   "include": [
-    "**/src/**/*.ts",
-    "**/test/*.test.ts",
+    "./**/src/**/*.ts",
+    "./**/test/*.test.ts",
+    "./utils/utils-build/*.ts",
   ],
   "exclude": [
-    // "**/test/*.test.ts",
     "node_modules",
   ],
   "compileOnSave": false,

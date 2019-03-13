@@ -8,7 +8,7 @@
  * Run this file as the argument to node.exe.
  *
  * To Do:
- * Split the executable and caller out so the main function can be loaded and
+ * Split into a function and caller out so the function can be loaded and
  * called from any js file e.g. test scripts.
  *
  */
@@ -19,7 +19,7 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* internal dependencies */
-import { config } from '../configServer';
+import { config } from '../../server/src/configServer';
 
 /* external dependencies */
 import fs from 'fs';

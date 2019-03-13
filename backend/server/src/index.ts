@@ -167,8 +167,6 @@ function load() {
     logger,
     /* database models object */
     models: {},
-    /* mongo connection for express session store */
-    mongoStore: {},
     /* morgan server logger */
     serverLogger,
     /* created http(s) servers */
@@ -295,10 +293,6 @@ async function closeAll() {
 
     if (Object.keys(obj.dbConnection).length !== 0) {
       await database.closeConnection(obj.dbConnection);
-    }
-
-    if (Object.keys(obj.mongoStore).length !== 0) {
-      await database.closeStore(obj.mongoStore);
     }
 
     process.removeListener('SIGINT', sigint);

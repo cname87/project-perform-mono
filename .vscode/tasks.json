@@ -3,6 +3,7 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
+    // Taskkill node.exe
     {
       "label": "Taskkill node.exe",
       "type": "shell",
@@ -16,12 +17,13 @@
       },
       "problemMatcher": []
     },
+    // Is Server Up?
     {
       "label": "Is Server Up?",
       "type": "process",
       "command": "node",
       "args": [
-        "${workspaceFolder}/backend/dist/server/src/server/isServerUp.js"
+        "${workspaceFolder}/backend/dist/utils/utils-build/isServerUp.js"
       ],
       "options": {
         "env": {
@@ -37,8 +39,9 @@
       },
       "problemMatcher": []
     },
+    // npm build backend
     {
-      "label": "Build server",
+      "label": "npm build backend",
       "type": "shell",
       "command": "npm",
       "args": [
@@ -58,8 +61,9 @@
         "panel": "shared"
       }
     },
+    // npm compile backend
     {
-      "label": "Compile server",
+      "label": "npm compile backend",
       "type": "npm",
       "script": "compile",
       "path": "backend/",
@@ -69,8 +73,9 @@
         "panel": "shared"
       }
     },
+    // npm tsc backend
     {
-      "label": "Run tsc",
+      "label": "npm tsc backend",
       "type": "npm",
       "script": "tsc",
       "path": "backend/",
