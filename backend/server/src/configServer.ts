@@ -98,13 +98,7 @@ export const config: IConfig = {
    * This section sets parameters used by the Angular app.
    */
 
-  APP_PATH: path.join(
-    appRoot,
-    '..',
-    'app-test-angular',
-    'dist',
-    'angular-tour-of-heroes',
-  ),
+  APP_PATH: path.join(appRoot, '..', 'frontend', 'dist'),
 
   /***********************************************************************/
   /* HTTP/S server parameters         F                                   */
