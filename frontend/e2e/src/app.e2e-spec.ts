@@ -1,6 +1,12 @@
 'use strict'; // necessary for es6 output in node
 
-import { browser, element, by, ElementFinder, ElementArrayFinder } from 'protractor';
+import {
+  browser,
+  element,
+  by,
+  ElementFinder,
+  ElementArrayFinder,
+} from 'protractor';
 import { promise } from 'selenium-webdriver';
 
 const expectedH1 = 'Tour of Heroes';
@@ -26,26 +32,28 @@ class Hero {
 
   // Hero from hero list <li> element.
   static async fromLi(li: ElementFinder): Promise<Hero> {
-      let stringsFromA = await li.all(by.css('a')).getText();
-      let strings = stringsFromA[0].split(' ');
-      return { id: +strings[0], name: strings[1] };
+    let stringsFromA = await li.all(by.css('a')).getText();
+    let strings = stringsFromA[0].split(' ');
+    return { id: +strings[0], name: strings[1] };
   }
 
   // Hero id and name from the given detail element.
   static async fromDetail(detail: ElementFinder): Promise<Hero> {
     // Get hero id from the first <div>
-    let _id = await detail.all(by.css('div')).first().getText();
+    let _id = await detail
+      .all(by.css('div'))
+      .first()
+      .getText();
     // Get name from the h2
     let _name = await detail.element(by.css('h2')).getText();
     return {
-        id: +_id.substr(_id.indexOf(' ') + 1),
-        name: _name.substr(0, _name.lastIndexOf(' '))
+      id: +_id.substr(_id.indexOf(' ') + 1),
+      name: _name.substr(0, _name.lastIndexOf(' ')),
     };
   }
 }
 
 describe('Tutorial part 6', () => {
-
   beforeAll(() => browser.get(''));
 
   function getPageElts() {
@@ -61,28 +69,31 @@ describe('Tutorial part 6', () => {
       appHeroesHref: navElts.get(1),
       appHeroes: element(by.css('app-root app-heroes')),
       allHeroes: element.all(by.css('app-root app-heroes li')),
-      selectedHeroSubview: element(by.css('app-root app-heroes > div:last-child')),
+      selectedHeroSubview: element(
+        by.css('app-root app-heroes > div:last-child'),
+      ),
 
       heroDetail: element(by.css('app-root app-hero-detail > div')),
 
       searchBox: element(by.css('#search-box')),
-      searchResults: element.all(by.css('.search-result li'))
+      searchResults: element.all(by.css('.search-result li')),
     };
   }
 
   describe('Initial page', () => {
-
     it(`has title '${expectedTitle}'`, () => {
       expect(browser.getTitle()).toEqual(expectedTitle);
     });
 
     it(`has h1 '${expectedH1}'`, () => {
-        expectHeading(1, expectedH1);
+      expectHeading(1, expectedH1);
     });
 
     const expectedViewNames = ['Dashboard', 'Heroes'];
     it(`has views ${expectedViewNames}`, () => {
-      let viewNames = getPageElts().navElts.map((el: ElementFinder) => el.getText());
+      let viewNames = getPageElts().navElts.map((el: ElementFinder) =>
+        el.getText(),
+      );
       expect(viewNames).toEqual(expectedViewNames);
     });
 
@@ -90,11 +101,9 @@ describe('Tutorial part 6', () => {
       let page = getPageElts();
       expect(page.appDashboard.isPresent()).toBeTruthy();
     });
-
   });
 
   describe('Dashboard tests', () => {
-
     beforeAll(() => browser.get(''));
 
     it('has top heroes', () => {
@@ -102,9 +111,15 @@ describe('Tutorial part 6', () => {
       expect(page.topHeroes.count()).toEqual(4);
     });
 
-    it(`selects and routes to ${targetHero.name} details`, dashboardSelectTargetHero);
+    it(
+      `selects and routes to ${targetHero.name} details`,
+      dashboardSelectTargetHero,
+    );
 
-    it(`updates hero name (${newHeroName}) in details view`, updateHeroNameInDetailView);
+    it(
+      `updates hero name (${newHeroName}) in details view`,
+      updateHeroNameInDetailView,
+    );
 
     it(`cancels and shows ${targetHero.name} in Dashboard`, () => {
       element(by.buttonText('go back')).click();
@@ -114,9 +129,15 @@ describe('Tutorial part 6', () => {
       expect(targetHeroElt.getText()).toEqual(targetHero.name);
     });
 
-    it(`selects and routes to ${targetHero.name} details`, dashboardSelectTargetHero);
+    it(
+      `selects and routes to ${targetHero.name} details`,
+      dashboardSelectTargetHero,
+    );
 
-    it(`updates hero name (${newHeroName}) in details view`, updateHeroNameInDetailView);
+    it(
+      `updates hero name (${newHeroName}) in details view`,
+      updateHeroNameInDetailView,
+    );
 
     it(`saves and shows ${newHeroName} in Dashboard`, () => {
       element(by.buttonText('save')).click();
@@ -125,11 +146,9 @@ describe('Tutorial part 6', () => {
       let targetHeroElt = getPageElts().topHeroes.get(targetHeroDashboardIndex);
       expect(targetHeroElt.getText()).toEqual(newHeroName);
     });
-
   });
 
   describe('Heroes tests', () => {
-
     beforeAll(() => browser.get(''));
 
     it('can switch to Heroes view', () => {
@@ -149,7 +168,10 @@ describe('Tutorial part 6', () => {
       expect(hero.name).toEqual(targetHero.name.toUpperCase());
     });
 
-    it(`updates hero name (${newHeroName}) in details view`, updateHeroNameInDetailView);
+    it(
+      `updates hero name (${newHeroName}) in details view`,
+      updateHeroNameInDetailView,
+    );
 
     it(`shows ${newHeroName} in Heroes list`, () => {
       element(by.buttonText('save')).click();
@@ -168,7 +190,7 @@ describe('Tutorial part 6', () => {
       expect(page.allHeroes.count()).toEqual(9, 'number of heroes');
       const heroesAfter = await toHeroArray(page.allHeroes);
       // console.log(await Hero.fromLi(page.allHeroes[0]));
-      const expectedHeroes =  heroesBefore.filter(h => h.name !== newHeroName);
+      const expectedHeroes = heroesBefore.filter((h) => h.name !== newHeroName);
       expect(heroesAfter).toEqual(expectedHeroes);
       // expect(page.selectedHeroSubview.isPresent()).toBeFalsy();
     });
@@ -185,14 +207,20 @@ describe('Tutorial part 6', () => {
       let heroesAfter = await toHeroArray(page.allHeroes);
       expect(heroesAfter.length).toEqual(numHeroes + 1, 'number of heroes');
 
-      expect(heroesAfter.slice(0, numHeroes)).toEqual(heroesBefore, 'Old heroes are still there');
+      expect(heroesAfter.slice(0, numHeroes)).toEqual(
+        heroesBefore,
+        'Old heroes are still there',
+      );
 
       const maxId = heroesBefore[heroesBefore.length - 1].id;
-      expect(heroesAfter[numHeroes]).toEqual({id: maxId + 1, name: newHeroName});
+      expect(heroesAfter[numHeroes]).toEqual({
+        id: maxId + 1,
+        name: newHeroName,
+      });
     });
 
     it('displays correctly styled buttons', async () => {
-      element.all(by.buttonText('x')).then(buttons => {
+      element.all(by.buttonText('x')).then((buttons) => {
         for (const button of buttons) {
           // Inherited styles from styles.css
           expect(button.getCssValue('font-family')).toBe('Arial');
@@ -212,11 +240,9 @@ describe('Tutorial part 6', () => {
       expect(addButton.getCssValue('padding')).toBe('5px 10px');
       expect(addButton.getCssValue('border-radius')).toBe('4px');
     });
-
   });
 
   describe('Progressive hero search', () => {
-
     beforeAll(() => browser.get(''));
 
     it(`searches for 'Ma'`, async () => {
@@ -276,7 +302,6 @@ describe('Tutorial part 6', () => {
     expect(hero.id).toEqual(targetHero.id);
     expect(hero.name).toEqual(newHeroName.toUpperCase());
   }
-
 });
 
 function addToHeroName(text: string): promise.Promise<void> {
@@ -285,10 +310,10 @@ function addToHeroName(text: string): promise.Promise<void> {
 }
 
 function expectHeading(hLevel: number, expectedText: string): void {
-    let hTag = `h${hLevel}`;
-    let hText = element(by.css(hTag)).getText();
-    expect(hText).toEqual(expectedText, hTag);
-};
+  let hTag = `h${hLevel}`;
+  let hText = element(by.css(hTag)).getText();
+  expect(hText).toEqual(expectedText, hTag);
+}
 
 function getHeroAEltById(id: number): ElementFinder {
   let spanForId = element(by.cssContainingText('li span.badge', id.toString()));
@@ -303,5 +328,5 @@ function getHeroLiEltById(id: number): ElementFinder {
 async function toHeroArray(allHeroes: ElementArrayFinder): Promise<Hero[]> {
   let promisedHeroes = await allHeroes.map(Hero.fromLi);
   // The cast is necessary to get around issuing with the signature of Promise.all()
-  return <Promise<any>> Promise.all(promisedHeroes);
+  return <Promise<any>>Promise.all(promisedHeroes);
 }

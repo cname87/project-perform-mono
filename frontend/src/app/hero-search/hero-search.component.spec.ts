@@ -4,17 +4,15 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { HeroSearchComponent } from './hero-search.component';
 
-
 describe('HeroSearchComponent', () => {
   let component: HeroSearchComponent;
   let fixture: ComponentFixture<HeroSearchComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ HeroSearchComponent ],
-      imports: [RouterTestingModule.withRoutes([]), HttpClientTestingModule]
-    })
-    .compileComponents();
+      declarations: [HeroSearchComponent],
+      imports: [RouterTestingModule.withRoutes([]), HttpClientTestingModule],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -25,17 +25,9 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-      "esnext.array",
-      "esnext.asynciterable",
-      "esnext.intl",
-      "esnext.symbol",
-      "scripthost",
-    ],
+    ], // extra types (above target?) which you know browser will support
     "listEmittedFiles": true,
-    "module": "commonjs",
+    "module": "commonjs",  // module loader format (independent of target) - commonjs for node
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
@@ -50,7 +42,7 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "target": "esnext",
+    "target": "esnext",  // Compiles to this JS version - higher for better debug support, lower for wider browser support
     // "traceResolution": true,
   },
 }

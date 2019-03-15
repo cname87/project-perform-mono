@@ -39,6 +39,8 @@
 			"Iuri",
 			"cname",
 			"daemonized",
+			"kjhtml",
+			"lcovonly",
 			"mongodb",
 			"nreq",
 			"proxyquired",

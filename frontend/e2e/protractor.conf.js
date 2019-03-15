@@ -8,11 +8,12 @@ exports.config = {
   specs: [
     './src/**/*.e2e-spec.ts'
   ],
+  chromeDriver: '../node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver.exe',
   capabilities: {
     'browserName': 'chrome',
   },
   directConnect: true,
-  baseUrl: 'http://localhost:4200/',
+  baseUrl: 'https://localhost:1337/',
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,
