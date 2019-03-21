@@ -1,0 +1,200 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "V1 covers the API for one team",
+    "version" : "1.0.0",
+    "title" : "Project Perform API V1",
+    "contact" : {
+      "name" : "Seán A. Young",
+      "email" : "cname87@yahoo.com"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host" : "localhost:1337",
+  "basePath" : "/api",
+  "schemes" : [ "https" ],
+  "tags" : [ {
+    "name" : "admins",
+    "description" : "Operations available to admins"
+  }, {
+    "name" : "users",
+    "description" : "Operations available to regular users"
+  } ],
+  "paths" : {
+    "/members" : {
+      "get" : {
+        "tags" : [ "users" ],
+        "summary" : "Returns the members of a team",
+        "operationId" : "getMembers",
+        "x-swagger-router-controller" : "members",
+        "description" : "Returns all team members\n",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "name",
+          "description" : "Pass an optional name search string to limit the returned list",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Members returned",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Member"
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad input parameter"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "admins" ],
+        "summary" : "Adds a member to a team",
+        "operationId" : "addMember",
+        "x-swagger-router-controller" : "Admins",
+        "description" : "Adds a supplied member to the team\n",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "member",
+          "description" : "Member to add",
+          "schema" : {
+            "$ref" : "#/definitions/Member"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Member created"
+          },
+          "400" : {
+            "description" : "Invalid input"
+          },
+          "409" : {
+            "description" : "A member with that ID already exists"
+          }
+        }
+      }
+    },
+    "/members/{id}" : {
+      "get" : {
+        "tags" : [ "users" ],
+        "summary" : "Returns a specific team member",
+        "operationId" : "getMember",
+        "x-swagger-router-controller" : "members",
+        "produces" : [ "application/json" ],
+        "description" : "Obtain information about a specific team member\n",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "description" : "The ID of the new member",
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Member information returned",
+            "schema" : {
+              "$ref" : "#/definitions/Member"
+            }
+          },
+          "400" : {
+            "description" : "ID not a valid integer"
+          },
+          "404" : {
+            "description" : "A member with that ID was not found",
+            "schema" : {
+              "$ref" : "#/definitions/Member"
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "admins" ],
+        "summary" : "Deletes a member from a team",
+        "operationId" : "deleteMember",
+        "x-swagger-router-controller" : "members",
+        "description" : "Deletes a member from the team\n",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "description" : "The ID of the team member to delete",
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Member deleted"
+          },
+          "400" : {
+            "description" : "ID is not a valid integer"
+          },
+          "409" : {
+            "description" : "A member with that ID does not exist"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "admins" ],
+        "summary" : "Updates a member in a team",
+        "operationId" : "updateMember",
+        "x-swagger-router-controller" : "members",
+        "description" : "Updates the data on a member of the team\n",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "description" : "The ID of the team member to update",
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "in" : "body",
+          "name" : "member",
+          "description" : "Member to update",
+          "schema" : {
+            "$ref" : "#/definitions/Member"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Member updated"
+          },
+          "400" : {
+            "description" : "ID is not a valid integer"
+          },
+          "409" : {
+            "description" : "A member with that ID does not exist"
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "Member" : {
+      "description" : "Team member information",
+      "type" : "object",
+      "required" : [ "id", "name" ],
+      "properties" : {
+        "id" : {
+          "type" : "integer",
+          "format" : "int32",
+          "example" : 5
+        },
+        "name" : {
+          "type" : "string",
+          "format" : "string",
+          "example" : "Team Member"
+        }
+      }
+    }
+  }
+}

@@ -53,7 +53,6 @@ const { runDatabaseApp } = config.DATABASE;
 const { handlers } = config.HANDLERS;
 const errorHandler = config.ERROR_HANDLER;
 /* route controllers */
-const { router: controllerRoot } = config.ROOT_CONTROLLER;
 const { router: controllerFail } = config.FAIL_CONTROLLER;
 /* database models */
 const { createModel: usersModels } = config.USERSMODEL;
@@ -124,7 +123,6 @@ function load() {
     [key: string]: express.Router;
   }
   const controllers: IRouters = {};
-  controllers.root = controllerRoot;
   controllers.fail = controllerFail;
 
   /* handlers used by controllers */
@@ -248,7 +246,7 @@ async function runApp() {
       }
 
       /* run the server functionality */
-      runServer.runServer(app);
+      await runServer.runServer(app);
 
       debug(modulename + ': server up and running');
 

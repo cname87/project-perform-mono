@@ -31,8 +31,6 @@ import * as DUMPERROR from '../../utils/src/dumpError';
 import * as DATABASE from '../../database/src/index';
 
 /* list of controllers */
-import * as ROOT_CONTROLLER from './controllers/root';
-
 /* import fail test controller */
 import * as FAIL_CONTROLLER from './controllers/fail';
 
@@ -72,7 +70,6 @@ export const config: IConfig = {
   LOGGER,
   DUMPERROR,
   DATABASE,
-  ROOT_CONTROLLER,
   FAIL_CONTROLLER,
   USERSMODEL,
   TESTSMODEL,
@@ -196,4 +193,21 @@ export const config: IConfig = {
   MONITOR_OUT_LOG: path.join(appRoot, 'utils', 'logs', 'monitorOut.log'),
   // child stderr log
   MONITOR_ERR_LOG: path.join(appRoot, 'utils', 'logs', 'monitorErr.log'),
+
+  /***********************************************************************/
+  /* Swagger api configuration                                       */
+  /***********************************************************************/
+
+  /**
+   * This section sets all configuration parameters for swagger-tools.
+   */
+  API_FILE: path.join(appRoot, 'api', 'swagger.json'),
+  CONTROLLERS_PATH: path.join(
+    appRoot,
+    'dist',
+    'server',
+    'src',
+    'controllers',
+    'api',
+  ),
 };

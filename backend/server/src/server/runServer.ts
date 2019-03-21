@@ -19,7 +19,8 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-// import favicon from 'serve-favicon';
+import path from 'path';
+import swaggerTools = require('swagger-tools');
 import urlParser from 'url';
 import util from 'util';
 import uuidv1 from 'uuid/v1';
@@ -65,9 +66,6 @@ export async function runServer(app: express.Application) {
   }
   app.use(assignId);
 
-  /* serve favicon file (before logger) */
-  // app.use(favicon(config.FAVICON));
-
   /* log simple format to default stdout */
   app.use(serverLogger.logConsole);
   /* log detailed format to file */
@@ -88,7 +86,7 @@ export async function runServer(app: express.Application) {
 
   if (app.get('env') === 'development') {
     /* debug log basic information from the request */
-    app.use(function debugRequest(req, _res, next) {
+    app.use((req, _res, next) => {
       debug('\n' + modulename + ': *** Request received ***\n');
       debug(modulename + ': req.url: ' + req.url);
       debug(modulename + ': re.baseUrl: ' + req.baseUrl);
@@ -130,6 +128,66 @@ export async function runServer(app: express.Application) {
     app.post('/raiseEvent', handles['raiseEvent']);
   }
 
+  /* set up the swagger api handler */
+  const setupSwagger = new Promise((resolve) => {
+    /* swaggerRouter configuration */
+    const options = {
+      controllers: config.CONTROLLERS_PATH,
+      /* use stubs for routes with no controller */
+      useStubs: false,
+    };
+
+    /* swagger api definition */
+    const swaggerDoc = require(config.API_FILE);
+
+    /* initialize the swagger middleware */
+    swaggerTools.initializeMiddleware(swaggerDoc, (middleware) => {
+      /* interpret swagger resources and attach metadata to request (1st) */
+      app.use(middleware.swaggerMetadata());
+
+      // // Provide the security handlers  *** To Do ***
+      // app.use(middleware.swaggerSecurity({
+      //   oauth2 (req, def, scopes, callback) {
+      //     // Do real stuff here
+      //   },
+      // }));
+
+      /* get model for later integration using swagger-mongoose */
+      const swaggerToolsTyped: any = swaggerTools;
+      swaggerToolsTyped.specs.v2.composeModel(
+        swaggerDoc,
+        '#/definitions/Member',
+        (err: any, schema: any) => {
+          if (err) {
+            throw err;
+          }
+          console.log(JSON.stringify(schema, null, '  '));
+        },
+      );
+
+      /* validate swagger requests */
+      app.use(
+        middleware.swaggerValidator({
+          validateResponse: true,
+        }),
+      );
+
+      /* route validated requests to appropriate controller */
+      app.use(middleware.swaggerRouter(options));
+
+      /* serve the swagger api UI at http://localhost:port/api/docs */
+      app.use(
+        middleware.swaggerUi({
+          swaggerUi: '/api/docs',
+        }),
+      );
+
+      resolve();
+    });
+  });
+
+  await setupSwagger;
+
   /* serve the angular files */
   const staticAppOptions = {
     maxAge: '1d',
@@ -138,17 +196,15 @@ export async function runServer(app: express.Application) {
   app.use(express.static(config.APP_PATH, staticAppOptions));
 
   /* present the angular index.html page for anything not routed by angular */
-  app.use(
-    '/',
-    /* skip dummyurl for server test purposes */
-    (req, res, next) => {
-      if (req.path.slice(0, 9) !== '/dummyurl') {
-        controllers.root(req, res, next);
-      } else {
-        next();
-      }
-    },
-  );
+  app.use((req, res, next) => {
+    /* skip /dummyUrl for server test purposes */
+    if (req.path.slice(0, 9) !== '/dummyUrl') {
+      const filepath = path.join(config.APP_PATH, 'index.html');
+      res.sendFile(filepath);
+    } else {
+      next();
+    }
+  });
 
   /* handle all errors passed down via the error handling functionality */
   app.use(handles.errorHandler.notFound);

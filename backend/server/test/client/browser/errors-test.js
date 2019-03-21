@@ -106,7 +106,7 @@ describe('page not found', function() {
         chai.expect(response.ok).to.eql(true);
 
         const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/dummyurl&timestamp=' + dt, '_blank');
+        testWindow = window.open('https://localhost:1337/dummyUrl&timestamp=' + dt, '_blank');
 
         await new Promise(function(resolve) {
 

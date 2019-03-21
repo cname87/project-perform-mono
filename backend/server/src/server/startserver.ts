@@ -104,7 +104,7 @@ export async function startServer(app: express.Application) {
     serverPort = config.PORT;
   }
 
-  /* start the http or https server */
+  /* start the https server */
   await connectServer(
     serverType,
     serverName,
