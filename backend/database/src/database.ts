@@ -52,7 +52,6 @@ export class Database {
     ModelName: string,
     modelSchema: SchemaDefinition,
     dbCollectionName: string,
-    dbConnection: Connection,
   ) => Model<Document, {}>;
 
   /* dbConnection stores dummy until external resolves dbConnection promise and stores in dbConnection */
@@ -153,14 +152,13 @@ async function closeConnection(
 }
 
 /**
- * Creates a Mongoose model based on a supplied database
- * connection instance, schema, and collection.
+ * Creates a Mongoose model based on a calling database
+ * and supplied schema and collection.
  * @params
  * - this: Accesses logger and dumpError.
  * - ModelName: The name to give the created model.
  * - modelSchema: The schema definition to use in the model.
  * - dbCollectionName: The name of the collection to use.
- * - dbConnection: The connection to the database to use.
  * @returns
  * Returns a Mongoose database model object
  * @throws
@@ -171,7 +169,6 @@ function createModel(
   ModelName: string,
   modelSchema: SchemaDefinition,
   dbCollectionName: string,
-  dbConnection: Connection,
 ): Model<Document, {}> {
   debug(modulename + ': running createModel');
 
@@ -181,7 +178,7 @@ function createModel(
   });
 
   try {
-    const DbModel = dbConnection.model(ModelName, DbSchema);
+    const DbModel = this.dbConnection.model(ModelName, DbSchema);
     debug(modulename + `: mongoose model \'${DbModel.modelName}\' created`);
     return DbModel;
   } catch (err) {

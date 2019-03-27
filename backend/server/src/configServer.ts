@@ -31,19 +31,29 @@ import * as DUMPERROR from '../../utils/src/dumpError';
 import * as DATABASE from '../../database/src/index';
 
 /* list of controllers */
-/* import fail test controller */
 import * as FAIL_CONTROLLER from './controllers/fail';
 
-/* list of models */
-import * as USERSMODEL from '../../models/src/users';
-import * as TESTSMODEL from '../../models/src/tests';
+/* list of handlers */
+import * as MEMBERS_HANDLER from './handlers/members';
 
-interface IConfig {
+/* list of models */
+import * as USERS_MODEL from '../../models/src/users';
+import * as TESTS_MODEL from '../../models/src/tests';
+import * as MEMBERS_MODEL from '../../models/src/members';
+
+export interface IConfig {
   readonly LOGGER: {
     Logger: typeof LOGGER.Logger;
   };
   readonly DUMPERROR: {
     DumpError: typeof DUMPERROR.DumpError;
+  };
+  readonly MEMBERS_HANDLER: {
+    addMember: typeof MEMBERS_HANDLER.addMember;
+    deleteMember: typeof MEMBERS_HANDLER.deleteMember;
+    getMember: typeof MEMBERS_HANDLER.getMember;
+    getMembers: typeof MEMBERS_HANDLER.getMembers;
+    updateMember: typeof MEMBERS_HANDLER.updateMember;
   };
   readonly [index: string]: any;
 }
@@ -71,8 +81,10 @@ export const config: IConfig = {
   DUMPERROR,
   DATABASE,
   FAIL_CONTROLLER,
-  USERSMODEL,
-  TESTSMODEL,
+  MEMBERS_HANDLER,
+  USERS_MODEL,
+  TESTS_MODEL,
+  MEMBERS_MODEL,
 
   /***********************************************************************/
   /* Misc application parameters                                         */
@@ -211,3 +223,9 @@ export const config: IConfig = {
     'api',
   ),
 };
+
+import * as express from 'express';
+
+export interface IAppLocals {
+  app: express.Application;
+}

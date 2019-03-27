@@ -33,13 +33,10 @@ import { strict } from 'assert';
 import { EventEmitter } from 'events';
 import express from 'express';
 
-interface IObjects {
-  [key: string]: object | any[];
-}
-
 /* app used by closeAll which can be called from external
  * => a module variable */
-let app: express.Application = {} as any;
+// tslint:disable-next-line: no-object-literal-type-assertion
+let app: express.Application = {} as express.Application;
 
 /* event emitter needed by Mocha before server up */
 export const event: EventEmitter = new EventEmitter();
@@ -55,8 +52,9 @@ const errorHandler = config.ERROR_HANDLER;
 /* route controllers */
 const { router: controllerFail } = config.FAIL_CONTROLLER;
 /* database models */
-const { createModel: usersModels } = config.USERSMODEL;
-const { createModel: testsModels } = config.TESTSMODEL;
+const { createModel: modelUsers } = config.USERS_MODEL;
+const { createModel: modelTests } = config.TESTS_MODEL;
+const { createModel: modelMembers } = config.MEMBERS_MODEL;
 
 /* Create the single instances of the general logger & dumpError
  * utilities, and the server logger middleware.
@@ -129,11 +127,10 @@ function load() {
   /**
    * @description The handlers - functions that take actions.
    */
-  interface IHandlers {
-    [key: string]: () => {};
-  }
-  const handles: IHandlers = {};
-  handles.raiseEvent = handlers.raiseEvent;
+  // interface IHandlers {
+  //   [key: string]: () => {};
+  // }
+  const handles = handlers;
   /* server error handler */
   handles.errorHandler = errorHandler;
 
@@ -146,7 +143,7 @@ function load() {
    * to downstream functions.
    */
 
-  const appLocals: IObjects = {
+  const appLocals = {
     // *** constants & set up objects ***
 
     /* application config object */
@@ -172,26 +169,11 @@ function load() {
     /* express session store */
     sessionStore: {},
   };
+
   app = express();
   Object.assign(app.locals, appLocals);
-
   return app;
 }
-
-// async function setupDatabase(obj: IObjects) {
-//   debug(modulename + ': running setupDatabase');
-
-//   logger.info('\n*** CONNECTING TO THE DATABASE ***\n');
-
-//   try {
-//     const database = runDatabaseApp();
-//     obj.dbConnection = database.dbConnection;
-//     return;
-//   } catch (err) {
-//     /* deal with error in caller */
-//     return;
-//   }
-// }
 
 let database: any;
 
@@ -212,8 +194,9 @@ async function runApp() {
       debug(modulename + ': database set up complete');
 
       /* generate the models object */
-      obj.models.Users = usersModels(obj.dbConnection, database);
-      obj.models.Tests = testsModels(obj.dbConnection, database);
+      obj.models.users = modelUsers(database);
+      obj.models.tests = modelTests(database);
+      obj.models.members = modelMembers(database);
     } else {
       logger.error(modulename + ': database failed to connect');
     }

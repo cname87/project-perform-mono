@@ -10,14 +10,11 @@ export const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
+import * as express from 'express';
 import createError from 'http-errors';
-import { MongoError } from 'mongodb';
 import path from 'path';
 import urlParser, { Url } from 'url';
 import util from 'util';
-
-// executes a callback when a http request closes, finishes, or errors.
-// const onFinished from 'on-finished');
 import * as winston from 'winston';
 
 /* module variables */
@@ -28,7 +25,11 @@ let logger: winston.Logger;
  * to this point without error and creates a 'Not Found' error.
  */
 
-export function notFound(_req: any, _res: any, next: any) {
+export function notFound(
+  _req: express.Request,
+  _res: express.Response,
+  next: express.NextFunction,
+) {
   debug(modulename + ': notFound called');
   next(createError(404));
 }
@@ -42,20 +43,38 @@ export function notFound(_req: any, _res: any, next: any) {
  * exception in the final errorhandling function.
  */
 
-export function assignCode(err: any, _req: any, res: any, next: any) {
-  /* default to internal server error code if err.status does not
-   * include a code */
-  res.statusCode = err.status || 500;
+export function assignCode(
+  err: any,
+  _req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  debug(modulename + ': assignCode called');
 
-  /* override code for specific cases */
-  /* example: signal Service Unavailable (with the implication that
-   * it is temporary) for a certain type of error */
-  if (err instanceof MongoError) {
-    res.statusCode = 503;
+  if (err.failedValidation && err.message.slice(0, 8) === 'Response') {
+    /* if swagger returns a response validation failure then set res.statusCode to internal server error, 500.
+    (swagger response validation should set res.statusCode to 500 anyway) */
+
+    res.statusCode = 500;
   }
 
-  /* note code in error status so dumped with the error */
-  err.status = res.statusCode;
+  if (err.failedValidation && err.message.slice(0, 7) === 'Request') {
+    /* if swagger returns a request validation failure then set res.statusCode to invalid data error, 400.
+    (swagger request validation should set res.statusCode to 400 anyway) */
+    res.statusCode = 500;
+  }
+
+  if (typeof err === 'object') {
+    /* set the response status code to the error httpStatusCode field, if one was added on error creation, or leave as is if the response already included a status code, or set to the internal server error code */
+    res.statusCode = err.httpStatusCode || res.statusCode || 500;
+
+    /* replace 2xx status codes */
+    res.statusCode =
+      (res.statusCode >= 200 && res.statusCode < 300) ? 500 : res.statusCode;
+
+    /* override the response status message if err.message exists */
+    res.statusMessage = err.message || res.statusMessage;
+  }
 
   next(err);
 }
@@ -64,13 +83,17 @@ export function assignCode(err: any, _req: any, res: any, next: any) {
  * Log detail on all errors passed in.
  */
 
-export function logError(err: any, req: any, res: any, next: any) {
+export function logError(
+  err: any,
+  req: express.Request,
+  res: express.Response,next: express.NextFunction,
+) {
   debug(modulename + ': logError started');
 
   logger = res.app.locals.logger;
   const dumpError = res.app.locals.dumpError;
 
-  logger.error(modulename + ': http server logError handler called');
+  logger.error(modulename + ': server logger called');
 
   logger.error(
     modulename +
@@ -86,7 +109,9 @@ export function logError(err: any, req: any, res: any, next: any) {
       '\nbody query string: ' +
       util.inspect(req.query) +
       '\nsigned cookies: ' +
-      util.inspect(req.signedCookies),
+      util.inspect(req.signedCookies) +
+      '\nResponse http status code: ' +
+      res.statusCode,
   );
 
   /* dump the error */
@@ -110,6 +135,8 @@ export function sendErrorResponse(err: any, req: any, res: any, next: any) {
       res.send('Internal server error');
       process.emit('thrownException', renderErr);
     } else {
+      /* set to text/html in case set to json prior to a swagger response validation fail */
+      res.set('Content-Type', 'text/html');
       /* send the rendered html */
       res.send(html);
     }
@@ -146,6 +173,7 @@ export function sendErrorResponse(err: any, req: any, res: any, next: any) {
   const originalUrl = req.originalUrl;
 
   /* check that response not already sent */
+  /* Note: swagger response validation fail will have set headers */
   if (!res.headersSent) {
     /* render the error response */
     renderErrorResponse(message, statusCode, stack, originalUrl);
@@ -171,12 +199,15 @@ export function sendErrorResponse(err: any, req: any, res: any, next: any) {
  * the server (which should restart).
  */
 
-export function throwError(err: any, _req: any, res: any, next: any) {
+export function throwError(_err: any, _req: any, res: any, next: any) {
   debug(modulename + ': throwError called');
 
   if (res.statusCode === 500) {
-    /* caught in index.js */
-    process.emit('thrownException', err);
+    /* reset the server after a delay to allow error page be rendered */
+    setTimeout(() => {
+      /* caught in index.js */
+      // process.emit('thrownException', err);
+    }, 1000);
   }
 
   next();

@@ -267,12 +267,7 @@ describe('Database connection', () => {
     const getDatabase = proxyquire(indexPath, {});
     database = await getDatabase.runDatabaseApp();
 
-    const model = database.createModel(
-      testModel,
-      testSchema,
-      testCollection,
-      database.dbConnection,
-    );
+    const model = database.createModel(testModel, testSchema, testCollection);
     expect(model.collection.name, 'Should return a mongoose model').to.eql(
       testCollection,
     );
@@ -285,19 +280,14 @@ describe('Database connection', () => {
     const getDatabase = proxyquire(indexPath, {});
     database = await getDatabase.runDatabaseApp();
 
-    const dummyConnection: any = {};
+    const dummyCollection: any = {}; // will fail
 
     try {
-      database.createModel(
-        testModel,
-        testSchema,
-        testCollection,
-        dummyConnection,
-      );
+      database.createModel(testModel, testSchema, dummyCollection);
       expect.fail('Should not have reached this point');
     } catch (err) {
       expect(err.message, 'Should be a connection error').to.eql(
-        'dbConnection.model is not a function',
+        'collection name must be a String',
       );
     }
   });

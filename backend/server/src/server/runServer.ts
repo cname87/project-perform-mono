@@ -165,7 +165,7 @@ export async function runServer(app: express.Application) {
         },
       );
 
-      /* validate swagger requests */
+      /* validate swagger requests, and responses if desired */
       app.use(
         middleware.swaggerValidator({
           validateResponse: true,

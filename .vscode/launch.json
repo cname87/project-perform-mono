@@ -92,6 +92,7 @@
     "args": [
       "--config", "${workspaceFolder}/backend/.mocharc.json",
       "${workspaceFolder}/backend/dist/**/test/*.test.js",
+      "${workspaceFolder}/backend/server/test/*.js",
     ],
     "env": {
       "NODE_ENV": "development",

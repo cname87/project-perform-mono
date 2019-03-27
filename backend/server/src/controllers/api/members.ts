@@ -1,17 +1,26 @@
+const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import debugFunction from 'debug';
+const debug = debugFunction('PP_' + modulename);
+debug(`Starting ${modulename}`);
+
 /**
  * Handles http calls routed through the Swagger api router.
  * Handles calls to <api-prefix>/members
  */
 
+import { NextFunction, Request } from 'express';
 import {
   Swagger20Request,
   Swagger20Response,
   SwaggerRequestParameter,
   SwaggerRequestParameters,
 } from 'swagger-tools';
+import * as winston from 'winston';
 
-import * as membersHandles from '../../handlers/members';
-import * as utils from '../writer';
+import { IConfig } from '../../configServer';
+
+/* type with req.swagger and req.app */
+type IRequest = Swagger20Request<IParams> & Request;
 
 interface IParams extends SwaggerRequestParameters {
   id: SwaggerRequestParameter<number>;
@@ -20,82 +29,94 @@ interface IParams extends SwaggerRequestParameters {
 }
 
 export const getMember = (
-  req: Swagger20Request<IParams>,
+  req: IRequest,
   res: Swagger20Response,
-  _next: any,
+  next: NextFunction,
 ) => {
   const id = req.swagger.params['id'].value;
-  membersHandles
-    .getMember(id)
-    .then((response) => {
-      utils.writeJson(res, response);
+  const config: IConfig = req.app.locals.config;
+  const handles = req.app.locals.handles;
+  const logger: winston.Logger = req.app.locals.logger;
+  const dumpError = req.app.locals.dumpError;
+
+  config.MEMBERS_HANDLER.getMember(req, id)
+    .then((payload) => {
+      handles.writeJson(res, payload);
     })
-    .catch((response) => {
-      utils.writeJson(res, response);
+    .catch((err) => {
+      logger.error(modulename + ': handles getMember returned error');
+      dumpError(err);
+      next(err);
     });
 };
 
 export const getMembers = (
-  req: Swagger20Request<IParams>,
+  req: IRequest,
   res: Swagger20Response,
-  _next: any,
+  next: NextFunction,
 ) => {
   const name = req.swagger.params['name'].value;
-  membersHandles
-    .getMembers(name)
-    .then((response) => {
-      utils.writeJson(res, response);
+  const config = req.app.locals.config as IConfig;
+
+  config.MEMBERS_HANDLER.getMembers(name)
+    .then((payload) => {
+      req.app.locals.handles.writeJson(res, payload);
     })
-    .catch((response) => {
-      utils.writeJson(res, response);
+    .catch((err) => {
+      next(err);
     });
 };
 
 export const addMember = (
-  req: Swagger20Request<IParams>,
+  req: IRequest,
   res: Swagger20Response,
-  _next: any,
+  next: NextFunction,
 ) => {
   const member = req.swagger.params['member'].value;
-  membersHandles
-    .addMember(member)
-    .then((response) => {
-      utils.writeJson(res, response);
+  const config = req.app.locals.config as IConfig;
+  const members = req.app.locals.models.Members;
+  const handles = req.app.locals.handles;
+
+  config.MEMBERS_HANDLER.addMember(members, member)
+    .then((payload) => {
+      handles.writeJson(res, payload);
     })
-    .catch((response) => {
-      utils.writeJson(res, response);
+    .catch((err) => {
+      next(err);
     });
 };
 
 export const deleteMember = (
-  req: Swagger20Request<IParams>,
+  req: IRequest,
   res: Swagger20Response,
-  _next: any,
+  next: NextFunction,
 ) => {
   const id = req.swagger.params['id'].value;
-  membersHandles
-    .deleteMember(id)
-    .then((response) => {
-      utils.writeJson(res, response);
+  const config = req.app.locals.config as IConfig;
+
+  config.MEMBERS_HANDLER.deleteMember(id)
+    .then((payload) => {
+      req.app.locals.handles.writeJson(res, payload);
     })
-    .catch((response) => {
-      utils.writeJson(res, response);
+    .catch((err) => {
+      next(err);
     });
 };
 
 export const updateMember = (
-  req: Swagger20Request<IParams>,
+  req: IRequest,
   res: Swagger20Response,
-  _next: any,
+  next: NextFunction,
 ) => {
   const id = req.swagger.params['id'].value;
+  const config = req.app.locals.config as IConfig;
+
   const member = req.swagger.params['member'].value;
-  membersHandles
-    .updateMember(id, member)
-    .then((response) => {
-      utils.writeJson(res, response);
+  config.MEMBERS_HANDLER.updateMember(id, member)
+    .then((payload) => {
+      req.app.locals.handles.writeJson(res, payload);
     })
-    .catch((response) => {
-      utils.writeJson(res, response);
+    .catch((err) => {
+      next(err);
     });
 };

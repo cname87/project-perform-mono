@@ -156,19 +156,6 @@ describe('dumpError tests', () => {
     expect(errorLog.includes('Error Message'), 'error message printed').to.be
       .true;
 
-    /* error status */
-
-    /* test that error status logged to console.log */
-    expect(capturedConsoleLog.includes('Error Status'), 'error status logged')
-      .to.be.true;
-
-    /* error message dumped to both info and error logs */
-    infoLog = fs.readFileSync(loggerConfig.INFO_LOG).toString();
-    errorLog = fs.readFileSync(loggerConfig.ERROR_LOG).toString();
-    expect(infoLog.includes('Error Status'), 'error status printed').to.be.true;
-    expect(errorLog.includes('Error Status'), 'error status printed').to.be
-      .true;
-
     /* error code */
 
     /* test that error status logged to console.log */
@@ -236,8 +223,6 @@ describe('dumpError tests', () => {
     /* test that info is not redumped */
     expect(capturedConsoleLog.includes('Error Message'), 'no error message').to
       .be.false;
-    expect(capturedConsoleLog.includes('Error Status'), 'no error status').to.be
-      .false;
     expect(capturedConsoleLog.includes('Error Code'), 'no error code').to.be
       .false;
     expect(capturedConsoleLog.includes('Error Stack'), 'no error stack').to.be
@@ -301,7 +286,7 @@ describe('dumpError tests', () => {
 
     /* dump an error */
     const err: IErr = new Error('Test error');
-    err['status'] = 'Test status';
+    //    err['status'] = 'Test status';
     err['code'] = 100;
     err['dumped'] = false;
     dumpError(err);

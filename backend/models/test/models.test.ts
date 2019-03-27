@@ -42,7 +42,7 @@ describe('Database models operations', () => {
       test2: 'test22',
     };
 
-    modelTests = createModelTests(database.dbConnection, database);
+    modelTests = createModelTests(database);
   });
 
   after(async () => {
@@ -57,7 +57,7 @@ describe('Database models operations', () => {
   });
 
   it('Creates the users model', async () => {
-    const modelUsers = createModelUsers(database.dbConnection, database);
+    const modelUsers = createModelUsers(database);
     expect(modelUsers.collection.name, 'Should return the model').to.eql(
       'users',
     );

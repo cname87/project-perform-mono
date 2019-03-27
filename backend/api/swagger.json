@@ -1,9 +1,9 @@
 {
   "swagger" : "2.0",
   "info" : {
-    "description" : "V1 covers the API for one team",
-    "version" : "1.0.0",
     "title" : "Project Perform API V1",
+    "version" : "1.0.0",
+    "description" : "V1.x.x cover the API for one team",
     "contact" : {
       "name" : "Seán A. Young",
       "email" : "cname87@yahoo.com"
@@ -26,9 +26,9 @@
   "paths" : {
     "/members" : {
       "get" : {
-        "tags" : [ "users" ],
         "summary" : "Returns the members of a team",
         "operationId" : "getMembers",
+        "tags" : [ "users" ],
         "x-swagger-router-controller" : "members",
         "description" : "Returns all team members\n",
         "produces" : [ "application/json" ],
@@ -55,15 +55,16 @@
         }
       },
       "post" : {
-        "tags" : [ "admins" ],
         "summary" : "Adds a member to a team",
-        "operationId" : "addMember",
-        "x-swagger-router-controller" : "Admins",
         "description" : "Adds a supplied member to the team\n",
+        "operationId" : "addMember",
+        "tags" : [ "admins" ],
+        "x-swagger-router-controller" : "Admins",
         "consumes" : [ "application/json" ],
         "parameters" : [ {
           "in" : "body",
           "name" : "member",
+          "required" : true,
           "description" : "Member to add",
           "schema" : {
             "$ref" : "#/definitions/Member"
@@ -71,32 +72,42 @@
         } ],
         "responses" : {
           "201" : {
-            "description" : "Member created"
+            "description" : "Member created",
+            "schema" : {
+              "$ref" : "#/definitions/Member"
+            }
           },
           "400" : {
-            "description" : "Invalid input"
+            "description" : "The supplied input is not a valid member",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
           },
           "409" : {
-            "description" : "A member with that ID already exists"
+            "description" : "A member with that ID already exists",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
           }
         }
       }
     },
     "/members/{id}" : {
       "get" : {
-        "tags" : [ "users" ],
         "summary" : "Returns a specific team member",
-        "operationId" : "getMember",
-        "x-swagger-router-controller" : "members",
-        "produces" : [ "application/json" ],
         "description" : "Obtain information about a specific team member\n",
+        "operationId" : "getMember",
+        "tags" : [ "users" ],
+        "x-swagger-router-controller" : "members",
+        "produces" : [ "application/json", "text/html" ],
         "parameters" : [ {
           "in" : "path",
           "name" : "id",
+          "description" : "The ID of the team member",
           "required" : true,
-          "description" : "The ID of the new member",
           "type" : "integer",
-          "format" : "int32"
+          "minimum" : 1,
+          "maximum" : 999999
         } ],
         "responses" : {
           "200" : {
@@ -106,12 +117,21 @@
             }
           },
           "400" : {
-            "description" : "ID not a valid integer"
+            "description" : "The supplied member ID is not a valid integer",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
           },
           "404" : {
-            "description" : "A member with that ID was not found",
+            "description" : "A member with the supplied member ID was not found",
             "schema" : {
-              "$ref" : "#/definitions/Member"
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
             }
           }
         }
@@ -195,6 +215,10 @@
           "example" : "Team Member"
         }
       }
+    },
+    "Error" : {
+      "description" : "Error",
+      "type" : "string"
     }
   }
 }

@@ -1,22 +1,72 @@
+const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import debugFunction from 'debug';
+const debug = debugFunction('PP_' + modulename);
+debug(`Starting ${modulename}`);
+
+import { Request } from 'express';
+import { Document, Model } from 'mongoose';
+import * as winston from 'winston';
+
+interface IMember {
+  name: string;
+  id: number;
+}
+
 /**
- * Returns a specific team member
- * Obtain information about a specific team member
+ * Adds a supplied member to the team
  *
- * id Integer The ID of the new member
- * returns Member
+ * @param database database
+ * @param member Member to add
+ * @returns the member added
  */
-export const getMember = (_id: number) => {
-  return new Promise((resolve, _reject) => {
-    const examples: any = {};
-    examples['application/json'] = {
-      name: 'Team Member',
-      id: 5,
-    };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
+export const addMember = async (modelMembers: any, member: IMember) => {
+  /* *** to do: check id is unique */
+
+  const addedMember = new modelMembers(member);
+  await addedMember.save();
+  return addedMember;
+};
+
+/**
+ * Returns a specific team member given by the id parameter passed in.
+ * Note: The member data model has the id key set to unique so no more than 1 member can be returned.
+ * @param req The htt request being actioned (used to retrieve the data model)
+ * @param idParam The id of the member to return
+ * @returns Promise that resolves to a Member object
+ */
+export const getMember = (req: Request, idParam: number): Promise<IMember> => {
+  debug(modulename + ': running getMember');
+
+  const logger: winston.Logger = req.app.locals.logger;
+  const dumpError = req.app.locals.dumpError;
+  const modelMembers: Model<Document> = req.app.locals.models.members;
+
+  return new Promise((resolve, reject) => {
+    modelMembers.findOne({ id: idParam }, (err: Error, doc: Document) => {
+      /* return any database access error */
+      if (err) {
+        logger.error(modulename + ': getMember database error');
+        dumpError(err);
+        const errDb = {
+          message: 'The database service is unavailable',
+          httpStatusCode: 503,
+        };
+        return reject(errDb);
+      }
+
+      /* return error if no member found */
+      if (!doc) {
+        logger.error(modulename + ': getMember found no matching member');
+        const errNotFound = {
+          message: 'The supplied member ID does not match a stored member',
+          httpStatusCode: 404,
+        };
+        return reject(errNotFound);
+      }
+
+      /* strip down to member object and return */
+      return resolve(doc.toObject());
+    });
   });
 };
 
@@ -45,19 +95,6 @@ export const getMembers = (_name: string) => {
     } else {
       resolve();
     }
-  });
-};
-
-/**
- * Adds a member to a team
- * Adds a supplied member to the team
- *
- * member Member Member to add (optional)
- * no response value expected for this operation
- */
-export const addMember = (_member: any) => {
-  return new Promise((resolve, _reject) => {
-    resolve();
   });
 };
 

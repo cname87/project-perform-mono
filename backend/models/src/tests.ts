@@ -7,13 +7,10 @@ import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-import { Connection, Document, Model, SchemaDefinition } from 'mongoose';
+import { Document, Model, SchemaDefinition } from 'mongoose';
 import { Database } from './configModels';
 
-export function createModel(
-  dbConnection: Connection,
-  database: Database,
-): Model<Document> {
+export function createModel(database: Database): Model<Document> {
   debug(modulename + ': running createModel');
 
   /* set up schema, collection, and model name */
@@ -24,5 +21,5 @@ export function createModel(
   const collection = 'tests';
   const ModelName = 'Tests';
 
-  return database.createModel(ModelName, schema, collection, dbConnection);
+  return database.createModel(ModelName, schema, collection);
 }

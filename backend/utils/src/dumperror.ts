@@ -33,9 +33,12 @@ debug(`Starting ${modulename}`);
 import winston from 'winston';
 
 interface IDumpErr extends Error {
+  /* some externally generated errors include a code field */
+  code?: string | number;
+  /* set true to show that the error has been dumped already */
   dumped?: boolean;
-  status?: string | number;
-  code?: number;
+  /* can be used to add a http status code on creation, which is later written into the http response */
+  httpStatusCode?: number;
 }
 
 export type dumpErrorInstance = (err: IDumpErr | string) => void;
@@ -83,12 +86,12 @@ function dumpError(err: IDumpErr | string) {
       DumpError.dump(err.toString());
     }
 
-    if (err.status) {
-      DumpError.dump('Error Status: \n' + err.status + '\n');
-    }
-
     if (err.code) {
       DumpError.dump('Error Code: \n' + err.code + '\n');
+    }
+
+    if (err.httpStatusCode) {
+      DumpError.dump('Error HTTP Status Code: \n' + err.httpStatusCode + '\n');
     }
 
     if (err.stack) {

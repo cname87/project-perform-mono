@@ -5,11 +5,12 @@
  * The handles object is injected downstream from index.js.
  */
 
-const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));
+const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
+import { NextFunction, Request, Response } from 'express';
 /**
  * This handler emits an event.
  * The event emitter is req.app.locals.event.
@@ -21,7 +22,7 @@ debug(`Starting ${modulename}`);
  * Note: There is no checking of the request body data..
  */
 
-function raiseEvent(req: any, res: any, _next: any) {
+function raiseEvent(req: Request, res: Response, _next: NextFunction) {
   debug(modulename + ': handler raiseEvent was called');
 
   /* retrieve data sent via POST */
@@ -47,6 +48,14 @@ function raiseEvent(req: any, res: any, _next: any) {
   res.end();
 }
 
+/** This handler sends a JSON payload in a response */
+export const writeJson: any = (res: Response, payload: object) => {
+  res.status(200);
+  res.json(payload);
+};
+
 /* export the list of available request handlers */
-export const handlers = {} as any;
-handlers.raiseEvent = raiseEvent;
+export const handlers = {
+  raiseEvent,
+  writeJson,
+};

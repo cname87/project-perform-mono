@@ -16,9 +16,10 @@ declare namespace NodeJS {
   }
 }
 
-declare interface IConfig {
-  readonly [index: string]: any;
-}
+// Commented out 24-Mar-19
+// declare interface IConfig {
+//   readonly [index: string]: any;
+// }
 
 declare interface IErr extends Error {
   dumped?: boolean;
