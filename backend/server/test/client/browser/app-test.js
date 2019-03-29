@@ -31,8 +31,9 @@ describe('fall back to the angular index.html', function() {
 
         const dt = new Date().toString();
         testWindow = window.open('https://localhost:1337/notfound.html' +
-            '?timestamp=' + dt,
-        '_blank');
+          '?timestamp=' + dt,
+          '_blank'
+        );
 
         await new Promise(function(resolve) {
 
@@ -46,7 +47,7 @@ describe('fall back to the angular index.html', function() {
 
         const readTitle = testWindow.document.title;
         console.log('Page title: ', readTitle);
-        chai.expect(readTitle, 'Page title').to.eql('AngularTourOfHeroes');
+        chai.expect(readTitle, 'Page title').to.eql('Tour of Heroes');
 
     });
 

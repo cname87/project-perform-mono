@@ -82,6 +82,7 @@ describe('logger', () => {
     await sleep(100);
 
     /* both files have output */
+    /* Note: will fail if log files roll over to <name>1.log when full */
     infoLog = fs
       .readFileSync(loggerConfig.INFO_LOG)
       .toString()

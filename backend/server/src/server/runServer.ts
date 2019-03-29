@@ -45,10 +45,6 @@ export async function runServer(app: express.Application) {
 
   /* 'development' or 'production' */
   app.set('env', config.ENV);
-  /* default path to views for res.render */
-  app.set('views', config.PATH_VIEWS);
-  /* default view file extension to use (when omitted) */
-  app.set('view engine', 'pug');
   /* use strong etag validation */
   app.set('etag', 'strong');
   /* /Foo different to /foo */

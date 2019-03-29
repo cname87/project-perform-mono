@@ -4,7 +4,7 @@
 
 let testWindow = {};
 
-function postData(url = '', data = {}) {
+async function postData(url = '', data = {}) {
 
     const myRequest = new Request(url);
     const myInit = {
@@ -17,10 +17,23 @@ function postData(url = '', data = {}) {
         body: JSON.stringify(data),
     };
 
-    // @ts-ignore
-    return fetch(myRequest, myInit);
+    return await fetch(myRequest, myInit);
 
 };
+
+async function getData(url = '') {
+
+  const myRequest = new Request(url);
+  const myInit = {
+      method: 'GET',
+      cache: 'no-cache',
+      credentials: 'omit',
+  };
+
+  return await fetch(myRequest, myInit);
+
+};
+
 
 /* sleep utility */
 function sleep(delay = 100){
@@ -90,9 +103,28 @@ async function isServerUp() {
 
 };
 
+async function closeTest (number, message) {
+
+  await new Promise(async function(resolve) {
+
+      const url = 'https://localhost:1337/raiseEvent';
+      const data = {
+          number: number,
+          message: message,
+      };
+      const response = await postData(url, data);
+
+      chai.expect(response.ok).to.eql(true);
+
+      resolve();
+
+  });
+
+};
+
 describe('page not found', function() {
 
-    before('Open dummy page', async function() {
+    before('Send get dummy page', async function() {
 
         console.log('Starting page not found tests');
 
@@ -105,225 +137,37 @@ describe('page not found', function() {
         const response = await postData(url, data);
         chai.expect(response.ok).to.eql(true);
 
-        const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/dummyUrl&timestamp=' + dt, '_blank');
+    });
 
-        await new Promise(function(resolve) {
+    after('Close test', async () => {
+        await closeTest(2, '404 test end')
+    });
 
-            testWindow.onload = function() {
+    it('should have body with code: 404', async function() {
 
-                resolve();
+        /* /dummyUrl set to go to 404 i.e. not to Angular front end */
+        const url = 'https://localhost:1337/dummyUrl';
+        const response = await getData(url);
+        chai.expect(response.ok).to.eql(false);
 
-            };
-
-        });
+        /* the body should match what was sent by the server */
+        const readBody = await response.json();
+        console.log('Page body : ', readBody);
+        /* the server sends { code: 404, ... } */
+        chai.expect(readBody.code, 'Body code').to.eql(404);
 
     });
 
-    after('Close window', async function() {
-
-        await new Promise(async function(resolve) {
-
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: '404 test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
-
-    });
-
-    it('should have title ERROR', function() {
-
-        const readTitle = testWindow.document.title;
-        console.log('Page title: ', readTitle);
-        chai.expect(readTitle, 'Page title').to.eql('ERROR');
-
-    });
-
-    it('should return 404', function() {
-
-        /* test returned status */
-        const resStatus = testWindow.document
-            .getElementsByTagName('h3')[1].innerHTML.slice(-3);
-        console.log('response status: ' + resStatus);
-        chai.expect(resStatus).to.eql('404');
-
-    });
-
-});
-
-describe('page not found - \'production\'', function() {
-
-    before('Open dummy page', async function() {
-
-        console.log('Starting page not found - \'production\' tests');
-
-        /* signal server that client 404 test starting */
-        const url = 'https://localhost:1337/raiseEvent';
-        const data = {
-            number: 1,
-            message: '404-prod test start',
-        };
-        const response = await postData(url, data);
-        chai.expect(response.ok).to.eql(true);
-
-        const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/fail?fail=404-prod&timestamp=' + dt, '_blank');
-
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
-
-    });
-
-    after('Close window', async function() {
-
-        await new Promise(async function(resolve) {
-
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: '404-prod test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
-
-    });
-
-    it('should have title ERROR', function() {
-
-        const readTitle = testWindow.document.title;
-        console.log('Page title: ', readTitle);
-        chai.expect(readTitle, 'Page title').to.eql('ERROR');
-
-    });
-
-    it('should not render a stack', function() {
-
-        const readStack = testWindow.document
-            .getElementsByTagName('pre')[0].innerHTML;
-        console.log('Stack rendered: ', readStack);
-        chai.expect(readStack, 'Stack not rendered').to.eql('');
-
-    });
-
-    it('should return 404', function() {
-
-        /* test returned status */
-        const resStatus = testWindow.document
-            .getElementsByTagName('h3')[1].innerHTML.slice(-3);
-        console.log('response status: ' + resStatus);
-        chai.expect(resStatus).to.eql('404');
-
-    });
-
-});
-
-describe('page not found - \'development\'', function() {
-
-    before('Open ?fail=404-dev', async function() {
-
-        console.log('Starting page not found - \'development\' tests');
-
-        const url = 'https://localhost:1337/raiseEvent';
-        const data = {
-            number: 1,
-            message: '404-dev test start',
-        };
-        const response = await postData(url, data);
-        chai.expect(response.ok).to.eql(true);
-
-        const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/fail?fail=404-dev&timestamp=' + dt, '_blank');
-
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
-
-    });
-
-    after('Close window', async function() {
-
-        await new Promise(async function(resolve) {
-
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: '404-dev test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
-
-    });
-
-    it('should have title ERROR', function() {
-
-        const readTitle = testWindow.document.title;
-        console.log('Page title: ', readTitle);
-        chai.expect(readTitle, 'Page title').to.eql('ERROR');
-
-    });
-
-    it('should render a stack', function() {
-
-        const readStackTitle = testWindow.document
-            .getElementsByTagName('pre')[0].innerHTML.split(' ')[0];
-        console.log('Stack rendered: ', readStackTitle);
-        chai.expect(readStackTitle, 'Stack rendered').to.eql('NotFoundError:');
-
-    });
-
-    it('should return 404', function() {
-
-        /* test returned status */
-        const resStatus = testWindow.document
-            .getElementsByTagName('h3')[1].innerHTML.slice(-3);
-        console.log('response status: ' + resStatus);
-        chai.expect(resStatus).to.eql('404');
+    it('should return 404', async function() {
+
+        /* /dummyUrl set to go to 404 i.e. not to Angular front end */
+        const url = 'https://localhost:1337/dummyUrl';
+        const response = await getData(url);
+        chai.expect(response.ok).to.eql(false);
+
+        /* the http response should report 404 */
+        console.log('response status: ' + response.status);
+        chai.expect(response.status).to.eql(404);
 
     });
 
@@ -344,52 +188,35 @@ describe('coffee not found - return 418', function() {
         const response = await postData(url, data);
         chai.expect(response.ok).to.eql(true);
 
+        });
+
+    after('Close test', async () => {
+      await closeTest(2, 'Coffee test end')
+    });
+
+    it('should have body with code: 418', async function() {
+
         const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/fail?fail=coffee&timestamp=' + dt, '_blank');
+        const url = 'https://localhost:1337/testServer/fail?fail=coffee&timestamp' + dt;
+        const response = await getData(url);
+        chai.expect(response.ok).to.eql(false);
 
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
+        /* the body should match what was sent by the server */
+        const readBody = await response.json();
+        console.log('Page body : ', readBody);
+        chai.expect(readBody.code, 'Body code').to.eql(418);
 
     });
 
-    after('Close window', async function() {
+    it('should return 418', async function() {
 
-        await new Promise(async function(resolve) {
+        const dt = new Date().toString();
+        const url = 'https://localhost:1337/testServer/fail?fail=coffee&timestamp' + dt;
+        const response = await getData(url);
+        chai.expect(response.ok).to.eql(false);
 
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: 'Coffee test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
-
-    });
-
-    it('should return 418', function() {
-
-        /* test returned status */
-        const resStatus = testWindow.document
-            .getElementsByTagName('h3')[1].innerHTML.slice(-3);
-        console.log('response status: ' + resStatus);
-        chai.expect(resStatus).to.eql('418');
+        console.log('response status: ' + response.status);
+        chai.expect(response.status).to.eql(418);
 
     });
 
@@ -410,125 +237,24 @@ describe('response sent twice', function() {
         const response = await postData(url, data);
         chai.expect(response.ok).to.eql(true);
 
+    });
+
+    after('Close test', async () => {
+      await closeTest(2, 'Sent test end')
+    });
+
+    it('should return \'Response sent\'', async function() {
+
         const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/fail?fail=sent&timestamp=' + dt, '_blank');
-
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
-
-    });
-
-    after('Close window', async function() {
-
-        await new Promise(async function(resolve) {
-
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: 'Sent test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
-
-    });
-
-    it('should return \'Response sent\'', function() {
-
-        /* test returned status */
-        const response = testWindow.document
-            .getElementsByTagName('body')[0].innerHTML;
-        console.log('response: ' + response);
-        chai.expect(response).to.eql('Test: Response sent');
-
-    });
-
-});
-
-describe('fail query not recognised', function() {
-
-    before('Open with ?fail=dummy', async function() {
-
-        console.log('Starting fail=dummy test');
-
-        const url = 'https://localhost:1337/raiseEvent';
-        const data = {
-            number: 1,
-            message: 'Return 404 test start',
-        };
-        const response = await postData(url, data);
+        const url = 'https://localhost:1337/testServer/fail?fail=sent&timestamp=' + dt;
+        const response = await getData(url);
         chai.expect(response.ok).to.eql(true);
 
-        const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/fail?fail=dummy&timestamp=' + dt, '_blank');
-
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
-
-    });
-
-    after('Close window', async function() {
-
-        await new Promise(async function(resolve) {
-
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: 'Return 404 test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
-
-    });
-
-    it('should have title ERROR', function() {
-
-        const readTitle = testWindow.document.title;
-        console.log('Page title: ', readTitle);
-        chai.expect(readTitle, 'Page title').to.eql('ERROR');
-
-    });
-
-    it('should return 404', function() {
-
-        /* test returned status */
-        const resStatus = testWindow.document
-            .getElementsByTagName('h3')[1].innerHTML.slice(-3);
-        console.log('response status: ' + resStatus);
-        chai.expect(resStatus).to.eql('404');
+        /* the body should match what was sent by the server */
+        const readBody = await response.json();
+        console.log('Page body : ', readBody);
+        chai.expect(readBody.message, 'Body message')
+          .to.eql('Test: Response sent');
 
     });
 
@@ -549,71 +275,36 @@ describe('throw a specific error', function() {
         const response = await postData(url, data);
         chai.expect(response.ok).to.eql(true);
 
+    });
+
+    after('Close test', async () => {
+      await closeTest(2, 'Trap-503 test end')
+    });
+
+
+    it('should have body with code: 503', async function() {
+
         const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/fail?fail=trap-503&timestamp=' + dt, '_blank');
+        const url = 'https://localhost:1337/testServer/fail?fail=trap-503&timestamp=' + dt;
+        const response = await getData(url);
+        chai.expect(response.ok).to.eql(false);
 
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
+        /* the body should match what was sent by the server */
+        const readBody = await response.json();
+        console.log('Page body : ', readBody);
+        chai.expect(readBody.code, 'Body code').to.eql(503);
 
     });
 
-    after('Close window', async function() {
+    it('should return 503', async function() {
 
-        await new Promise(async function(resolve) {
+        const dt = new Date().toString();
+        const url = 'https://localhost:1337/testServer/fail?fail=trap-503&timestamp=' + dt;
+        const response = await getData(url);
+        chai.expect(response.ok).to.eql(false);
 
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: 'Trap-503 test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
-
-    });
-
-    it('should have title ERROR', function() {
-
-        const readTitle = testWindow.document.title;
-        console.log('Page title: ', readTitle);
-        chai.expect(readTitle, 'Page title').to.eql('ERROR');
-
-    });
-
-    it('message should be server error', function() {
-
-        /* test returned message */
-        const resMessage = testWindow.document
-            .getElementsByTagName('h3')[0].innerHTML;
-        console.log('response status: ' + resMessage);
-        chai.expect(resMessage)
-            .to.eql('Error message: \\fail.js: Test error');
-
-    });
-
-    it('should return 503', function() {
-
-        /* test returned status */
-        const resStatus = testWindow.document
-            .getElementsByTagName('h3')[1].innerHTML.slice(-3);
-        console.log('response status: ' + resStatus);
-        chai.expect(resStatus).to.eql('503');
+        console.log('response status: ' + response.status);
+        chai.expect(response.status).to.eql(503);
 
     });
 
@@ -635,75 +326,37 @@ describe('trap an unhandled promise rejection ' +
         const response = await postData(url, data);
         chai.expect(response.ok).to.eql(true);
 
+    });
+
+    after('Close test', async function() {
+
+        await closeTest(2, 'Async-handled test end')
+
+    });
+
+    it('should have body code: 501', async function() {
+
         const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/fail?fail=async-handled&timestamp=' + dt, '_blank');
+        const url = 'https://localhost:1337/testServer/fail?fail=async-handled&timestamp=' + dt;
+        const response = await getData(url);
+        chai.expect(response.ok).to.eql(false);
 
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
+        /* the body should match what was sent by the server */
+        const readBody = await response.json();
+        console.log('Page body : ', readBody);
+        chai.expect(readBody.code, 'Body code').to.eql(501);
 
     });
 
-    after('Close window', async function() {
+    it('should return 501', async function() {
 
-        /* test server back up */
-        await isServerUp();
+        const dt = new Date().toString();
+        const url = 'https://localhost:1337/testServer/fail?fail=async-handled&timestamp=' + dt;
+        const response = await getData(url);
+        chai.expect(response.ok).to.eql(false);
 
-        await new Promise(async function(resolve) {
-
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: 'Async-handled test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
-
-    });
-
-    it('should have title ERROR', function() {
-
-        const readTitle = testWindow.document.title;
-        console.log('Page title: ', readTitle);
-        chai.expect(readTitle, 'Page title').to.eql('ERROR');
-
-    });
-
-    it('message should be server error', function() {
-
-        /* test returned message */
-        const resMessage = testWindow.document
-            .getElementsByTagName('h3')[0].innerHTML;
-        console.log('response status: ' + resMessage);
-        chai.expect(resMessage)
-            .to.eql('Error message: Testing trapped ' +
-            'unhandled promise rejection');
-
-    });
-
-    it('should throw a 501 error', function() {
-
-        /* test returned status */
-        const resStatus = testWindow.document
-            .getElementsByTagName('h3')[1].innerHTML.slice(-3);
-        console.log('response status: ' + resStatus);
-        chai.expect(resStatus).to.eql('501');
+        console.log('response status: ' + response.status);
+        chai.expect(response.status).to.eql(501);
 
     });
 
@@ -724,151 +377,39 @@ describe('throw an error', function() {
         const response = await postData(url, data);
         chai.expect(response.ok).to.eql(true);
 
-        const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/fail?fail=error&timestamp=' + dt, '_blank');
-
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
-
     });
 
     after('Close window', async function() {
 
         /* test server back up */
-        await isServerUp();
-
-        await new Promise(async function(resolve) {
-
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: 'Error test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
+        await sleep(1100); // delay as error handler delays before calling process.exit
+        await closeTest(2, 'Error test end')
 
     });
 
-    it('should have title ERROR', function() {
-
-        const readTitle = testWindow.document.title;
-        console.log('Page title: ', readTitle);
-        chai.expect(readTitle, 'Page title').to.eql('ERROR');
-
-    });
-
-    it('message should be server error', function() {
-
-        /* test returned message */
-        const resMessage = testWindow.document
-            .getElementsByTagName('h3')[0].innerHTML;
-        console.log('response status: ' + resMessage);
-        chai.expect(resMessage)
-            .to.eql('Error message: A server error occurred');
-
-    });
-
-    it('should return 500', function() {
-
-        /* test returned status */
-        const resStatus = testWindow.document
-            .getElementsByTagName('h3')[1].innerHTML.slice(-3);
-        console.log('response status: ' + resStatus);
-        chai.expect(resStatus).to.eql('500');
-
-    });
-
-});
-
-describe('cause a view render error', function() {
-
-    before('Open /tests/fail with ?fail=renderError', async function() {
-
-        console.log('Starting fail=renderError test');
-
-        /* signal server that test starting */
-        const url = 'https://localhost:1337/raiseEvent';
-        const data = {
-            number: 1,
-            message: 'Render error test start',
-        };
-        const response = await postData(url, data);
-        chai.expect(response.ok).to.eql(true);
+    it('should have body as sent', async function() {
 
         const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/fail?fail=renderError&timestamp=' + dt, '_blank');
+        const url = 'https://localhost:1337/testServer/fail?fail=error&timestamp=' + dt;
+        const response = await getData(url);
+        chai.expect(response.ok).to.eql(false);
 
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
+        /* the body should match what was sent by the server */
+        const readBody = await response.json();
+        console.log('Page body : ', readBody);
+        chai.expect(readBody.code, 'Body code').to.eql(500);
 
     });
 
-    after('Close window', async function() {
+    it('should return 500', async function() {
 
-        /* test server back up */
-        await isServerUp();
+      const dt = new Date().toString();
+      const url = 'https://localhost:1337/testServer/fail?fail=error&timestamp=' + dt;
+      const response = await getData(url);
+      chai.expect(response.ok).to.eql(false);
 
-        await new Promise(async function(resolve) {
-
-            setTimeout(() => {
-
-                testWindow.close();
-                resolve();
-
-            }, 500);
-
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: 'Render error test end',
-            };
-            const response = await postData(url, data);
-
-            chai.expect(response.ok).to.eql(true);
-
-        });
-
-    });
-
-    it('should have title ERROR', function() {
-
-        const readTitle = testWindow.document.title;
-        console.log('Page title: ', readTitle);
-        chai.expect(readTitle, 'Page title').to.eql('');
-
-    });
-
-    it('should have body message', function() {
-
-        const readBody = testWindow.document
-            .getElementsByTagName('body')[0].innerHTML;
-        console.log('Page body: ', readBody);
-        chai.expect(readBody, 'Page body')
-            .to.eql('Internal server error');
+      console.log('response status: ' + response.status);
+      chai.expect(response.status).to.eql(500);
 
     });
 
@@ -892,42 +433,31 @@ describe('unhandled promise rejection', function() {
         const dt = new Date().toString();
         testWindow = window.open('https://localhost:1337/testServer/fail?fail=async&timestamp=' + dt, '_blank');
 
-        await new Promise(function(resolve) {
-
-            testWindow.onload = function() {
-
-                resolve();
-
-            };
-
-        });
-
     });
 
     after('Close window', async function() {
 
-        /* test server back up */
-        await isServerUp();
+      await sleep(1100); // delay ato match delays calling process.exit
 
-        await new Promise(async function(resolve) {
+      await new Promise(async function(resolve) {
 
-            setTimeout(() => {
+        setTimeout(() => {
 
-                testWindow.close();
-                resolve();
+            testWindow.close();
+            resolve();
 
-            }, 500);
+        }, 500);
 
-            const url = 'https://localhost:1337/raiseEvent';
-            const data = {
-                number: 2,
-                message: 'Async test end',
-            };
-            const response = await postData(url, data);
+        const url = 'https://localhost:1337/raiseEvent';
+        const data = {
+            number: 2,
+            message: 'Async test end',
+        };
+        const response = await postData(url, data);
 
-            chai.expect(response.ok).to.eql(true);
+        chai.expect(response.ok).to.eql(true);
 
-        });
+      });
 
     });
 
@@ -976,8 +506,7 @@ describe('server crash', function() {
 
     after('Close window', async function() {
 
-        /* test server back up */
-        await isServerUp();
+      await sleep(1100); // delay as errorhandler delays before calling process.exit
 
         await new Promise(async function(resolve) {
 
@@ -1011,5 +540,55 @@ describe('server crash', function() {
 
     });
 
+
+});
+
+describe('fail query not recognised', function() {
+
+  before('Open with ?fail=dummy', async function() {
+
+      console.log('Starting fail=dummy test');
+
+      const url = 'https://localhost:1337/raiseEvent';
+      const data = {
+          number: 1,
+          message: 'Return 404 test start',
+      };
+      const response = await postData(url, data);
+      chai.expect(response.ok).to.eql(true);
+
+  });
+
+  after('Close test', async () => {
+    await closeTest(2, 'Return 404 test end')
+  });
+
+  it('should have body with code: 404', async function() {
+
+      const dt = new Date().toString();
+      const url = 'https://localhost:1337/testServer/fail?fail=dummy&timestamp=' + dt;
+      const response = await getData(url);
+      chai.expect(response.ok).to.eql(false);
+
+      /* the body should match what was sent by the server */
+      const readBody = await response.json();
+      console.log('Page body : ', readBody);
+      /* the server sends { code: 404, ... } */
+      chai.expect(readBody.code, 'Body code').to.eql(404);
+
+  });
+
+  it('should return 404', async function() {
+
+      const dt = new Date().toString();
+      const url = 'https://localhost:1337/testServer/fail?fail=dummy&timestamp=' + dt;
+      const response = await getData(url);
+      chai.expect(response.ok).to.eql(false);
+
+      /* the http response should report 404 */
+      console.log('response status: ' + response.status);
+      chai.expect(response.status).to.eql(404);
+
+  });
 
 });

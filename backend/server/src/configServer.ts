@@ -97,7 +97,7 @@ export const config: IConfig = {
 
   /* ok to start server if database fails to start? */
   ENV_FILE: path.join(appRoot, '.env'),
-  IS_NO_DB_OK: false,
+  IS_NO_DB_OK: true,
 
   /***********************************************************************/
   /* Angular app parameters                                              */
@@ -141,8 +141,6 @@ export const config: IConfig = {
 
   // 'development' or 'production'
   ENV: 'development',
-  // path to the views directory
-  PATH_VIEWS: path.join(appRoot, 'server', 'src', 'views'),
   // path to static server for server tests
   STATIC_TEST_PATH: path.join(appRoot, 'server', 'test', 'client', 'browser'),
   // path to favicon

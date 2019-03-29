@@ -99,7 +99,7 @@
         "operationId" : "getMember",
         "tags" : [ "users" ],
         "x-swagger-router-controller" : "members",
-        "produces" : [ "application/json", "text/html" ],
+        "produces" : [ "application/json" ],
         "parameters" : [ {
           "in" : "path",
           "name" : "id",
@@ -117,13 +117,19 @@
             }
           },
           "400" : {
-            "description" : "The supplied member ID is not a valid integer",
+            "description" : "The supplied member ID is not valid",
             "schema" : {
               "$ref" : "#/definitions/Error"
             }
           },
           "404" : {
             "description" : "A member with the supplied member ID was not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "503" : {
+            "description" : "The database service is not available now",
             "schema" : {
               "$ref" : "#/definitions/Error"
             }
@@ -218,7 +224,20 @@
     },
     "Error" : {
       "description" : "Error",
-      "type" : "string"
+      "type" : "object",
+      "required" : [ "code", "message" ],
+      "properties" : {
+        "code" : {
+          "type" : "integer",
+          "format" : "integer",
+          "example" : 5
+        },
+        "message" : {
+          "type" : "string",
+          "format" : "string",
+          "example" : "Not found"
+        }
+      }
     }
   }
 }

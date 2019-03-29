@@ -38,7 +38,7 @@ interface IDumpErr extends Error {
   /* set true to show that the error has been dumped already */
   dumped?: boolean;
   /* can be used to add a http status code on creation, which is later written into the http response */
-  httpStatusCode?: number;
+  statusCode?: number;
 }
 
 export type dumpErrorInstance = (err: IDumpErr | string) => void;
@@ -90,8 +90,8 @@ function dumpError(err: IDumpErr | string) {
       DumpError.dump('Error Code: \n' + err.code + '\n');
     }
 
-    if (err.httpStatusCode) {
-      DumpError.dump('Error HTTP Status Code: \n' + err.httpStatusCode + '\n');
+    if (err.statusCode) {
+      DumpError.dump('Error HTTP Status Code: \n' + err.statusCode + '\n');
     }
 
     if (err.stack) {

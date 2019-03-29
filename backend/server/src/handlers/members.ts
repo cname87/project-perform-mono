@@ -49,7 +49,7 @@ export const getMember = (req: Request, idParam: number): Promise<IMember> => {
         dumpError(err);
         const errDb = {
           message: 'The database service is unavailable',
-          httpStatusCode: 503,
+          statusCode: 503,
         };
         return reject(errDb);
       }
@@ -59,7 +59,7 @@ export const getMember = (req: Request, idParam: number): Promise<IMember> => {
         logger.error(modulename + ': getMember found no matching member');
         const errNotFound = {
           message: 'The supplied member ID does not match a stored member',
-          httpStatusCode: 404,
+          statusCode: 404,
         };
         return reject(errNotFound);
       }

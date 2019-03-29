@@ -2,7 +2,7 @@
   "timeout": 0,
   "color": true,
   "check-leaks": true,
-  "global": "__core-js_shared__, __coverage__, __extends, __assign, __rest, __decorate, __param, __metadata, __awaiter, __generator, __exportStar, __values, __read, __spread, __await, __asyncGenerator, __asyncDelegator, __asyncValues, __makeTemplateObject, __importStar, __importDefault",
+  "global": "core, __core-js_shared__, __coverage__, __extends, __assign, __rest, __decorate, __param, __metadata, __awaiter, __generator, __exportStar, __values, __read, __spread, __await, __asyncGenerator, __asyncDelegator, __asyncValues, __makeTemplateObject, __importStar, __importDefault",
   "ui": "bdd",
   "bail": false
 }
