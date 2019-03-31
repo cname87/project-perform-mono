@@ -21,8 +21,8 @@ import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-/* import dumpError function type */
-import { dumpErrorFunction } from './configDatabase';
+/* import dumpError and logger instance types */
+import { typeDumpErrorInstance, typeLoggerInstance } from './configDatabase';
 
 /* external type dependencies */
 import mongoose, {
@@ -33,12 +33,11 @@ import mongoose, {
   Schema,
   SchemaDefinition,
 } from 'mongoose';
-import { Logger } from 'winston';
 
 /**
  * The class constructor for the exported database object.
  */
-export class Database {
+class Database {
   /* the connection is initially a promise */
   public dbConnectionPromise: Promise<Connection>;
   /* the connection promise is resolved externally and the result is stored here */
@@ -55,17 +54,19 @@ export class Database {
   ) => Model<Document, {}>;
 
   /* dbConnection stores dummy until external resolves dbConnection promise and stores in dbConnection */
-  private dummyConnection: any = {};
+  private dummyConnection: Connection = ({} as unknown) as Connection;
 
   constructor(
     readonly connectionUrl: string,
     readonly connectionOptions: ConnectionOptions,
-    readonly logger: Logger | Console = console,
-    readonly dumpError: dumpErrorFunction | Console['error'] = console.error,
+    readonly logger: typeLoggerInstance | Console = console,
+    readonly dumpError:
+      | typeDumpErrorInstance
+      | Console['error'] = console.error,
   ) {
     this.closeConnection = closeConnection;
     this.createModel = createModel;
-    this.dbConnection = this.dummyConnection as Connection;
+    this.dbConnection = this.dummyConnection;
     this.dbConnectionPromise = connectToDB(
       connectionUrl,
       connectionOptions,
@@ -90,8 +91,8 @@ export class Database {
 async function connectToDB(
   uri: string,
   options: ConnectionOptions,
-  logger: Logger | Console,
-  dumpError: dumpErrorFunction | Console['error'],
+  logger: typeLoggerInstance | Console,
+  dumpError: typeDumpErrorInstance | Console['error'],
 ): Promise<Connection> {
   debug(modulename + ': running connectToDB');
 
@@ -187,3 +188,6 @@ function createModel(
     throw err;
   }
 }
+
+/* export the Database class */
+export { Database };

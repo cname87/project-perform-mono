@@ -2,7 +2,8 @@
  * This module sets all configuration parameters for the
  * database component.
  *
- * It must be stored in the database directory alongside the index.js file.
+ * It must be stored alongside the database index.js file as it is called from index.js using a relative path.
+ *
  * Their are 4 configuration items:
  * - filepaths - module file paths.
  * - internal module types (dumpError) needed by other modules.
@@ -17,44 +18,46 @@ debug(`Starting ${modulename}`);
 
 /* external dependencies */
 import * as appRootObject from 'app-root-path';
-import * as path from 'path';
+/* appRoot will be the directory containing the node_modules directory which includes app-root-path, i.e. should be in .../backend */
 const appRoot = appRootObject.toString();
 import { ConnectionOptions } from 'mongoose';
+import * as path from 'path';
 import { format } from 'util';
 
 /**
  * The filepaths configuration object.
- * This object stores all internal filepaths used throughout the database component.
- * Allows for easy file location changes.
+ *
+ * This object stores all internal module objects used throughout the database component.  It allows for easy file location changes.
+ *
+ * Note that module paths are relative to the location of this file and that translates to the compiled dist file.
+ * The path to the .env file is absolute (as this is not created in the /dist directtory during compilation).
+ *
+ * NOTE:  If the relative location of any referenced file changes then the relative path must be updated below.
  */
 
 // a utility to dump errors to the logger
-import * as DUMPERROR from '../../utils/src/dumpError';
+import { DumpError, typeDumpErrorInstance } from '../../utils/src/dumpError';
 // a configured winston general logger
-import * as LOGGER from '../../utils/src/logger';
-// Database class
-import * as DATABASE from './database';
+import { Logger, typeLoggerInstance } from '../../utils/src/logger';
+// the Database class
+import { Database } from './database';
+// relative path to backend .env file
+const ENV_FILE = path.join(appRoot, '.env');
 
-export interface IFilepaths {
-  readonly DATABASE: typeof DATABASE;
-  readonly DUMPERROR: {
-    DumpError: typeof DUMPERROR.DumpError;
-  };
-  readonly LOGGER: {
-    Logger: typeof LOGGER.Logger;
-  };
-  readonly ENV_FILE: string;
-}
-export const filepaths: IFilepaths = {
-  DATABASE,
-  DUMPERROR,
-  LOGGER,
-  ENV_FILE: path.join(appRoot, '.env'),
+export const filepaths = {
+  Database,
+  DumpError,
+  Logger,
+  ENV_FILE,
 };
 
-/* export types needed in other modules */
-export type dumpErrorFunction = DUMPERROR.dumpErrorInstance;
-export type Database = DATABASE.Database;
+/* the Database class is the type for instances of the Database class */
+export type Database = Database;
+/* the type of instance of the DumpError class */
+export type typeDumpErrorInstance = typeDumpErrorInstance;
+/* the type of instance of the Logger class */
+export type typeLoggerInstance = typeLoggerInstance;
+
 /**
  * This method returns the uri parameter in Mongoose.createConnection(uri options) that connects to a MongoDB database server.
  */
@@ -87,9 +90,22 @@ export function getMongoUri(): string {
  */
 export function getConnectionOptions(): ConnectionOptions {
   return {
-    // if not connected, return errors immediately
+    /* if not connected, return errors immediately */
     bufferMaxEntries: 0,
-    // prevents mongoose deprecation warning
+    /* prevents mongoose deprecation warning */
     useNewUrlParser: true,
+    /* prevents mongoose deprecation warning */
+    useCreateIndex: true,
   };
+}
+
+/* path to database index.js file for unit test */
+export const indexPath = path.join(appRoot, 'dist', 'database', 'src', 'index');
+
+/* type for database readystate */
+export const enum DBReadyState {
+  Disconnected = 0,
+  Connected = 1,
+  Connecting = 2,
+  Disconnecting = 3,
 }

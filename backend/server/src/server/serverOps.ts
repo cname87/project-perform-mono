@@ -16,8 +16,16 @@ import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
-/* external dependencies */
+/**
+ * Import external dependencies.
+ */
+import http from 'http';
 import shutdownHelper from 'http-shutdown';
+
+/**
+ * Import local types.
+ */
+import { IErr } from '../configServer';
 
 /**
  * The exported server constructor.
@@ -27,7 +35,7 @@ export class Server {
   public logger: object;
   public dumpError: (err: any) => void;
   public listenErrors: number;
-  public expressServer: object;
+  public expressServer: http.Server;
   public setupServer: (...params: any) => any;
   public listenServer: (...params: any) => any;
   public stopServer: (...params: any) => any;
@@ -41,7 +49,8 @@ export class Server {
     /* a count of the number server listen errors allowed */
     this.listenErrors = 3;
     /* the server object returned by express createServer */
-    this.expressServer = {};
+    // tslint:disable-next-line: no-object-literal-type-assertion
+    this.expressServer = {} as http.Server;
 
     /* operations methods */
     this.setupServer = setupServer;

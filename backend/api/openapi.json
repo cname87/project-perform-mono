@@ -1,0 +1,423 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "Project Perform API V1",
+    "version" : "2.0.0-oas3",
+    "description" : "V1.x.x cover the API for one team",
+    "contact" : {
+      "name" : "Sean Young",
+      "email" : "cname@yahoo.com"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers" : [ {
+    "url" : "https://localhost:1337/api-v1",
+    "description" : "Development server"
+  } ],
+  "tags" : [ {
+    "name" : "admins",
+    "description" : "Operations available to admins"
+  }, {
+    "name" : "users",
+    "description" : "Operations available to regular users"
+  } ],
+  "paths" : {
+    "/members" : {
+      "get" : {
+        "summary" : "Returns the members of a team",
+        "operationId" : "getMembers",
+        "tags" : [ "users" ],
+        "x-swagger-router-controller" : "members",
+        "description" : "Returns all team members\n",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "name",
+          "description" : "Pass an optional name search string to limit the returned list",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "maxLength" : 35
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Members returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Member"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "The request is not valid",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "The supplied match string does not match any team member",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503" : {
+            "description" : "The database service is not available now",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Adds a member to a team",
+        "operationId" : "addMember",
+        "tags" : [ "admins" ],
+        "x-swagger-router-controller" : "members",
+        "description" : "Adds a supplied member to the team\n",
+        "requestBody" : {
+          "description" : "Team member detail",
+          "x-name" : "member",
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Member"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Member created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "The request is not a valid",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "A member with that ID already exists",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503" : {
+            "description" : "The database service is not available now",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "summary" : "Updates a member in a team",
+        "description" : "Updates the data on a member of the team\n",
+        "operationId" : "updateMember",
+        "tags" : [ "admins" ],
+        "x-swagger-router-controller" : "members",
+        "requestBody" : {
+          "description" : "Team member to be updated detail",
+          "x-name" : "member",
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Member"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Member updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "The request is not a valid",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "A member with that ID does not exist",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503" : {
+            "description" : "The database service is not available now",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/{id}" : {
+      "get" : {
+        "summary" : "Returns a specific team member",
+        "description" : "Obtain information about a specific team member\n",
+        "operationId" : "getMember",
+        "tags" : [ "users" ],
+        "x-swagger-router-controller" : "members",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "description" : "The ID of the team member",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 999
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Member information returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "The request is not valid",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "A member with the supplied member ID was not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503" : {
+            "description" : "The database service is not available now",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "Deletes a member from a team",
+        "description" : "Deletes a member from the team\n",
+        "operationId" : "deleteMember",
+        "tags" : [ "admins" ],
+        "x-swagger-router-controller" : "members",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "description" : "The ID of the team member",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 999
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Member deleted"
+          },
+          "400" : {
+            "description" : "The request is not a valid",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "A member with that ID does not exist",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503" : {
+            "description" : "The database service is not available now",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Member" : {
+        "description" : "Team member information",
+        "required" : [ "id", "name" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int32",
+            "minimum" : 1,
+            "maximum" : 999,
+            "example" : 5
+          },
+          "name" : {
+            "type" : "string",
+            "format" : "string",
+            "maxLength" : 35,
+            "example" : "John Athlete"
+          }
+        }
+      },
+      "Error" : {
+        "description" : "Error",
+        "required" : [ "code", "message" ],
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "integer",
+            "format" : "int32",
+            "example" : 5
+          },
+          "message" : {
+            "type" : "string",
+            "format" : "string",
+            "example" : "Not found"
+          }
+        }
+      }
+    }
+  }
+}

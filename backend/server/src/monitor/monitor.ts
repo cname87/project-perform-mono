@@ -31,10 +31,8 @@ import * as forever from 'forever-monitor';
 /* create instances of logger and dumpError for monitor
  * Note: the same logger will be used by index and all other module */
 debug(modulename + ': loading loggers');
-const { Logger } = config.LOGGER;
-export const logger = Logger.getInstance();
-const { DumpError } = config.DUMPERROR;
-export const dumpError = DumpError.getInstance(logger);
+export const logger = config.Logger.getInstance();
+export const dumpError = config.DumpError.getInstance(logger);
 
 /* child process will be index.js */
 interface IChild extends forever.Monitor {

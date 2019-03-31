@@ -1,74 +1,97 @@
 ﻿/**
  * This application runs a http(s) server with a database backend.
- * It creates a controllers object listing the supported base controllers.
- * It creates a handles object listing the supported handlers.
- * It creates a 'objects' object which is used to store the database connection,
- * database session information and server information for use throughout
- * the application.
- * It reads a server configuration file into a configuration object
- * It attempts to start the database and then starts the server,
- * injecting the above controllers, handles and communication
- * and configuration objects.
+ *
+ * It creates an object with key items which it attaches to the express app application so it is accessible by all middleware.
+ *
+ * It attempts to start the database and then starts the server.
+ *
  * It can start the server in the absence of a database connection
  * if the configuration file is so configured.
+ *
  * It can be stopped via a SIGINT, or if started via a forever
  * monitoring service via a message from the forever process.
+ *
  */
 
-/* Note: All exports are for mocha. */
-
-const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));
+const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-/* import configuration files */
-import { config } from './configServer';
-// tslint:disable-next-line: ordered-imports
+/**
+ * Import all dependencies.
+ */
+/* import configuration object and types */
+import {
+  config,
+  Database,
+  IAppLocals,
+  IControllers,
+  IErr,
+  IExpressApp,
+  IModels,
+  processExtended,
+  Server,
+} from './configServer';
+/* import secret configuration parameters */
 import * as dotenv from 'dotenv';
 dotenv.config({ path: config.ENV_FILE });
-
-/* external dependencies */
+/* import external dependencies */
 import { strict } from 'assert';
 import { EventEmitter } from 'events';
 import express from 'express';
 
-/* app used by closeAll which can be called from external
- * => a module variable */
-// tslint:disable-next-line: no-object-literal-type-assertion
-let app: express.Application = {} as express.Application;
-
-/* event emitter needed by Mocha before server up */
-export const event: EventEmitter = new EventEmitter();
-
-/* server */
-const startServer = config.START_SERVER;
-const runServer = config.RUN_SERVER;
-/* database */
-const { runDatabaseApp } = config.DATABASE;
-/* middleware */
-const { handlers } = config.HANDLERS;
-const errorHandler = config.ERROR_HANDLER;
+/**
+ * Define aliases for config parameters.
+ */
+/* server initiation methods */
+const { runServer, startServer } = config;
+/* database creation function */
+const { runDatabaseApp } = config;
+/* handlers used by controllers */
+const { miscHandlers } = config;
+/* errorHandler middleware */
+const { errorHandlers } = config;
 /* route controllers */
-const { router: controllerFail } = config.FAIL_CONTROLLER;
+const { failController } = config;
 /* database models */
-const { createModel: modelUsers } = config.USERS_MODEL;
-const { createModel: modelTests } = config.TESTS_MODEL;
-const { createModel: modelMembers } = config.MEMBERS_MODEL;
-
-/* Create the single instances of the general logger & dumpError
- * utilities, and the server logger middleware.
- * These are passed via the app.locals object.
- * Also, other modules can create new instances later without the parameter
- * and they will receive the same instance. */
-const { Logger } = config.LOGGER;
-const logger = Logger.getInstance();
-const { DumpError } = config.DUMPERROR;
-const dumpError = DumpError.getInstance(logger);
-const { ServerLogger } = config.SERVER_LOGGER;
+const { createModelMembers, createModelTests, createModelUsers } = config;
+/* Create the single instances of the general logger & dumpError utilities, and the server logger middleware.  These are passed via the appLocals object. Also, other modules can create new instances later without any parameters and they will receive the same instance. */
+const logger = config.Logger.getInstance();
+const dumpError = config.DumpError.getInstance(logger);
+const { ServerLogger } = config;
 const serverLogger = new ServerLogger(config);
 
-export async function uncaughtException(err: Error) {
+/**
+ * An applocals object is added to the express app object containing objects and variables needed across requests.
+ */
+const appLocals: IAppLocals = ({} as unknown) as IAppLocals;
+appLocals.config = config;
+/* generate the controllers object */
+const controllers: IControllers = {};
+controllers.fail = failController;
+appLocals.controllers = controllers;
+/* appLocals.database filled during server startup */
+/* appLocals.dbConnection filled during server startup */
+appLocals.dumpError = dumpError;
+appLocals.errorHandler = errorHandlers;
+/* event emitter needed by Mocha before server up */
+const event: EventEmitter = new EventEmitter();
+appLocals.event = event;
+appLocals.miscHandlers = miscHandlers;
+appLocals.logger = logger;
+/* appLocals.models filled during server startup */
+appLocals.serverLogger = serverLogger;
+
+/* the express app used throughout */
+/* add the appLocals object for access in middleware */
+const app: IExpressApp = Object.assign(express(), { appLocals });
+
+/**
+ * Handles uncaught exceptions.
+ * @param err Error passed in by error handler.
+ */
+async function uncaughtException(err: Error) {
   debug(modulename + ': running uncaughtException');
 
   /* note: a process.uncaughtException also logs the trace to console.error */
@@ -77,16 +100,17 @@ export async function uncaughtException(err: Error) {
   await closeAll();
   process.exit(-11);
 }
-
 /* capture all uncaught application exceptions (only once) */
 process.once('uncaughtException', uncaughtException);
-
-// *** Switch to uncaughtException or otherwise avoid hacking process.
 /* use process.thrownException instead of uncaughtException to throw
  * errors internally */
-process.once('thrownException', uncaughtException);
+(process as processExtended).once('thrownException', uncaughtException);
 
-export async function unhandledRejection(reason: any) {
+/**
+ * Handles unhandled rejection.
+ * @param reason Reason passed in by error handler.
+ */
+async function unhandledRejection(reason: IErr) {
   debug(modulename + ': running unhandledRejection');
 
   logger.error(modulename + ': unhandled promise rejection');
@@ -94,109 +118,49 @@ export async function unhandledRejection(reason: any) {
   await closeAll();
   process.exit(-12);
 }
-
 /* capture unhandled promise rejection (only once) */
-process.once('unhandledRejection', unhandledRejection);
+(process as processExtended).once('unhandledRejection', unhandledRejection);
 
 /**
- * Called to set up a database connection.
- * @param  objects
- * The database connection is returned in objects['dbConnection'].
- * @returns
- * Returns a promise.
- * If the connection is successful, then objects['dbConnection']
- * will contain the database connection instance.
- * If the connection to the database fails then objects['dbConnection']
- * will be empty.
+ * Initiate the server creation.
  */
-
-function load() {
-  debug(modulename + ': running load');
-
-  /* generate the controllers object */
-  /**
-   * @description The controllers - routers that direct incoming urls.
-   */
-  interface IRouters {
-    [key: string]: express.Router;
-  }
-  const controllers: IRouters = {};
-  controllers.fail = controllerFail;
-
-  /* handlers used by controllers */
-  /**
-   * @description The handlers - functions that take actions.
-   */
-  // interface IHandlers {
-  //   [key: string]: () => {};
-  // }
-  const handles = handlers;
-  /* server error handler */
-  handles.errorHandler = errorHandler;
-
-  /**
-   * @description
-   * The express app is provided an app.locals object containing
-   * (i) constants & set-up objects, e.g. config object, database connection.
-   * (iii) objects/variables needed across requests.
-   * app.locals is passed to run the application and is also passed on
-   * to downstream functions.
-   */
-
-  const appLocals = {
-    // *** constants & set up objects ***
-
-    /* application config object */
-    config,
-    /* controllers object */
-    controllers,
-    /* connection instance to a mongoDB database on a server */
-    dbConnection: {},
-    /* error logger */
-    dumpError,
-    /* event emitter used for test */
-    event,
-    /* handles object*/
-    handles,
-    /* winston general logger */
-    logger,
-    /* database models object */
-    models: {},
-    /* morgan server logger */
-    serverLogger,
-    /* created http(s) servers */
-    servers: [],
-    /* express session store */
-    sessionStore: {},
-  };
-
-  app = express();
-  Object.assign(app.locals, appLocals);
-  return app;
-}
-
-let database: any;
-
-/* Run the application */
 async function runApp() {
   debug(modulename + ': running runApp');
 
   logger.info('\n*** STARTING THE APPLICATION ***\n');
 
-  const obj = app.locals;
+  /* holds db state */
+  const enum DBReadyState {
+    Disconnected = 0,
+    Connected = 1,
+    Connecting = 2,
+    Disconnecting = 3,
+  }
+  let isDbReady = DBReadyState.Disconnected;
 
   try {
     debug(modulename + ': calling the database');
-    database = await runDatabaseApp();
-    obj.dbConnection = database.dbConnection;
 
-    if (obj.dbConnection.readyState === 1) {
+    /* create a database connection */
+    const database = await runDatabaseApp();
+    appLocals.database = database;
+
+    /* obtain the database connection object */
+    const dbConnection = database.dbConnection;
+    appLocals.dbConnection = dbConnection;
+
+    /* set database ready state variable */
+    isDbReady = appLocals.dbConnection.readyState;
+
+    if (isDbReady === DBReadyState.Connected) {
       debug(modulename + ': database set up complete');
 
       /* generate the models object */
-      obj.models.users = modelUsers(database);
-      obj.models.tests = modelTests(database);
-      obj.models.members = modelMembers(database);
+      const models: IModels = {};
+      models.users = createModelUsers(database);
+      models.tests = createModelTests(database);
+      models.members = createModelMembers(database);
+      appLocals.models = models;
     } else {
       logger.error(modulename + ': database failed to connect');
     }
@@ -206,30 +170,45 @@ async function runApp() {
     dumpError(err);
   }
 
-  /* call the http server if db connected or not needed
-   * otherwise exit */
-  if (obj.dbConnection.readyState === 1 || obj.config.IS_NO_DB_OK) {
+  /* call the http server if db connected or not needed otherwise exit */
+  if (isDbReady === DBReadyState.Connected || config.IS_NO_DB_OK) {
     debug(modulename + ': calling the http server');
 
     logger.info('\n*** STARTING SERVER ***\n');
 
     /* start the server */
     try {
-      await startServer.startServer(app);
+      /* holds connected servers */
+      const servers: Server[] = [];
+      await startServer(
+        app,
+        servers, // filled with connected server on return
+        config,
+        logger,
+        dumpError,
+      );
+      appLocals.servers = servers;
 
       /* set up an error handlers for the servers */
-      for (const server of obj.servers) {
+      for (const server of servers) {
         server.expressServer.on('error', async (err: Error) => {
           logger.error(modulename + ': Unexpected server error - exiting');
           dumpError(err);
-          await closeAll();
+          await closeAll(appLocals.servers, appLocals.database);
           debug(modulename + ': will exit with code -3');
           process.exitCode = -3;
         });
       }
 
       /* run the server functionality */
-      await runServer.runServer(app);
+      await runServer(
+        app,
+        config,
+        controllers,
+        errorHandlers,
+        miscHandlers,
+        serverLogger,
+      );
 
       debug(modulename + ': server up and running');
 
@@ -237,7 +216,7 @@ async function runApp() {
       const arg = {
         message: 'Server running 0',
       };
-      obj.event.emit('indexRunApp', arg);
+      appLocals.event.emit('indexRunApp', arg);
 
       /* if started from forever signal that server is up */
       if (process.send) {
@@ -248,32 +227,39 @@ async function runApp() {
     } catch (err) {
       logger.error(modulename + ': server start up error - exiting');
       dumpError(err);
-      await closeAll();
+      await closeAll(appLocals.servers, appLocals.database);
       debug(modulename + ': will exit with code -2');
       process.exitCode = -2;
     }
   } else {
     logger.error(modulename + ': no database connection - exiting');
-    await closeAll();
+    await closeAll(appLocals.servers, appLocals.database);
     debug(modulename + ': will exit with code -1');
     process.exitCode = -1;
   }
 }
 
-/* closes all server and database connections */
-async function closeAll() {
-  const obj = app.locals;
-
+/**
+ * Closes all server and database connections
+ * @param servers Array of created servers.
+ * @param database Created database instance.
+ */
+async function closeAll(
+  servers: Server[] = appLocals.servers,
+  database: Database = appLocals.database,
+) {
   try {
     debug(modulename + ': closing connections...');
 
-    for (const svr of obj.servers) {
-      await svr.stopServer();
-      svr.expressServer.removeAllListeners();
+    if (servers && servers.length > 0) {
+      for (const svr of servers) {
+        await svr.stopServer();
+        svr.expressServer.removeAllListeners();
+      }
     }
 
-    if (Object.keys(obj.dbConnection).length !== 0) {
-      await database.closeConnection(obj.dbConnection);
+    if (database) {
+      await database.closeConnection(database.dbConnection);
     }
 
     process.removeListener('SIGINT', sigint);
@@ -294,7 +280,10 @@ async function closeAll() {
   }
 }
 
-export async function sigint() {
+/**
+ * Shuts down the application gracefully.
+ */
+async function sigint() {
   debug(modulename + ': running sigint');
 
   await closeAll();
@@ -309,13 +298,19 @@ export async function sigint() {
     number: 0,
   };
 
-  app.locals.event.emit('indexSigint', arg);
+  appLocals.event.emit('indexSigint', arg);
 }
 
-/* registers an event handler for SIGINT
- * event triggers if CTRL+C pressed */
+/**
+ * Registers an event handler for SIGINT.
+ * Event triggers if CTRL+C pressed
+ */
 process.on('SIGINT', sigint);
 
+/**
+ * Receives a message and shuts down the server gracefully.
+ * @param message Message from the parent monitor application.
+ */
 interface IMessage {
   action: string;
   code: number;
@@ -336,20 +331,27 @@ async function parentMessage(message: IMessage) {
 
   logger.info('\n*** CLOSING THE SERVER ON MONITOR REQUEST ***\n');
 
+  /* a code is returned to tell forever that this exit should not be subject to a restart */
   process.exit(message.code);
 }
 
 /**
  * process.send is true if started by forever. The 'message' event
  * triggers if forever exits on a SIGINT i.e. CTRL+C pressed.
- * A code is returned to tell forever that this exit should
- * not be subject to a restart
  */
 if (process.send) {
   process.on('message', parentMessage);
 }
 
-load();
+/* create the server */
 runApp();
 
-export const appObjects = app.locals;
+/* Note: All exports are for mocha. */
+export {
+  appLocals,
+  event,
+  IAppLocals,
+  sigint,
+  uncaughtException,
+  unhandledRejection,
+};

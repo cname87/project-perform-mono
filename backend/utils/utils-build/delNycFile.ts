@@ -3,7 +3,7 @@
  *
  * .nyc_output can be used to reprint the coverage report but it is easier to just look at the index.html in the coverage directory.
  *
- * It is generated in the workspace root.
+ * It is generated in the node app root, i.e. if node run from /backend then the file to delete is /backend/.nyc_output.
  *
  * Usage:
  * Used in package.com: npm run delNyc
@@ -21,7 +21,7 @@ import * as shell from 'shelljs';
 const appRoot = appRootObject.toString();
 
 /* create path to .nyc_output file in workspace root */
-const filePath = path.join(appRoot, '..', '.nyc_output');
+const filePath = path.join(appRoot, '.nyc_output');
 
 shell.rm('-rf', filePath);
 

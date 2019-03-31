@@ -10,8 +10,14 @@ export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
 /* import configuration file */
-import { filepaths, getConnectionOptions, getMongoUri } from './configDatabase';
-// tslint:disable-next-line: ordered-imports
+import {
+  Database,
+  filepaths,
+  getConnectionOptions,
+  getMongoUri,
+} from './configDatabase';
+
+/* import secret configuration parameters */
 import * as dotenv from 'dotenv';
 dotenv.config({ path: filepaths.ENV_FILE });
 
@@ -27,27 +33,19 @@ dotenv.config({ path: filepaths.ENV_FILE });
  *
  * @throws Throws an error if the database set up fails.
  */
-export async function runDatabaseApp() {
+async function runDatabaseApp(): Promise<Database> {
   debug(modulename + ': running runDatabaseApp');
 
-  /* Database class */
-  const { Database } = filepaths.DATABASE;
-
-  /*
-   * Create the single instances of the general logger & dumpError utilities.
-   * (Other modules receive the same instance).
-   */
-  const { Logger } = filepaths.LOGGER;
-  const logger = Logger.getInstance();
-  const { DumpError } = filepaths.DUMPERROR;
-  const dumpError = DumpError.getInstance(logger);
+  /* create the single instance of the general logger and dumpError utility */
+  const logger = filepaths.Logger.getInstance();
+  const dumpError = filepaths.DumpError.getInstance();
 
   logger.info('\n*** CONNECTING TO THE DATABASE ***\n');
 
   try {
     const connectionUrl = getMongoUri();
     const connectOptions = getConnectionOptions();
-    const database = new Database(
+    const database = new filepaths.Database(
       connectionUrl,
       connectOptions,
       logger,
@@ -63,3 +61,6 @@ export async function runDatabaseApp() {
     throw err;
   }
 }
+
+/* export Database instance type and database creation function */
+export { Database, runDatabaseApp };

@@ -132,7 +132,22 @@
         "reveal": "always",
         "panel": "shared"
       },
-      "problemMatcher": []
+    },
+    // Change to /backend  *** NOT WORKING
+    {
+      "label": "Change to backend",
+      "type": "shell",
+      "windows": {
+        "command": "CD",
+        "args": [ 
+          "${workspaceFolder}\\backend"
+        ],
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
     },
     // Is Server Up?
     {

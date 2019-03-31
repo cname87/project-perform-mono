@@ -23,7 +23,7 @@ import https from 'https';
  * Starts the http(s) server.
  * @param app
  * The express app object
- * app.locals holds other set up objects including the array used to store
+ * app.appLocals holds other set up objects including the array used to store
  * the https(s) servers.
  * @returns
  * Void
@@ -31,23 +31,24 @@ import https from 'https';
  * Throws an error if an error occurs during the server listen request.
  */
 
-export async function startServer(app: express.Application) {
+async function startServer(
+  app: express.Express,
+  servers: any,
+  config: any,
+  logger: any,
+  dumpError: any,
+) {
   debug(modulename + ': running startServer');
 
-  const objects = app.locals;
-  const config = app.locals.config;
-  const logger = app.locals.logger;
-  const dumpError = app.locals.dumpError;
-
   /* import serverops module */
-  const { Server } = config.SERVER;
+  const Server = config.Server;
 
   /* server connection utility function */
   async function connectServer(
     svrType: any,
     svrName: string,
     svrOptions: object,
-    expressApp: express.Application,
+    expressApp: express.Express,
     svrPort: number,
     listenRetries: number,
     listenTimeout: number,
@@ -64,7 +65,7 @@ export async function startServer(app: express.Application) {
     }
 
     /* store created server in objects */
-    objects.servers.push(server);
+    servers.push(server);
   }
 
   /* set up http server connection variables */
@@ -117,3 +118,6 @@ export async function startServer(app: express.Application) {
 
   debug(modulename + ': https(s) server up and listening');
 }
+
+/* export the start server function */
+export { startServer };

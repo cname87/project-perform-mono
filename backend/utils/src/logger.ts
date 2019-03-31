@@ -2,6 +2,7 @@
  * This module provides a Winston logger service.
  * It uses the file paths specified in the imported
  * configuration file.
+ * The logs directory must exist but the files are created if they do not exist.
  */
 
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
@@ -43,15 +44,17 @@ const { combine, timestamp, label, printf } = format;
 const defaultInfoLog = loggerConfig.INFO_LOG;
 const defaultErrorLog = loggerConfig.ERROR_LOG;
 
-export class Logger {
-  public static instance: winston.Logger;
+type typeLoggerInstance = winston.Logger;
+
+class Logger {
+  public static instance: typeLoggerInstance;
 
   public static getInstance(
     infoLog: string = defaultInfoLog,
     errorLog: string = defaultErrorLog,
-  ): winston.Logger {
+  ): typeLoggerInstance {
     if (!Logger.instance) {
-      Logger.instance = new Logger(infoLog, errorLog) as winston.Logger;
+      Logger.instance = new Logger(infoLog, errorLog) as typeLoggerInstance;
     }
     return Logger.instance;
   }
@@ -65,7 +68,7 @@ export class Logger {
   }
 }
 
-function makeLogger(infoFile: string, errorFile: string): winston.Logger {
+function makeLogger(infoFile: string, errorFile: string): typeLoggerInstance {
   debug(modulename + ': running logger');
 
   /* log paths */
@@ -148,7 +151,7 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
     },
   };
 
-  const loggerObject: winston.Logger = createLogger({
+  const loggerObject: typeLoggerInstance = createLogger({
     levels: myLevels.levels,
     transports: [
       new transports.File(options.errorFile),
@@ -165,3 +168,6 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
   const logger = Object.create(loggerObject);
   return logger;
 }
+
+/* export Logger class and instance type */
+export { Logger, typeLoggerInstance };

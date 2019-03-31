@@ -10,7 +10,7 @@ debug(`Starting ${modulename}`);
 import { Document, Model, SchemaDefinition } from 'mongoose';
 import { Database } from '../../database/src/configDatabase';
 
-export function createModel(database: Database): Model<Document> {
+function createModel(database: Database): Model<Document> {
   debug(modulename + ': running createModel');
 
   /* set up user schema, collection, and model name */
@@ -24,3 +24,6 @@ export function createModel(database: Database): Model<Document> {
 
   return database.createModel(ModelName, schema, collection);
 }
+
+/* export the model creation function */
+export { createModel as createModelUsers };

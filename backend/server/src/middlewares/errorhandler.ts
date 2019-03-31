@@ -6,15 +6,22 @@
 
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
-export const debug = debugFunction('PP_' + modulename);
+export const debug = debugFunction('PP_' + modulename); // exported for mocha
 debug(`Starting ${modulename}`);
 
-/* external dependencies */
-import * as express from 'express';
+/**
+ * Import external dependencies
+ */
+import { NextFunction, Response } from 'express';
 import createError from 'http-errors';
 import urlParser from 'url';
 import util from 'util';
 import * as winston from 'winston';
+
+/**
+ * Import types
+ */
+import { IRequestApp, processExtended } from '../configServer';
 
 /* module variables */
 let logger: winston.Logger;
@@ -24,11 +31,7 @@ let logger: winston.Logger;
  * to this point without error and creates a 'Not Found' error.
  */
 
-export function notFound(
-  _req: express.Request,
-  _res: express.Response,
-  next: express.NextFunction,
-) {
+function notFound(_req: IRequestApp, _res: Response, next: NextFunction) {
   debug(modulename + ': notFound called');
   next(createError(404));
 }
@@ -40,34 +43,31 @@ export function notFound(
  * exception in the final errorhandling function.
  */
 
-export function assignCode(
+function assignCode(
   err: any,
-  _req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
+  _req: IRequestApp,
+  res: Response,
+  next: NextFunction,
 ) {
   debug(modulename + ': assignCode called');
 
-  if (err.failedValidation && err.message.slice(0, 8) === 'Response') {
-    /* if swagger returns a response validation failure then set res.statusCode to internal server error, 500.
-    (swagger response validation should set res.statusCode to 500 anyway) */
-
-    res.statusCode = 500;
+  if (err.failedValidation) {
+    /* if swagger returns a validation failure then set err.statusCode to invalid data error, 400. */
+    err.statusCode = 400;
   }
 
-  if (err.failedValidation && err.message.slice(0, 7) === 'Request') {
-    /* if swagger returns a request validation failure then set res.statusCode to invalid data error, 400.
-    (swagger request validation should set res.statusCode to 400 anyway) */
-    res.statusCode = 400;
+  if (err.failedValidation && 'originalResponse' in err) {
+    /* if swagger returns a response validation failure then set err.statusCode to internal server error, 500 */
+    /* the key 'originalResponse' will exist only for a swagger response validation fail */
+
+    err.statusCode = 500;
   }
 
   if (typeof err === 'object') {
-    /* set the response status code to the error statusCode field, if one was added on error creation, or, if not, set to the internal server error code 500 */
-    res.statusCode = err.statusCode ? err.statusCode : 500;
-
-    /* replace 2xx status codes */
-    res.statusCode =
-      res.statusCode >= 200 && res.statusCode < 300 ? 500 : res.statusCode;
+    /* set the response status code to the error statusCode field, if one was added on error creation, or if one was added above. */
+    res.statusCode = err.statusCode ? err.statusCode : res.statusCode;
+    /* If empty, set the response code to internal server error, 500. */
+    res.statusCode = res.statusCode ? res.statusCode : 500;
 
     /* override the response status message if err.message exists */
     res.statusMessage = err.message || res.statusMessage;
@@ -79,17 +79,16 @@ export function assignCode(
 /**
  * Log detail on all errors passed in.
  */
-
-export function logError(
+function logError(
   err: any,
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
+  req: IRequestApp,
+  res: Response,
+  next: NextFunction,
 ) {
   debug(modulename + ': logError started');
 
-  logger = res.app.locals.logger;
-  const dumpError = res.app.locals.dumpError;
+  logger = req.app.appLocals.logger;
+  const dumpError = req.app.appLocals.dumpError;
 
   logger.error(modulename + ': server logger called');
 
@@ -122,11 +121,11 @@ export function logError(
  * Sends a response to the client with status code and message.
  */
 
-export function sendErrorResponse(
+function sendErrorResponse(
   err: any,
-  _req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
+  _req: IRequestApp,
+  res: Response,
+  next: NextFunction,
 ) {
   /* set response */
   const message = {
@@ -161,11 +160,11 @@ export function sendErrorResponse(
  * the server (which should restart).
  */
 
-export function throwError(
+function throwError(
   err: any,
-  _req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
+  _req: IRequestApp,
+  res: Response,
+  next: NextFunction,
 ) {
   debug(modulename + ': throwError called');
 
@@ -173,9 +172,23 @@ export function throwError(
     /* reset the server after a delay to allow error data be sent */
     setTimeout(() => {
       /* caught in index.js */
-      process.emit('thrownException', err);
+      (process as processExtended).emit('thrownException', err);
     }, 1000);
   }
 
   next();
 }
+
+/* export object with all error handling functions */
+export const errorHandlers = {
+  notFound,
+  assignCode,
+  logError,
+  sendErrorResponse,
+  throwError,
+};
+
+/* export for mocha */
+export const debugErrorHandlers = {
+  debug,
+};

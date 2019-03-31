@@ -10,6 +10,7 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 import * as appRootObject from 'app-root-path';
+/* appRoot will be the directory containing the node_modules directory which includes app-root-path, i.e. should be in .../backend */
 const appRoot = appRootObject.toString();
 import * as path from 'path';
 
@@ -24,6 +25,19 @@ import * as path from 'path';
 
 export const loggerConfig = {
   /* log file paths used to set up the logger */
-  INFO_LOG: path.join(appRoot, 'utils', 'logs', 'info.log'),
-  ERROR_LOG: path.join(appRoot, 'utils', 'logs', 'error.log'),
+  INFO_LOG: path.join(appRoot, 'logs', 'info.log'),
+  ERROR_LOG: path.join(appRoot, 'logs', 'error.log'),
 };
+
+/***********************************************************************/
+/* Types                                                               */
+/***********************************************************************/
+
+/* extra fields for created errors */
+/* Error: 'name' is mandatory, 'message' is optional */
+export interface IErr extends Error {
+  /* set true to show that the error has been dumped already */
+  dumped?: boolean;
+  /* add a http status code on creation, which is later written into the http response */
+  statusCode?: number;
+}

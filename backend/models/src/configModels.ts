@@ -12,5 +12,3 @@ debug(`Starting ${modulename}`);
 /* database type */
 import { Database } from '../../database/src/configDatabase';
 export type Database = Database;
-
-export const test = 5;

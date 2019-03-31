@@ -89,7 +89,7 @@
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": true,
     "no-unnecessary-initializer": true,
-    // "no-unused-expression": true,  // replaced by no-unused-expression-chai
+    // "no-unused-expression": [true, "allow-new"],  // replaced by no-unused-expression-chai
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "object-literal-sort-keys": false,
@@ -100,6 +100,7 @@
       "check-else",
       "check-whitespace"
     ],
+    "ordered-imports": false, // disabled having to sort imports
     "prefer-const": true,
     "quotemark": [
       true,

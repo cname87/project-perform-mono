@@ -12,12 +12,11 @@
     ],
     "exclude-after-remap": false,
     "extension": [
-      ".ts",
-      ".tsx"
+      ".js"
     ],
     "functions": 0,
     "include": [
-      "**/*.ts"
+      "**/*.js"
     ],
     "lines": 60,
     "per-file": true,

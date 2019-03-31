@@ -19,8 +19,9 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
+import OpenAPIBackend from 'openapi-backend';
 import path from 'path';
-import swaggerTools = require('swagger-tools');
+import swaggerTools = require('oas-tools');
 import urlParser from 'url';
 import util from 'util';
 import uuidv1 from 'uuid/v1';
@@ -29,19 +30,21 @@ import uuidv1 from 'uuid/v1';
  * Sets up express middleware and responds to incoming requests.
  * @param app
  * The express app object
- * app.locals holds other set up objects including the array used to store
+ * app.appLocals holds other set up objects including the array used to store
  * the https(s) servers.
  * @returns
  * Void.
  */
 
-export async function runServer(app: express.Application) {
+async function runServer(
+  app: express.Express,
+  config: any,
+  controllers: any,
+  errorHandlers: any,
+  handles: any,
+  serverLogger: any,
+) {
   debug(modulename + ': running runServer');
-
-  const config = app.locals.config;
-  const handles = app.locals.handles;
-  const controllers = app.locals.controllers;
-  const serverLogger = app.locals.serverLogger;
 
   /* 'development' or 'production' */
   app.set('env', config.ENV);
@@ -102,8 +105,8 @@ export async function runServer(app: express.Application) {
     });
   }
 
-  /* enable test functionality in dev mode or if set by a test */
-  if (app.get('env') === 'development' || app.get('test')) {
+  /* enable test functionality in dev mode */
+  if (app.get('env') === 'development') {
     /* serve server test files from a static server mounted on /testServer */
     const staticTestOptions = {
       redirect: false,
@@ -135,51 +138,52 @@ export async function runServer(app: express.Application) {
 
     /* swagger api definition */
     const swaggerDoc = require(config.API_FILE);
+    swaggerTools.configure({
+      controllers: config.CONTROLLERS_PATH,
+      strict: true,
+    });
 
     /* initialize the swagger middleware */
-    swaggerTools.initializeMiddleware(swaggerDoc, (middleware) => {
-      /* interpret swagger resources and attach metadata to request (1st) */
-      app.use(middleware.swaggerMetadata());
+    swaggerTools.initializeMiddleware(
+      swaggerDoc,
+      app as any,
+      (middleware: any) => {
+        /* interpret swagger resources and attach metadata to request (1st) */
+        app.use(middleware.swaggerMetadata());
 
-      // // Provide the security handlers  *** To Do ***
-      // app.use(middleware.swaggerSecurity({
-      //   oauth2 (req, def, scopes, callback) {
-      //     // Do real stuff here
-      //   },
-      // }));
+        /* get model for later integration using swagger-mongoose */
+        // const swaggerToolsTyped: any = swaggerTools;
+        // swaggerToolsTyped.specs.v2.composeModel(
+        //   swaggerDoc,
+        //   '#/definitions/Member',
+        //   (err: any, schema: any) => {
+        //     if (err) {
+        //       throw err;
+        //     }
+        //     console.log(JSON.stringify(schema, null, '  '));
+        //   },
+        // );
 
-      /* get model for later integration using swagger-mongoose */
-      const swaggerToolsTyped: any = swaggerTools;
-      swaggerToolsTyped.specs.v2.composeModel(
-        swaggerDoc,
-        '#/definitions/Member',
-        (err: any, schema: any) => {
-          if (err) {
-            throw err;
-          }
-          console.log(JSON.stringify(schema, null, '  '));
-        },
-      );
+        /* validate swagger requests, and responses if desired */
+        app.use(
+          middleware.swaggerValidator({
+            validateResponse: true,
+          }),
+        );
 
-      /* validate swagger requests, and responses if desired */
-      app.use(
-        middleware.swaggerValidator({
-          validateResponse: true,
-        }),
-      );
+        /* route validated requests to appropriate controller */
+        app.use(middleware.swaggerRouter(options));
 
-      /* route validated requests to appropriate controller */
-      app.use(middleware.swaggerRouter(options));
+        /* serve the swagger api UI at http://localhost:port/api/docs */
+        app.use(
+          middleware.swaggerUi({
+            swaggerUi: '/api/docs',
+          }),
+        );
 
-      /* serve the swagger api UI at http://localhost:port/api/docs */
-      app.use(
-        middleware.swaggerUi({
-          swaggerUi: '/api/docs',
-        }),
-      );
-
-      resolve();
-    });
+        resolve();
+      },
+    );
   });
 
   await setupSwagger;
@@ -203,9 +207,12 @@ export async function runServer(app: express.Application) {
   });
 
   /* handle all errors passed down via the error handling functionality */
-  app.use(handles.errorHandler.notFound);
-  app.use(handles.errorHandler.assignCode);
-  app.use(handles.errorHandler.logError);
-  app.use(handles.errorHandler.sendErrorResponse);
-  app.use(handles.errorHandler.throwError);
+  app.use(errorHandlers.notFound);
+  app.use(errorHandlers.assignCode);
+  app.use(errorHandlers.logError);
+  app.use(errorHandlers.sendErrorResponse);
+  app.use(errorHandlers.throwError);
 }
+
+/* export the run server function */
+export { runServer };

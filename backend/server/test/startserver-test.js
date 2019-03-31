@@ -23,10 +23,8 @@ describe('Start server tests', function() {
     };
 
     /* internal dumpError and logger utilities */
-    const { Logger } = config.LOGGER;
-    const logger = Logger.getInstance(config);
-    const { DumpError } = config.DUMPERROR;
-    const dumpError = DumpError.getInstance(logger);
+    const logger = config.Logger.getInstance();
+    const dumpError = config.DumpError.getInstance(logger);
 
     const chai = require('chai');
     const sinon = require('sinon');
@@ -76,8 +74,7 @@ describe('Start server tests', function() {
 
         try {
 
-            await config.START_SERVER
-                .startServer(app);
+            await config.startServer(app, objects.servers, objects.config, objects.logger, objects.dumpError);
 
         } catch (err) {
 
@@ -99,8 +96,7 @@ describe('Start server tests', function() {
 
         try {
 
-            await config.START_SERVER
-                .startServer(app);
+          await config.startServer(app, objects.servers, objects.config, objects.logger, objects.dumpError);
 
         } catch (err) {
 
@@ -121,10 +117,8 @@ describe('Start server tests', function() {
         try {
 
             /* start server twice and second listen attempt will fail */
-            await config.START_SERVER
-                .startServer(app);
-            await config.START_SERVER
-                .startServer(app);
+            await config.startServer(app, objects.servers, objects.config, objects.logger, objects.dumpError);
+            await config.startServer(app, objects.servers, objects.config, objects.logger, objects.dumpError);
             expect.fail(true, false, 'should not have reached here');
 
         } catch (err) {

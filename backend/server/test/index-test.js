@@ -10,10 +10,8 @@ describe('Application tests', function() {
   const indexPath = '../../dist/server/src/index';
   const { config } = require(path.join(appRoot, 'dist', 'server', 'src','configServer'));
 
-  const { Logger } = config.LOGGER;
-  const logger = Logger.getInstance();
-  const { DumpError } = config.DUMPERROR;
-  const dumpError = DumpError.getInstance(logger);
+  const logger = config.Logger.getInstance();
+  const dumpError = config.DumpError.getInstance(logger);
 
   /* require a database as default */
   config.IS_NO_DB_OK = false;
@@ -110,32 +108,28 @@ describe('Application tests', function() {
     spyConsoleError = sinon.spy(console, 'error');
 
     /* stub Logger */
-    config.LOGGER = {
-      Logger: {
-        getInstance: () => {
-          return {
-            info: (message) => {
-              logger.info(message);
-              spyLoggerInfo(message);
-            },
-            error: (message) => {
-              logger.error(message);
-              spyLoggerError(message);
-            },
-          };
-        },
+    config.Logger = {
+      getInstance: () => {
+        return {
+          info: (message) => {
+            logger.info(message);
+            spyLoggerInfo(message);
+          },
+          error: (message) => {
+            logger.error(message);
+            spyLoggerError(message);
+          },
+        };
       },
     };
 
     /* stub DumpError */
-    config.DUMPERROR = {
-      DumpError: {
-        getInstance: () => {
-          return (err) => {
-            dumpError(err);
-            spyDumpError(err);
-          };
-        },
+    config.DumpError = {
+      getInstance: () => {
+        return (err) => {
+          dumpError(err);
+          spyDumpError(err);
+        };
       },
     };
 
@@ -229,7 +223,7 @@ describe('Application tests', function() {
      * handler will cause the overall programme to exit
      * don't use await and can't exit with process.exit()
      * or else follow-on async statements not reached */
-    index.appObjects.servers[0].expressServer.emit(
+    index.appLocals.servers[0].expressServer.emit(
       'error',
       new Error('Test Error'),
     );
@@ -271,7 +265,7 @@ describe('Application tests', function() {
      * handler will cause the overall programme to exit
      * don't use await and can't exit with process.exit()
      * or else follow-on async statements not reached */
-    index.appObjects.servers[0].expressServer.emit(
+    index.appLocals.servers[0].expressServer.emit(
       'error',
       new Error('Test Error'),
     );
@@ -299,12 +293,10 @@ describe('Application tests', function() {
     'Tests a server start with database fail, and database is required',
     async function() {
       /* stub so connectDB throws an error */
-      const databaseRestore = config.DATABASE;
-      config.DATABASE = {
-        runDatabaseApp: () => {
+      const runRestore = config.runDatabaseApp;
+      config.runDatabaseApp = () => {
           throw new Error('Test error');
-        },
-      };
+      },
 
       /* require index.js */
       runIndex();
@@ -318,7 +310,7 @@ describe('Application tests', function() {
       await sleep(3000);
 
       /* restore database */
-      config.DATABASE = databaseRestore;
+      config.runDatabaseApp = runRestore;
 
       expect(spyConsoleError.notCalled).to.be.true;
 
@@ -340,12 +332,10 @@ describe('Application tests', function() {
 
       /* stub so connectDB returns (not throws) an error
        * this means the dbConnection object will equal an error */
-      const databaseRestore = config.DATABASE;
-      config.DATABASE = {
-        runDatabaseApp: () => {
+      const runRestore = config.runDatabaseApp;
+      config.runDatabaseApp = () => {
           throw new Error('Test error');
-        },
-      };
+      },
 
       /* require index.js */
       runIndex();
@@ -353,7 +343,7 @@ describe('Application tests', function() {
       expect(response).not.to.be.instanceof(Error);
 
       /* restore database */
-      config.DATABASE = databaseRestore;
+      config.runDatabaseApp = runRestore;
 
       /* restore */
       config.IS_NO_DB_OK = false;
@@ -386,12 +376,10 @@ describe('Application tests', function() {
 
   it('Tests a server start up fail', async function() {
     /* set up so startServer throws an error */
-    const startServerRestore = config.START_SERVER;
-    config.START_SERVER = {
-        startServer: () => {
-            throw new Error('Test error');
-        },
-    };
+    const startServerRestore = config.startServer;
+    config.startServer = () => {
+      throw new Error('Test error');
+    },
 
     /* require index.js */
     runIndex();
@@ -401,7 +389,7 @@ describe('Application tests', function() {
     );
     expect(response).not.to.be.instanceof(Error);
 
-    config.START_SERVER = startServerRestore;
+    config.startServer = startServerRestore;
 
     expect(spyConsoleError.notCalled).to.be.true;
 

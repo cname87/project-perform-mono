@@ -3,6 +3,10 @@ import debugFunction = require('debug');
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
+/*
+ * external dependencies
+ */
+
 /* set up mocha, sinon & chai */
 import { fail } from 'assert';
 import chai = require('chai');
@@ -15,34 +19,35 @@ sinon.assert.expose(chai.assert, {
   prefix: '',
 });
 
-/* external dependencies */
-import appRootObject = require('app-root-path');
-const appRoot = appRootObject.toString();
+/* other external dependencies */
 import { SchemaDefinition } from 'mongoose';
-import path = require('path');
 import proxyquireObject = require('proxyquire');
 const proxyquire = proxyquireObject.noPreserveCache();
 
-const indexPath = path.join(appRoot, 'dist', 'database', 'src', 'index');
-
-/* internal dependencies */
-// import 'dotenv/config';
+/*
+ * internal dependencies
+ */
 import {
-  Database,
+  Database, // Database instance type
+  DBReadyState, // type for database connected readystate
   filepaths,
   getConnectionOptions,
   getMongoUri,
+  indexPath, // path to database index.js file
 } from '../src/configDatabase';
-// tslint:disable-next-line: ordered-imports
+
+/* secret configuration */
 import * as dotenv from 'dotenv';
 dotenv.config({ path: filepaths.ENV_FILE });
 
+/**
+ * tests
+ */
 describe('Database connection', () => {
   debug(`Running ${modulename} describe - Database.connection`);
 
   /* set up module  variables */
   let database: Database;
-  const debugEnabled = true;
   const spyDebug = sinon.spy();
 
   /* derive db name from the connection uri */
@@ -60,14 +65,14 @@ describe('Database connection', () => {
   const testCollection = 'mochaTest';
   const testModel = 'mochaTestModel';
 
-  afterEach('Close database connection', async () => {
-    debug(`Running ${modulename} afterEach - Close database connection`);
+  afterEach('close database connection', async () => {
+    debug(`Running ${modulename} afterEach - close database connection`);
 
-    /* close dbConnection if open */
+    debug('close dbConnection if open');
     if (
       database &&
       database.dbConnection &&
-      database.dbConnection.readyState === 1
+      database.dbConnection.readyState === DBReadyState.Connected
     ) {
       await database.closeConnection(database.dbConnection);
     }
@@ -76,51 +81,37 @@ describe('Database connection', () => {
   it('tests spyDebug', async () => {
     debug(`Running ${modulename} it - tests spyDebug`);
 
-    /* stub index import debugFunction function */
+    debug('spy on index debug function via debugFunction stub');
     const debugFunctionStub = (prefix: string) => {
-      const debugLocal = debugFunction(prefix);
-      debugLocal.enabled = debugEnabled;
+      const debugIndex = debugFunction(prefix);
+      debugIndex.enabled = true;
       return (message: string) => {
         spyDebug(message);
-        debugLocal(message);
+        debugIndex(message);
       };
     };
 
-    /* try connect to database */
+    debug('connect to database');
     const getDatabase = proxyquire(indexPath, {
       debug: debugFunctionStub,
     });
     database = await getDatabase.runDatabaseApp();
 
-    if (true) {
-      /* slice off /index.js: as it might be index.ts depending on run mechanism */
-      expect(spyDebug.lastCall.lastArg.slice(-22)).to.eql(
-        'running runDatabaseApp',
-      );
-    }
+    debug('run tests');
+    /* slice off /index.js: as it might be /index.ts */
+    expect(spyDebug.lastCall.lastArg.slice(-22)).to.eql(
+      'running runDatabaseApp',
+    );
   });
 
   it('makes a connection to a database', async () => {
     debug(`Running ${modulename} it - makes a connection to a database`);
 
-    /* close dbConnection if open */
-    if (
-      database &&
-      database.dbConnection &&
-      database.dbConnection.readyState === 1
-    ) {
-      await database.closeConnection(database.dbConnection);
-      expect(
-        database.dbConnection.readyState,
-        'Connection should be closed',
-      ).to.equal(0);
-    }
-
-    /* connect to database */
+    debug('connect to database');
     const getDatabase = proxyquire(indexPath, {});
     database = await getDatabase.runDatabaseApp();
 
-    /* test */
+    debug('run tests');
     if (database && database.dbConnection && database.dbConnection.db) {
       expect(
         database.dbConnection.db.databaseName,
@@ -129,7 +120,7 @@ describe('Database connection', () => {
       expect(
         database.dbConnection.readyState,
         'Connection should be open',
-      ).to.equal(1);
+      ).to.equal(DBReadyState.Connected);
     } else {
       expect(fail('database or dbConnection or db is falsy'));
     }
@@ -138,11 +129,11 @@ describe('Database connection', () => {
   it('makes a 2nd connection to a database', async () => {
     debug(`Running ${modulename} it - makes a 2nd connection to a database`);
 
-    /* connect to database */
+    debug('connect to database');
     const getDatabase = proxyquire(indexPath, {});
     database = await getDatabase.runDatabaseApp();
 
-    /* test */
+    debug('run tests');
     if (database && database.dbConnection && database.dbConnection.db) {
       expect(
         database.dbConnection.db.databaseName,
@@ -151,15 +142,15 @@ describe('Database connection', () => {
       expect(
         database.dbConnection.readyState,
         'Connection should be open',
-      ).to.equal(1);
+      ).to.equal(DBReadyState.Connected);
     } else {
       expect(fail('database or dbConnection or db is falsy'));
     }
 
-    /* make a 2nd connection to the database */
+    debug('make a 2nd connection to the database');
     const database2 = await getDatabase.runDatabaseApp();
 
-    /* test */
+    debug('run tests');
     if (database2 && database2.dbConnection && database2.dbConnection.db) {
       expect(
         database2.dbConnection.db.databaseName,
@@ -168,10 +159,12 @@ describe('Database connection', () => {
       expect(
         database2.dbConnection.readyState,
         'Connection should be open',
-      ).to.equal(1);
+      ).to.equal(DBReadyState.Connected);
 
-      /* close 2nd dbConnection */
+      debug('close the 2nd dbConnection');
       await database2.closeConnection(database2.dbConnection);
+
+      debug('run tests');
       expect(
         database2.dbConnection.readyState,
         'Connection should be closed',
@@ -189,11 +182,10 @@ describe('Database connection', () => {
       getMongoUri: () => 'dummyUri',
     };
 
-    /* try connect to database */
+    debug('failed connection to database');
     const getDatabase = proxyquire(indexPath, {
       './configDatabase': configStub,
     });
-
     try {
       await getDatabase.runDatabaseApp();
       expect.fail('Should not have reached this point');
@@ -205,20 +197,21 @@ describe('Database connection', () => {
   it('closes an open database connection', async () => {
     debug(`Running ${modulename} it - closes an open database connection`);
 
-    /* connect to database */
+    debug('connect to database');
     const getDatabase = proxyquire(indexPath, {});
     database = await getDatabase.runDatabaseApp();
 
     if (database && database.dbConnection && database.dbConnection.db) {
+      debug('run tests');
       expect(
         database.dbConnection.readyState,
         'Connection should be open',
-      ).to.eql(1);
+      ).to.eql(DBReadyState.Connected);
 
-      /* close to database */
+      debug('close the database');
       await database.closeConnection(database.dbConnection);
 
-      /* test */
+      debug('run tests');
       expect(
         database.dbConnection.readyState,
         'Connection should be closed',
@@ -232,17 +225,17 @@ describe('Database connection', () => {
     debug(`Running ${modulename} it - closes a closed database connection`);
 
     if (database && database.dbConnection && database.dbConnection.db) {
-      /* close database */
+      debug('close the database');
       await database.closeConnection(database.dbConnection);
       expect(
         database.dbConnection.readyState,
         'Connection should be closed',
       ).to.equal(0);
 
-      /* close again */
+      debug('close the database again');
       await database.closeConnection(database.dbConnection);
 
-      /* test */
+      debug('run tests');
       expect(
         database.dbConnection.readyState,
         'Connection should still be closed',
@@ -255,19 +248,25 @@ describe('Database connection', () => {
   it('closes an invalid database connection', async () => {
     debug(`Running ${modulename} it - closes an invalid database connection`);
 
+    debug('try close an invalid database');
     const dummyConnection: any = {};
     const result = await database.closeConnection(dummyConnection);
+
+    debug('run tests');
     expect(result, 'Returns an error').to.be.instanceOf(Error);
   });
 
   it('Creates a mongoose model', async () => {
     debug(`Running ${modulename} it creates a mongoose model`);
 
-    /* connect to database */
+    debug('connect to database');
     const getDatabase = proxyquire(indexPath, {});
     database = await getDatabase.runDatabaseApp();
 
+    debug('create mongoose model');
     const model = database.createModel(testModel, testSchema, testCollection);
+
+    debug('run tests');
     expect(model.collection.name, 'Should return a mongoose model').to.eql(
       testCollection,
     );
@@ -276,16 +275,18 @@ describe('Database connection', () => {
   it('Fails to create a mongoose model', async () => {
     debug(`Running ${modulename} it - fails to create a mongoose model`);
 
-    /* connect to database */
+    debug('connect to database');
     const getDatabase = proxyquire(indexPath, {});
     database = await getDatabase.runDatabaseApp();
 
-    const dummyCollection: any = {}; // will fail
+    const dummyCollection: any = {};
 
     try {
+      debug('fail to create a Mongoose model');
       database.createModel(testModel, testSchema, dummyCollection);
       expect.fail('Should not have reached this point');
     } catch (err) {
+      debug('run tests');
       expect(err.message, 'Should be a connection error').to.eql(
         'collection name must be a String',
       );
@@ -295,13 +296,13 @@ describe('Database connection', () => {
   it('tests sending no logger or dumpError', async () => {
     debug(`Running ${modulename} it - tests sending no logger or dumpError`);
 
-    /* connect to database without configuring logger or dumpError */
+    debug('connect to database without configuring logger or dumpError');
     const connectionUrl = getMongoUri();
     const connectOptions = getConnectionOptions();
-    database = new filepaths.DATABASE.Database(connectionUrl, connectOptions);
+    database = new filepaths.Database(connectionUrl, connectOptions);
     database.dbConnection = await database.dbConnectionPromise;
 
-    /* test */
+    debug('run tests');
     if (database && database.dbConnection && database.dbConnection.db) {
       expect(
         database.dbConnection.db.databaseName,
@@ -310,7 +311,7 @@ describe('Database connection', () => {
       expect(
         database.dbConnection.readyState,
         'Connection should be open',
-      ).to.equal(1);
+      ).to.equal(DBReadyState.Connected);
     } else {
       expect(fail('database or dbConnection or db is falsy'));
     }

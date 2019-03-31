@@ -3,8 +3,9 @@ import debugFunction = require('debug');
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-/* dummy import to avoid vscode error (?) 'Cannot find __filename' */
-import 'basic-auth';
+/*
+ * external dependencies
+ */
 
 /* set up mocha, sinon & chai */
 import chai = require('chai');
@@ -27,8 +28,12 @@ import util = require('util');
 const sleep = util.promisify(setTimeout);
 import intercept = require('intercept-stdout');
 
+/*
+ * internal dependencies
+ */
+
 /* configuration file expected in application root directory */
-import { loggerConfig } from '../src/configUtils';
+import { IErr, loggerConfig } from '../src/configUtils';
 const copyLoggerConfig = {
   INFO_LOG: loggerConfig.INFO_LOG,
   ERROR_LOG: loggerConfig.ERROR_LOG,
@@ -38,13 +43,9 @@ const copyLoggerConfig = {
 const loggerPath = '../src/logger';
 const dumpErrorPath = '../src/dumpError';
 
-/* types */
-interface IErr extends Error {
-  dumped?: boolean;
-  status?: string | number;
-  code?: number;
-}
-
+/*
+ * tests
+ */
 describe('dumpError tests', () => {
   debug(`Running ${modulename}: describe - dumpError`);
 
@@ -131,8 +132,7 @@ describe('dumpError tests', () => {
 
     /* dump an error */
     const err: IErr = new Error('Test error');
-    err['status'] = 'Test status';
-    err['code'] = 100;
+    err['statusCode'] = 100;
     err['dumped'] = false;
     dumpError(err);
 
@@ -156,17 +156,17 @@ describe('dumpError tests', () => {
     expect(errorLog.includes('Error Message'), 'error message printed').to.be
       .true;
 
-    /* error code */
+    /* error name */
 
-    /* test that error status logged to console.log */
-    expect(capturedConsoleLog.includes('Error Code'), 'error code logged').to.be
+    /* test that error name logged to console.log */
+    expect(capturedConsoleLog.includes('Error Name'), 'error name logged').to.be
       .true;
 
-    /* error message dumped to both info and error logs */
+    /* error name dumped to both info and error logs */
     infoLog = fs.readFileSync(loggerConfig.INFO_LOG).toString();
     errorLog = fs.readFileSync(loggerConfig.ERROR_LOG).toString();
-    expect(infoLog.includes('Error Code'), 'error code printed').to.be.true;
-    expect(errorLog.includes('Error Code'), 'error code printed').to.be.true;
+    expect(infoLog.includes('Error Name'), 'error name printed').to.be.true;
+    expect(errorLog.includes('Error Name'), 'error name printed').to.be.true;
 
     /* error stack */
 
@@ -204,7 +204,7 @@ describe('dumpError tests', () => {
     expect(capturedConsoleLog.includes('Error Message'), 'error not redumped')
       .to.be.false;
 
-    /* test an error with no message, status, code */
+    /* test an error with no message, status */
 
     /* clear and start intercepting console.log again */
     capturedConsoleLog = '';
@@ -223,8 +223,6 @@ describe('dumpError tests', () => {
     /* test that info is not redumped */
     expect(capturedConsoleLog.includes('Error Message'), 'no error message').to
       .be.false;
-    expect(capturedConsoleLog.includes('Error Code'), 'no error code').to.be
-      .false;
     expect(capturedConsoleLog.includes('Error Stack'), 'no error stack').to.be
       .false;
 
@@ -286,8 +284,7 @@ describe('dumpError tests', () => {
 
     /* dump an error */
     const err: IErr = new Error('Test error');
-    //    err['status'] = 'Test status';
-    err['code'] = 100;
+    err['statusCode'] = 100;
     err['dumped'] = false;
     dumpError(err);
 

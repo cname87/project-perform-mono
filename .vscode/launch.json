@@ -91,14 +91,15 @@
     "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
     "args": [
       "--config", "${workspaceFolder}/backend/.mocharc.json",
-      "${workspaceFolder}/backend/dist/**/test/*.test.js",
-      "${workspaceFolder}/backend/server/test/*.js",
+      "${workspaceFolder}/backend/dist/models/test/*.test.js",
+      // "${workspaceFolder}/backend/server/test/*.js",
     ],
     "env": {
       "NODE_ENV": "development",
       "DEBUG": "MM* PP* SY*", // comment out to remove debug output
       "DEBUG_COLORS": "true"
     },
+    "cwd": "${workspaceFolder}/backend",
     "outputCapture": "std",
     "console": "integratedTerminal", // allows you use CTRL+C to exit
     "internalConsoleOptions": "neverOpen",
@@ -120,16 +121,19 @@
         "--reporter=text",
         "--reporter=html",
         "--report-dir", "${workspaceFolder}/backend/coverage/all",
-        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
+        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha", 
         "--config", "${workspaceFolder}/backend/.mocharc.json",
-        "${workspaceFolder}/backend/dist/**/test/*.test.js",
-        "${workspaceFolder}/backend/server/test/*.js",
+        "${workspaceFolder}/backend/dist/database/test/*.test.js",
+        "${workspaceFolder}/backend/dist/models/test/*.test.js",
+        "${workspaceFolder}/backend/dist/utils/test/*.test.js",
+        // "${workspaceFolder}/backend/server/test/*.js",
       ],
       "env": {
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*", // comment out to remove debug output
         "DEBUG_COLORS": "true"
       },
+      "cwd": "${workspaceFolder}/backend",
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
@@ -296,7 +300,7 @@
         "--disable-popup-blocking", // necessary for window.open() to work
       ],
       "userDataDir": true,
-      "url": "https://localhost:1337/testServer/loadMocha.html",
+      "url": "https://localhost:1337/",
       // tell vscode where to find scripts on the server
       "pathMapping": {
         "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",

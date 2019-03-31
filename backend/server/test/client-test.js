@@ -93,14 +93,14 @@ describe('Server', () => {
     index = await awaitIndex();
     /* Now define all objects that are dependent on index being started */
     spyIndexDebug = sinon.spy(index, 'debug');
-    spyLoggerInfo = sinon.spy(index.appObjects.logger, 'info');
-    spyLoggerError = sinon.spy(index.appObjects.logger, 'error');
-    spyDumpError = sinon.spy(index.appObjects, 'dumpError');
+    spyLoggerInfo = sinon.spy(index.appLocals.logger, 'info');
+    spyLoggerError = sinon.spy(index.appLocals.logger, 'error');
+    spyDumpError = sinon.spy(index.appLocals, 'dumpError');
     spyErrorHandlerDebug = sinon.spy(
-      index.appObjects.config.ERROR_HANDLER,
+      index.appLocals.config.TEST,
       'debug',
     );
-    eventEmitter = index.appObjects.event;
+    eventEmitter = index.appLocals.event;
   });
 
   beforeEach('Reset spies', () => {

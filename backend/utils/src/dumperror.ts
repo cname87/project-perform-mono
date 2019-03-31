@@ -32,28 +32,28 @@ debug(`Starting ${modulename}`);
 /* external dependencies */
 import winston from 'winston';
 
-interface IDumpErr extends Error {
-  /* some externally generated errors include a code field */
-  code?: string | number;
-  /* set true to show that the error has been dumped already */
-  dumped?: boolean;
-  /* can be used to add a http status code on creation, which is later written into the http response */
-  statusCode?: number;
-}
+/**
+ * Import local types.
+ */
+import { IErr } from './configUtils';
 
-export type dumpErrorInstance = (err: IDumpErr | string) => void;
+type typeDumpErrorInstance = (err: IErr | string) => void;
 
-export class DumpError {
+class DumpError {
   /* holds the singleton instance */
-  public static instance: dumpErrorInstance;
+  public static instance: typeDumpErrorInstance;
 
   /* the function that dumps the error - logger.error or console.error */
   public static dump: (err: any) => void;
 
   /* creates new instance if one does not exist */
-  public static getInstance(initialLogger?: winston.Logger): dumpErrorInstance {
+  public static getInstance(
+    initialLogger?: winston.Logger,
+  ): typeDumpErrorInstance {
     if (!DumpError.instance) {
-      DumpError.instance = new DumpError(initialLogger) as dumpErrorInstance;
+      DumpError.instance = new DumpError(
+        initialLogger,
+      ) as typeDumpErrorInstance;
     }
     return DumpError.instance;
   }
@@ -63,14 +63,14 @@ export class DumpError {
     if (!DumpError.instance) {
       DumpError.dump = initialLogger
         ? initialLogger.error.bind(initialLogger)
-        : (DumpError.dump = console.error);
+        : console.error;
       DumpError.instance = dumpError;
     }
     return DumpError.instance;
   }
 }
 
-function dumpError(err: IDumpErr | string) {
+function dumpError(err: IErr | string) {
   debug(modulename + ': running dumpError');
 
   if (err && typeof err === 'object') {
@@ -79,15 +79,15 @@ function dumpError(err: IDumpErr | string) {
       return;
     }
 
+    if (err.name) {
+      DumpError.dump('Error Name: \n' + err.name + '\n');
+    }
+
     if (err.message) {
       DumpError.dump('Error Message: \n' + err.message + '\n');
     } else {
       /* if no message property just dump the object */
       DumpError.dump(err.toString());
-    }
-
-    if (err.code) {
-      DumpError.dump('Error Code: \n' + err.code + '\n');
     }
 
     if (err.statusCode) {
@@ -106,3 +106,6 @@ function dumpError(err: IDumpErr | string) {
     DumpError.dump('DumpError: err is null or not an object or string');
   }
 }
+
+/* export DumpError class and type of an instance of the class */
+export { DumpError, typeDumpErrorInstance };

@@ -3,6 +3,10 @@ import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
+/*
+ * external dependencies
+ */
+
 /* set up mocha, sinon & chai */
 import chai = require('chai');
 import 'mocha';
@@ -11,15 +15,21 @@ const expect = chai.expect;
 /* external dependencies */
 import { Document, Model } from 'mongoose';
 
-/* database type */
+/*
+ * internal dependencies
+ */
+
 import { runDatabaseApp } from '../../database/src/index';
-import { Database, test } from '../src/configModels';
-import { createModel as createModelTests } from '../src/tests';
-import { createModel as createModelUsers } from '../src/users';
+import { Database } from '../src/configModels';
+import { createModelTests } from '../src/tests';
+import { createModelUsers } from '../src/users';
 
-console.log(test); // *** remove but keep istanbul coverage somehow
-
+/*
+ * tests
+ */
 describe('Database models operations', () => {
+  debug(`Running ${modulename} describe - Database models operation`);
+
   let database: Database;
   interface ITestModel {
     test1: string;
@@ -29,8 +39,11 @@ describe('Database models operations', () => {
   let docContent2: ITestModel;
   let modelTests: Model<Document>;
 
-  before(async () => {
-    /* connection created here is used for all tests */
+  before('Create database connection & tests model', async () => {
+    debug(
+      `Running ${modulename} after - Create database connection & tests model`,
+    );
+
     database = await runDatabaseApp();
 
     docContent1 = {
@@ -41,43 +54,62 @@ describe('Database models operations', () => {
       test1: 'test21',
       test2: 'test22',
     };
-
-    modelTests = createModelTests(database);
   });
 
-  after(async () => {
-    /* shutdown dbConnection after (if not already shut down) */
+  after('Close database connection', async () => {
+    debug(`Running ${modulename} after - Close database connection`);
+
     await database.closeConnection(database.dbConnection);
   });
 
-  it('Creates the tests model', async () => {
+  it('creates the tests model', async () => {
+    debug(`Running ${modulename} it - creates the test model`);
+
+    debug('create tests model');
+    modelTests = createModelTests(database);
+    debug('run tests');
     expect(modelTests.collection.name, 'Should return the model').to.eql(
       'tests',
     );
   });
 
   it('Creates the users model', async () => {
+    debug(`Running ${modulename} it - creates the test model`);
+
+    debug('create users model');
     const modelUsers = createModelUsers(database);
+
+    debug('run tests');
     expect(modelUsers.collection.name, 'Should return the model').to.eql(
       'users',
     );
   });
 
-  it('Deletes docs', async () => {
+  it('deletes docs', async () => {
+    debug(`Running ${modulename} it - deletes docs`);
+
+    debug('delete tests docs');
     await modelTests.deleteMany({
       _id: {
         $exists: true,
       },
     });
     const count = await modelTests.countDocuments();
+
+    debug('run tests');
     expect(count, 'All docs have been deleted').to.eql(0);
   });
 
-  it('Create and save docs', async () => {
+  it('creates and saves docs', async () => {
+    debug(`Running ${modulename} it - creates and saves docs`);
+
+    debug('create docs');
     const testDoc1 = new modelTests(docContent1);
     const returnedDoc1 = await testDoc1.save();
     const testDoc2 = new modelTests(docContent2);
     const returnedDoc2 = await testDoc2.save();
+
+    debug('run tests');
     expect(
       returnedDoc1.get('test1'),
       'returned doc to equal doc that was saved',
@@ -88,21 +120,34 @@ describe('Database models operations', () => {
     ).to.eql('test22');
   });
 
-  it('Find docs', async () => {
+  it('finds docs', async () => {
+    debug(`Running ${modulename} it - finds docs`);
+
+    debug('find docs');
     const foundDocs = await modelTests.find();
+
+    debug('run tests');
     expect(foundDocs.length, 'to equal').to.eql(2);
   });
 
-  it('Find a doc', async () => {
+  it('finds a doc', async () => {
+    debug(`Running ${modulename} it - finds a doc`);
+
+    debug('find a doc');
     const foundDocs = await modelTests.find();
     const id = foundDocs[1]._id;
     const foundDoc = await modelTests.findById(id);
+
+    debug('run tests');
     foundDoc
       ? expect(foundDoc.get('test2'), 'to equal').to.eql('test22')
       : expect.fail(true, false, 'Should have failed earlier');
   });
 
-  it('Update a doc', async () => {
+  it('updates a doc', async () => {
+    debug(`Running ${modulename} it - updates a doc`);
+
+    debug('update a doc');
     const foundDocs = await modelTests.find();
     const id = foundDocs[0]._id;
     let foundDoc = await modelTests.findById(id);
@@ -117,15 +162,20 @@ describe('Database models operations', () => {
       },
     );
     foundDoc = await modelTests.findById(id);
+
+    debug('run tests');
     foundDoc
       ? expect(foundDoc.get('test2'), 'to equal').to.eql('updatedTest12')
       : expect.fail(true, false, 'Should have failed earlier');
   });
 
-  it('Access a database that is down', async () => {
-    /* close dbConnection before db shutdown or mocha won't exit */
+  it('fails to access a database that is down', async () => {
+    debug(`Running ${modulename} it - fails to access a database that is down`);
+
+    debug('close database');
     await database.closeConnection(database.dbConnection);
 
+    debug('run tests');
     try {
       await modelTests.find();
       expect.fail(true, false, 'Should have failed earlier');

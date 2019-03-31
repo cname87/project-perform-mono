@@ -3,6 +3,7 @@
     "./**/src/**/*.ts",
     "./**/test/*.test.ts",
     "./utils/utils-build/*.ts",
+    "./**/types/*.d.ts",
   ],
   "exclude": [
     "node_modules",

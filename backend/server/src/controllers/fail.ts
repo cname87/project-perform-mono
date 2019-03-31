@@ -10,7 +10,7 @@ debug(`Starting ${modulename}`);
 
 /* dependencies */
 import express from 'express';
-export const router = express.Router();
+const router = express.Router();
 import asyncHandler from 'express-async-handler';
 import createError from 'http-errors';
 
@@ -37,9 +37,6 @@ router.get('/', (req, res, next) => {
       createError(501, 'Testing trapped unhandled promise rejection'),
     );
   }
-
-  /* set true to enable server test paths */
-  req.app.set('test', true);
 
   /* read url query */
   switch (req.query.fail) {
@@ -89,3 +86,6 @@ router.get('/', (req, res, next) => {
       return next(createError(404, '/fail query not sent or not recognised'));
   }
 });
+
+/* export the router */
+export { router as failController };
