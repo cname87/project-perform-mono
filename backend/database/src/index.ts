@@ -9,6 +9,9 @@ import debugFunction from 'debug';
 export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
+/* external dependencies */
+import winston = require('winston');
+
 /* import configuration file */
 import {
   Database,
@@ -37,7 +40,8 @@ async function runDatabaseApp(): Promise<Database> {
   debug(modulename + ': running runDatabaseApp');
 
   /* create the single instance of the general logger and dumpError utility */
-  const logger = filepaths.Logger.getInstance();
+  const Logger = filepaths.Logger;
+  const logger = new Logger() as winston.Logger;
   const dumpError = filepaths.DumpError.getInstance();
 
   logger.info('\n*** CONNECTING TO THE DATABASE ***\n');

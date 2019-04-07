@@ -25,6 +25,7 @@ import * as path from 'path';
 
 export const loggerConfig = {
   /* log file paths used to set up the logger */
+  LOGS_DIR: path.join(appRoot, 'logs'),
   INFO_LOG: path.join(appRoot, 'logs', 'info.log'),
   ERROR_LOG: path.join(appRoot, 'logs', 'error.log'),
 };
@@ -34,7 +35,7 @@ export const loggerConfig = {
 /***********************************************************************/
 
 /* extra fields for created errors */
-/* Error: 'name' is mandatory, 'message' is optional */
+/* Note that this extends Error: 'name' is mandatory, 'message' is optional */
 export interface IErr extends Error {
   /* set true to show that the error has been dumped already */
   dumped?: boolean;

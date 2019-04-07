@@ -10,7 +10,8 @@ describe('Application tests', function() {
   const indexPath = '../../dist/server/src/index';
   const { config } = require(path.join(appRoot, 'dist', 'server', 'src','configServer'));
 
-  const logger = config.Logger.getInstance();
+  // const logger = config.Logger.getInstance();
+  const logger = new config.Logger;
   const dumpError = config.DumpError.getInstance(logger);
 
   /* require a database as default */
@@ -108,8 +109,8 @@ describe('Application tests', function() {
     spyConsoleError = sinon.spy(console, 'error');
 
     /* stub Logger */
-    config.Logger = {
-      getInstance: () => {
+    config.Logger = class Logger {
+      constructor() {
         return {
           info: (message) => {
             logger.info(message);
@@ -120,7 +121,7 @@ describe('Application tests', function() {
             spyLoggerError(message);
           },
         };
-      },
+      }
     };
 
     /* stub DumpError */

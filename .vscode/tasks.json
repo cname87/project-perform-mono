@@ -3,14 +3,14 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
-    // npm build frontend
     {
       "label": "npm build frontend",
       "type": "shell",
       "command": "npm",
       "args": [
         "run",
-        "--prefix", "${workspaceRoot}/frontend",
+        "--prefix",
+        "${workspaceRoot}/frontend",
         "build"
       ],
       "isBackground": true,
@@ -18,10 +18,7 @@
         "focus": true,
         "panel": "dedicated"
       },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
+      "group": "build",
       "problemMatcher": {
         "owner": "typescript",
         "source": "ts",
@@ -42,14 +39,14 @@
         }
       }
     },
-    // npm start frontend
     {
       "label": "npm start frontend",
       "type": "shell",
       "command": "npm",
       "args": [
         "run",
-        "--prefix", "${workspaceRoot}/frontend",
+        "--prefix",
+        "${workspaceRoot}/frontend",
         "start"
       ],
       "isBackground": true,
@@ -57,10 +54,7 @@
         "focus": true,
         "panel": "dedicated"
       },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
+      "group": "build",
       "problemMatcher": {
         "owner": "typescript",
         "source": "ts",
@@ -81,14 +75,14 @@
         }
       }
     },
-    // npm start backend
     {
       "label": "npm start backend",
       "type": "shell",
       "command": "npm",
       "args": [
         "run",
-        "--prefix", "${workspaceRoot}/backend",
+        "--prefix",
+        "${workspaceRoot}/backend",
         "start"
       ],
       "isBackground": true,
@@ -96,31 +90,9 @@
         "focus": true,
         "panel": "dedicated"
       },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "problemMatcher": {
-        // "owner": "typescript",
-        // "source": "ts",
-        // "applyTo": "closedDocuments",
-        // "fileLocation": [
-        //   "relative",
-        //   "${cwd}"
-        // ],
-        // "pattern": "$tsc",
-        // "background": {
-        //   "activeOnStart": true,
-        //   "beginsPattern": {
-        //     "regexp": "(.*?)"
-        //   },
-        //   "endsPattern": {
-        //     "regexp": "Compiled |Failed to compile."
-        //   }
-        // }
-      }
+      "group": "build",
+      "problemMatcher": {}
     },
-    // Taskkill node.exe
     {
       "label": "Taskkill node.exe",
       "type": "shell",
@@ -131,25 +103,23 @@
       "presentation": {
         "reveal": "always",
         "panel": "shared"
-      },
+      }
     },
-    // Change to /backend  *** NOT WORKING
     {
       "label": "Change to backend",
       "type": "shell",
       "windows": {
         "command": "CD",
-        "args": [ 
+        "args": [
           "${workspaceFolder}\\backend"
-        ],
+        ]
       },
       "group": "test",
       "presentation": {
         "reveal": "always",
         "panel": "shared"
-      },
+      }
     },
-    // Is Server Up?
     {
       "label": "Is Server Up?",
       "type": "process",
@@ -171,7 +141,6 @@
       },
       "problemMatcher": []
     },
-    // npm delete nyc file
     {
       "label": "npm delete nyc file",
       "type": "shell",
@@ -187,7 +156,6 @@
         "panel": "shared"
       }
     },
-    // npm build backend
     {
       "label": "npm build backend",
       "type": "shell",
@@ -209,7 +177,6 @@
         "panel": "shared"
       }
     },
-    // npm compile backend
     {
       "label": "npm compile backend",
       "type": "npm",
@@ -221,7 +188,6 @@
         "panel": "shared"
       }
     },
-    // npm tsc backend
     {
       "label": "npm tsc backend",
       "type": "npm",

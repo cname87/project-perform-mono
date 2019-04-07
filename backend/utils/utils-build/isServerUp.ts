@@ -18,20 +18,25 @@ import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
-/* internal dependencies */
-import { config } from '../../server/src/configServer';
-
 /* external dependencies */
+import * as appRootObject from 'app-root-path';
+const appRoot = appRootObject.toString();
 import fs from 'fs';
 import httpRequest from 'request-promise-native';
+import * as path from 'path';
 import util from 'util';
 const sleep = util.promisify(setTimeout);
 
+/* internal dependencies */
+const ROOT_CA = path.join(appRoot, 'server', 'certs', 'rootCA.crt');
+const HTTPS_KEY = path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem');
+const HTTPS_CERT = path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem');
+
 const options = {
   url: 'https://localhost:1337/',
-  key: fs.readFileSync(config.HTTPS_KEY),
-  cert: fs.readFileSync(config.HTTPS_CERT),
-  ca: fs.readFileSync(config.ROOT_CA),
+  key: fs.readFileSync(HTTPS_KEY),
+  cert: fs.readFileSync(HTTPS_CERT),
+  ca: fs.readFileSync(ROOT_CA),
 };
 const serverIsUp = () => {
   let response;

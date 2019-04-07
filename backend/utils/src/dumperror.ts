@@ -30,12 +30,12 @@ debug(`Starting ${modulename}`);
  */
 
 /* external dependencies */
-import winston from 'winston';
 
 /**
  * Import local types.
  */
 import { IErr } from './configUtils';
+import { Logger } from './logger';
 
 type typeDumpErrorInstance = (err: IErr | string) => void;
 
@@ -47,9 +47,7 @@ class DumpError {
   public static dump: (err: any) => void;
 
   /* creates new instance if one does not exist */
-  public static getInstance(
-    initialLogger?: winston.Logger,
-  ): typeDumpErrorInstance {
+  public static getInstance(initialLogger?: Logger): typeDumpErrorInstance {
     if (!DumpError.instance) {
       DumpError.instance = new DumpError(
         initialLogger,
@@ -59,7 +57,8 @@ class DumpError {
   }
 
   /* instantiates if necessary and sets dump to logger.error or console.error */
-  public constructor(initialLogger?: winston.Logger) {
+  public constructor(initialLogger?: any) {
+    // replace any ***********
     if (!DumpError.instance) {
       DumpError.dump = initialLogger
         ? initialLogger.error.bind(initialLogger)

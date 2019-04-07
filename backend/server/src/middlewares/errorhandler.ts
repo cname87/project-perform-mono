@@ -68,6 +68,9 @@ function assignCode(
     res.statusCode = err.statusCode ? err.statusCode : res.statusCode;
     /* If empty, set the response code to internal server error, 500. */
     res.statusCode = res.statusCode ? res.statusCode : 500;
+    /* If 20x, set the response code to internal server error, 500. */
+    res.statusCode =
+      res.statusCode < 200 || res.statusCode > 299 ? res.statusCode : 500;
 
     /* override the response status message if err.message exists */
     res.statusMessage = err.message || res.statusMessage;
@@ -186,9 +189,4 @@ export const errorHandlers = {
   logError,
   sendErrorResponse,
   throwError,
-};
-
-/* export for mocha */
-export const debugErrorHandlers = {
-  debug,
 };

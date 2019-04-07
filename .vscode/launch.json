@@ -91,13 +91,16 @@
     "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
     "args": [
       "--config", "${workspaceFolder}/backend/.mocharc.json",
+      "${workspaceFolder}/backend/dist/database/test/*.test.js",
       "${workspaceFolder}/backend/dist/models/test/*.test.js",
+      "${workspaceFolder}/backend/dist/utils/test/*.test.js",
       // "${workspaceFolder}/backend/server/test/*.js",
     ],
     "env": {
       "NODE_ENV": "development",
       "DEBUG": "MM* PP* SY*", // comment out to remove debug output
-      "DEBUG_COLORS": "true"
+      "DEBUG_COLORS": "true",
+      "RUN_CHROME": "true",
     },
     "cwd": "${workspaceFolder}/backend",
     "outputCapture": "std",
@@ -126,12 +129,13 @@
         "${workspaceFolder}/backend/dist/database/test/*.test.js",
         "${workspaceFolder}/backend/dist/models/test/*.test.js",
         "${workspaceFolder}/backend/dist/utils/test/*.test.js",
-        // "${workspaceFolder}/backend/server/test/*.js",
+        "${workspaceFolder}/backend/server/test/*.js",
       ],
       "env": {
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*", // comment out to remove debug output
-        "DEBUG_COLORS": "true"
+        "DEBUG_COLORS": "true",
+        "RUN_CHROME": "true",
       },
       "cwd": "${workspaceFolder}/backend",
       "outputCapture": "std",
@@ -177,7 +181,7 @@
       "cwd":  "${workspaceFolder}/backend",
       "env": {
         "NODE_ENV": "development",
-        "DEBUG": "MM* PP* SY* swagger-tools:middleware:*",
+        "DEBUG": "MM* PP* SY*",
         "DEBUG_COLORS": "true"
       },
       "outputCapture": "std",
@@ -316,10 +320,42 @@
       "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
       "trace": true,
     },
+    // https://localhost:1337/testServer/loadmocha.html
+    {
+      // starts Chrome and connect to the client-side test file.
+      // server-side client tests must be started in advance of running this
+      "name": "Launch https://localhost:1337/testServer/loadMocha.html",
+      "type": "chrome",
+      "request": "launch",
+      "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "runtimeArgs": [
+        "--remote-debugging-port=9222",
+        "--incognito",
+        "--start-maximized",
+        "--new-window",
+        "--disable-popup-blocking", // necessary for window.open() to work
+      ],
+      "userDataDir": true,
+      "url": "https://localhost:1337/testServer/loadmocha.html",
+      // tell vscode where to find scripts on the server
+      "pathMapping": {
+        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
+        "/testServer": "${workspaceFolder}/backend/server/test/client/browser",
+      },
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${workspaceFolder}/frontend/*",
+      },
+      "smartStep": true,
+      "disableNetworkCache": true,
+      "showAsyncStacks": true,
+      "sourceMaps": true,
+      "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
+      "trace": true,
+    },
     // Client-fired server tests
     {
       /* This runs the server-side mocha client test file to test the server-side behaviour during client-side fired tests. */
-      /* If not commented out in the js file it kicks off the browser tests that fire the client-side tests.  Otherwise you can load testServer/loadmocha.html manually. Or if you need debug of the browser-side then set up a launch configuration to load loadmocha.html. */
+      /* If not commented out in the js file it kicks off the browser tests that fire the client-side tests.  Otherwise you can load testServer/loadmocha.html manually, or if you need debug of the browser-side then use up a launch configuration to load loadmocha.html. */
       "type": "node",
       "request": "launch",
       "name": "Mocha Client Tests",
@@ -335,6 +371,8 @@
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*", // comment out to remove debug output
         "DEBUG_COLORS": "true",
+        /* set to 'true' to automatically run chrome and set tp 'false' when using a compound configuration to launch chrome */
+        "RUN_CHROME": "true",
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
@@ -345,7 +383,7 @@
         "${workspaceFolder}/backend/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
-      "preLaunchTask": "Taskkill node.exe", // can't use in compound calls
+      // "preLaunchTask": "Taskkill node.exe", // can't use in compound calls
     },
     // Client-fired server tests with Istanbul
     {
@@ -366,6 +404,7 @@
         "NODE_ENV": "development",
         "DEBUG": "MM* PP* SY*", // comment out to remove debug output
         "DEBUG_COLORS": "true",
+        "RUN_CHROME": "true",
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
@@ -381,11 +420,25 @@
     },
   ],
   "compounds": [
+    /* Run backend server and frontend app */
     {
       "name": "Backend/Frontend",
       "configurations": [
         "Launch server index.js",
-        "Launch https://localhost:1337/"]
+        "Launch https://localhost:1337/",
+      ]
+
+    },
+    /* Mocha client tests Backend/Frontend */
+    {
+      "name": "Mocha client tests Backend/Frontend",
+      /* use when debugging client-side mocha scripts */
+      /* You must set RUN_CHROME to 'false' and disable Taskkill on Mocha Client Tests before running this */
+      /* you must close Chrome manually after */
+      "configurations": [
+        "Mocha Client Tests",
+        "Launch https://localhost:1337/testServer/loadMocha.html",
+      ]
     },
   ],
-}
+}y

@@ -18,10 +18,12 @@ import debugFunction from 'debug';
 export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-/**
- * Import all dependencies.
- */
-/* import configuration object and types */
+/* external dependencies */
+import { strict } from 'assert';
+import { EventEmitter } from 'events';
+import express from 'express';
+
+/* import configuration object */
 import {
   config,
   Database,
@@ -33,23 +35,22 @@ import {
   processExtended,
   Server,
 } from './configServer';
+
 /* import secret configuration parameters */
 import * as dotenv from 'dotenv';
+import winston = require('winston');
 dotenv.config({ path: config.ENV_FILE });
-/* import external dependencies */
-import { strict } from 'assert';
-import { EventEmitter } from 'events';
-import express from 'express';
 
-/**
+/*
  * Define aliases for config parameters.
  */
+
 /* server initiation methods */
 const { runServer, startServer } = config;
 /* database creation function */
 const { runDatabaseApp } = config;
 /* handlers used by controllers */
-const { miscHandlers } = config;
+const { miscHandlers, membersHandlers1 } = config;
 /* errorHandler middleware */
 const { errorHandlers } = config;
 /* route controllers */
@@ -57,7 +58,8 @@ const { failController } = config;
 /* database models */
 const { createModelMembers, createModelTests, createModelUsers } = config;
 /* Create the single instances of the general logger & dumpError utilities, and the server logger middleware.  These are passed via the appLocals object. Also, other modules can create new instances later without any parameters and they will receive the same instance. */
-const logger = config.Logger.getInstance();
+const Logger = config.Logger;
+const logger = new Logger() as winston.Logger;
 const dumpError = config.DumpError.getInstance(logger);
 const { ServerLogger } = config;
 const serverLogger = new ServerLogger(config);
@@ -69,6 +71,7 @@ const appLocals: IAppLocals = ({} as unknown) as IAppLocals;
 appLocals.config = config;
 /* generate the controllers object */
 const controllers: IControllers = {};
+// controllers.members = members;       XXXX fix
 controllers.fail = failController;
 appLocals.controllers = controllers;
 /* appLocals.database filled during server startup */
@@ -79,6 +82,7 @@ appLocals.errorHandler = errorHandlers;
 const event: EventEmitter = new EventEmitter();
 appLocals.event = event;
 appLocals.miscHandlers = miscHandlers;
+appLocals.membersHandlers1 = membersHandlers1;
 appLocals.logger = logger;
 /* appLocals.models filled during server startup */
 appLocals.serverLogger = serverLogger;

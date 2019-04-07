@@ -32,7 +32,7 @@ import https from 'https';
  */
 
 async function startServer(
-  app: express.Express,
+  app: express.Application,
   servers: any,
   config: any,
   logger: any,
@@ -48,7 +48,7 @@ async function startServer(
     svrType: any,
     svrName: string,
     svrOptions: object,
-    expressApp: express.Express,
+    expressApp: express.Application,
     svrPort: number,
     listenRetries: number,
     listenTimeout: number,

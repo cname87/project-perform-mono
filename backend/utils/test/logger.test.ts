@@ -18,8 +18,6 @@ sinon.assert.expose(chai.assert, {
 });
 
 /* external dependencies */
-import appRootObject = require('app-root-path');
-const appRoot = appRootObject.toString();
 import fs from 'fs';
 import path = require('path');
 import proxyquire = require('proxyquire');
@@ -103,15 +101,11 @@ describe('logger', () => {
     /* set up test log files */
     // it is assumed process.env.NODE_ENV = 'development'
     loggerConfig.INFO_LOG = path.join(
-      appRoot,
-      'utils',
-      'logs',
+      loggerConfig.LOGS_DIR,
       'loggerInfoTest.log',
     );
     loggerConfig.ERROR_LOG = path.join(
-      appRoot,
-      'utils',
-      'logs',
+      loggerConfig.LOGS_DIR,
       'loggerErrorTest.log',
     );
 
@@ -190,15 +184,11 @@ describe('logger', () => {
     /* set up env variable and test log files */
     process.env.NODE_ENV = 'production';
     loggerConfig.INFO_LOG = path.join(
-      appRoot,
-      'utils',
-      'logs',
+      loggerConfig.LOGS_DIR,
       'loggerInfoTest.log',
     );
     loggerConfig.ERROR_LOG = path.join(
-      appRoot,
-      'utils',
-      'logs',
+      loggerConfig.LOGS_DIR,
       'loggerErrorTest.log',
     );
 
@@ -273,15 +263,11 @@ describe('logger', () => {
 
     /* set up env variable and test log files */
     loggerConfig.INFO_LOG = path.join(
-      appRoot,
-      'utils',
-      'logs',
+      loggerConfig.LOGS_DIR,
       'loggerInfoTest.log',
     );
     loggerConfig.ERROR_LOG = path.join(
-      appRoot,
-      'utils',
-      'logs',
+      loggerConfig.LOGS_DIR,
       'loggerErrorTest.log',
     );
 

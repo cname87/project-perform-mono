@@ -97,7 +97,7 @@ describe('Server', () => {
     spyLoggerError = sinon.spy(index.appLocals.logger, 'error');
     spyDumpError = sinon.spy(index.appLocals, 'dumpError');
     spyErrorHandlerDebug = sinon.spy(
-      index.appLocals.config.TEST,
+      index.appLocals.config.ERROR_HANDLERS,
       'debug',
     );
     eventEmitter = index.appLocals.event;
@@ -202,10 +202,13 @@ describe('Server', () => {
             'handlersRaiseEvent',
             browserEventsCallback,
           );
+          /* close down chrome if configured to start automatically */
           setTimeout( () => {
-          /* appears you must exit chrome in windows 10 to allow node exit */
-          /* unref() doesn't work, kill('SIGINT') works and doesn't kill mocha */
-          browserInstance.kill('SIGINT');
+            if (process.env.RUN_CHROME === 'true') {
+              /* appears you must exit chrome in windows 10 to allow node exit */
+              /* unref() doesn't work, kill('SIGINT') works and doesn't kill mocha */
+              browserInstance.kill('SIGINT');
+            }
           }, 5000);
           resolve();
         }
@@ -214,17 +217,18 @@ describe('Server', () => {
       /* all browser events received here */
       eventEmitter.on('handlersRaiseEvent', browserEventsCallback);
 
-      /* start chrome on mocha test page */
-      /* NOTE: Comment out and start via vscode for debug. */
-      browserInstance = spawn('C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-        ['https://localhost:1337/testServer/loadMocha.html',
-        '--remote-debugging-port=9222',  // Only of use if you attach
-        '--incognito',
-        '--start-maximized',
-        '--new-window',
-        '--disable-popup-blocking', // necessary for window.open() to work
-        { detached: true, stdio: [ 'ignore', 'ignore', 'ignore' ] }
-      ]);
+      /* start chrome on mocha test page if so configured */
+      if (process.env.RUN_CHROME === 'true') {
+        browserInstance = spawn('C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+          ['https://localhost:1337/testServer/loadMocha.html',
+          '--remote-debugging-port=9222',  // Only of use if you attach
+          '--incognito',
+          '--start-maximized',
+          '--new-window',
+          '--disable-popup-blocking', // necessary for window.open() to work
+          { detached: true, stdio: [ 'ignore', 'ignore', 'ignore' ] }
+        ]);
+      }
     });
   });
 

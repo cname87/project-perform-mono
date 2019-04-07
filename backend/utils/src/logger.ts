@@ -10,26 +10,28 @@ import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
-/* import configuration file */
-import { loggerConfig } from './configUtils';
-
 /* external dependencies */
 import * as fs from 'fs';
 import * as winston from 'winston';
 const { createLogger, format, transports } = winston;
 const { combine, timestamp, label, printf } = format;
 
+/* import configuration file */
+import { loggerConfig } from './configUtils';
+
 /**
  * Usage:
  *
- * Add...
- * import { Logger } from '<path to>logger';
- * logger = Logger.getInstance();
+ * A config file is imported that contains all configuration infomation:
+ * - The logs directory, which must exist.
+ * - The log files paths.
  *
- * Set the log files paths in configUtils.ts (which must be in the same directory as this file).
+ * In the module requiring a logger service add...
+ * import { Logger } from '<path to><this file>';
+ * logger = new Logger as winstin.Logger;
  *
- * Once this module is imported then all subsequent imports get the same
- * object.
+ * Note: This service proides a singleton logger i.e. all imports get the same
+ * Logger class object.
  *
  * Then...
  * Use logger.info('text') to log 'text' to the info file,
@@ -47,7 +49,7 @@ const defaultErrorLog = loggerConfig.ERROR_LOG;
 type typeLoggerInstance = winston.Logger;
 
 class Logger {
-  public static instance: typeLoggerInstance;
+  public static instance: winston.Logger;
 
   public static getInstance(
     infoLog: string = defaultInfoLog,
@@ -59,7 +61,7 @@ class Logger {
     return Logger.instance;
   }
 
-  public constructor(infoLog: string, errorLog: string) {
+  public constructor(infoLog = defaultInfoLog, errorLog = defaultErrorLog) {
     if (!Logger.instance) {
       Logger.instance = makeLogger(infoLog, errorLog);
     }
@@ -68,7 +70,7 @@ class Logger {
   }
 }
 
-function makeLogger(infoFile: string, errorFile: string): typeLoggerInstance {
+function makeLogger(infoFile: string, errorFile: string): winston.Logger {
   debug(modulename + ': running logger');
 
   /* log paths */

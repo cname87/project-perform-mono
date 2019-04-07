@@ -19,8 +19,6 @@ sinon.assert.expose(chai.assert, {
 });
 
 /* external dependencies */
-import appRootObject = require('app-root-path');
-const appRoot = appRootObject.toString();
 import fs from 'fs';
 import path = require('path');
 import proxyquire = require('proxyquire');
@@ -35,6 +33,7 @@ import intercept = require('intercept-stdout');
 /* configuration file expected in application root directory */
 import { IErr, loggerConfig } from '../src/configUtils';
 const copyLoggerConfig = {
+  LOGS_DIR: loggerConfig.LOGS_DIR,
   INFO_LOG: loggerConfig.INFO_LOG,
   ERROR_LOG: loggerConfig.ERROR_LOG,
 };
@@ -54,15 +53,11 @@ describe('dumpError tests', () => {
 
     /* set up env variable and test log files */
     loggerConfig.INFO_LOG = path.join(
-      appRoot,
-      'utils',
-      'logs',
+      loggerConfig.LOGS_DIR,
       'dumpInfoTest.log',
     );
     loggerConfig.ERROR_LOG = path.join(
-      appRoot,
-      'utils',
-      'logs',
+      loggerConfig.LOGS_DIR,
       'dumpErrorTest.log',
     );
 
@@ -105,6 +100,7 @@ describe('dumpError tests', () => {
     }
 
     /* reset loggerConfig */
+    loggerConfig.LOGS_DIR = copyLoggerConfig.LOGS_DIR;
     loggerConfig.INFO_LOG = copyLoggerConfig.INFO_LOG;
     loggerConfig.ERROR_LOG = copyLoggerConfig.ERROR_LOG;
   });

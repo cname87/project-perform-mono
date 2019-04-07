@@ -18,26 +18,26 @@ debug(`Starting ${modulename}`);
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import express from 'express';
-import OpenAPIBackend from 'openapi-backend';
+import express, { Request, NextFunction, Response } from 'express';
+import { OpenAPIBackend } from 'openapi-backend';
 import path from 'path';
-import swaggerTools = require('oas-tools');
 import urlParser from 'url';
 import util from 'util';
 import uuidv1 from 'uuid/v1';
+
+/* internal dependencies */
+import { IErr, IExpressApp, IRequestApp } from '../configServer';
 
 /**
  * Sets up express middleware and responds to incoming requests.
  * @param app
  * The express app object
- * app.appLocals holds other set up objects including the array used to store
- * the https(s) servers.
- * @returns
- * Void.
+ * *** TO DO.
+ * @returns Void.
  */
 
 async function runServer(
-  app: express.Express,
+  app: IExpressApp,
   config: any,
   controllers: any,
   errorHandlers: any,
@@ -59,7 +59,10 @@ async function runServer(
   app.use(compression());
 
   /* assign a unique id to each request */
-  function assignId(req: any, _res: any, next: () => void) {
+  interface IRequestUuid extends Request {
+    id?: string;
+  }
+  function assignId(req: IRequestUuid, _res: Response, next: NextFunction) {
     req.id = uuidv1();
     next();
   }
@@ -127,66 +130,64 @@ async function runServer(
     app.post('/raiseEvent', handles['raiseEvent']);
   }
 
-  /* set up the swagger api handler */
-  const setupSwagger = new Promise((resolve) => {
-    /* swaggerRouter configuration */
-    const options = {
-      controllers: config.CONTROLLERS_PATH,
-      /* use stubs for routes with no controller */
-      useStubs: false,
-    };
-
-    /* swagger api definition */
-    const swaggerDoc = require(config.API_FILE);
-    swaggerTools.configure({
-      controllers: config.CONTROLLERS_PATH,
-      strict: true,
-    });
-
-    /* initialize the swagger middleware */
-    swaggerTools.initializeMiddleware(
-      swaggerDoc,
-      app as any,
-      (middleware: any) => {
-        /* interpret swagger resources and attach metadata to request (1st) */
-        app.use(middleware.swaggerMetadata());
-
-        /* get model for later integration using swagger-mongoose */
-        // const swaggerToolsTyped: any = swaggerTools;
-        // swaggerToolsTyped.specs.v2.composeModel(
-        //   swaggerDoc,
-        //   '#/definitions/Member',
-        //   (err: any, schema: any) => {
-        //     if (err) {
-        //       throw err;
-        //     }
-        //     console.log(JSON.stringify(schema, null, '  '));
-        //   },
-        // );
-
-        /* validate swagger requests, and responses if desired */
-        app.use(
-          middleware.swaggerValidator({
-            validateResponse: true,
-          }),
-        );
-
-        /* route validated requests to appropriate controller */
-        app.use(middleware.swaggerRouter(options));
-
-        /* serve the swagger api UI at http://localhost:port/api/docs */
-        app.use(
-          middleware.swaggerUi({
-            swaggerUi: '/api/docs',
-          }),
-        );
-
-        resolve();
+  /* route paths as per the api file */
+  const api = new OpenAPIBackend({
+    definition: config.API_FILE,
+    apiRoot: '/',
+    strict: true,
+    validate: true,
+    withContext: true,
+    ajvOpts: { unknownFormats: true },
+    handlers: {
+      getMembers: (
+        context,
+        req: IRequestApp,
+        res: Response,
+        next: NextFunction,
+      ) => app.appLocals.membersHandlers1.getMembers(context, req, res, next),
+      validationFail: (context, next: NextFunction) => {
+        app.appLocals.logger.error(modulename + ': API validation fail');
+        if (context && context.validation && context.validation.errors) {
+          app.appLocals.dumpError(context.validation.errors.toString());
+        }
+        const err: IErr = {
+          name: 'VALIDATION_FAIL',
+          message: 'API validation fail',
+          statusCode: 400,
+          dumped: true,
+        };
+        next(err);
       },
-    );
+      notFound: (
+        _context,
+        _req: Request,
+        _res: Response,
+        next: NextFunction,
+      ) => {
+        /* let the frontend or the errorhandler handle not founds */
+        next();
+      },
+    },
   });
 
-  await setupSwagger;
+  /* initialize OpenAPI middleware */
+  api.init();
+
+  /* openAPI calls handler based on api */
+  app.use((req, res, next) =>
+    api.handleRequest(
+      {
+        method: req.method,
+        path: req.path,
+        body: req.body,
+        query: req.query,
+        headers: req.headers as any,
+      },
+      req,
+      res,
+      next,
+    ),
+  );
 
   /* serve the angular files */
   const staticAppOptions = {

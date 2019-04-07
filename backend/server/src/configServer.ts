@@ -11,72 +11,70 @@ import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
-/**
- * Import all external dependencies.
- */
+/* external dependencies */
 import { EventEmitter } from 'events';
-import { Express, Request, Router } from 'express';
+import { Request, Router, Application } from 'express';
 import { Connection, Document, Model } from 'mongoose';
 import * as appRootObject from 'app-root-path';
 import * as path from 'path';
 const appRoot = appRootObject.toString();
 
-/**
- * Import all required modules.
- */
-import { startServer } from './server/startserver';
+/* import all required modules */
+
+/* server class abd functions */
 import { Server } from './server/serverOps';
+import { startServer } from './server/startserver';
 import { runServer } from './server/runServer';
-// a configured morgan http(s) server logger
-import { ServerLogger } from './middlewares/serverlogger';
-// an express error handler middleware
-import * as TEST from './middlewares/errorhandler';
-const errorHandlers = TEST.errorHandlers;
+/* a configured morgan http(s) server logger */
+import { ServerLogger } from './server/serverlogger';
 // a configured winston general logger
 import { Logger, typeLoggerInstance } from '../../utils/src/logger';
-// a utility to dump errors to the logger
+/* a utility to dump errors to the logger */
 import { DumpError, typeDumpErrorInstance } from '../../utils/src/dumpError';
-// database files
+/* access to debug logger for mocha - must be imported this way */
+import * as ERROR_HANDLERS from './middlewares/errorhandler';
+/* error handler middleware functions */
+const errorHandlers = ERROR_HANDLERS.errorHandlers;
+/* database class and creation function */
 import { Database, runDatabaseApp } from '../../database/src/index';
-/* list of controllers */
-import { failController } from './controllers/fail';
-/* handlers for /api/members */
-import * as membersApiHandlers from './handlers/members';
-// shared request handler functions
-import { miscHandlers } from './middlewares/handlers';
-/* list of models */
+/* models */
 import { createModelUsers } from '../../models/src/users';
 import { createModelTests } from '../../models/src/tests';
 import { createModelMembers } from '../../models/src/members';
+/* controllers */
+import { failController } from './controllers/fail';
+/* handlers for /members api */
+import { membersHandlers1 } from './handlers/api/membersApi';
+/* 2nd level members handlers */
+import * as membersHandlers from './handlers/membersHandlers';
+// shared request handler functions
+import { miscHandlers } from './handlers/miscHandlers';
 
 // tslint:disable:object-literal-sort-keys
 export const config = {
   /***********************************************************************/
-  /* File paths to all modules                                           */
+  /* Internal imports                                                    */
   /***********************************************************************/
 
   /**
-   * This section sets up application directory structure i.e. paths for
-   * all the internal modules.
+   * This section sets up  imports for all the internal modules.
    */
-
-  /* all modules, not in node_modules, that are imported anywhere */
-  /* all are imported above */
-  TEST,
-  startServer,
   Server,
+  startServer,
   runServer,
-  miscHandlers,
   ServerLogger,
-  errorHandlers,
   Logger,
   DumpError,
+  ERROR_HANDLERS,
+  errorHandlers,
   runDatabaseApp,
-  failController,
-  membersApiHandlers,
   createModelUsers,
   createModelTests,
   createModelMembers,
+  failController,
+  membersHandlers1,
+  membersHandlers,
+  miscHandlers,
 
   /***********************************************************************/
   /* Misc application parameters                                         */
@@ -87,9 +85,13 @@ export const config = {
    * application programme.
    */
 
-  /* ok to start server if database fails to start? */
   ENV_FILE: path.join(appRoot, '.env'),
+  /* ok to start server if database fails to start? */
   IS_NO_DB_OK: true,
+  /* directory for logs used by all backend components */
+  LOGS_DIR: path.join(appRoot, 'logs'),
+  // 'development' or 'production'
+  ENV: 'development',
 
   /***********************************************************************/
   /* Angular app parameters                                              */
@@ -102,7 +104,7 @@ export const config = {
   APP_PATH: path.join(appRoot, '..', 'frontend', 'dist'),
 
   /***********************************************************************/
-  /* HTTP/S server parameters         F                                   */
+  /* HTTP/S server parameters                                            */
   /***********************************************************************/
 
   // port to be listened on
@@ -121,22 +123,8 @@ export const config = {
   /* time between retries in seconds
    * a number between 1 to 10 */
   SVR_LISTEN_TIMEOUT: 3,
-
-  /***********************************************************************/
-  /* Express server middleware parameters                                */
-  /***********************************************************************/
-
-  /**
-   * This section sets all configuration parameters used by the Express
-   * server set up.
-   */
-
-  // 'development' or 'production'
-  ENV: 'development',
   // path to static server for server tests
   STATIC_TEST_PATH: path.join(appRoot, 'server', 'test', 'client', 'browser'),
-  // path to favicon
-  FAVICON: path.join(appRoot, '..', 'app-test-angular', 'src', 'favicon.ico'),
 
   /***********************************************************************/
   /* Morgan server logger parameters                                     */
@@ -144,15 +132,17 @@ export const config = {
 
   /**
    * This section sets all configuration parameters for the Morgan server
-   * logger middleware.
+   * logger.
    */
 
   // sets morgan http logger format
   MORGAN_FORMAT:
     ':id :remote-addr [:date[clf]]' +
     ' :method :url :status :res[content-length]',
-  // morgan logger logs directory
-  LOGS_DIR: path.join(appRoot, 'utils', 'logs'),
+  // directory for server log files
+  get MORGAN_LOGS_DIR() {
+    return this.LOGS_DIR;
+  },
   // morgan logger stream file name
   MORGAN_STREAM_FILE: 'serverLog.log',
 
@@ -185,33 +175,24 @@ export const config = {
   /* The logs directory referenced in the various log files
    * must exist. */
   // forever log when run as a daemon
-  MONITOR_FOREVER_LOG: path.join(
-    appRoot,
-    'utils',
-    'logs',
-    'monitorForever.log',
-  ),
+  MONITOR_FOREVER_LOG: path.join('monitorForever.log'),
   // child stdout log
-  MONITOR_OUT_LOG: path.join(appRoot, 'utils', 'logs', 'monitorOut.log'),
+  get MONITOR_OUT_LOG() {
+    return path.join(this.LOGS_DIR, 'monitorOut.log');
+  },
   // child stderr log
-  MONITOR_ERR_LOG: path.join(appRoot, 'utils', 'logs', 'monitorErr.log'),
+  get MONITOR_ERR_LOG() {
+    return path.join(this.LOGS_DIR, 'monitorErr.log');
+  },
 
   /***********************************************************************/
-  /* Swagger api configuration                                           */
+  /* API middleware configuration                                           */
   /***********************************************************************/
 
   /**
-   * This section sets all configuration parameters for swagger-tools.
+   * This section sets all configuration parameters for the API middleware.
    */
   API_FILE: path.join(appRoot, 'api', 'openapi.json'),
-  CONTROLLERS_PATH: path.join(
-    appRoot,
-    'dist',
-    'server',
-    'src',
-    'controllers',
-    'api',
-  ),
 };
 
 /***********************************************************************/
@@ -226,8 +207,6 @@ export type Database = Database;
 export type typeDumpErrorInstance = typeDumpErrorInstance;
 /* the type of instance of the Logger class */
 export type typeLoggerInstance = typeLoggerInstance;
-// /* the ServerLogger class is the type for instances of the ServerLogger class */
-// export type typeServerLoggerInstance = ServerLogger;
 
 /* controllers object */
 export interface IControllers {
@@ -257,6 +236,8 @@ export interface IAppLocals {
   event: EventEmitter;
   /* handles object*/
   miscHandlers: typeof miscHandlers;
+  membersHandlers1: typeof membersHandlers1;
+  memberhandlers: typeof membersHandlers;
   /* winston general logger */
   logger: typeLoggerInstance;
   /* database models object */
@@ -268,7 +249,7 @@ export interface IAppLocals {
 }
 
 /* extension of Express type to support appLocals */
-export interface IExpressApp extends Express {
+export interface IExpressApp extends Application {
   appLocals: IAppLocals;
 }
 
