@@ -3,10 +3,6 @@ import debugFunction = require('debug');
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-/*
- * external dependencies
- */
-
 /* set up mocha, sinon & chai */
 import chai = require('chai');
 import 'mocha';
@@ -21,10 +17,12 @@ sinon.assert.expose(chai.assert, {
 /* external dependencies */
 import fs from 'fs';
 import path = require('path');
-import proxyquire = require('proxyquire');
+import proxyquireObject = require('proxyquire');
+const proxyquire = proxyquireObject.noPreserveCache();
 import util = require('util');
 const sleep = util.promisify(setTimeout);
 import intercept = require('intercept-stdout');
+import * as winston from 'winston';
 
 /*
  * internal dependencies
@@ -32,77 +30,33 @@ import intercept = require('intercept-stdout');
 
 /* configuration file expected in application root directory */
 import { IErr, loggerConfig } from '../src/configUtils';
-const copyLoggerConfig = {
-  LOGS_DIR: loggerConfig.LOGS_DIR,
-  INFO_LOG: loggerConfig.INFO_LOG,
-  ERROR_LOG: loggerConfig.ERROR_LOG,
-};
+
+/* set up test log files */
+const infoLog = path.join(loggerConfig.LOGS_DIR, 'dumpInfoTest.log');
+const errorLog = path.join(loggerConfig.LOGS_DIR, 'dumpErrorTest.log');
 
 /* paths for proxyquire */
 const loggerPath = '../src/logger';
 const dumpErrorPath = '../src/dumpError';
 
-/*
- * tests
- */
 describe('dumpError tests', () => {
   debug(`Running ${modulename}: describe - dumpError`);
 
-  before('Set up', () => {
-    debug(`Running ${modulename}: before - Set up`);
+  after('Delete test log files', () => {
+    debug(`Running ${modulename}: after - Delete test log files`);
 
-    /* set up env variable and test log files */
-    loggerConfig.INFO_LOG = path.join(
-      loggerConfig.LOGS_DIR,
-      'dumpInfoTest.log',
-    );
-    loggerConfig.ERROR_LOG = path.join(
-      loggerConfig.LOGS_DIR,
-      'dumpErrorTest.log',
-    );
-
-    /* files only deleted when all hard links closed,
-     * i.e. when programme closes */
+    /* delete files */
     try {
-      fs.unlinkSync(loggerConfig.INFO_LOG);
+      fs.unlinkSync(infoLog);
     } catch (err) {
       /* ok - file didn't exist */
     }
 
     try {
-      fs.unlinkSync(loggerConfig.ERROR_LOG);
+      fs.unlinkSync(errorLog);
     } catch (err) {
       /* ok - file didn't exist */
     }
-
-    /* create two empty files */
-    fs.writeFileSync(loggerConfig.INFO_LOG, '');
-    fs.writeFileSync(loggerConfig.ERROR_LOG, '');
-  });
-
-  after('Delete test log files & reset loggerConfig', () => {
-    debug(
-      `Running ${modulename}: after - Delete test log files & reset loggerConfig`,
-    );
-
-    /* files only deleted when all hard links closed,
-     * i.e. when programme closes */
-    try {
-      fs.unlinkSync(loggerConfig.INFO_LOG);
-    } catch (err) {
-      /* ok - file didn't exist */
-    }
-
-    try {
-      fs.unlinkSync(loggerConfig.ERROR_LOG);
-    } catch (err) {
-      /* ok - file didn't exist */
-    }
-
-    /* reset loggerConfig */
-    loggerConfig.LOGS_DIR = copyLoggerConfig.LOGS_DIR;
-    loggerConfig.INFO_LOG = copyLoggerConfig.INFO_LOG;
-    loggerConfig.ERROR_LOG = copyLoggerConfig.ERROR_LOG;
   });
 
   it('should log to files and console.log', async function runTest() {
@@ -110,15 +64,15 @@ describe('dumpError tests', () => {
 
     /* use proxyquire to reload Logger and DumpError */
     const { Logger } = proxyquire(loggerPath, {});
-    const logger = Logger.getInstance();
+    const logger = new Logger(infoLog, errorLog) as winston.Logger;
     const { DumpError } = proxyquire(dumpErrorPath, {});
-    const dumpError = DumpError.getInstance(logger);
+    const dumpError = new DumpError(logger) as (err: any) => void;
 
     /* both log files should be empty */
-    let infoLog = fs.readFileSync(loggerConfig.INFO_LOG).toString();
-    let errorLog = fs.readFileSync(loggerConfig.ERROR_LOG).toString();
-    expect(infoLog.length === 0, 'info log file to be empty').to.be.true;
-    expect(errorLog.length === 0, 'error log file to be empty').to.be.true;
+    let infoLogged = fs.readFileSync(infoLog).toString();
+    let errorLogged = fs.readFileSync(errorLog).toString();
+    expect(infoLogged.length === 0, 'info log file to be empty').to.be.true;
+    expect(errorLogged.length === 0, 'error log file to be empty').to.be.true;
 
     /* start intercepting console.log */
     let capturedConsoleLog = '';
@@ -145,11 +99,11 @@ describe('dumpError tests', () => {
       .to.be.true;
 
     /* error message dumped to both info and error logs */
-    infoLog = fs.readFileSync(loggerConfig.INFO_LOG).toString();
-    errorLog = fs.readFileSync(loggerConfig.ERROR_LOG).toString();
-    expect(infoLog.includes('Error Message'), 'error message printed').to.be
+    infoLogged = fs.readFileSync(infoLog).toString();
+    errorLogged = fs.readFileSync(errorLog).toString();
+    expect(infoLogged.includes('Error Message'), 'error message printed').to.be
       .true;
-    expect(errorLog.includes('Error Message'), 'error message printed').to.be
+    expect(errorLogged.includes('Error Message'), 'error message printed').to.be
       .true;
 
     /* error name */
@@ -159,10 +113,10 @@ describe('dumpError tests', () => {
       .true;
 
     /* error name dumped to both info and error logs */
-    infoLog = fs.readFileSync(loggerConfig.INFO_LOG).toString();
-    errorLog = fs.readFileSync(loggerConfig.ERROR_LOG).toString();
-    expect(infoLog.includes('Error Name'), 'error name printed').to.be.true;
-    expect(errorLog.includes('Error Name'), 'error name printed').to.be.true;
+    infoLogged = fs.readFileSync(infoLog).toString();
+    errorLogged = fs.readFileSync(errorLog).toString();
+    expect(infoLogged.includes('Error Name'), 'error name printed').to.be.true;
+    expect(errorLogged.includes('Error Name'), 'error name printed').to.be.true;
 
     /* error stack */
 
@@ -173,12 +127,12 @@ describe('dumpError tests', () => {
     ).to.be.true;
 
     /* error stack dumped to both info and error logs */
-    infoLog = fs.readFileSync(loggerConfig.INFO_LOG).toString();
-    errorLog = fs.readFileSync(loggerConfig.ERROR_LOG).toString();
-    expect(infoLog.includes('Error Stacktrace'), 'error stack printed').to.be
+    infoLogged = fs.readFileSync(infoLog).toString();
+    errorLogged = fs.readFileSync(errorLog).toString();
+    expect(infoLogged.includes('Error Stacktrace'), 'error stack printed').to.be
       .true;
-    expect(errorLog.includes('Error Stacktrace'), 'error stack printed').to.be
-      .true;
+    expect(errorLogged.includes('Error Stacktrace'), 'error stack printed').to
+      .be.true;
 
     /* clear and start intercepting console.log again */
     capturedConsoleLog = '';
@@ -265,7 +219,7 @@ describe('dumpError tests', () => {
     /* use proxyquire to reload DumpError */
     const { DumpError } = proxyquire(dumpErrorPath, {});
     /* don't pass logger to dumpError */
-    const dumpError = DumpError.getInstance();
+    const dumpError = new DumpError() as (err: any) => void;
 
     /* start intercepting console.log */
     let capturedConsoleError = '';

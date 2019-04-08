@@ -34,7 +34,8 @@ import winston = require('winston');
 debug(modulename + ': loading loggers');
 const Logger = config.Logger;
 export const logger = new Logger() as winston.Logger;
-export const dumpError = config.DumpError.getInstance(logger);
+const DumpError = config.DumpError;
+export const dumpError = new DumpError(logger) as (err: any) => void;
 
 /* child process will be index.js */
 interface IChild extends forever.Monitor {

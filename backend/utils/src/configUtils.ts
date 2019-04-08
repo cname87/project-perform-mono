@@ -26,8 +26,8 @@ import * as path from 'path';
 export const loggerConfig = {
   /* log file paths used to set up the logger */
   LOGS_DIR: path.join(appRoot, 'logs'),
-  INFO_LOG: path.join(appRoot, 'logs', 'info.log'),
-  ERROR_LOG: path.join(appRoot, 'logs', 'error.log'),
+  INFO_LOG: 'info.log',
+  ERROR_LOG: 'error.log',
 };
 
 /***********************************************************************/

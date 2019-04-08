@@ -10,9 +10,9 @@ describe('Application tests', function() {
   const indexPath = '../../dist/server/src/index';
   const { config } = require(path.join(appRoot, 'dist', 'server', 'src','configServer'));
 
-  // const logger = config.Logger.getInstance();
   const logger = new config.Logger;
-  const dumpError = config.DumpError.getInstance(logger);
+  const DumpError = config.DumpError;
+  const dumpError = new DumpError(logger);
 
   /* require a database as default */
   config.IS_NO_DB_OK = false;
@@ -125,13 +125,13 @@ describe('Application tests', function() {
     };
 
     /* stub DumpError */
-    config.DumpError = {
-      getInstance: () => {
+    config.DumpError = class DumpError {
+      constructor() {
         return (err) => {
           dumpError(err);
           spyDumpError(err);
         };
-      },
+      }
     };
 
     runIndex = function() {

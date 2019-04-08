@@ -42,7 +42,8 @@ async function runDatabaseApp(): Promise<Database> {
   /* create the single instance of the general logger and dumpError utility */
   const Logger = filepaths.Logger;
   const logger = new Logger() as winston.Logger;
-  const dumpError = filepaths.DumpError.getInstance();
+  const DumpError = filepaths.DumpError;
+  const dumpError = new DumpError(logger) as (err: any) => void;
 
   logger.info('\n*** CONNECTING TO THE DATABASE ***\n');
 

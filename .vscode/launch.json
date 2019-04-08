@@ -94,7 +94,7 @@
       "${workspaceFolder}/backend/dist/database/test/*.test.js",
       "${workspaceFolder}/backend/dist/models/test/*.test.js",
       "${workspaceFolder}/backend/dist/utils/test/*.test.js",
-      // "${workspaceFolder}/backend/server/test/*.js",
+      "${workspaceFolder}/backend/server/test/*.js",
     ],
     "env": {
       "NODE_ENV": "development",
@@ -441,4 +441,4 @@
       ]
     },
   ],
-}y
+}

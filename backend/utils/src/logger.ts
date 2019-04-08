@@ -12,6 +12,7 @@ debug(`Starting ${modulename}`);
 
 /* external dependencies */
 import * as fs from 'fs';
+import * as path from 'path';
 import * as winston from 'winston';
 const { createLogger, format, transports } = winston;
 const { combine, timestamp, label, printf } = format;
@@ -28,7 +29,7 @@ import { loggerConfig } from './configUtils';
  *
  * In the module requiring a logger service add...
  * import { Logger } from '<path to><this file>';
- * logger = new Logger as winstin.Logger;
+ * logger = new Logger as winston.Logger;
  *
  * Note: This service proides a singleton logger i.e. all imports get the same
  * Logger class object.
@@ -43,23 +44,14 @@ import { loggerConfig } from './configUtils';
  */
 
 /* log file paths */
-const defaultInfoLog = loggerConfig.INFO_LOG;
-const defaultErrorLog = loggerConfig.ERROR_LOG;
-
-type typeLoggerInstance = winston.Logger;
+const defaultInfoLog = path.join(loggerConfig.LOGS_DIR, loggerConfig.INFO_LOG);
+const defaultErrorLog = path.join(
+  loggerConfig.LOGS_DIR,
+  loggerConfig.ERROR_LOG,
+);
 
 class Logger {
   public static instance: winston.Logger;
-
-  public static getInstance(
-    infoLog: string = defaultInfoLog,
-    errorLog: string = defaultErrorLog,
-  ): typeLoggerInstance {
-    if (!Logger.instance) {
-      Logger.instance = new Logger(infoLog, errorLog) as typeLoggerInstance;
-    }
-    return Logger.instance;
-  }
 
   public constructor(infoLog = defaultInfoLog, errorLog = defaultErrorLog) {
     if (!Logger.instance) {
@@ -153,7 +145,7 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
     },
   };
 
-  const loggerObject: typeLoggerInstance = createLogger({
+  const loggerObject = createLogger({
     levels: myLevels.levels,
     transports: [
       new transports.File(options.errorFile),
@@ -167,9 +159,9 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
     loggerObject.add(new transports.Console(options.console));
   }
 
-  const logger = Object.create(loggerObject);
+  const logger: winston.Logger = Object.create(loggerObject);
   return logger;
 }
 
-/* export Logger class and instance type */
-export { Logger, typeLoggerInstance };
+/* export Logger class */
+export { Logger };

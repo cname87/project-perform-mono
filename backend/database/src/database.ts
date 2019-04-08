@@ -21,9 +21,6 @@ import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-/* import dumpError and logger instance types */
-import { typeDumpErrorInstance, typeLoggerInstance } from './configDatabase';
-
 /* external type dependencies */
 import mongoose, {
   Connection,
@@ -33,6 +30,7 @@ import mongoose, {
   Schema,
   SchemaDefinition,
 } from 'mongoose';
+import winston = require('winston');
 
 /**
  * The class constructor for the exported database object.
@@ -59,10 +57,8 @@ class Database {
   constructor(
     readonly connectionUrl: string,
     readonly connectionOptions: ConnectionOptions,
-    readonly logger: typeLoggerInstance | Console = console,
-    readonly dumpError:
-      | typeDumpErrorInstance
-      | Console['error'] = console.error,
+    readonly logger: winston.Logger | Console = (console = console),
+    readonly dumpError: (err: any) => void = console.error,
   ) {
     this.closeConnection = closeConnection;
     this.createModel = createModel;
@@ -91,8 +87,8 @@ class Database {
 async function connectToDB(
   uri: string,
   options: ConnectionOptions,
-  logger: typeLoggerInstance | Console,
-  dumpError: typeDumpErrorInstance | Console['error'],
+  logger: winston.Logger | Console,
+  dumpError: (err: any) => void,
 ): Promise<Connection> {
   debug(modulename + ': running connectToDB');
 

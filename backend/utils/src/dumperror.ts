@@ -13,7 +13,7 @@ debug(`Starting ${modulename}`);
  *
  * Add...
  * const { DumpError } = <path to file>.dumpError;
- * const dumpError = DumpError.getInstance(logger);
+ * const dumpError = new DumpError(logger) as (err: any) => void;
  *
  * where 'logger' is optional.
  * - Use a winston logger with a logger.error function.
@@ -22,7 +22,7 @@ debug(`Starting ${modulename}`);
  * Also once this module is imported then all subsequent imports get the same
  * object, irrespective of the logger parameter passed in.  Thus you can
  * set up DumpError in the main module and add...
- * dumpError = DumpError.getInstance(); in other modules,
+ * dumpError = new DumpError(); in other modules,
  *
  * Note: The property 'dumped' is set to true on an object
  * that is passed in to prevent an error object that has
@@ -34,31 +34,17 @@ debug(`Starting ${modulename}`);
 /**
  * Import local types.
  */
-import { IErr } from './configUtils';
-import { Logger } from './logger';
-
-type typeDumpErrorInstance = (err: IErr | string) => void;
+import winston = require('winston');
 
 class DumpError {
   /* holds the singleton instance */
-  public static instance: typeDumpErrorInstance;
+  public static instance: (err: any) => void;
 
   /* the function that dumps the error - logger.error or console.error */
   public static dump: (err: any) => void;
 
-  /* creates new instance if one does not exist */
-  public static getInstance(initialLogger?: Logger): typeDumpErrorInstance {
-    if (!DumpError.instance) {
-      DumpError.instance = new DumpError(
-        initialLogger,
-      ) as typeDumpErrorInstance;
-    }
-    return DumpError.instance;
-  }
-
   /* instantiates if necessary and sets dump to logger.error or console.error */
-  public constructor(initialLogger?: any) {
-    // replace any ***********
+  public constructor(initialLogger?: winston.Logger) {
     if (!DumpError.instance) {
       DumpError.dump = initialLogger
         ? initialLogger.error.bind(initialLogger)
@@ -69,7 +55,7 @@ class DumpError {
   }
 }
 
-function dumpError(err: IErr | string) {
+function dumpError(err: any) {
   debug(modulename + ': running dumpError');
 
   if (err && typeof err === 'object') {
@@ -107,4 +93,4 @@ function dumpError(err: IErr | string) {
 }
 
 /* export DumpError class and type of an instance of the class */
-export { DumpError, typeDumpErrorInstance };
+export { DumpError };

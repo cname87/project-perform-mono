@@ -38,7 +38,7 @@ import {
 
 /* import secret configuration parameters */
 import * as dotenv from 'dotenv';
-import winston = require('winston');
+import * as winston from 'winston';
 dotenv.config({ path: config.ENV_FILE });
 
 /*
@@ -60,7 +60,8 @@ const { createModelMembers, createModelTests, createModelUsers } = config;
 /* Create the single instances of the general logger & dumpError utilities, and the server logger middleware.  These are passed via the appLocals object. Also, other modules can create new instances later without any parameters and they will receive the same instance. */
 const Logger = config.Logger;
 const logger = new Logger() as winston.Logger;
-const dumpError = config.DumpError.getInstance(logger);
+const DumpError = config.DumpError;
+const dumpError = new DumpError(logger) as (err: any) => void;
 const { ServerLogger } = config;
 const serverLogger = new ServerLogger(config);
 

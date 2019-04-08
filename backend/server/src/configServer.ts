@@ -28,9 +28,9 @@ import { runServer } from './server/runServer';
 /* a configured morgan http(s) server logger */
 import { ServerLogger } from './server/serverlogger';
 // a configured winston general logger
-import { Logger, typeLoggerInstance } from '../../utils/src/logger';
+import { Logger } from '../../utils/src/logger';
 /* a utility to dump errors to the logger */
-import { DumpError, typeDumpErrorInstance } from '../../utils/src/dumpError';
+import { DumpError } from '../../utils/src/dumpError';
 /* access to debug logger for mocha - must be imported this way */
 import * as ERROR_HANDLERS from './middlewares/errorhandler';
 /* error handler middleware functions */
@@ -49,6 +49,7 @@ import { membersHandlers1 } from './handlers/api/membersApi';
 import * as membersHandlers from './handlers/membersHandlers';
 // shared request handler functions
 import { miscHandlers } from './handlers/miscHandlers';
+import winston = require('winston');
 
 // tslint:disable:object-literal-sort-keys
 export const config = {
@@ -203,10 +204,6 @@ export const config = {
 export type Server = Server;
 /* the Database class is the type for instances of the Database class */
 export type Database = Database;
-/* the type of instance of the DumpError class */
-export type typeDumpErrorInstance = typeDumpErrorInstance;
-/* the type of instance of the Logger class */
-export type typeLoggerInstance = typeLoggerInstance;
 
 /* controllers object */
 export interface IControllers {
@@ -229,17 +226,17 @@ export interface IAppLocals {
   /* database connection */
   dbConnection: Connection;
   /* error logger */
-  dumpError: typeDumpErrorInstance;
+  dumpError: (err: any) => void;
   /* error handler middleware */
   errorHandler: typeof errorHandlers;
   /* event emitter used for test */
   event: EventEmitter;
+  /* logger service */
+  logger: winston.Logger;
   /* handles object*/
   miscHandlers: typeof miscHandlers;
   membersHandlers1: typeof membersHandlers1;
   memberhandlers: typeof membersHandlers;
-  /* winston general logger */
-  logger: typeLoggerInstance;
   /* database models object */
   models: IModels;
   /* morgan server logger */

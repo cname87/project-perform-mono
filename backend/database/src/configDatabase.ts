@@ -36,9 +36,9 @@ import { format } from 'util';
  */
 
 // a utility to dump errors to the logger
-import { DumpError, typeDumpErrorInstance } from '../../utils/src/dumpError';
+import { DumpError } from '../../utils/src/dumpError';
 // a configured winston general logger
-import { Logger, typeLoggerInstance } from '../../utils/src/logger';
+import { Logger } from '../../utils/src/logger';
 // the Database class
 import { Database } from './database';
 // relative path to backend .env file
@@ -53,10 +53,6 @@ export const filepaths = {
 
 /* the Database class is the type for instances of the Database class */
 export type Database = Database;
-/* the type of instance of the DumpError class */
-export type typeDumpErrorInstance = typeDumpErrorInstance;
-/* the type of instance of the Logger class */
-export type typeLoggerInstance = typeLoggerInstance;
 
 /**
  * This method returns the uri parameter in Mongoose.createConnection(uri options) that connects to a MongoDB database server.
