@@ -39,6 +39,22 @@ const errorLog = path.join(loggerConfig.LOGS_DIR, 'dumpErrorTest.log');
 const loggerPath = '../src/logger';
 const dumpErrorPath = '../src/dumpError';
 
+/**
+ * Function to delete a file if it exists.
+ * @params filepath: The path to file to be deleted.
+ * @returns Void
+ * Note: The file is only deleted when all hard links are closed, i.e. when programme closes.
+ */
+function deleteFile(filePath: string) {
+  /* files only deleted when all hard links closed,
+   * i.e. when programme closes */
+  try {
+    fs.unlinkSync(filePath);
+  } catch (err) {
+    /* ok - file didn't exist */
+  }
+}
+
 describe('dumpError tests', () => {
   debug(`Running ${modulename}: describe - dumpError`);
 
@@ -46,21 +62,16 @@ describe('dumpError tests', () => {
     debug(`Running ${modulename}: after - Delete test log files`);
 
     /* delete files */
-    try {
-      fs.unlinkSync(infoLog);
-    } catch (err) {
-      /* ok - file didn't exist */
-    }
-
-    try {
-      fs.unlinkSync(errorLog);
-    } catch (err) {
-      /* ok - file didn't exist */
-    }
+    deleteFile(infoLog);
+    deleteFile(errorLog);
   });
 
   it('should log to files and console.log', async function runTest() {
     debug(`Running ${modulename}: it - should log to files and console.log`);
+
+    /* delete files in case they exist following an aborted test run*/
+    deleteFile(infoLog);
+    deleteFile(errorLog);
 
     /* use proxyquire to reload Logger and DumpError */
     const { Logger } = proxyquire(loggerPath, {});

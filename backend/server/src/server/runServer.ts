@@ -114,10 +114,15 @@ async function runServer(
     const staticTestOptions = {
       redirect: false,
     };
-
     app.use(
       '/testServer',
       express.static(config.STATIC_TEST_PATH, staticTestOptions),
+    );
+
+    /* serve node_modules files from a static server mounted on /node_modules so mocha etc can be loaded by the browser for client-fired tests */
+    app.use(
+      '/node_modules',
+      express.static(config.NODE_MODULES_PATH, staticTestOptions),
     );
 
     /* use fail controller to test errorhandling */
@@ -133,55 +138,128 @@ async function runServer(
   /* route paths as per the api file */
   const api = new OpenAPIBackend({
     definition: config.API_FILE,
-    apiRoot: '/',
+    apiRoot: '/api-v1',
     strict: true,
     validate: true,
     withContext: true,
-    ajvOpts: { unknownFormats: true },
+    ajvOpts: {
+      unknownFormats: ['int32', 'string'],
+      verbose: true,
+    },
     handlers: {
+      getMember: (
+        context,
+        req: IRequestApp,
+        res: Response,
+        next: NextFunction,
+      ) => app.appLocals.membersApi.getMember(context, req, res, next),
       getMembers: (
         context,
         req: IRequestApp,
         res: Response,
         next: NextFunction,
-      ) => app.appLocals.membersHandlers1.getMembers(context, req, res, next),
-      validationFail: (context, next: NextFunction) => {
+      ) => app.appLocals.membersApi.getMembers(context, req, res, next),
+      addMember: (
+        context,
+        req: IRequestApp,
+        res: Response,
+        next: NextFunction,
+      ) => app.appLocals.membersApi.addMember(context, req, res, next),
+      deleteMember: (
+        context,
+        req: IRequestApp,
+        res: Response,
+        next: NextFunction,
+      ) => app.appLocals.membersApi.deleteMember(context, req, res, next),
+      deleteMembers: (
+        context,
+        req: IRequestApp,
+        res: Response,
+        next: NextFunction,
+      ) => app.appLocals.membersApi.deleteMembers(context, req, res, next),
+      updateMember: (
+        context,
+        req: IRequestApp,
+        res: Response,
+        next: NextFunction,
+      ) => app.appLocals.membersApi.updateMember(context, req, res, next),
+      validationFail: (
+        context,
+        _req: Request,
+        _res: Response,
+        next: NextFunction,
+      ) => {
+        debug(modulename + ': running validationFail');
+
         app.appLocals.logger.error(modulename + ': API validation fail');
-        if (context && context.validation && context.validation.errors) {
-          app.appLocals.dumpError(context.validation.errors.toString());
-        }
         const err: IErr = {
-          name: 'VALIDATION_FAIL',
+          name: 'REQUEST_VALIDATION_FAIL',
           message: 'API validation fail',
           statusCode: 400,
-          dumped: true,
+          dumped: false,
         };
+
+        if (!(context && context.validation && context.validation.errors)) {
+          /* openapi-backend types require this test */
+          return next(err);
+        }
+
+        err.message =
+          'API validation fail\n' + util.inspect(context.validation.errors);
+        app.appLocals.dumpError(err);
         next(err);
       },
-      notFound: (
+      notImplemented: async (
+        /* called if no operation handler has been registered for a matched operation */
+        context,
+        _req: Request,
+        res: Response,
+        next: NextFunction,
+      ) => {
+        debug(modulename + ': running notImplemented');
+        if (context && context.operation && context.operation.operationId) {
+          /* return mocked response from api definition */
+          const {
+            status,
+            mock,
+          }: {
+            status: number;
+            mock: any;
+          } = api.mockResponseForOperation(context.operation.operationId);
+          res.status(status).json(mock);
+        } else {
+          /* if no context supplied then pass on to be treated as a not found */
+          next();
+        }
+      },
+      notFound: async (
+        /* called if path not matched - needed or an exception thrown */
         _context,
         _req: Request,
         _res: Response,
         next: NextFunction,
       ) => {
-        /* let the frontend or the errorhandler handle not founds */
+        debug(modulename + ': running notFound');
+
+        /* let angular or errorhandler deal with not founds */
         next();
       },
     },
   });
 
-  /* initialize OpenAPI middleware */
+  /* initialize Openapi-backend middleware */
   api.init();
 
-  /* openAPI calls handler based on api */
+  /* openapi-backend calls a handler based on the path and the api */
   app.use((req, res, next) =>
     api.handleRequest(
+      /* the first parameter is passed to openapi-backend middleware - the others are passed to the called handler function */
       {
         method: req.method,
         path: req.path,
         body: req.body,
         query: req.query,
-        headers: req.headers as any,
+        headers: req.headers as { [key: string]: string | string[] },
       },
       req,
       res,

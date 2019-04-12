@@ -31,8 +31,7 @@ describe('file retrieval', function() {
     it('should receive an x-icon content type', async function() {
 
         const dt = new Date().toString();
-        testWindow = window.open('https://localhost:1337/testServer/pagetest.html' +
-            '?timestamp=' + dt,
+        testWindow = window.open('https://localhost:1337/testServer/browser/static/pagetest.html' + '?timestamp=' + dt,
         '_blank');
 
         await new Promise(function(resolve) {
@@ -52,7 +51,7 @@ describe('file retrieval', function() {
         };
 
         /* download the favicon */
-        const myRequest = new Request('https://localhost:1337/testServer/filetest.ico');
+        const myRequest = new Request('https://localhost:1337/testServer/browser/static/filetest.ico');
 
         response = await fetch(myRequest, myInit);
 

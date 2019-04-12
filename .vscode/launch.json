@@ -91,10 +91,11 @@
     "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
     "args": [
       "--config", "${workspaceFolder}/backend/.mocharc.json",
-      "${workspaceFolder}/backend/dist/database/test/*.test.js",
-      "${workspaceFolder}/backend/dist/models/test/*.test.js",
-      "${workspaceFolder}/backend/dist/utils/test/*.test.js",
-      "${workspaceFolder}/backend/server/test/*.js",
+      // "${workspaceFolder}/backend/dist/database/test/*.test.js",
+      // "${workspaceFolder}/backend/dist/models/test/*.test.js",
+      // "${workspaceFolder}/backend/dist/utils/test/*.test.js",
+      "${workspaceFolder}/backend/dist/server/test/client-fired/*.test.js",
+      // "${workspaceFolder}/backend/server/test/*.js",
     ],
     "env": {
       "NODE_ENV": "development",
@@ -320,11 +321,11 @@
       "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
       "trace": true,
     },
-    // https://localhost:1337/testServer/loadmocha.html
+    // https://localhost:1337/testServer/browser/run/loadmocha.html
     {
-      // starts Chrome and connect to the client-side test file.
+      // starts Chrome and loads the client-side browser test runner.
       // server-side client tests must be started in advance of running this
-      "name": "Launch https://localhost:1337/testServer/loadMocha.html",
+      "name": "Launch https://localhost:1337/testServer/browser/run/loadMocha.html",
       "type": "chrome",
       "request": "launch",
       "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -336,11 +337,11 @@
         "--disable-popup-blocking", // necessary for window.open() to work
       ],
       "userDataDir": true,
-      "url": "https://localhost:1337/testServer/loadmocha.html",
+      "url": "https://localhost:1337/testServer/browser/run/loadmocha.html",
       // tell vscode where to find scripts on the server
       "pathMapping": {
         "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
-        "/testServer": "${workspaceFolder}/backend/server/test/client/browser",
+        "/testServer": "${workspaceFolder}/backend/server/test/client",
       },
       "sourceMapPathOverrides": {
         "webpack:///./*": "${workspaceFolder}/frontend/*",
@@ -352,13 +353,13 @@
       "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
       "trace": true,
     },
-    // Client-fired server tests
+    // Mocha Client-fired server tests
     {
       /* This runs the server-side mocha client test file to test the server-side behaviour during client-side fired tests. */
       /* If not commented out in the js file it kicks off the browser tests that fire the client-side tests.  Otherwise you can load testServer/loadmocha.html manually, or if you need debug of the browser-side then use up a launch configuration to load loadmocha.html. */
       "type": "node",
       "request": "launch",
-      "name": "Mocha Client Tests",
+      "name": "Mocha Client-fired Server Tests",
       "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
       "args": [
         // mocha options
@@ -372,7 +373,7 @@
         "DEBUG": "MM* PP* SY*", // comment out to remove debug output
         "DEBUG_COLORS": "true",
         /* set to 'true' to automatically run chrome and set tp 'false' when using a compound configuration to launch chrome */
-        "RUN_CHROME": "true",
+        "RUN_CHROME": "false",  // set false when using compound configurations
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
@@ -385,12 +386,12 @@
       "autoAttachChildProcesses": true,
       // "preLaunchTask": "Taskkill node.exe", // can't use in compound calls
     },
-    // Client-fired server tests with Istanbul
+    // Mocha Client-fired server tests with Istanbul
     {
       /* see above */
       "type": "node",
       "request": "launch",
-      "name": "Mocha Client Tests with Istanbul",
+      "name": "Mocha Client-fired Server Tests with Istanbul",
       "program": "${workspaceFolder}/backend/node_modules/nyc/bin/nyc",
       "args": [
         "--reporter=text",
@@ -418,6 +419,37 @@
       "preLaunchTask": "Taskkill node.exe", // can't use in compound calls
       "postDebugTask": "npm delete nyc file", // delete .nyc_report
     },
+    // https://localhost:1337/testServer/api/run/loadmocha.html
+    {
+      // starts Chrome and loads the client-side api test runner.
+      "name": "Launch https://localhost:1337/testServer/api/run/loadMocha.html",
+      "type": "chrome",
+      "request": "launch",
+      "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "runtimeArgs": [
+        "--remote-debugging-port=9222",
+        "--incognito",
+        "--start-maximized",
+        "--new-window",
+        "--disable-popup-blocking", // necessary for window.open() to work
+      ],
+      "userDataDir": true,
+      "url": "https://localhost:1337/testServer/api/run/loadmocha.html",
+      // tell vscode where to find scripts on the server
+      "pathMapping": {
+        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
+        "/testServer": "${workspaceFolder}/backend/server/test/client/",
+      },
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${workspaceFolder}/frontend/*",
+      },
+      "smartStep": true,
+      "disableNetworkCache": true,
+      "showAsyncStacks": true,
+      "sourceMaps": true,
+      "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
+      "trace": true,
+    },
   ],
   "compounds": [
     /* Run backend server and frontend app */
@@ -433,11 +465,11 @@
     {
       "name": "Mocha client tests Backend/Frontend",
       /* use when debugging client-side mocha scripts */
-      /* You must set RUN_CHROME to 'false' and disable Taskkill on Mocha Client Tests before running this */
+      /* You must set RUN_CHROME to 'false' and disable Taskkill on Mocha Client-fired server Tests before running this */
       /* you must close Chrome manually after */
       "configurations": [
-        "Mocha Client Tests",
-        "Launch https://localhost:1337/testServer/loadMocha.html",
+        "Mocha Client-fired Server Tests",
+        "Launch https://localhost:1337/testServer/browser/run/loadMocha.html",
       ]
     },
   ],

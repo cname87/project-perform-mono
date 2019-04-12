@@ -8,12 +8,12 @@ const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
 import { Document, DocumentToObjectOptions, Model, Schema } from 'mongoose';
-import { Database } from '../../database/src/configDatabase';
+import { Database } from './configModels';
 
 function createModel(database: Database): Model<Document> {
   debug(modulename + ': running createModel');
 
-  /* set up user schema, collection, and model name */
+  /* set up schema, collection, and model name */
   const schema = new Schema({
     id: { type: Number, unique: true },
     name: String,
@@ -41,5 +41,5 @@ function createModel(database: Database): Model<Document> {
   return model;
 }
 
-/* export the users model creation function */
+/* export the model creation function */
 export { createModel as createModelMembers };

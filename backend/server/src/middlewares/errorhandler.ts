@@ -51,18 +51,6 @@ function assignCode(
 ) {
   debug(modulename + ': assignCode called');
 
-  if (err.failedValidation) {
-    /* if swagger returns a validation failure then set err.statusCode to invalid data error, 400. */
-    err.statusCode = 400;
-  }
-
-  if (err.failedValidation && 'originalResponse' in err) {
-    /* if swagger returns a response validation failure then set err.statusCode to internal server error, 500 */
-    /* the key 'originalResponse' will exist only for a swagger response validation fail */
-
-    err.statusCode = 500;
-  }
-
   if (typeof err === 'object') {
     /* set the response status code to the error statusCode field, if one was added on error creation, or if one was added above. */
     res.statusCode = err.statusCode ? err.statusCode : res.statusCode;
@@ -71,9 +59,6 @@ function assignCode(
     /* If 20x, set the response code to internal server error, 500. */
     res.statusCode =
       res.statusCode < 200 || res.statusCode > 299 ? res.statusCode : 500;
-
-    /* override the response status message if err.message exists */
-    res.statusMessage = err.message || res.statusMessage;
   }
 
   next(err);
@@ -140,7 +125,7 @@ function sendErrorResponse(
   /* Note: swagger response validation fail will have set headers */
   if (!res.headersSent) {
     /* send the error response */
-    res.json(message);
+    res.status(res.statusCode).json(message);
   } else {
     /* send nothing if headers already sent */
     debug(

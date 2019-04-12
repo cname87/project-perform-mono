@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.json",
+  "include": [
+    "./**/*.client-test.ts",
+  ],
+  "exclude": [],
+  "compilerOptions": {
+    // list directory options first
+    "outDir": "../../../dist/",  // overlays on dist/
+    "lib": [
+      "dom", // needed so 'fetch' etc allowed in client-side scripts
+      "esnext", // telling compiler that browser support esnext types
+    ],
+    "module": "esnext",  // for browser
+    "target": "esnext",  // es5 for wider browser support
+  },
+}

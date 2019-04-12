@@ -1,0 +1,40 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Mocha Tests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/mocha/mocha.css" />
+</head>
+
+    <body>
+        <!-- test results output to the div with id = 'mocha' -->
+        <div id="mocha"></div>
+
+        <!-- load mocha and sinon -->
+        <script src="/node_modules/mocha/mocha.js"></script>
+        <script src="/node_modules/chai/chai.js"></script>
+        <script src="/node_modules/sinon/pkg/sinon.js"></script>
+        <script src="/node_modules/sinon-chai/lib/sinon-chai.js"></script>
+
+        <!-- set up mocha -->
+        <script class="mocha-init">
+          mocha.setup({
+            ui: 'bdd',
+            timeout: 0,
+            globals: [],
+          });
+          mocha.checkLeaks();
+        </script>
+
+        <!-- load your test files here -->
+        <script src="/testServer/api/api-requests.client-test.js"></script>
+
+        <!-- run mocha -->
+        <script class="mocha-exec">
+          mocha.run();
+        </script>
+
+    </body>
+
+</html>

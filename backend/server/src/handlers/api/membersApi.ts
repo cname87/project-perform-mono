@@ -13,17 +13,30 @@ import { NextFunction, Response } from 'express';
 import { Context } from 'openapi-backend';
 
 /* import local types */
-import { IRequestApp } from '../../configServer';
+import { IRequestApp, IMember, IErr } from '../../configServer';
 
 export const getMember = (
-  // context: Context,
+  context: Context | undefined,
   req: IRequestApp,
   res: Response,
   next: NextFunction,
 ) => {
   debug(modulename + ': running getMember');
 
-  const id = req.params.id;
+  if (!(context && context.request && context.request.params)) {
+    const err: IErr = {
+      name: 'UNEXPECTED_FAIL',
+      message: 'context not supplied',
+      statusCode: 500,
+      dumped: false,
+    };
+    req.app.appLocals.dumpError(err);
+    return next(err);
+  }
+
+  const idString = context.request.params.id as string;
+  const id = Number.parseInt(idString, 10);
+
   const config = req.app.appLocals.config;
   const handles = req.app.appLocals.miscHandlers;
   const logger = req.app.appLocals.logger;
@@ -32,7 +45,7 @@ export const getMember = (
   config.membersHandlers
     .getMember(req, id)
     .then((payload) => {
-      handles.writeJson(res, 200, payload);
+      handles.writeJson(context, req, res, next, 200, payload);
     })
     .catch((err) => {
       logger.error(modulename + ': handler getMember returned error');
@@ -50,12 +63,7 @@ export const getMembers = (
   debug(modulename + ': running getMembers');
 
   let name = '';
-  if (
-    context &&
-    context.request &&
-    context.request.params &&
-    context.request.params.id
-  ) {
+  if (context && context.request && context.request.params) {
     name = context.request.params.name as string;
   }
   const config = req.app.appLocals.config;
@@ -66,7 +74,7 @@ export const getMembers = (
   config.membersHandlers
     .getMembers(req, name)
     .then((payload) => {
-      handles.writeJson(res, 200, payload);
+      handles.writeJson(context, req, res, next, 200, payload);
     })
     .catch((err) => {
       logger.error(modulename + ': handler getMembers returned error');
@@ -76,11 +84,24 @@ export const getMembers = (
 };
 
 export const addMember = (
+  context: Context | undefined,
   req: IRequestApp,
   res: Response,
   next: NextFunction,
 ) => {
-  const member = 'x' as any;
+  debug(modulename + ': running addMember');
+
+  if (!(context && context.request && context.request.body)) {
+    const err: IErr = {
+      name: 'UNEXPECTED_FAIL',
+      message: 'context not supplied',
+      statusCode: 500,
+      dumped: false,
+    };
+    req.app.appLocals.dumpError(err);
+    return next(err);
+  }
+  const member = context.request.body as IMember;
   const config = req.app.appLocals.config;
   const handles = req.app.appLocals.miscHandlers;
   const logger = req.app.appLocals.logger;
@@ -89,7 +110,7 @@ export const addMember = (
   config.membersHandlers
     .addMember(req, member)
     .then((payload) => {
-      handles.writeJson(res, 201, payload);
+      handles.writeJson(context, req, res, next, 201, payload);
     })
     .catch((err) => {
       logger.error(modulename + ': handler addMember returned error');
@@ -99,20 +120,37 @@ export const addMember = (
 };
 
 export const deleteMember = (
+  context: Context | undefined,
   req: IRequestApp,
   res: Response,
   next: NextFunction,
 ) => {
-  const id = 'x' as any;
+  debug(modulename + ': running deleteMember');
+
+  if (!(context && context.request && context.request.params)) {
+    const err: IErr = {
+      name: 'UNEXPECTED_FAIL',
+      message: 'context not supplied',
+      statusCode: 500,
+      dumped: false,
+    };
+    req.app.appLocals.dumpError(err);
+    return next(err);
+  }
+
+  const idString = context.request.params.id as string;
+  const id = Number.parseInt(idString, 10);
+
   const config = req.app.appLocals.config;
   const handles = req.app.appLocals.miscHandlers;
   const logger = req.app.appLocals.logger;
   const dumpError = req.app.appLocals.dumpError;
 
   config.membersHandlers
+
     .deleteMember(req, id)
     .then((payload) => {
-      handles.writeJson(res, 200, payload);
+      handles.writeJson(context, req, res, next, 200, payload);
     })
     .catch((err) => {
       logger.error(modulename + ': handler deleteMember returned error');
@@ -121,12 +159,50 @@ export const deleteMember = (
     });
 };
 
-export const updateMember = (
+export const deleteMembers = (
+  context: Context | undefined,
   req: IRequestApp,
   res: Response,
   next: NextFunction,
 ) => {
-  const member = 'x' as any;
+  debug(modulename + ': running deleteMembers');
+
+  const config = req.app.appLocals.config;
+  const handles = req.app.appLocals.miscHandlers;
+  const logger = req.app.appLocals.logger;
+  const dumpError = req.app.appLocals.dumpError;
+
+  config.membersHandlers
+    .deleteMembers(req)
+    .then((number) => {
+      const payload = { count: number };
+      handles.writeJson(context, req, res, next, 200, payload);
+    })
+    .catch((err) => {
+      logger.error(modulename + ': handler deleteMembers returned error');
+      dumpError(err);
+      next(err);
+    });
+};
+export const updateMember = (
+  context: Context | undefined,
+  req: IRequestApp,
+  res: Response,
+  next: NextFunction,
+) => {
+  debug(modulename + ': running updateMember');
+
+  if (!(context && context.request && context.request.body)) {
+    const err: IErr = {
+      name: 'UNEXPECTED_FAIL',
+      message: 'context not supplied',
+      statusCode: 500,
+      dumped: false,
+    };
+    req.app.appLocals.dumpError(err);
+    return next(err);
+  }
+  const member = context.request.body as IMember;
   const config = req.app.appLocals.config;
   const handles = req.app.appLocals.miscHandlers;
   const logger = req.app.appLocals.logger;
@@ -135,7 +211,7 @@ export const updateMember = (
   config.membersHandlers
     .updateMember(req, member)
     .then((payload) => {
-      handles.writeJson(res, 200, payload);
+      handles.writeJson(context, req, res, next, 200, payload);
     })
     .catch((err) => {
       logger.error(modulename + ': handler updateMember returned error');
@@ -144,7 +220,11 @@ export const updateMember = (
     });
 };
 
-export const membersHandlers1 = {
+export const membersApi = {
   getMember,
   getMembers,
+  addMember,
+  deleteMember,
+  deleteMembers,
+  updateMember,
 };

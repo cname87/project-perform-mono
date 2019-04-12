@@ -18,7 +18,6 @@ sinon.assert.expose(chai.assert, {
   prefix: '',
 });
 
-/* other external dependencies */
 /* use proxyquire for index.js module loading */
 import proxyquireObject = require('proxyquire');
 /* ensure fresh load each time */

@@ -105,8 +105,7 @@ describe('logger', () => {
 
   /**
    * Function to delete a file if it exists.
-   * @params
-   * - filepath: The path to file to be deleted.
+   * @params filepath: The path to file to be deleted.
    * @returns Void
    * Note: The file is only deleted when all hard links are closed, i.e. when programme closes.
    */

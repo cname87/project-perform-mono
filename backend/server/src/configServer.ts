@@ -38,13 +38,12 @@ const errorHandlers = ERROR_HANDLERS.errorHandlers;
 /* database class and creation function */
 import { Database, runDatabaseApp } from '../../database/src/index';
 /* models */
-import { createModelUsers } from '../../models/src/users';
 import { createModelTests } from '../../models/src/tests';
 import { createModelMembers } from '../../models/src/members';
 /* controllers */
 import { failController } from './controllers/fail';
 /* handlers for /members api */
-import { membersHandlers1 } from './handlers/api/membersApi';
+import { membersApi } from './handlers/api/membersApi';
 /* 2nd level members handlers */
 import * as membersHandlers from './handlers/membersHandlers';
 // shared request handler functions
@@ -69,11 +68,10 @@ export const config = {
   ERROR_HANDLERS,
   errorHandlers,
   runDatabaseApp,
-  createModelUsers,
   createModelTests,
   createModelMembers,
   failController,
-  membersHandlers1,
+  membersApi,
   membersHandlers,
   miscHandlers,
 
@@ -125,7 +123,8 @@ export const config = {
    * a number between 1 to 10 */
   SVR_LISTEN_TIMEOUT: 3,
   // path to static server for server tests
-  STATIC_TEST_PATH: path.join(appRoot, 'server', 'test', 'client', 'browser'),
+  STATIC_TEST_PATH: path.join(appRoot, 'dist', 'server', 'test', 'client'),
+  NODE_MODULES_PATH: path.join(appRoot, 'node_modules'),
 
   /***********************************************************************/
   /* Morgan server logger parameters                                     */
@@ -235,7 +234,7 @@ export interface IAppLocals {
   logger: winston.Logger;
   /* handles object*/
   miscHandlers: typeof miscHandlers;
-  membersHandlers1: typeof membersHandlers1;
+  membersApi: typeof membersApi;
   memberhandlers: typeof membersHandlers;
   /* database models object */
   models: IModels;
@@ -282,3 +281,15 @@ interface IProcessExtended {
 }
 
 export type processExtended = IProcessExtended & NodeJS.Process;
+
+export type typeSigInt = () => Promise<void>;
+export type typeUncaught = (err: IErr) => Promise<void>;
+
+/* create type for the index.ts export (for mocha) */
+export interface IServerIndex {
+  appLocals: IAppLocals;
+  event: EventEmitter;
+  sigint: typeSigInt;
+  uncaughtException: typeUncaught;
+  unhandledRejection: typeUncaught;
+}

@@ -2,13 +2,12 @@
   "extends": [
       "tslint:latest",
       "tslint-no-unused-expression-chai"
-      // "tslint-microsoft-contrib" // causes too may errors
   ],
   "linterOptions": {
     "exclude": [
     ]
   },
-  "rulesDirectory": [ // custom rules you can use
+  "rulesDirectory": [ // custom rule you can use
     "./node_modules/tslint-eslint-rules/dist/rules",
     "./node_modules/tslint-microsoft-contrib"
   ],

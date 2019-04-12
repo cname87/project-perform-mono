@@ -3,6 +3,7 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
+    // npm build frontend
     {
       "label": "npm build frontend",
       "type": "shell",
@@ -39,6 +40,7 @@
         }
       }
     },
+    // npm start frontend
     {
       "label": "npm start frontend",
       "type": "shell",
@@ -75,6 +77,7 @@
         }
       }
     },
+    // npm start backend
     {
       "label": "npm start backend",
       "type": "shell",
@@ -91,8 +94,9 @@
         "panel": "dedicated"
       },
       "group": "build",
-      "problemMatcher": {}
+      "problemMatcher": [],
     },
+    // Taskkill.exe
     {
       "label": "Taskkill node.exe",
       "type": "shell",
@@ -101,25 +105,13 @@
       },
       "group": "test",
       "presentation": {
-        "reveal": "always",
+        "reveal": "silent",
+        "focus": false,
         "panel": "shared"
-      }
-    },
-    {
-      "label": "Change to backend",
-      "type": "shell",
-      "windows": {
-        "command": "CD",
-        "args": [
-          "${workspaceFolder}\\backend"
-        ]
       },
-      "group": "test",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
+      "problemMatcher": [],
     },
+    // Is Server Up?
     {
       "label": "Is Server Up?",
       "type": "process",
@@ -136,11 +128,13 @@
       },
       "group": "test",
       "presentation": {
-        "reveal": "always",
+        "reveal": "silent",
+        "focus": false,
         "panel": "shared"
       },
       "problemMatcher": []
     },
+    //npm delete nyc file
     {
       "label": "npm delete nyc file",
       "type": "shell",
@@ -152,10 +146,12 @@
         "delNyc"
       ],
       "presentation": {
-        "reveal": "always",
+        "reveal": "silent",
+        "focus": false,
         "panel": "shared"
       }
     },
+    // npm build backend
     {
       "label": "npm build backend",
       "type": "shell",
@@ -174,9 +170,11 @@
       "options": {},
       "presentation": {
         "reveal": "always",
+        "focus": true,
         "panel": "shared"
       }
     },
+    // npm compile backend
     {
       "label": "npm compile backend",
       "type": "npm",
@@ -184,20 +182,10 @@
       "path": "backend/",
       "problemMatcher": [],
       "presentation": {
-        "reveal": "always",
+        "reveal": "silent",
+        "focus": false,
         "panel": "shared"
       }
     },
-    {
-      "label": "npm tsc backend",
-      "type": "npm",
-      "script": "tsc",
-      "path": "backend/",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    }
   ]
 }

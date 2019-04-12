@@ -137,7 +137,7 @@ export const getMembers = (
     modelMembers
       .find()
       .where('name')
-      .regex(new RegExp(`${matchString}.*`, 'i')) //
+      .regex(new RegExp(`${matchString}.*`, 'i'))
       .lean(true) // return json object
       .select({ _id: 0, __v: 0 }) // exclude _id and __v fields
       .exec((err: Error, docs: [IMember]) => {
@@ -219,6 +219,41 @@ export const deleteMember = (
 
       /* return undefined to match api */
       return resolve();
+    });
+  });
+};
+
+/**
+ * Deletes all the members in a team.
+ * @param req The http request being actioned (used to retrieve the data model).
+ * @param matchString A string to match members to return.
+ * @rejects Resolves to a reported error.
+ * @returns Promise that resolves to undefined.
+ */
+export const deleteMembers = (req: IRequestApp): Promise<number> => {
+  debug(modulename + ': running deleteMembers');
+
+  const logger = req.app.appLocals.logger;
+  const dumpError = req.app.appLocals.dumpError;
+  const modelMembers = req.app.appLocals.models.members;
+
+  return new Promise((resolve, reject) => {
+    modelMembers.deleteMany({}).exec((err: Error, result) => {
+      /* return any database access error */
+      if (err) {
+        logger.error(modulename + ': deleteMembers database error');
+        dumpError(err);
+        const errDb: IErr = {
+          name: 'DATABASE_ACCESS',
+          message: 'The database service is unavailable',
+          statusCode: 503,
+          dumped: true,
+        };
+        return reject(errDb);
+      }
+
+      /* return number of members deleted */
+      return resolve(result.n);
     });
   });
 };

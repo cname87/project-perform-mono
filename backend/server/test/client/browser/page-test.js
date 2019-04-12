@@ -31,7 +31,7 @@ describe('test page', function() {
 
         const dt = new Date().toString();
         testWindow = window.open(
-          'https://localhost:1337/testServer/pagetest.html' +
+          'https://localhost:1337/testServer/browser/static/pagetest.html' +
           '?timestamp=' + dt, '_blank'
         );
 

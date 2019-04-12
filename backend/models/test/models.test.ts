@@ -22,7 +22,6 @@ import { Document, Model } from 'mongoose';
 import { runDatabaseApp } from '../../database/src/index';
 import { Database } from '../src/configModels';
 import { createModelTests } from '../src/tests';
-import { createModelUsers } from '../src/users';
 
 /*
  * tests
@@ -32,8 +31,8 @@ describe('Database models operations', () => {
 
   let database: Database;
   interface ITestModel {
-    test1: string;
-    test2: string;
+    id: number;
+    name: string;
   }
   let docContent1: ITestModel;
   let docContent2: ITestModel;
@@ -47,12 +46,12 @@ describe('Database models operations', () => {
     database = await runDatabaseApp();
 
     docContent1 = {
-      test1: 'test11',
-      test2: 'test12',
+      id: 11,
+      name: 'test12',
     };
     docContent2 = {
-      test1: 'test21',
-      test2: 'test22',
+      id: 21,
+      name: 'test22',
     };
   });
 
@@ -70,18 +69,6 @@ describe('Database models operations', () => {
     debug('run tests');
     expect(modelTests.collection.name, 'Should return the model').to.eql(
       'tests',
-    );
-  });
-
-  it('Creates the users model', async () => {
-    debug(`Running ${modulename} it - creates the test model`);
-
-    debug('create users model');
-    const modelUsers = createModelUsers(database);
-
-    debug('run tests');
-    expect(modelUsers.collection.name, 'Should return the model').to.eql(
-      'users',
     );
   });
 
@@ -111,11 +98,11 @@ describe('Database models operations', () => {
 
     debug('run tests');
     expect(
-      returnedDoc1.get('test1'),
+      returnedDoc1.get('id'),
       'returned doc to equal doc that was saved',
-    ).to.eql('test11');
+    ).to.eql(11);
     expect(
-      returnedDoc2.get('test2'),
+      returnedDoc2.get('name'),
       'returned doc to equal doc that was saved',
     ).to.eql('test22');
   });
@@ -134,13 +121,11 @@ describe('Database models operations', () => {
     debug(`Running ${modulename} it - finds a doc`);
 
     debug('find a doc');
-    const foundDocs = await modelTests.find();
-    const id = foundDocs[1]._id;
-    const foundDoc = await modelTests.findById(id);
+    const foundDoc = await modelTests.findOne({ id: 21 });
 
     debug('run tests');
     foundDoc
-      ? expect(foundDoc.get('test2'), 'to equal').to.eql('test22')
+      ? expect(foundDoc.get('name'), 'to equal').to.eql('test22')
       : expect.fail(true, false, 'Should have failed earlier');
   });
 
@@ -148,9 +133,7 @@ describe('Database models operations', () => {
     debug(`Running ${modulename} it - updates a doc`);
 
     debug('update a doc');
-    const foundDocs = await modelTests.find();
-    const id = foundDocs[0]._id;
-    let foundDoc = await modelTests.findById(id);
+    let foundDoc = await modelTests.findOne({ id: 11 });
     await modelTests.updateMany(
       {
         _id: {
@@ -158,14 +141,14 @@ describe('Database models operations', () => {
         },
       },
       {
-        test2: 'updatedTest12',
+        name: 'updatedTest12',
       },
     );
-    foundDoc = await modelTests.findById(id);
+    foundDoc = await modelTests.findOne({ id: 11 });
 
     debug('run tests');
     foundDoc
-      ? expect(foundDoc.get('test2'), 'to equal').to.eql('updatedTest12')
+      ? expect(foundDoc.get('name'), 'to equal').to.eql('updatedTest12')
       : expect.fail(true, false, 'Should have failed earlier');
   });
 

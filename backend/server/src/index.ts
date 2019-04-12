@@ -34,6 +34,9 @@ import {
   IModels,
   processExtended,
   Server,
+  typeSigInt,
+  typeUncaught,
+  IServerIndex,
 } from './configServer';
 
 /* import secret configuration parameters */
@@ -50,13 +53,13 @@ const { runServer, startServer } = config;
 /* database creation function */
 const { runDatabaseApp } = config;
 /* handlers used by controllers */
-const { miscHandlers, membersHandlers1 } = config;
+const { miscHandlers, membersApi } = config;
 /* errorHandler middleware */
 const { errorHandlers } = config;
 /* route controllers */
 const { failController } = config;
 /* database models */
-const { createModelMembers, createModelTests, createModelUsers } = config;
+const { createModelMembers, createModelTests } = config;
 /* Create the single instances of the general logger & dumpError utilities, and the server logger middleware.  These are passed via the appLocals object. Also, other modules can create new instances later without any parameters and they will receive the same instance. */
 const Logger = config.Logger;
 const logger = new Logger() as winston.Logger;
@@ -79,11 +82,12 @@ appLocals.controllers = controllers;
 /* appLocals.dbConnection filled during server startup */
 appLocals.dumpError = dumpError;
 appLocals.errorHandler = errorHandlers;
-/* event emitter needed by Mocha before server up */
+/* event emitter to signal server up etc */
+/* create before db setup call as async nature of db setup means index exports before db up and index.event definition needed by mocha so it can await server up event */
 const event: EventEmitter = new EventEmitter();
 appLocals.event = event;
 appLocals.miscHandlers = miscHandlers;
-appLocals.membersHandlers1 = membersHandlers1;
+appLocals.membersApi = membersApi;
 appLocals.logger = logger;
 /* appLocals.models filled during server startup */
 appLocals.serverLogger = serverLogger;
@@ -96,15 +100,15 @@ const app: IExpressApp = Object.assign(express(), { appLocals });
  * Handles uncaught exceptions.
  * @param err Error passed in by error handler.
  */
-async function uncaughtException(err: Error) {
+const uncaughtException: typeUncaught = async (err: IErr) => {
   debug(modulename + ': running uncaughtException');
 
-  /* note: a process.uncaughtException also logs the trace to console.error */
+  /* note: process.uncaughtException also logs the trace to console.error */
   logger.error(modulename + ': uncaught exception');
   dumpError(err);
   await closeAll();
   process.exit(-11);
-}
+};
 /* capture all uncaught application exceptions (only once) */
 process.once('uncaughtException', uncaughtException);
 /* use process.thrownException instead of uncaughtException to throw
@@ -115,14 +119,14 @@ process.once('uncaughtException', uncaughtException);
  * Handles unhandled rejection.
  * @param reason Reason passed in by error handler.
  */
-async function unhandledRejection(reason: IErr) {
+const unhandledRejection: typeUncaught = async (reason: IErr) => {
   debug(modulename + ': running unhandledRejection');
 
   logger.error(modulename + ': unhandled promise rejection');
   dumpError(reason);
   await closeAll();
   process.exit(-12);
-}
+};
 /* capture unhandled promise rejection (only once) */
 (process as processExtended).once('unhandledRejection', unhandledRejection);
 
@@ -162,7 +166,6 @@ async function runApp() {
 
       /* generate the models object */
       const models: IModels = {};
-      models.users = createModelUsers(database);
       models.tests = createModelTests(database);
       models.members = createModelMembers(database);
       appLocals.models = models;
@@ -228,7 +231,7 @@ async function runApp() {
         process.send('Server is running');
       }
 
-      logger.info('\n*** SERVER UP AND RUNNING ***\n');
+      logger.info(`\n*** SERVER LISTENING ON PORT ${config.PORT} ***\n`);
     } catch (err) {
       logger.error(modulename + ': server start up error - exiting');
       dumpError(err);
@@ -243,6 +246,27 @@ async function runApp() {
     process.exitCode = -1;
   }
 }
+
+/**
+ * Shuts down the application gracefully.
+ */
+const sigint: typeSigInt = async () => {
+  debug(modulename + ': running sigint');
+
+  await closeAll();
+
+  debug(modulename + ': SIGINT - will exit normally with code 0');
+
+  logger.info('\n*** CLOSING THE SERVER ON SIGINT REQUEST ***\n');
+
+  /* raise an event that mocha can read */
+  const arg = {
+    message: 'Server exit 0',
+    number: 0,
+  };
+
+  appLocals.event.emit('indexSigint', arg);
+};
 
 /**
  * Closes all server and database connections
@@ -283,27 +307,6 @@ async function closeAll(
     debug(modulename + ': will exit with code -4');
     process.exitCode = -4;
   }
-}
-
-/**
- * Shuts down the application gracefully.
- */
-async function sigint() {
-  debug(modulename + ': running sigint');
-
-  await closeAll();
-
-  debug(modulename + ': SIGINT - will exit normally with code 0');
-
-  logger.info('\n*** CLOSING THE SERVER ON SIGINT REQUEST ***\n');
-
-  /* raise an event that mocha can read */
-  const arg = {
-    message: 'Server exit 0',
-    number: 0,
-  };
-
-  appLocals.event.emit('indexSigint', arg);
 }
 
 /**
@@ -351,11 +354,10 @@ if (process.send) {
 /* create the server */
 runApp();
 
-/* Note: All exports are for mocha. */
-export {
+/* All exports are for mocha. */
+export const index: IServerIndex = {
   appLocals,
   event,
-  IAppLocals,
   sigint,
   uncaughtException,
   unhandledRejection,
