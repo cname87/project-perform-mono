@@ -287,6 +287,7 @@ export type typeUncaught = (err: IErr) => Promise<void>;
 
 /* create type for the index.ts export (for mocha) */
 export interface IServerIndex {
+  debug?: any; // see notes
   appLocals: IAppLocals;
   event: EventEmitter;
   sigint: typeSigInt;

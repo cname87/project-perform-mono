@@ -28,6 +28,7 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "lib": [
+      "dom" // needed for puppeteer
     ], // for browser-side scripts - extra types which you know browser will support
     "listEmittedFiles": true,
     "module": "commonjs",  // module loader format (independent of target) - commonjs for node

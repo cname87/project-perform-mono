@@ -1,7 +1,7 @@
 {
   "extends": "../../../tsconfig.json",
   "include": [
-    "./**/*.client-test.ts",
+    "./**/*.ts",
   ],
   "exclude": [],
   "compilerOptions": {

@@ -3,6 +3,23 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
+    // npm build backend
+    {
+      "label": "npm build backend",
+      "type": "npm",
+      "script": "build",
+      "path": "backend/",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      }
+    },
     // npm build frontend
     {
       "label": "npm build frontend",
@@ -40,63 +57,7 @@
         }
       }
     },
-    // npm start frontend
-    {
-      "label": "npm start frontend",
-      "type": "shell",
-      "command": "npm",
-      "args": [
-        "run",
-        "--prefix",
-        "${workspaceRoot}/frontend",
-        "start"
-      ],
-      "isBackground": true,
-      "presentation": {
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "group": "build",
-      "problemMatcher": {
-        "owner": "typescript",
-        "source": "ts",
-        "applyTo": "closedDocuments",
-        "fileLocation": [
-          "relative",
-          "${cwd}"
-        ],
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "Compiled |Failed to compile."
-          }
-        }
-      }
-    },
-    // npm start backend
-    {
-      "label": "npm start backend",
-      "type": "shell",
-      "command": "npm",
-      "args": [
-        "run",
-        "--prefix",
-        "${workspaceRoot}/backend",
-        "start"
-      ],
-      "isBackground": true,
-      "presentation": {
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "group": "build",
-      "problemMatcher": [],
-    },
-    // Taskkill.exe
+    // Taskkill node.exe
     {
       "label": "Taskkill node.exe",
       "type": "shell",
@@ -109,7 +70,7 @@
         "focus": false,
         "panel": "shared"
       },
-      "problemMatcher": [],
+      "problemMatcher": []
     },
     // Is Server Up?
     {
@@ -134,7 +95,7 @@
       },
       "problemMatcher": []
     },
-    //npm delete nyc file
+    // npm delete nyc file
     {
       "label": "npm delete nyc file",
       "type": "shell",
@@ -149,43 +110,9 @@
         "reveal": "silent",
         "focus": false,
         "panel": "shared"
-      }
-    },
-    // npm build backend
-    {
-      "label": "npm build backend",
-      "type": "shell",
-      "command": "npm",
-      "args": [
-        "run",
-        "--prefix",
-        "${workspaceRoot}/backend",
-        "build"
-      ],
-      "problemMatcher": [],
-      "group": {
-        "kind": "build",
-        "isDefault": true
       },
-      "options": {},
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      }
-    },
-    // npm compile backend
-    {
-      "label": "npm compile backend",
-      "type": "npm",
-      "script": "compile",
-      "path": "backend/",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared"
-      }
+      "group": "build",
+      "problemMatcher": []
     },
   ]
 }

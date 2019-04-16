@@ -1,7 +1,8 @@
 /**
- * Runs a set of tests fired by a client-side browser script.
+ * Runs a set of tests (under one mocha describe test) fired by client-side
+ * scripts.
  *
- * The tests test all api paths including validation fails.
+ * The tests test all error handler functionality.
  *
  * To run:
  *
@@ -34,21 +35,20 @@ sinon.assert.expose(chai.assert, {
 import proxyquireObject = require('proxyquire');
 /* ensure fresh load each time */
 const proxyquire = proxyquireObject.noPreserveCache();
-// import * as chromeLauncher from 'chrome-launcher';
-import { EventEmitter } from 'events';
 import puppeteer from 'puppeteer-core';
-import winston = require('winston');
 
 /* internal dependencies */
 import { IServerIndex } from '../../src/configServer';
 const indexPath = '../../src/index';
+import { EventEmitter } from 'events';
+import winston = require('winston');
 
 /* path to chrome executable */
 const chromeExec =
   'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
 /* url that initiates the client-fired tests */
 const fireTestUrl =
-  'https://localhost:1337/testServer/api/static/loadMocha.html';
+  'https://localhost:1337/testServer/errors/static/loadMocha.html';
 /* hold browser open for this time (ms) */
 const browserDelay = 5000;
 /* event names */
@@ -56,8 +56,8 @@ const indexRunApp = 'indexRunApp';
 const indexSigint = 'indexSigint';
 const handlersRaiseEvent = 'handlersRaiseEvent';
 
-describe('server API', () => {
-  debug(`Running ${modulename} describe - server API`);
+describe('Server', () => {
+  debug('Start browser-driven tests');
 
   /* shared variables */
   let index: IServerIndex;
@@ -65,6 +65,12 @@ describe('server API', () => {
   let spyConsoleError: sinon.SinonSpy<[any?, ...any[]], void>;
   let spyDumpError: sinon.SinonSpy<[any], void>;
   let spyLoggerError: sinon.SinonSpy<[object], winston.Logger>;
+  let spyErrorHandlerDebug: sinon.SinonSpy<[any, ...any[]], void>;
+  let stubProcessEmit: sinon.SinonStub<
+    ['multipleResolves', NodeJS.MultipleResolveListener],
+    NodeJS.Process
+  >;
+  let stubProcessExit: sinon.SinonStub<[number?], never>;
 
   /* awaits that server index.ts has run and fired the completion event */
   const serverIndexStart = (): Promise<IServerIndex> => {
@@ -95,6 +101,14 @@ describe('server API', () => {
     spyLoggerError = sinon.spy(index.appLocals.logger, 'error');
     spyDumpError = sinon.spy(index.appLocals, 'dumpError');
     eventEmitter = index.appLocals.event;
+    /* stub process.emit - will stub emit uncaught exception handler */
+    stubProcessEmit = sinon.stub(process, 'emit');
+    /* stub process.exit */
+    stubProcessExit = sinon.stub(process, 'exit');
+    spyErrorHandlerDebug = sinon.spy(
+      index.appLocals.config.ERROR_HANDLERS,
+      'debug',
+    );
   };
 
   /* awaits that index.ts has shut and fired the completion event */
@@ -115,7 +129,7 @@ describe('server API', () => {
     });
   };
 
-  before('set up spies', async () => {
+  before('before', async () => {
     debug(`Running ${modulename} before - set up spies`);
     await runServerAndSetupSpies();
   });
@@ -128,7 +142,7 @@ describe('server API', () => {
     sinon.resetHistory();
   });
 
-  after('close and reset', async () => {
+  after('after', async () => {
     debug(`Running ${modulename} after - close and reset`);
 
     debug('Shutting index.js');
@@ -139,7 +153,7 @@ describe('server API', () => {
     sinon.restore();
   });
 
-  it('serves client requests', async () => {
+  it('Test browser-fired server functionality', async () => {
     debug(`Running ${modulename} it - serves client requests`);
 
     /* set true when browser tests have run */
@@ -154,24 +168,64 @@ describe('server API', () => {
          * mocha test - a reject causes a test case fail. */
         try {
           switch (arg.message) {
-            case 'API tests start':
-            case 'Angular fall back test start':
-            case 'File retrieval test start':
+            case 'Start tests':
+            case '404 test start':
+            case 'Coffee test start':
+            case 'Sent test start':
+            case 'Trap-503 test start':
+            case 'Async-handled test start':
+            case 'Error test start':
+            case 'Async test start':
+            case 'Crash test start':
+            case 'Return 404 test start':
+            case 'Check server up':
               break;
-            case 'API tests end':
-            case 'Angular fall back test end':
-            case 'File retrieval test end':
-              expect(spyConsoleError.notCalled).to.be.true;
-              expect(spyLoggerError.notCalled).to.be.true;
-              expect(spyDumpError.notCalled).to.be.true;
+            case '404 test end':
+            case 'Coffee test end':
+            case 'Return 404 test end':
+            case 'Trap-503 test end':
+              expect(spyLoggerError.callCount).to.be.greaterThan(1);
+              expect(spyDumpError.callCount).to.be.greaterThan(0);
+              sinon.resetHistory();
+              break;
+            case 'Sent test end':
+              // second error message informs on header already sent
+              expect(
+                spyErrorHandlerDebug.calledWith(
+                  '\\errorhandler.js: not sending a client ' +
+                    'response as headers already sent',
+                ),
+              ).to.be.true;
+              // will actually return a not found initially
+              expect(spyDumpError.callCount).to.eql(1);
+              sinon.resetHistory();
+              break;
+            case 'Async-handled test end':
+              expect(spyLoggerError.callCount).to.eql(4);
+              expect(spyDumpError.callCount).to.be.greaterThan(0);
+              sinon.resetHistory();
+              break;
+            case 'Error test end':
+              expect(stubProcessEmit.called).to.eql(true);
+              sinon.resetHistory();
+              break;
+            case 'Async test end':
+              /* unhandled rejection will trigger process to emit an
+               * 'unhandled exception' and also 'warning' as the
+               * unhandled exception handling is deprecated */
+              expect(stubProcessEmit.called).to.eql(true);
+              sinon.resetHistory();
+              break;
+            case 'Crash test end':
+              expect(stubProcessExit.callCount).to.eql(1);
               sinon.resetHistory();
               break;
             case 'End tests':
               expect(spyConsoleError.notCalled).to.be.true;
               expect(spyLoggerError.notCalled).to.be.true;
               expect(spyDumpError.notCalled).to.be.true;
-              sinon.resetHistory();
               endTestCalled = true;
+              sinon.resetHistory();
               break;
             default:
               reject(new Error('should not reach this point'));
@@ -181,7 +235,7 @@ describe('server API', () => {
           reject(err);
         }
 
-        /* only close when client-fires above end test event */
+        /* only close when browser tests complete */
         if (endTestCalled) {
           eventEmitter.removeListener(
             handlersRaiseEvent,
@@ -209,6 +263,10 @@ describe('server API', () => {
           browserInstance = await puppeteer.launch({
             headless: false,
             executablePath: chromeExec,
+            defaultViewport: {
+              width: 800,
+              height: 800,
+            },
             args: [
               '--incognito',
               '--start-maximized',

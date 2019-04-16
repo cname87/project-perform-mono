@@ -148,7 +148,7 @@ describe('Application tests', function() {
        * The stubbed debug is also spied via an anonymous
        * sinon spy - spyDebug.
        */
-      index = proxyquire(indexPath, {
+      const { index: indexLocal } = proxyquire(indexPath, {
         debug: (prefix) => {
           return (message) => {
             require('debug')(prefix)(message);
@@ -157,6 +157,8 @@ describe('Application tests', function() {
         },
         './configServer': config,
       });
+      /* assign destructured index to module variable */
+      index = indexLocal;
     };
 
     debug(modulename + ':\n\n *** Tests start here ***\n\n');
