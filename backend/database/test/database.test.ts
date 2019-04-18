@@ -36,10 +36,6 @@ import {
   indexPath, // path to database index.js file
 } from '../src/configDatabase';
 
-/* secret configuration */
-import * as dotenv from 'dotenv';
-dotenv.config({ path: filepaths.ENV_FILE });
-
 /**
  * tests
  */

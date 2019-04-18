@@ -32,7 +32,7 @@ import { Logger } from '../../utils/src/logger';
 /* a utility to dump errors to the logger */
 import { DumpError } from '../../utils/src/dumpError';
 /* access to debug logger for mocha - must be imported this way */
-import * as ERROR_HANDLERS from './middlewares/errorhandler';
+import * as ERROR_HANDLERS from './handlers/errorhandler';
 /* error handler middleware functions */
 const errorHandlers = ERROR_HANDLERS.errorHandlers;
 /* database class and creation function */

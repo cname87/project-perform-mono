@@ -30,7 +30,6 @@
     "tscClient": "tsc --project ./server/test/client/tsconfig.client.json",
     "tscClientWatch": "tsc --watch --project ./server/test/client/tsconfig.client.json",
     "compile": "npm run delDist && npm run tscServer && npm run tscClient",
-    "compileWatch": "npm run tscServerWatch && npm run tscClientWatch",
     "prettierBase": "prettier",
     "prettierCheck": "npm run prettierBase -- --list-different \"./**/*.{ts,tsx}\"",
     "prettierWrite": "npm run prettierBase -- --write \"./**/*.{ts,tsx}\"",

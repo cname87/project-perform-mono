@@ -208,8 +208,8 @@
               }
             }
           },
-          "409" : {
-            "description" : "A member with that ID does not exist",
+          "404" : {
+            "description" : "A member with the supplied member ID was not found",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -382,7 +382,14 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "Member deleted"
+            "description" : "Member deleted",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Count"
+                }
+              }
+            }
           },
           "400" : {
             "description" : "The request is not a valid",
@@ -394,7 +401,7 @@
               }
             }
           },
-          "409" : {
+          "404" : {
             "description" : "A member with that ID does not exist",
             "content" : {
               "application/json" : {

@@ -4,6 +4,11 @@
  *
  */
 
+/* import configuration parameters into process.env */
+/* the .env file must be in process.cwd() */
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 export const debug = debugFunction(`PP_${modulename}`);
@@ -19,10 +24,6 @@ import {
   getConnectionOptions,
   getMongoUri,
 } from './configDatabase';
-
-/* import secret configuration parameters */
-import * as dotenv from 'dotenv';
-dotenv.config({ path: filepaths.ENV_FILE });
 
 /**
  * This function connects to a MongoDB online database.

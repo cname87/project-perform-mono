@@ -63,8 +63,8 @@ export const getMembers = (
   debug(modulename + ': running getMembers');
 
   let name = '';
-  if (context && context.request && context.request.params) {
-    name = context.request.params.name as string;
+  if (context && context.request && context.request.query) {
+    name = context.request.query.name as string;
   }
   const config = req.app.appLocals.config;
   const handles = req.app.appLocals.miscHandlers;
@@ -149,7 +149,8 @@ export const deleteMember = (
   config.membersHandlers
 
     .deleteMember(req, id)
-    .then((payload) => {
+    .then((number) => {
+      const payload = { count: number };
       handles.writeJson(context, req, res, next, 200, payload);
     })
     .catch((err) => {

@@ -5,6 +5,7 @@
     "check-coverage": true,
     "exclude": [
       "**/*.d.ts",
+      "coverage/**/*.*",
       "node_modules/**",
       "**/test/*.*",
       "**/test/**/*.*",

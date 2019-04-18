@@ -201,12 +201,17 @@ async function runServer(
 
         if (!(context && context.validation && context.validation.errors)) {
           /* openapi-backend types require this test */
+          /* unexpected error if no context.validation.errors returned */
+          err.message = err.message + ': unexpected failure';
+          err.statusCode = 500;
           return next(err);
         }
 
+        /* dump detail and then strip back for the client */
         err.message =
           'API validation fail\n' + util.inspect(context.validation.errors);
         app.appLocals.dumpError(err);
+        err.message = 'API validation fail';
         next(err);
       },
       notImplemented: async (

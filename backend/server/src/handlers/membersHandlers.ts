@@ -159,7 +159,8 @@ export const getMembers = (
           logger.error(modulename + ': getMembers found no matching member');
           const errNotFound: IErr = {
             name: 'DATABASE_NOT_FOUND',
-            message: 'The supplied match string does not match any team member',
+            message:
+              'No members found: The supplied match string does not match any stored members, or no matchstring supplied and no members are stored',
             statusCode: 404,
             dumped: true,
           };
@@ -183,7 +184,7 @@ export const getMembers = (
 export const deleteMember = (
   req: IRequestApp,
   idParam: number,
-): Promise<undefined> => {
+): Promise<number> => {
   debug(modulename + ': running deleteMember');
 
   const modelMembers = req.app.appLocals.models.members;
@@ -217,8 +218,8 @@ export const deleteMember = (
         return reject(errNotFound);
       }
 
-      /* return undefined to match api */
-      return resolve();
+      /* return count (= 1) to match api */
+      return resolve(result.n);
     });
   });
 };
@@ -300,7 +301,7 @@ export const updateMember = (
           logger.error(modulename + ': updateMember found no matching member');
           const errNotFound: IErr = {
             name: 'DATABASE_NOT_FOUND',
-            message: 'The supplied member id does not match any team member',
+            message: 'The supplied member ID does not match a stored member',
             statusCode: 404,
             dumped: true,
           };

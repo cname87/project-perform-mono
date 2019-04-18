@@ -20,11 +20,16 @@ import * as shell from 'shelljs';
 
 const appRoot = appRootObject.toString();
 
-/* create path to .nyc_output file in workspace root */
-const filePath = path.join(appRoot, '.nyc_output');
+/* create path to .nyc_output file in /backend root */
+const filePath1 = path.join(appRoot, '.nyc_output');
+shell.rm('-rf', filePath1);
+if (fs.existsSync(filePath1)) {
+  console.error('.nyc_output file not deleted');
+}
 
-shell.rm('-rf', filePath);
-
-if (fs.existsSync(filePath)) {
+/* create path to .nyc_output file in project root */
+const filePath2 = path.join(appRoot, '..', '.nyc_output');
+shell.rm('-rf', filePath2);
+if (fs.existsSync(filePath2)) {
   console.error('.nyc_output file not deleted');
 }

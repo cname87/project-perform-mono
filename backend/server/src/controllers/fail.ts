@@ -3,12 +3,12 @@
  * It is to test server fail scenarios.
  */
 
-const modulename: string = __filename.slice(__filename.lastIndexOf('\\'));
+const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-/* dependencies */
+/* external dependencies */
 import express from 'express';
 const router = express.Router();
 import asyncHandler from 'express-async-handler';

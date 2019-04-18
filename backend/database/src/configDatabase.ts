@@ -35,20 +35,17 @@ import { format } from 'util';
  * NOTE:  If the relative location of any referenced file changes then the relative path must be updated below.
  */
 
-// a utility to dump errors to the logger
+/* a utility to dump errors to the logger */
 import { DumpError } from '../../utils/src/dumpError';
-// a configured winston general logger
+/* a configured winston general logger */
 import { Logger } from '../../utils/src/logger';
-// the Database class
+/* the Database class */
 import { Database } from './database';
-// relative path to backend .env file
-const ENV_FILE = path.join(appRoot, '.env');
 
 export const filepaths = {
   Database,
   DumpError,
   Logger,
-  ENV_FILE,
 };
 
 /* the Database class is the type for instances of the Database class */
@@ -63,7 +60,9 @@ export function getMongoUri(): string {
   const user = encodeURIComponent(process.env.DB_USER as string);
   const password = encodeURIComponent(process.env.DB_PASSWORD as string);
   const host = process.env.DB_HOST as string;
-  const db = process.env.DB_DATABASE as string;
+  const db = process.env.TEST_MODE
+    ? (process.env.DB_DATABASE_TEST as string)
+    : (process.env.DB_DATABASE as string);
   const ssl = 'true';
   const authSource = 'admin';
   const authMechanism = 'DEFAULT';
@@ -88,9 +87,9 @@ export function getConnectionOptions(): ConnectionOptions {
   return {
     /* if not connected, return errors immediately */
     bufferMaxEntries: 0,
-    /* prevents mongoose deprecation warning */
+    /* prevent mongoose deprecation warnings */
     useNewUrlParser: true,
-    /* prevents mongoose deprecation warning */
+    useFindAndModify: false,
     useCreateIndex: true,
   };
 }

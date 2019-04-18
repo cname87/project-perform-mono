@@ -6,38 +6,25 @@
  * This client-side script sends requests that drive testing the application api paths.
  */
 
-async function deleteData(url = '') {
+async function sendRequest(
+  url: string,
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  data?: { id: number; name: string } | { number: number; message: string },
+) {
   const myRequest = new Request(url);
-  const myInit: RequestInit = {
-    method: 'DELETE',
-    cache: 'no-cache',
-    credentials: 'omit',
-  };
-  const fetched = await fetch(myRequest, myInit);
-  return fetched;
-}
+  const headers = data
+    ? {
+        'Content-Type': 'application/json; charset=utf-8',
+      }
+    : undefined;
+  const body = data ? JSON.stringify(data) : undefined;
 
-async function getData(url = '') {
-  const myRequest = new Request(url);
   const myInit: RequestInit = {
-    method: 'GET',
+    method,
     cache: 'no-cache',
     credentials: 'omit',
-  };
-  const fetched = await fetch(myRequest, myInit);
-  return fetched;
-}
-
-async function postData(url = '', data = {}) {
-  const myRequest = new Request(url);
-  const myInit: RequestInit = {
-    method: 'POST',
-    cache: 'no-cache',
-    credentials: 'omit',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-    body: JSON.stringify(data),
+    headers,
+    body,
   };
   const fetched = await fetch(myRequest, myInit);
   return fetched;
@@ -50,7 +37,7 @@ async function sendMessage(number: number, message: string) {
       number,
       message,
     };
-    const response = await postData(url, data);
+    const response = await sendRequest(url, 'POST', data);
 
     chai.expect(response.ok).to.eql(true);
 
@@ -64,7 +51,7 @@ after('Signal tests ending', async () => {
   await sendMessage(2, 'End tests');
 });
 
-describe('Api requests', () => {
+describe('api requests', () => {
   before('Signal tests starting', async () => {
     console.log('Starting API requests tests');
     await sendMessage(1, 'API tests start');
@@ -77,19 +64,19 @@ describe('Api requests', () => {
 
   it('should delete all members', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const response = await deleteData(url);
+    const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(true);
 
     const readBody = await response.json();
     console.log('Page body : ', readBody);
     /* the server sends { count: n } */
-    chai.expect(readBody.count, 'Number deleted').to.be.above(0);
+    chai.expect(readBody.count, 'Number deleted').to.be.above(-1);
   });
 
   it('should create a member', async () => {
     const url = 'https://localhost:1337/api-v1/members';
     const data = { id: 1, name: 'test1' };
-    const response = await postData(url, data);
+    const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
 
     const readBody = await response.json();
@@ -101,7 +88,7 @@ describe('Api requests', () => {
   it('should create another member', async () => {
     const url = 'https://localhost:1337/api-v1/members';
     const data = { id: 2, name: 'test2' };
-    const response = await postData(url, data);
+    const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
 
     const readBody = await response.json();
@@ -110,16 +97,419 @@ describe('Api requests', () => {
     chai.expect(readBody.name, 'Created name').eql('test2');
   });
 
-  it('should get all members', async () => {
+  it('should create another member', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const response = await getData(url);
+    const data = { id: 3, name: 'name3' };
+    const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
 
     const readBody = await response.json();
     console.log('Page body : ', readBody);
-    /* the server sends [{ id: 1, "name"; "GET test" }, ... ] */
+    /* the server the data back */
+    chai.expect(readBody.name, 'Created name').eql('name3');
+  });
+
+  it('should get all members', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(true);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    /* the server sends [{ id: 1, "name"; "test1" }, ... ] */
+    chai.expect(readBody.length, 'Number returned').to.eql(3);
+    chai.expect(readBody[1].id, 'Document 2 id').to.eql(2);
+  });
+
+  it('should get queried members', async () => {
+    const url = 'https://localhost:1337/api-v1/members?name=test';
+    const response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(true);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    /* the server sends [{ id: 1, "name"; "test1" }, ... ] */
     chai.expect(readBody.length, 'Number returned').to.eql(2);
     chai.expect(readBody[1].id, 'Document 2 id').to.eql(2);
+  });
+
+  it('should update a member', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 2, name: 'test2_updated' };
+    const response = await sendRequest(url, 'PUT', data);
+    chai.expect(response.ok).to.eql(true);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    /* the server sends { id: 2, "name"; "test2_updated" } */
+    chai.expect(readBody.id, 'Document id').to.eql(2);
+    chai.expect(readBody.name, 'Document name').to.eql('test2_updated');
+  });
+
+  it('should get a member', async () => {
+    const url = 'https://localhost:1337/api-v1/members/2';
+    const response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(true);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    /* the server sends { id: 2, "name"; "test2_updated" } */
+    chai.expect(readBody.id, 'Document id').to.eql(2);
+    chai.expect(readBody.name, 'Document name').to.eql('test2_updated');
+  });
+
+  it('should delete a member', async () => {
+    const url = 'https://localhost:1337/api-v1/members/2';
+    const response = await sendRequest(url, 'DELETE');
+    chai.expect(response.ok).to.eql(true);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    /* the server sends { count: 1} } */
+    chai.expect(readBody.count, 'Delete count').to.eql(1);
+  });
+
+  it('should delete all members', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const response = await sendRequest(url, 'DELETE');
+    chai.expect(response.ok).to.eql(true);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    /* the server sends { count: n } */
+    chai.expect(readBody.count, 'Number deleted').to.eql(2);
+  });
+});
+
+describe('failed api requests', () => {
+  before('Signal tests starting', async () => {
+    console.log('Starting failed API requests tests');
+    await sendMessage(1, 'Failed API tests start');
+  });
+
+  after('Signal tests ending', async () => {
+    console.log('Ending failed API requests tests');
+    await sendMessage(2, 'Failed API tests end');
+  });
+
+  it('should fail to create - duplicate ', async () => {
+    let url = 'https://localhost:1337/api-v1/members';
+    let data = { id: 7, name: 'test7' };
+    let response = await sendRequest(url, 'POST', data);
+    chai.expect(response.ok).to.eql(true);
+
+    url = 'https://localhost:1337/api-v1/members';
+    data = { id: 7, name: 'test7' };
+    response = await sendRequest(url, 'POST', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(409);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'member already exists')
+      .eql('A member with that id already exists in the database');
+  });
+
+  it('should fail to read - not there ', async () => {
+    let url = 'https://localhost:1337/api-v1/members/997';
+    let response = await sendRequest(url, 'DELETE');
+
+    url = 'https://localhost:1337/api-v1/members/997';
+    response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(404);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'member not found')
+      .eql('The supplied member ID does not match a stored member');
+  });
+
+  it('should fail to update - not there ', async () => {
+    let url = 'https://localhost:1337/api-v1/members/4';
+    let response = await sendRequest(url, 'DELETE');
+
+    url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 4, name: 'test4_create_updated' };
+    response = await sendRequest(url, 'PUT', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(404);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'member not found')
+      .eql('The supplied member ID does not match a stored member');
+  });
+
+  it('should fail to delete - not there ', async () => {
+    let url = 'https://localhost:1337/api-v1/members/997';
+    let response = await sendRequest(url, 'DELETE');
+
+    url = 'https://localhost:1337/api-v1/members/997';
+    response = await sendRequest(url, 'DELETE');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(404);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'member not found')
+      .eql('The supplied member ID does not match a stored member');
+  });
+
+  it('should fail to read all - matchstring matches nothing', async () => {
+    /* create a member so database definitely not empty */
+    let url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 9, name: 'test9' };
+    let response = await sendRequest(url, 'POST', data);
+
+    url = 'https://localhost:1337/api-v1/members?name=xxx';
+    response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(404);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'no member found')
+      .eql(
+        'No members found: The supplied match string does not match any stored members, or no matchstring supplied and no members are stored',
+      );
+  });
+
+  it('should fail to read all - empty ', async () => {
+    /* delete all */
+    let url = 'https://localhost:1337/api-v1/members';
+    let response = await sendRequest(url, 'DELETE');
+
+    url = 'https://localhost:1337/api-v1/members';
+    response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(404);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'no member found')
+      .eql(
+        'No members found: The supplied match string does not match any stored members, or no matchstring supplied and no members are stored',
+      );
+  });
+});
+
+describe('invalid api requests', () => {
+  before('Signal tests starting', async () => {
+    console.log('Starting invalid API requests tests');
+    await sendMessage(1, 'Invalid API requests tests start');
+  });
+
+  after('Signal tests ending', async () => {
+    console.log('Ending invalid API requests tests');
+    await sendMessage(2, 'Invalid API requests tests end');
+  });
+
+  it('should fail to create - id > max', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 1001, name: 'test1' };
+    const response = await sendRequest(url, 'POST', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to create - negative id', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: -13, name: 'test1' };
+    const response = await sendRequest(url, 'POST', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to create - name too long', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 1, name: '0123456789012345678901234567890123456789' };
+    const response = await sendRequest(url, 'POST', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to create - missing property', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 1 } as any;
+    const response = await sendRequest(url, 'POST', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to update - id > max', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 1001, name: 'test2_updated' };
+    const response = await sendRequest(url, 'PUT', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to update - id < 0', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: -13, name: 'test2_updated' };
+    const response = await sendRequest(url, 'PUT', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to update - name too long', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 1, name: '0123456789012345678901234567890123456789' };
+    const response = await sendRequest(url, 'PUT', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to update - missing property', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 1 } as any;
+    const response = await sendRequest(url, 'PUT', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to get - query too long', async () => {
+    const url =
+      'https://localhost:1337/api-v1/members?name=0123456789012345678901234567890123456789';
+    const response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to get - id > max', async () => {
+    const url = 'https://localhost:1337/api-v1/members/1001';
+    const response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to get - id < 0', async () => {
+    const url = 'https://localhost:1337/api-v1/members/-13';
+    const response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to get - id not a number', async () => {
+    const url = 'https://localhost:1337/api-v1/members/x';
+    const response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(400);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to delete id > max', async () => {
+    const url = 'https://localhost:1337/api-v1/members/1001';
+    const response = await sendRequest(url, 'DELETE');
+    chai.expect(response.ok).to.eql(false);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to delete id < 0', async () => {
+    const url = 'https://localhost:1337/api-v1/members/-13';
+    const response = await sendRequest(url, 'DELETE');
+    chai.expect(response.ok).to.eql(false);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
+  });
+
+  it('should fail to delete id not a number', async () => {
+    const url = 'https://localhost:1337/api-v1/members/x';
+    const response = await sendRequest(url, 'DELETE');
+    chai.expect(response.ok).to.eql(false);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'API validation fail')
+      .eql('API validation fail');
   });
 });
 

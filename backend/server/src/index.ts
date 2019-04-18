@@ -13,6 +13,12 @@
  *
  */
 
+/* import configuration parameters into process.env */
+/* the .env file must be in process.cwd() */
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+/* file header */
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 export const debug = debugFunction(`PP_${modulename}`);
@@ -22,6 +28,7 @@ debug(`Starting ${modulename}`);
 import { strict } from 'assert';
 import { EventEmitter } from 'events';
 import express from 'express';
+import * as winston from 'winston';
 
 /* import configuration object */
 import {
@@ -38,11 +45,6 @@ import {
   typeUncaught,
   IServerIndex,
 } from './configServer';
-
-/* import secret configuration parameters */
-import * as dotenv from 'dotenv';
-import * as winston from 'winston';
-dotenv.config({ path: config.ENV_FILE });
 
 /*
  * Define aliases for config parameters.
@@ -75,7 +77,6 @@ const appLocals: IAppLocals = ({} as unknown) as IAppLocals;
 appLocals.config = config;
 /* generate the controllers object */
 const controllers: IControllers = {};
-// controllers.members = members;       XXXX fix
 controllers.fail = failController;
 appLocals.controllers = controllers;
 /* appLocals.database filled during server startup */

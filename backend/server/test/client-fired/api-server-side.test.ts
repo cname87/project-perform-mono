@@ -12,6 +12,8 @@
  * The following parameters should be set in config.ts:
  * config.IS_NO_DB_OK = false; i.e. a database is required.
  *
+ * The database used up by the server must be 'test' (as driven by the process.env variable 'TEST_MODE') or the test run will abort.
+ *
  */
 
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
@@ -42,6 +44,7 @@ import winston = require('winston');
 /* internal dependencies */
 import { IServerIndex } from '../../src/configServer';
 const indexPath = '../../src/index';
+const dbTestName = 'test';
 
 /* path to chrome executable */
 const chromeExec =
@@ -91,6 +94,10 @@ describe('server API', () => {
     spyConsoleError = sinon.spy(console, 'error');
     /* run server index.js */
     index = await serverIndexStart();
+    /* test that the database is the test database */
+    if (index.appLocals.database.dbConnection.db.databaseName !== dbTestName) {
+      throw new Error('Test database not loaded + aborting tests');
+    }
     /* Now define all objects that are dependent on index being started */
     spyLoggerError = sinon.spy(index.appLocals.logger, 'error');
     spyDumpError = sinon.spy(index.appLocals, 'dumpError');
@@ -155,6 +162,8 @@ describe('server API', () => {
         try {
           switch (arg.message) {
             case 'API tests start':
+            case 'Failed API tests start':
+            case 'Invalid API requests tests start':
             case 'Angular fall back test start':
             case 'File retrieval test start':
               break;
@@ -164,6 +173,13 @@ describe('server API', () => {
               expect(spyConsoleError.notCalled).to.be.true;
               expect(spyLoggerError.notCalled).to.be.true;
               expect(spyDumpError.notCalled).to.be.true;
+              sinon.resetHistory();
+              break;
+            case 'Failed API tests end':
+            case 'Invalid API requests tests end':
+              expect(spyConsoleError.called).to.be.false;
+              expect(spyLoggerError.called).to.be.true;
+              expect(spyDumpError.called).to.be.true;
               sinon.resetHistory();
               break;
             case 'End tests':
@@ -209,6 +225,10 @@ describe('server API', () => {
           browserInstance = await puppeteer.launch({
             headless: false,
             executablePath: chromeExec,
+            defaultViewport: {
+              width: 800,
+              height: 800,
+            },
             args: [
               '--incognito',
               '--start-maximized',
