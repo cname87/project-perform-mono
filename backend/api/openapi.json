@@ -2,7 +2,7 @@
   "openapi" : "3.0.1",
   "info" : {
     "title" : "Project Perform API V1",
-    "version" : "2.0.0-oas3",
+    "version" : "1.0.0",
     "description" : "V1.x.x cover the API for one team",
     "contact" : {
       "name" : "Sean Young",

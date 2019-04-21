@@ -300,6 +300,98 @@ describe('failed api requests', () => {
   });
 });
 
+describe('bad database tests', () => {
+  before('Signal  starting', async () => {
+    console.log('Starting bad database tests');
+    await sendMessage(1, 'Bad database tests start');
+  });
+
+  after('Signal tests ending', async () => {
+    console.log('Ending bad database tests');
+    await sendMessage(2, 'Bad database tests end');
+  });
+
+  it('should fail to create - bad database', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 8, name: 'test8' };
+    const response = await sendRequest(url, 'POST', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(503);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'bad database')
+      .eql('The database service is unavailable');
+  });
+
+  it('should fail to get one - bad database ', async () => {
+    const url = 'https://localhost:1337/api-v1/members/1';
+    const response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(503);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'bad database')
+      .eql('The database service is unavailable');
+  });
+
+  it('should fail to get all - bad database ', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(503);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'bad database')
+      .eql('The database service is unavailable');
+  });
+
+  it('should fail to update - bad database', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const data = { id: 1, name: 'test1' };
+    const response = await sendRequest(url, 'PUT', data);
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(503);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'bad database')
+      .eql('The database service is unavailable');
+  });
+
+  it('should fail to delete one - bad database ', async () => {
+    const url = 'https://localhost:1337/api-v1/members/1';
+    const response = await sendRequest(url, 'DELETE');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(503);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'bad database')
+      .eql('The database service is unavailable');
+  });
+
+  it('should fail to delete all - bad database ', async () => {
+    const url = 'https://localhost:1337/api-v1/members';
+    const response = await sendRequest(url, 'DELETE');
+    chai.expect(response.ok).to.eql(false);
+    chai.expect(response.status).to.eql(503);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+    chai
+      .expect(readBody.message, 'bad database')
+      .eql('The database service is unavailable');
+  });
+});
+
 describe('invalid api requests', () => {
   before('Signal tests starting', async () => {
     console.log('Starting invalid API requests tests');

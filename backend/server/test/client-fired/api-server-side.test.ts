@@ -45,7 +45,6 @@ import winston = require('winston');
 import { IServerIndex } from '../../src/configServer';
 const indexPath = '../../src/index';
 const dbTestName = 'test';
-
 /* path to chrome executable */
 const chromeExec =
   'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
@@ -167,6 +166,136 @@ describe('server API', () => {
             case 'Angular fall back test start':
             case 'File retrieval test start':
               break;
+            case 'Bad database tests start':
+              /* only way to stub mongoose queries to mock entire chain */
+              //
+              /* mock addMember */
+              function FakeMembers(this: any) {
+                this.save = () => {
+                  return {
+                    then: () => {
+                      return {
+                        catch: (cb: any) =>
+                          cb(new Error('Test database fail error')),
+                      };
+                    },
+                  };
+                };
+              }
+              sinon
+                .stub(index.appLocals.models, 'members')
+                .callsFake(FakeMembers);
+              /* mock getMember */
+              const fakeFindOne: any = () => {
+                return {
+                  exec: () => {
+                    return {
+                      then: () => {
+                        return {
+                          catch: (cb: any) =>
+                            cb(new Error('Test database fail error')),
+                        };
+                      },
+                    };
+                  },
+                };
+              };
+              sinon
+                .stub(index.appLocals.models.members, 'findOne')
+                .callsFake(fakeFindOne);
+              /* mock getMembers */
+              const fakeFind: any = () => {
+                return {
+                  where: () => {
+                    return {
+                      regex: () => {
+                        return {
+                          lean: () => {
+                            return {
+                              select: () => {
+                                return {
+                                  exec: () => {
+                                    return {
+                                      then: () => {
+                                        return {
+                                          catch: (cb: any) =>
+                                            cb(
+                                              new Error(
+                                                'Test database fail error',
+                                              ),
+                                            ),
+                                        };
+                                      },
+                                    };
+                                  },
+                                };
+                              },
+                            };
+                          },
+                        };
+                      },
+                    };
+                  },
+                };
+              };
+              sinon
+                .stub(index.appLocals.models.members, 'find')
+                .callsFake(fakeFind);
+              /* mock updateMember */
+              const fakeFindOneAndUpdate: any = () => {
+                return {
+                  exec: () => {
+                    return {
+                      then: () => {
+                        return {
+                          catch: (cb: any) =>
+                            cb(new Error('Test database fail error')),
+                        };
+                      },
+                    };
+                  },
+                };
+              };
+              sinon
+                .stub(index.appLocals.models.members, 'findOneAndUpdate')
+                .callsFake(fakeFindOneAndUpdate);
+              /* mock deleteMember */
+              const fakeDeleteOne: any = () => {
+                return {
+                  exec: () => {
+                    return {
+                      then: () => {
+                        return {
+                          catch: (cb: any) =>
+                            cb(new Error('Test database fail error')),
+                        };
+                      },
+                    };
+                  },
+                };
+              };
+              sinon
+                .stub(index.appLocals.models.members, 'deleteOne')
+                .callsFake(fakeDeleteOne);
+              /* mock deleteMembers */
+              const fakeDeleteMany: any = () => {
+                return {
+                  exec: () => {
+                    return {
+                      then: () => {
+                        return {
+                          catch: (cb: any) =>
+                            cb(new Error('Test database fail error')),
+                        };
+                      },
+                    };
+                  },
+                };
+              };
+              sinon
+                .stub(index.appLocals.models.members, 'deleteMany')
+                .callsFake(fakeDeleteMany);
+              break;
             case 'API tests end':
             case 'Angular fall back test end':
             case 'File retrieval test end':
@@ -181,6 +310,13 @@ describe('server API', () => {
               expect(spyLoggerError.called).to.be.true;
               expect(spyDumpError.called).to.be.true;
               sinon.resetHistory();
+              break;
+            case 'Bad database tests end':
+              expect(spyConsoleError.called).to.be.false;
+              expect(spyLoggerError.called).to.be.true;
+              expect(spyDumpError.called).to.be.true;
+              sinon.resetHistory();
+              // restore
               break;
             case 'End tests':
               expect(spyConsoleError.notCalled).to.be.true;

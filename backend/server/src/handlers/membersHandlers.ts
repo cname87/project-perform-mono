@@ -12,6 +12,26 @@ import { Document } from 'mongoose';
  * Import local types
  */
 import { IErr, IMember, IRequestApp } from '../configServer';
+import winston = require('winston');
+
+/* shared function to report unknown database error */
+const databaseUnavailable = (
+  err: any,
+  caller: string,
+  logger: winston.Logger,
+  dumpError: (err: any) => void,
+  reject: (reason: any) => void,
+) => {
+  logger.error(modulename + ': ' + caller + ' database error reported');
+  dumpError(err);
+  const errDb: IErr = {
+    name: 'DATABASE_ACCESS',
+    message: 'The database service is unavailable',
+    statusCode: 503,
+    dumped: true,
+  };
+  return reject(errDb);
+};
 
 /**
  * Adds a supplied member object to the database.
@@ -31,9 +51,13 @@ export const addMember = (
 
   const addedMember = new modelMembers(member);
   return new Promise((resolve, reject) => {
-    addedMember.save((err: Error, savedMember: Document) => {
-      /* return any database access error */
-      if (err) {
+    addedMember
+      .save()
+      .then((savedMember: Document) => {
+        /* return the added member as a JSON object*/
+        return resolve(savedMember.toObject());
+      })
+      .catch((err) => {
         /* check if failure was trying to add a duplicate */
         if (err.message.includes('duplicate')) {
           logger.error(modulename + ': addMember duplicate member found ');
@@ -46,20 +70,10 @@ export const addMember = (
           };
           return reject(errDbDuplicate);
         }
-        logger.error(modulename + ': addMember database error');
-        dumpError(err);
-        const errDbUnknown: IErr = {
-          name: 'DATABASE_ACCESS',
-          message: 'The database service is unavailable',
-          statusCode: 503,
-          dumped: true,
-        };
-        return reject(errDbUnknown);
-      }
-
-      /* return the added member as a JSON object*/
-      return resolve(savedMember.toObject());
-    });
+        /* report a general database unavailable error */
+        const functionName = 'addMember';
+        databaseUnavailable(err, functionName, logger, dumpError, reject);
+      });
   });
 };
 
@@ -82,35 +96,29 @@ export const getMember = (
   const dumpError = req.app.appLocals.dumpError;
 
   return new Promise((resolve, reject) => {
-    modelMembers.findOne({ id: idParam }, (err: Error, doc: Document) => {
-      /* return any database access error */
-      if (err) {
-        logger.error(modulename + ': getMember database error');
-        dumpError(err);
-        const errDb: IErr = {
-          name: 'DATABASE_ACCESS',
-          message: 'The database service is unavailable',
-          statusCode: 503,
-          dumped: true,
-        };
-        return reject(errDb);
-      }
-
-      /* return error if no member found */
-      if (!doc) {
-        logger.error(modulename + ': getMember found no matching member');
-        const errNotFound: IErr = {
-          name: 'DATABASE_NOT_FOUND',
-          message: 'The supplied member ID does not match a stored member',
-          statusCode: 404,
-          dumped: true,
-        };
-        return reject(errNotFound);
-      }
-
-      /* strip down to member object and return */
-      return resolve(doc.toObject());
-    });
+    modelMembers
+      .findOne({ id: idParam })
+      .exec()
+      .then((doc) => {
+        /* return error if no member found */
+        if (!doc) {
+          logger.error(modulename + ': getMember found no matching member');
+          const errNotFound: IErr = {
+            name: 'DATABASE_NOT_FOUND',
+            message: 'The supplied member ID does not match a stored member',
+            statusCode: 404,
+            dumped: true,
+          };
+          return reject(errNotFound);
+        }
+        /* strip down to member object and return */
+        return resolve(doc.toObject());
+      })
+      .catch((err) => {
+        /* report a general database unavailable error */
+        const functionName = 'getMember';
+        databaseUnavailable(err, functionName, logger, dumpError, reject);
+      });
   });
 };
 
@@ -140,20 +148,8 @@ export const getMembers = (
       .regex(new RegExp(`${matchString}.*`, 'i'))
       .lean(true) // return json object
       .select({ _id: 0, __v: 0 }) // exclude _id and __v fields
-      .exec((err: Error, docs: [IMember]) => {
-        /* return any database access error */
-        if (err) {
-          logger.error(modulename + ': getMembers database error');
-          dumpError(err);
-          const errDb: IErr = {
-            name: 'DATABASE_ACCESS',
-            message: 'The database service is unavailable',
-            statusCode: 503,
-            dumped: true,
-          };
-          return reject(errDb);
-        }
-
+      .exec()
+      .then((docs: [IMember]) => {
         /* return error if no member found */
         if (!docs.length) {
           logger.error(modulename + ': getMembers found no matching member');
@@ -166,9 +162,61 @@ export const getMembers = (
           };
           return reject(errNotFound);
         }
-
         /* return member objects array */
         return resolve(docs);
+      })
+      .catch((err) => {
+        /* report a general database unavailable error */
+        const functionName = 'getMembers';
+        databaseUnavailable(err, functionName, logger, dumpError, reject);
+      });
+  });
+};
+
+/**
+ * Adds a supplied member object to the database.
+ *
+ * @param req The http request being actioned (used to retrieve the data model).
+ * @param member Member to add.
+ * @rejects Resolves to a reported error.
+ * @returns Promise that resolves to the member object added.
+ */
+export const updateMember = (
+  req: IRequestApp,
+  member: IMember,
+): Promise<IMember> => {
+  const modelMembers = req.app.appLocals.models.members;
+  const logger = req.app.appLocals.logger;
+  const dumpError = req.app.appLocals.dumpError;
+
+  const updatedMember = new modelMembers(member);
+
+  return new Promise((resolve, reject) => {
+    modelMembers
+      .findOneAndUpdate({ id: member.id }, updatedMember, {
+        new: true,
+        runValidators: true,
+      })
+      .exec()
+      .then((doc) => {
+        /* return error if no member found */
+        if (!doc) {
+          logger.error(modulename + ': updateMember found no matching member');
+          const errNotFound: IErr = {
+            name: 'DATABASE_NOT_FOUND',
+            message: 'The supplied member ID does not match a stored member',
+            statusCode: 404,
+            dumped: true,
+          };
+          return reject(errNotFound);
+        }
+        /* return new member object */
+        resolve(doc.toObject());
+      })
+      .catch((err) => {
+        /* report a general database unavailable error */
+        const functionName = 'updateMember';
+        databaseUnavailable(err, functionName, logger, dumpError, reject);
       });
   });
 };
@@ -192,35 +240,29 @@ export const deleteMember = (
   const dumpError = req.app.appLocals.dumpError;
 
   return new Promise((resolve, reject) => {
-    modelMembers.deleteOne({ id: idParam }).exec((err: Error, result) => {
-      /* return any database access error */
-      if (err) {
-        logger.error(modulename + ': deleteMember database error');
-        dumpError(err);
-        const errDb: IErr = {
-          name: 'DATABASE_ACCESS',
-          message: 'The database service is unavailable',
-          statusCode: 503,
-          dumped: true,
-        };
-        return reject(errDb);
-      }
-
-      /* return error if no member deleted */
-      if (result.n === 0) {
-        logger.error(modulename + ': delete Member found no matching member');
-        const errNotFound: IErr = {
-          name: 'DATABASE_NOT_FOUND',
-          message: 'The supplied member ID does not match a stored member',
-          statusCode: 404,
-          dumped: true,
-        };
-        return reject(errNotFound);
-      }
-
-      /* return count (= 1) to match api */
-      return resolve(result.n);
-    });
+    modelMembers
+      .deleteOne({ id: idParam })
+      .exec()
+      .then((doc) => {
+        /* return error if no member deleted */
+        if (doc.n === 0) {
+          logger.error(modulename + ': delete Member found no matching member');
+          const errNotFound: IErr = {
+            name: 'DATABASE_NOT_FOUND',
+            message: 'The supplied member ID does not match a stored member',
+            statusCode: 404,
+            dumped: true,
+          };
+          return reject(errNotFound);
+        }
+        /* return count (= 1) to match api */
+        return resolve(doc.n);
+      })
+      .catch((err) => {
+        /* report a general database unavailable error */
+        const functionName = 'deleteMember';
+        databaseUnavailable(err, functionName, logger, dumpError, reject);
+      });
   });
 };
 
@@ -239,78 +281,17 @@ export const deleteMembers = (req: IRequestApp): Promise<number> => {
   const modelMembers = req.app.appLocals.models.members;
 
   return new Promise((resolve, reject) => {
-    modelMembers.deleteMany({}).exec((err: Error, result) => {
-      /* return any database access error */
-      if (err) {
-        logger.error(modulename + ': deleteMembers database error');
-        dumpError(err);
-        const errDb: IErr = {
-          name: 'DATABASE_ACCESS',
-          message: 'The database service is unavailable',
-          statusCode: 503,
-          dumped: true,
-        };
-        return reject(errDb);
-      }
-
-      /* return number of members deleted */
-      return resolve(result.n);
-    });
-  });
-};
-
-/**
- * Adds a supplied member object to the database.
- *
- * @param req The http request being actioned (used to retrieve the data model).
- * @param member Member to add.
- * @rejects Resolves to a reported error.
- * @returns Promise that resolves to the member object added.
- */
-export const updateMember = (
-  req: IRequestApp,
-  member: IMember,
-): Promise<IMember> => {
-  const modelMembers = req.app.appLocals.models.members;
-  const logger = req.app.appLocals.logger;
-  const dumpError = req.app.appLocals.dumpError;
-
-  const updatedMember = new modelMembers(member);
-
-  return new Promise((resolve, reject) => {
-    modelMembers.findOneAndUpdate(
-      { id: member.id },
-      updatedMember,
-      { new: true, runValidators: true },
-      (err: Error, doc: Document | null) => {
-        /* return any database access error */
-        if (err) {
-          logger.error(modulename + ': updateMember database error');
-          dumpError(err);
-          const errDb: IErr = {
-            name: 'DATABASE_ACCESS',
-            message: 'The database service is unavailable',
-            statusCode: 503,
-            dumped: true,
-          };
-          return reject(errDb);
-        }
-
-        /* return error if no member found */
-        if (!doc) {
-          logger.error(modulename + ': updateMember found no matching member');
-          const errNotFound: IErr = {
-            name: 'DATABASE_NOT_FOUND',
-            message: 'The supplied member ID does not match a stored member',
-            statusCode: 404,
-            dumped: true,
-          };
-          return reject(errNotFound);
-        }
-
-        /* return new member object */
-        resolve(doc.toObject());
-      },
-    );
+    modelMembers
+      .deleteMany({})
+      .exec()
+      .then((docs) => {
+        /* return number of members deleted */
+        return resolve(docs.n);
+      })
+      .catch((err) => {
+        /* report a general database unavailable error */
+        const functionName = 'deleteMembers';
+        databaseUnavailable(err, functionName, logger, dumpError, reject);
+      });
   });
 };
