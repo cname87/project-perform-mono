@@ -86,8 +86,8 @@ async function runServer(
   /* parse cookies to req.cookies / req.signedCookies */
   app.use(cookieParser(config.COOKIE_KEY));
 
+  /* debug log basic information from the request */
   if (app.get('env') === 'development') {
-    /* debug log basic information from the request */
     app.use((req, _res, next) => {
       debug('\n' + modulename + ': *** Request received ***\n');
       debug(modulename + ': req.url: ' + req.url);
@@ -213,29 +213,6 @@ async function runServer(
         app.appLocals.dumpError(err);
         err.message = 'API validation fail';
         next(err);
-      },
-      notImplemented: async (
-        /* called if no operation handler has been registered for a matched operation */
-        context,
-        _req: Request,
-        res: Response,
-        next: NextFunction,
-      ) => {
-        debug(modulename + ': running notImplemented');
-        if (context && context.operation && context.operation.operationId) {
-          /* return mocked response from api definition */
-          const {
-            status,
-            mock,
-          }: {
-            status: number;
-            mock: any;
-          } = api.mockResponseForOperation(context.operation.operationId);
-          res.status(status).json(mock);
-        } else {
-          /* if no context supplied then pass on to be treated as a not found */
-          next();
-        }
       },
       notFound: async (
         /* called if path not matched - needed or an exception thrown */

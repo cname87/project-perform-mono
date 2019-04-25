@@ -138,6 +138,9 @@
     "npm-intellisense.scanDevDependencies": true,
     "npm-intellisense.showBuildInLibs": true,
 
-		"typescript.surveys.enabled": false,
+        "typescript.surveys.enabled": false,
+        "cSpell.words": [
+            "admins"
+        ],
 	}
 }

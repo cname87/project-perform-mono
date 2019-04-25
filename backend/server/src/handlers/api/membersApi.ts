@@ -13,7 +13,7 @@ import { NextFunction, Response } from 'express';
 import { Context } from 'openapi-backend';
 
 /* import local types */
-import { IRequestApp, IMember, IErr } from '../../configServer';
+import { IRequestApp, IMember, IErr, IMemberNoId } from '../../configServer';
 
 export const addMember = (
   context: Context | undefined,
@@ -33,14 +33,14 @@ export const addMember = (
     req.app.appLocals.dumpError(err);
     return next(err);
   }
-  const member = context.request.body as IMember;
+  const memberNoId = context.request.body as IMemberNoId;
   const config = req.app.appLocals.config;
   const handles = req.app.appLocals.miscHandlers;
   const logger = req.app.appLocals.logger;
   const dumpError = req.app.appLocals.dumpError;
 
   config.membersHandlers
-    .addMember(req, member)
+    .addMember(req, memberNoId)
     .then((payload) => {
       handles.writeJson(context, req, res, next, 201, payload);
     })

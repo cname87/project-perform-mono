@@ -121,7 +121,10 @@ const writeJson = (
     const err: IErr = {
       name: 'RESPONSE_VALIDATION_FAIL',
       message:
-        'Response validation fail\n' + util.inspect(validationResult.errors),
+        'Response validation fail error:\n' +
+        util.inspect(validationResult.errors) +
+        '\nResponse payload:\n' +
+        util.inspect(payload),
       statusCode: 502,
       dumped: false,
     };

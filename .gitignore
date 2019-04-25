@@ -1,17 +1,19 @@
 
-# ignore all files and directories in all .nyc_output directories
+# ignore istanbul report directories
 .nyc_output/
-# ignore all files and directories in all 'coverage/' directories
+# ignore istanbul coverage directories
 coverage/
-# ignore all files and directories in all 'logs/' directories
+# ignore all all 'logs/' directories
 logs/
 # ignore all node_module dependencies
 node_modules/
 # ignore all files and directories in all public/ directories
 public/
-# ignore all files and directories in all dist/ directories
+# ignore all '/types'mdirectories 
+types/
+# ignore all compiled 'dist' directories
 dist/
-# ignore all files and directories in all dist/ directories
+# ignore all credential certs directories
 certs/
 # ignore all .env files
 .env

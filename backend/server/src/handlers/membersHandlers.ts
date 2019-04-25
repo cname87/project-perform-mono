@@ -11,7 +11,7 @@ import { Document } from 'mongoose';
 /**
  * Import local types
  */
-import { IErr, IMember, IRequestApp } from '../configServer';
+import { IErr, IMember, IRequestApp, IMemberNoId } from '../configServer';
 import winston = require('winston');
 
 /* shared function to report unknown database error */
@@ -37,19 +37,31 @@ const databaseUnavailable = (
  * Adds a supplied member object to the database.
  *
  * @param req The http request being actioned (used to retrieve the data model).
- * @param member Member to add.
+ * @param memberNoId Member to add.
  * @rejects Resolves to a reported error.
  * @returns Promise that resolves to the member object added.
  */
 export const addMember = (
   req: IRequestApp,
-  member: IMember,
+  memberNoId: IMemberNoId,
 ): Promise<IMember> => {
   const modelMembers = req.app.appLocals.models.members;
   const logger = req.app.appLocals.logger;
   const dumpError = req.app.appLocals.dumpError;
 
-  const addedMember = new modelMembers(member);
+  /* test that the supplied member does not already have an id */
+  if (memberNoId.id) {
+    const err: IErr = {
+      name: 'UNEXPECTED_FAIL',
+      message: 'member id exists before document creation',
+      statusCode: 500,
+      dumped: false,
+    };
+    req.app.appLocals.dumpError(err);
+    throw new Error('member id exists before document creation');
+  }
+
+  const addedMember = new modelMembers(memberNoId);
   return new Promise((resolve, reject) => {
     addedMember
       .save()
@@ -145,7 +157,7 @@ export const getMembers = (
     modelMembers
       .find()
       .where('name')
-      .regex(new RegExp(`${matchString}.*`, 'i'))
+      .regex('name', new RegExp(`^${matchString}.*`, 'i'))
       .lean(true) // return json object
       .select({ _id: 0, __v: 0 }) // exclude _id and __v fields
       .exec()

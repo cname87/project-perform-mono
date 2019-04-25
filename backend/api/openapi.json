@@ -17,19 +17,11 @@
     "url" : "https://localhost:1337/api-v1",
     "description" : "Development server"
   } ],
-  "tags" : [ {
-    "name" : "admins",
-    "description" : "Operations available to admins"
-  }, {
-    "name" : "users",
-    "description" : "Operations available to regular users"
-  } ],
   "paths" : {
     "/members" : {
       "get" : {
         "summary" : "Returns the members of a team",
         "operationId" : "getMembers",
-        "tags" : [ "users" ],
         "x-swagger-router-controller" : "members",
         "description" : "Returns all team members\n",
         "parameters" : [ {
@@ -101,9 +93,8 @@
       "post" : {
         "summary" : "Adds a member to a team",
         "operationId" : "addMember",
-        "tags" : [ "admins" ],
         "x-swagger-router-controller" : "members",
-        "description" : "Adds a supplied member to the team\n",
+        "description" : "Adds a supplied member to the team.\nA member object must be supplied in the body.\nAn error (409) will be returned if a member with the same id as the id in the supplied member object already exists. \n",
         "requestBody" : {
           "description" : "Team member detail",
           "x-name" : "member",
@@ -111,7 +102,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/Member"
+                "$ref" : "#/components/schemas/MemberWithoutId"
               }
             }
           }
@@ -173,7 +164,6 @@
         "summary" : "Updates a member in a team",
         "description" : "Updates the data on a member of the team\n",
         "operationId" : "updateMember",
-        "tags" : [ "admins" ],
         "x-swagger-router-controller" : "members",
         "requestBody" : {
           "description" : "Team member to be updated detail",
@@ -243,7 +233,6 @@
       "delete" : {
         "summary" : "Deletes all members of a team",
         "operationId" : "deleteMembers",
-        "tags" : [ "admins" ],
         "x-swagger-router-controller" : "members",
         "description" : "Deletes all team members\n",
         "responses" : {
@@ -295,7 +284,6 @@
         "summary" : "Returns a specific team member",
         "description" : "Obtain information about a specific team member\n",
         "operationId" : "getMember",
-        "tags" : [ "users" ],
         "x-swagger-router-controller" : "members",
         "parameters" : [ {
           "in" : "path",
@@ -366,7 +354,6 @@
         "summary" : "Deletes a member from a team",
         "description" : "Deletes a member from the team\n",
         "operationId" : "deleteMember",
-        "tags" : [ "admins" ],
         "x-swagger-router-controller" : "members",
         "parameters" : [ {
           "in" : "path",
@@ -449,6 +436,19 @@
             "maximum" : 999,
             "example" : 5
           },
+          "name" : {
+            "type" : "string",
+            "format" : "string",
+            "maxLength" : 35,
+            "example" : "John Athlete"
+          }
+        }
+      },
+      "MemberWithoutId" : {
+        "description" : "Team member information without the id field",
+        "required" : [ "name" ],
+        "type" : "object",
+        "properties" : {
           "name" : {
             "type" : "string",
             "format" : "string",

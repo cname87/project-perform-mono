@@ -162,7 +162,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch monitor.js",
-      "program": "${workspaceFolder}/backend/server/src/monitor/monitor.ts",
+      "program": "${workspaceFolder}/backend/monitor/src/index.ts",
       "cwd":  "${workspaceFolder}/backend",
       "env": {
       },

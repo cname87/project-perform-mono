@@ -164,7 +164,7 @@ async function closeConnection(
 function createModel(
   this: Database,
   ModelName: string,
-  modelSchema: SchemaDefinition,
+  modelSchema: SchemaDefinition, // accepts a Schema
   dbCollectionName: string,
 ): Model<Document, {}> {
   debug(modulename + ': running createModel');

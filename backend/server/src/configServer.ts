@@ -57,7 +57,7 @@ export const config = {
   /***********************************************************************/
 
   /**
-   * This section sets up  imports for all the internal modules.
+   * This section sets up imports for all the internal modules.
    */
   Server,
   startServer,
@@ -257,6 +257,10 @@ export interface IRequestApp extends Request {
 /* defines a team member */
 export interface IMember {
   name: string;
+  id: number;
+}
+
+export interface IMemberNoId {
   id: number;
 }
 
