@@ -161,6 +161,7 @@ describe('server API', () => {
         try {
           switch (arg.message) {
             case 'API tests start':
+              // index.appLocals.models.members.reset
             case 'Failed API tests start':
             case 'Invalid API requests tests start':
             case 'Angular fall back test start':

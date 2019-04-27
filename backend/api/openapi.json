@@ -96,7 +96,7 @@
         "x-swagger-router-controller" : "members",
         "description" : "Adds a supplied member to the team.\nA member object must be supplied in the body.\nAn error (409) will be returned if a member with the same id as the id in the supplied member object already exists. \n",
         "requestBody" : {
-          "description" : "Team member detail",
+          "description" : "Team member detail (without id field)",
           "x-name" : "member",
           "required" : true,
           "content" : {
@@ -120,16 +120,6 @@
           },
           "400" : {
             "description" : "The request is not a valid",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "409" : {
-            "description" : "A member with that ID already exists",
             "content" : {
               "application/json" : {
                 "schema" : {

@@ -1,6 +1,6 @@
-import { Hero } from './hero';
+import { Member } from './membersApi/membersApi';
 
-export const HEROES: Hero[] = [
+export const HEROES: Member[] = [
   { id: 11, name: 'Mr. Nice' },
   { id: 12, name: 'Narco' },
   { id: 13, name: 'Bombasto' },

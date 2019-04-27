@@ -3,7 +3,7 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
-    // npm backend server-side watch
+    // "npm backend server-side watch"
     {
       "label": "npm backend server-side watch",
       "type": "npm",
@@ -17,7 +17,7 @@
         "panel": "dedicated"
       }
     },
-    // npm backend client-side watch
+    // "npm backend client-side watch"
     {
       "label": "npm backend client-side watch",
       "type": "npm",
@@ -31,7 +31,7 @@
         "panel": "dedicated"
       }
     },
-    // npm build backend
+    // "npm build backend"
     {
       "label": "npm build backend",
       "type": "npm",
@@ -48,16 +48,16 @@
         "panel": "shared"
       }
     },
-    // npm build frontend
+    //  "npm build:dev frontend"
     {
-      "label": "npm build frontend",
+      "label": "npm build:dev frontend",
       "type": "shell",
       "command": "npm",
       "args": [
         "run",
         "--prefix",
         "${workspaceRoot}/frontend",
-        "build"
+        "build:dev"
       ],
       "isBackground": true,
       "presentation": {
@@ -85,7 +85,7 @@
         }
       }
     },
-    // Taskkill node.exe
+    // "Taskkill node.exe"
     {
       "label": "Taskkill node.exe",
       "type": "shell",
@@ -100,7 +100,7 @@
       },
       "problemMatcher": []
     },
-    // Is Server Up?
+    // "Is Server Up?"
     {
       "label": "Is Server Up?",
       "type": "process",
@@ -123,7 +123,7 @@
       },
       "problemMatcher": []
     },
-    // npm delete nyc file
+    // "npm delete nyc file"
     {
       "label": "npm delete nyc file",
       "type": "shell",
@@ -141,6 +141,6 @@
       },
       "group": "build",
       "problemMatcher": []
-    },
+    }
   ]
 }

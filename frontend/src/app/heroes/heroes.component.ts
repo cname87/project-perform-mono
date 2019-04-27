@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Hero } from '../hero';
-import { HeroService } from '../hero.service';
+import { MembersService } from '../members.service';
+import { Member } from '../membersApi/membersApi';
 
 @Component({
   selector: 'app-heroes',
@@ -9,16 +9,18 @@ import { HeroService } from '../hero.service';
   styleUrls: ['./heroes.component.css'],
 })
 export class HeroesComponent implements OnInit {
-  heroes: Hero[];
+  members: Member[];
 
-  constructor(private heroService: HeroService) {}
+  constructor(private membersService: MembersService) {}
 
   ngOnInit() {
-    this.getHeroes();
+    this.getMembers();
   }
 
-  getHeroes(): void {
-    this.heroService.getHeroes().subscribe((heroes) => (this.heroes = heroes));
+  getMembers(): void {
+    this.membersService.getMembers().subscribe((members) => {
+      this.members = members;
+    });
   }
 
   add(name: string): void {
@@ -26,13 +28,13 @@ export class HeroesComponent implements OnInit {
     if (!name) {
       return;
     }
-    this.heroService.addHero({ name } as Hero).subscribe((hero) => {
-      this.heroes.push(hero);
+    this.membersService.addMember({ name } as Member).subscribe((member) => {
+      this.members.push(member);
     });
   }
 
-  delete(hero: Hero): void {
-    this.heroes = this.heroes.filter((h) => h !== hero);
-    this.heroService.deleteHero(hero).subscribe();
+  delete(member: Member): void {
+    this.membersService.deleteMember(member.id).subscribe();
+    this.members = this.members.filter((m) => m.id !== member.id);
   }
 }

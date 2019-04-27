@@ -39,10 +39,11 @@ function createModel(database: Database): Model<Document> {
   });
 
   /* create the model */
-  const model = database.createModel(ModelName, memberSchema, collection);
+  const ModelMembers
+    = database.createModel(ModelName, memberSchema, collection);
 
   /* set toObject option so _id, and __v deleted */
-  model.schema.set('toObject', {
+  ModelMembers.schema.set('toObject', {
     transform: (
       _doc: Document,
       ret: any,
@@ -54,7 +55,7 @@ function createModel(database: Database): Model<Document> {
     },
   });
 
-  return model;
+  return ModelMembers;
 }
 
 /* export the model creation function */

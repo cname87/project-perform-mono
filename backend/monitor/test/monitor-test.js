@@ -4,7 +4,7 @@ const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 const debug = require('debug')('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
-describe('monitor', function() {
+describe.skip('monitor', function() {
 
     debug(modulename + ':\n\n *** describe server monitor starts here ***\n\n');
 

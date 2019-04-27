@@ -70,18 +70,6 @@ export const addMember = (
         return resolve(savedMember.toObject());
       })
       .catch((err) => {
-        /* check if failure was trying to add a duplicate */
-        if (err.message.includes('duplicate')) {
-          logger.error(modulename + ': addMember duplicate member found ');
-          dumpError(err);
-          const errDbDuplicate: IErr = {
-            name: 'DATABASE_DUPLICATE',
-            message: 'A member with that id already exists in the database',
-            statusCode: 409,
-            dumped: true,
-          };
-          return reject(errDbDuplicate);
-        }
         /* report a general database unavailable error */
         const functionName = 'addMember';
         databaseUnavailable(err, functionName, logger, dumpError, reject);

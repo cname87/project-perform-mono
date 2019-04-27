@@ -9,7 +9,10 @@
 async function sendRequest(
   url: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-  data?: { id: number; name: string } | { number: number; message: string },
+  data?:
+    | { name: string }
+    | { id: number; name: string }
+    | { number: number; message: string },
 ) {
   const myRequest = new Request(url);
   const headers = data
@@ -75,7 +78,7 @@ describe('api requests', () => {
 
   it('should create a member', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const data = { id: 1, name: 'test1' };
+    const data = { name: 'test1' };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
 
@@ -87,7 +90,7 @@ describe('api requests', () => {
 
   it('should create another member', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const data = { id: 2, name: 'test2' };
+    const data = { name: 'test2' };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
 
@@ -99,7 +102,7 @@ describe('api requests', () => {
 
   it('should create another member', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const data = { id: 3, name: 'name3' };
+    const data = { name: 'name3' };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
 
@@ -194,12 +197,12 @@ describe('failed api requests', () => {
 
   it('should fail to create - duplicate ', async () => {
     let url = 'https://localhost:1337/api-v1/members';
-    let data = { id: 7, name: 'test7' };
+    let data = { name: 'test7' };
     let response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
 
     url = 'https://localhost:1337/api-v1/members';
-    data = { id: 7, name: 'test7' };
+    data = { name: 'test7' };
     response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(409);
@@ -263,7 +266,7 @@ describe('failed api requests', () => {
   it('should fail to read all - matchstring matches nothing', async () => {
     /* create a member so database definitely not empty */
     let url = 'https://localhost:1337/api-v1/members';
-    const data = { id: 9, name: 'test9' };
+    const data = { name: 'test9' };
     let response = await sendRequest(url, 'POST', data);
 
     url = 'https://localhost:1337/api-v1/members?name=xxx';
@@ -313,7 +316,7 @@ describe('bad database tests', () => {
 
   it('should fail to create - bad database', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const data = { id: 8, name: 'test8' };
+    const data = { name: 'test8' };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(503);
@@ -405,7 +408,7 @@ describe('invalid api requests', () => {
 
   it('should fail to create - id > max', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const data = { id: 1001, name: 'test1' };
+    const data = { name: 'test1' };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(400);
@@ -419,7 +422,7 @@ describe('invalid api requests', () => {
 
   it('should fail to create - negative id', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const data = { id: -13, name: 'test1' };
+    const data = { name: 'test1' };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(400);
@@ -447,7 +450,7 @@ describe('invalid api requests', () => {
 
   it('should fail to create - missing property', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const data = { id: 1 } as any;
+    const data = {} as any;
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(400);
@@ -645,7 +648,7 @@ describe('fall back to the angular index.html', () => {
 
     const readTitle = testWindow.document.title;
     console.log('Page title: ', readTitle);
-    chai.expect(readTitle, 'Page title').to.eql('Tour of Heroes');
+    chai.expect(readTitle, 'Page title').to.eql('Team Members');
   });
 });
 

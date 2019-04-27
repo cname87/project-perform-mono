@@ -221,7 +221,7 @@ async function runServer(
         _res: Response,
         next: NextFunction,
       ) => {
-        debug(modulename + ': running notFound');
+        debug(modulename + ': api handler running notFound');
 
         /* let angular or errorhandler deal with not founds */
         next();
