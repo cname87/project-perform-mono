@@ -6,11 +6,11 @@ import { MembersService } from '../members.service';
 import { Member } from '../membersApi/membersApi';
 
 @Component({
-  selector: 'app-hero-detail',
-  templateUrl: './hero-detail.component.html',
-  styleUrls: ['./hero-detail.component.css'],
+  selector: 'app-member-detail',
+  templateUrl: './member-detail.component.html',
+  styleUrls: ['./member-detail.component.css'],
 })
-export class HeroDetailComponent implements OnInit {
+export class MemberDetailComponent implements OnInit {
   @Input() member: Member;
 
   constructor(

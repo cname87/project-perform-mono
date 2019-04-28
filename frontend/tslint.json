@@ -1,5 +1,8 @@
 {
-  "extends": ["tslint-angular"],
-  "rules": {
-  }
+  "extends": [
+    "tslint-angular",
+    "tslint:latest",
+    "tslint-no-unused-expression-chai",
+    "../tslint.json"
+  ]
 }

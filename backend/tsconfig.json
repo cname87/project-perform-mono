@@ -1,4 +1,5 @@
 {
+  "extends": "../tsconfig.json",
   "include": [
     "./**/src/**/*.ts",
     "./**/test/**/*.test.ts",
@@ -10,58 +11,21 @@
     "./server/test/client", // client-side files compiled separately
     "node_modules",
   ],
-  "compileOnSave": false,
+
   "compilerOptions": {
-    // list directory options first
+
+    /* list directory options first */
+    "baseUrl": ".",
     "outDir": "./dist",
     "rootDir": ".",
-    //
-    "allowJs": true,
-    "alwaysStrict": true,
-    "baseUrl": ".",
-    // "declaration": true, // generates declaration .d.ts files
-    // "declarationMap": true, // generates map files for declaration files
-    // "diagnostics": true,
-    "esModuleInterop": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "extendedDiagnostics": true,
-    "forceConsistentCasingInFileNames": true,
-    "importHelpers": true,
+
+    /* target and lib */
+    "target": "esnext",  // Compiles to this JS version - higher for better debug support, lower for wider browser support
     "lib": [
       "dom" // needed for puppeteer
     ], // for browser-side scripts - extra types which you know browser will support
-    "listEmittedFiles": true,
+
+    /* module option */
     "module": "commonjs",  // module loader format (independent of target) - commonjs for node
-    "moduleResolution": "node",
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "showConfig": true,
-    "sourceMap": true,
-    "strict": true,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
-    "target": "esnext",  // Compiles to this JS version - higher for better debug support, lower for wider browser support
-    // "traceResolution": true,},
-    "plugins": [
-      {
-        "name": "typescript-tslint-plugin",
-        "alwaysShowRuleFailuresAsWarnings": false,
-        "ignoreDefinitionFiles": true,
-        "configFile": "./tslint.json",
-        "suppressWhileTypeErrorsPresent": false,
-        "mockTypeScriptVersion": false,
-        "jsEnable": false,
-        "exclude": [
-          // "./server/test/client/**.*"
-        ]
-      }
-    ]
   }
 }

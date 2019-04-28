@@ -1,26 +1,26 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DashboardComponent } from './dashboard.component';
-import { HeroSearchComponent } from '../hero-search/hero-search.component';
+import { MemberSearchComponent } from '../member-search/member-search.component';
 
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
-import { HEROES } from '../mock-heroes';
-import { HeroService } from '../members.service';
+import { members } from '../mock-members';
+import { MembersService } from '../members.service';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
-  let heroService;
-  let getHeroesSpy;
+  let memberService;
+  let getMembersSpy;
 
   beforeEach(async(() => {
-    heroService = jasmine.createSpyObj('HeroService', ['getHeroes']);
-    getHeroesSpy = heroService.getHeroes.and.returnValue(of(HEROES));
+    memberService = jasmine.createSpyObj('memberService', ['getMembers']);
+    getMembersSpy = memberService.getMembers.and.returnValue(of(members));
     TestBed.configureTestingModule({
-      declarations: [DashboardComponent, HeroSearchComponent],
+      declarations: [DashboardComponent, MemberSearchComponent],
       imports: [RouterTestingModule.withRoutes([])],
-      providers: [{ provide: HeroService, useValue: heroService }],
+      providers: [{ provide: MembersService, useValue: memberService }],
     }).compileComponents();
   }));
 
@@ -34,14 +34,14 @@ describe('DashboardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display "Top Heroes" as headline', () => {
+  it('should display "Top Members" as headline', () => {
     expect(fixture.nativeElement.querySelector('h3').textContent).toEqual(
-      'Top Heroes',
+      'Top Members',
     );
   });
 
-  it('should call heroService', async(() => {
-    expect(getHeroesSpy.calls.any()).toBe(true);
+  it('should call memberService', async(() => {
+    expect(getMembersSpy.calls.any()).toBe(true);
   }));
 
   it('should display 4 links', async(() => {

@@ -8,11 +8,11 @@ import { MembersService } from '../members.service';
 import { Member } from '../membersApi/membersApi';
 
 @Component({
-  selector: 'app-hero-search',
-  templateUrl: './hero-search.component.html',
-  styleUrls: ['./hero-search.component.css'],
+  selector: 'app-member-search',
+  templateUrl: './member-search.component.html',
+  styleUrls: ['./member-search.component.css'],
 })
-export class HeroSearchComponent implements OnInit {
+export class MemberSearchComponent implements OnInit {
   members$: Observable<Member[]> | undefined;
   private searchTerms = new Subject<string>();
 

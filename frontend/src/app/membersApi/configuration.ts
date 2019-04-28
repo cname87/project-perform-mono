@@ -4,7 +4,7 @@ import { HttpHeaders } from '@angular/common/http';
  * Configuration object for membersService.
  */
 
-interface ConfigurationParameters {
+interface IConfigurationParameters {
   basePath: string;
   servicePath: string;
   defaultHeaders: HttpHeaders;
@@ -24,7 +24,7 @@ class Configuration {
   accessToken?: string | (() => string);
   withCredentials?: boolean;
 
-  constructor(configurationParameters: ConfigurationParameters) {
+  constructor(configurationParameters: IConfigurationParameters) {
     this.basePath = configurationParameters.basePath;
     this.servicePath = configurationParameters.servicePath;
     this.defaultHeaders = configurationParameters.defaultHeaders;

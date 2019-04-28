@@ -1,6 +1,6 @@
 /**
  * Count of documents.
  */
-export interface Count {
+export interface ICount {
   count: number;
 }

@@ -8,7 +8,7 @@
     "email": "cname87@yahoo.com"
   },
   "license": "MIT",
-  "author": "Seán Young <cname87@yahoo.com>",
+  "author": "Seán A. Young <cname87@yahoo.com>",
   "main": "./index.js",
   "repository": {
     "type": "git",
@@ -144,7 +144,7 @@
     "supports-color": "^6.1.0",
     "ts-loader": "^5.3.3",
     "ts-node": "^8.0.3",
-    "tslint": "^5.14.0",
+    "tslint": "^5.16.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-microsoft-contrib": "^6.1.0",
     "tslint-no-unused-expression-chai": "^0.1.4",

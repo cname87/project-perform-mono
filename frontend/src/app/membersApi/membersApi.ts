@@ -15,8 +15,8 @@ import { Observable } from 'rxjs';
 /* internal dependencies */
 import { membersConfiguration } from './configuration';
 import { CustomHttpUrlEncodingCodec } from './encoder';
-import { Count, Member, MemberWithoutId } from './model/models';
-export { Member, MemberWithoutId };
+import { ICount, IMember, IMemberWithoutId } from './model/models';
+export { IMember as Member, IMemberWithoutId as MemberWithoutId };
 
 @Injectable({
   providedIn: 'root',
@@ -36,7 +36,7 @@ export class MembersApi {
    * @param memberWithoutId Team member detail (but no id property).
    */
 
-  public addMember(memberWithoutId: MemberWithoutId): Observable<Member> {
+  public addMember(memberWithoutId: IMemberWithoutId): Observable<IMember> {
     if (memberWithoutId === null || memberWithoutId === undefined) {
       throw new Error(
         'Required parameter memberWithoutId was null or undefined when calling addMember.',
@@ -51,12 +51,12 @@ export class MembersApi {
     /* set Content-Type header - what content is being sent */
     headers = headers.set('Content-Type', 'application/json');
 
-    return this.httpClient.post<Member>(
+    return this.httpClient.post<IMember>(
       `${this.basePath}/${this.membersPath}`,
       memberWithoutId,
       {
         withCredentials: this.withCredentials,
-        headers: headers,
+        headers,
       },
     );
   }
@@ -66,7 +66,7 @@ export class MembersApi {
    * @param name An optional search string to limit the returned list.
    * All members with the name property starting with 'name' will be returned.
    */
-  public getMembers(name?: string): Observable<Array<Member>> {
+  public getMembers(name?: string): Observable<IMember[]> {
     let queryParameters = new HttpParams({
       encoder: new CustomHttpUrlEncodingCodec(),
     });
@@ -79,12 +79,12 @@ export class MembersApi {
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
 
-    return this.httpClient.get<Array<Member>>(
+    return this.httpClient.get<IMember[]>(
       `${this.basePath}/${this.membersPath}`,
       {
         params: queryParameters,
         withCredentials: this.withCredentials,
-        headers: headers,
+        headers,
       },
     );
   }
@@ -93,7 +93,7 @@ export class MembersApi {
    * Get a specific member.
    * @param id The value of the id property of the member.
    */
-  public getMember(id: number): Observable<Member> {
+  public getMember(id: number): Observable<IMember> {
     if (id === null || id === undefined) {
       throw new Error(
         'Required parameter id was null or undefined when calling getMember.',
@@ -105,11 +105,11 @@ export class MembersApi {
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
 
-    return this.httpClient.get<Member>(
+    return this.httpClient.get<IMember>(
       `${this.basePath}/${this.membersPath}/${encodeURIComponent(String(id))}`,
       {
         withCredentials: this.withCredentials,
-        headers: headers,
+        headers,
       },
     );
   }
@@ -120,7 +120,7 @@ export class MembersApi {
    * The member with that id is updated.
    * @param member Team member to be updated detail
    */
-  public updateMember(member: Member): Observable<Member> {
+  public updateMember(member: IMember): Observable<IMember> {
     if (member === null || member === undefined) {
       throw new Error(
         'Required parameter member was null or undefined when calling updateMember.',
@@ -135,12 +135,12 @@ export class MembersApi {
     /* set Content-Type header - what content is being sent */
     headers = headers.set('Content-Type', 'application/json');
 
-    return this.httpClient.put<Member>(
+    return this.httpClient.put<IMember>(
       `${this.basePath}/${this.membersPath}`,
       member,
       {
         withCredentials: this.withCredentials,
-        headers: headers,
+        headers,
       },
     );
   }
@@ -149,7 +149,7 @@ export class MembersApi {
    * Deletes a member.
    * @param id The ID of the team member.
    */
-  public deleteMember(id: number): Observable<Count> {
+  public deleteMember(id: number): Observable<ICount> {
     if (id === null || id === undefined) {
       throw new Error(
         'Required parameter id was null or undefined when calling deleteMember.',
@@ -161,11 +161,11 @@ export class MembersApi {
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
 
-    return this.httpClient.delete<Count>(
+    return this.httpClient.delete<ICount>(
       `${this.basePath}/${this.membersPath}/${encodeURIComponent(String(id))}`,
       {
         withCredentials: this.withCredentials,
-        headers: headers,
+        headers,
       },
     );
   }
@@ -173,15 +173,15 @@ export class MembersApi {
   /**
    * Deletes all members.
    */
-  public deleteMembers(): Observable<Count> {
+  public deleteMembers(): Observable<ICount> {
     let headers = this.defaultHeaders;
 
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
 
-    return this.httpClient.delete<Count>(`${this.basePath}/members`, {
+    return this.httpClient.delete<ICount>(`${this.basePath}/members`, {
       withCredentials: this.withCredentials,
-      headers: headers,
+      headers,
     });
   }
 }

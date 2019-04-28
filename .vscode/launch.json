@@ -22,7 +22,7 @@
       "url": "http://localhost:4200/#",
       // tell vscode where to find scripts on the server
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
+        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-members",
         "/testServer": "${workspaceFolder}/backend/server/test/client/browser",
       },
       "sourceMapPathOverrides": {
@@ -49,9 +49,9 @@
       "userDataDir": true,
       "url": "http://localhost:9876/debug.html",
       // tell vscode where to find scripts on the server
-      "webRoot": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
+      "webRoot": "${workspaceFolder}/frontend/dist/angular-tour-of-members",
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
+        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-members",
         "/testServer": "${workspaceFolder}/backend/server/test/client/browser",
       },
       "sourceMapPathOverrides": {
@@ -225,7 +225,7 @@
       "url": "https://localhost:1337/",
       // tell vscode where to find scripts on the server
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
+        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-members",
         "/testServer": "${workspaceFolder}/backend/dist/server/test/client/",
       },
       "sourceMapPathOverrides": {
@@ -285,7 +285,7 @@
         "--reporter=text",
         "--reporter=html",
         "--report-dir", "${workspaceFolder}/backend/coverage/all",
-        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha", 
+        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
         "--config", "${workspaceFolder}/backend/.mocharc.json",
         /* include testSetup.js to load .env */
         "${workspaceFolder}/backend/dist/test/testSetup.js",
@@ -372,7 +372,7 @@
       // "url": "https://localhost:1337/testServer/errors/static/loadmocha.html",
       // tell vscode where to find scripts on the server
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
+        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-members",
         "/testServer": "${workspaceFolder}/backend/dist/server/test/client",
       },
       "sourceMapPathOverrides": {

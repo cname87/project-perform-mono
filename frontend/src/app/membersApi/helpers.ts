@@ -28,8 +28,8 @@ export class Helpers {
     };
   }
 
-  /** Log a HeroService message with the MessageService */
+  /** Log a memberService message with the MessageService */
   public log(message: string) {
-    this.messageService.add(`HeroService: ${message}`);
+    this.messageService.add(`memberService: ${message}`);
   }
 }

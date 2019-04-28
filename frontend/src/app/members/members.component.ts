@@ -4,11 +4,11 @@ import { MembersService } from '../members.service';
 import { Member } from '../membersApi/membersApi';
 
 @Component({
-  selector: 'app-heroes',
-  templateUrl: './heroes.component.html',
-  styleUrls: ['./heroes.component.css'],
+  selector: 'app-members',
+  templateUrl: './members.component.html',
+  styleUrls: ['./members.component.css'],
 })
-export class HeroesComponent implements OnInit {
+export class MembersComponent implements OnInit {
   members: Member[];
 
   constructor(private membersService: MembersService) {

@@ -1,7 +1,7 @@
 /**
  * Team member information.
  */
-export interface Member {
+export interface IMember {
   id: number;
   name: string;
 }

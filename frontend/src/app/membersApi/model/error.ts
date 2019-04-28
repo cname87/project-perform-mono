@@ -1,7 +1,7 @@
 /**
  * Error report.
  */
-export interface ModelError {
+export interface IModelError {
   code: number;
   message: string;
 }

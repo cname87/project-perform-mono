@@ -2,10 +2,10 @@
 <div class="grid grid-pad">
   <a *ngFor="let member of members" class="col-1-4"
       routerLink="/detail/{{member.id}}">
-    <div class="module hero">
+    <div class="module member">
       <h4>{{ member.name }}</h4>
     </div>
   </a>
 </div>
 
-<app-hero-search></app-hero-search>
+<app-member-search></app-member-search>
