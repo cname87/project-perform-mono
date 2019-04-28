@@ -161,14 +161,15 @@ describe('server API', () => {
         try {
           switch (arg.message) {
             case 'API tests start':
-              // index.appLocals.models.members.reset
+              index.appLocals.models.members.resetCount();
+              break;
             case 'Failed API tests start':
             case 'Invalid API requests tests start':
             case 'Angular fall back test start':
             case 'File retrieval test start':
               break;
             case 'Bad database tests start':
-              /* only way to stub mongoose queries to mock entire chain */
+              /* only way to stub mongoose queries is to mock entire chain */
               //
               /* mock addMember */
               function FakeMembers(this: any) {

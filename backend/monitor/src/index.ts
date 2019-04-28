@@ -27,7 +27,7 @@ export const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* configuration file expected in directory above */
-import { config } from './configMonitor';
+import { config, IChild, IMonitor } from './configMonitor';
 export { config };
 
 /* external dependencies */
@@ -43,11 +43,8 @@ const DumpError = config.DumpError;
 export const dumpError = new DumpError(logger) as (err: any) => void;
 
 /* child process will be index.js */
-interface IChild extends forever.Monitor {
-  running: boolean;
-  exitCode: number;
-}
-export let child: IChild;
+
+let child: IChild;
 
 /* tells child process to close */
 function exit(cause: string) {
@@ -99,7 +96,6 @@ async function runMonitor(): Promise<void> {
   logger.info('\n*** STARTING MONITOR ***\n');
 
   /* forever start options */
-  // tslint:disable:object-literal-sort-keys
   const options = {
     /* required to communicate with child process */
     fork: true,
@@ -194,9 +190,6 @@ async function runMonitor(): Promise<void> {
     }
   });
 
-  interface IMonitor extends forever.Monitor {
-    child: IChild;
-  }
   /* 'exit' emitted after child.stop */
   child.on('exit', (Monitor: IMonitor) => {
     child.removeAllListeners();
@@ -243,9 +236,5 @@ async function runMonitor(): Promise<void> {
 
 runMonitor();
 
-/* exports for unit test */
-/* Note: exports of config, child, debug, logger and dumpError are also for unit test */
-export { runMonitor as testStart };
-export { exit as testExit };
-export { uncaughtException as testUncaughtException };
-export { unhandledRejection as testUnhandledRejection };
+/* all exports are for unit test */
+export { child, exit, runMonitor, uncaughtException, unhandledRejection };

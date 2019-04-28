@@ -55,6 +55,8 @@ after('Signal tests ending', async () => {
 });
 
 describe('api requests', () => {
+  const duplicateName = 'test2';
+
   before('Signal tests starting', async () => {
     console.log('Starting API requests tests');
     await sendMessage(1, 'API tests start');
@@ -90,26 +92,26 @@ describe('api requests', () => {
 
   it('should create another member', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const data = { name: 'test2' };
+    const data = { name: duplicateName };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
 
     const readBody = await response.json();
     console.log('Page body : ', readBody);
     /* the server the data back */
-    chai.expect(readBody.name, 'Created name').eql('test2');
+    chai.expect(readBody.name, 'Created name').eql(duplicateName);
   });
 
-  it('should create another member', async () => {
+  it('should create a member with duplicate name', async () => {
     const url = 'https://localhost:1337/api-v1/members';
-    const data = { name: 'name3' };
+    const data = { name: duplicateName };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
 
     const readBody = await response.json();
     console.log('Page body : ', readBody);
     /* the server the data back */
-    chai.expect(readBody.name, 'Created name').eql('name3');
+    chai.expect(readBody.name, 'Created name').eql(duplicateName);
   });
 
   it('should get all members', async () => {
@@ -125,7 +127,7 @@ describe('api requests', () => {
   });
 
   it('should get queried members', async () => {
-    const url = 'https://localhost:1337/api-v1/members?name=test';
+    const url = `https://localhost:1337/api-v1/members?name=${duplicateName}`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(true);
 
@@ -133,7 +135,7 @@ describe('api requests', () => {
     console.log('Page body : ', readBody);
     /* the server sends [{ id: 1, "name"; "test1" }, ... ] */
     chai.expect(readBody.length, 'Number returned').to.eql(2);
-    chai.expect(readBody[1].id, 'Document 2 id').to.eql(2);
+    chai.expect(readBody[1].id, 'Document 2 id').to.eql(3);
   });
 
   it('should update a member', async () => {
@@ -193,25 +195,6 @@ describe('failed api requests', () => {
   after('Signal tests ending', async () => {
     console.log('Ending failed API requests tests');
     await sendMessage(2, 'Failed API tests end');
-  });
-
-  it('should fail to create - duplicate ', async () => {
-    let url = 'https://localhost:1337/api-v1/members';
-    let data = { name: 'test7' };
-    let response = await sendRequest(url, 'POST', data);
-    chai.expect(response.ok).to.eql(true);
-
-    url = 'https://localhost:1337/api-v1/members';
-    data = { name: 'test7' };
-    response = await sendRequest(url, 'POST', data);
-    chai.expect(response.ok).to.eql(false);
-    chai.expect(response.status).to.eql(409);
-
-    const readBody = await response.json();
-    console.log('Page body : ', readBody);
-    chai
-      .expect(readBody.message, 'member already exists')
-      .eql('A member with that id already exists in the database');
   });
 
   it('should fail to read - not there ', async () => {
@@ -404,34 +387,6 @@ describe('invalid api requests', () => {
   after('Signal tests ending', async () => {
     console.log('Ending invalid API requests tests');
     await sendMessage(2, 'Invalid API requests tests end');
-  });
-
-  it('should fail to create - id > max', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
-    const data = { name: 'test1' };
-    const response = await sendRequest(url, 'POST', data);
-    chai.expect(response.ok).to.eql(false);
-    chai.expect(response.status).to.eql(400);
-
-    const readBody = await response.json();
-    console.log('Page body : ', readBody);
-    chai
-      .expect(readBody.message, 'API validation fail')
-      .eql('API validation fail');
-  });
-
-  it('should fail to create - negative id', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
-    const data = { name: 'test1' };
-    const response = await sendRequest(url, 'POST', data);
-    chai.expect(response.ok).to.eql(false);
-    chai.expect(response.status).to.eql(400);
-
-    const readBody = await response.json();
-    console.log('Page body : ', readBody);
-    chai
-      .expect(readBody.message, 'API validation fail')
-      .eql('API validation fail');
   });
 
   it('should fail to create - name too long', async () => {

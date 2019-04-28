@@ -17,6 +17,7 @@ import * as appRootObject from 'app-root-path';
 /* appRoot will be the directory containing the node_modules directory which includes app-root-path, i.e. should be in .../backend */
 const appRoot = appRootObject.toString();
 import * as path from 'path';
+import * as forever from 'forever-monitor';
 
 // a configured winston general logger
 import { Logger } from '../../utils/src/logger';
@@ -64,3 +65,22 @@ export const config = {
     'monitorErr.log',
   ),
 };
+
+export interface IChild extends forever.Monitor {
+  running: boolean;
+  exitCode: number;
+}
+export interface IMonitor extends forever.Monitor {
+  child: IChild;
+}
+
+export interface IMonitorIndex {
+  child: IChild;
+  exit: (signal: string) => void;
+  runMonitor: () => Promise<void>;
+  uncaughtException: (err: any) => Promise<void>;
+  unhandledRejection: (reason: any, promise: any) => Promise<void>;
+  debug: (text: string) => void;
+  logger: { error: (err: any) => void };
+  dumpError: (err: any) => void;
+}

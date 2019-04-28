@@ -38,7 +38,6 @@ import {
   IControllers,
   IErr,
   IExpressApp,
-  IModels,
   processExtended,
   Server,
   typeSigInt,
@@ -165,11 +164,10 @@ async function runApp() {
     if (isDbReady === DBReadyState.Connected) {
       debug(modulename + ': database set up complete');
 
-      /* generate the models object */
-      const models: IModels = {};
-      models.tests = createModelTests(database);
-      models.members = createModelMembers(database);
-      appLocals.models = models;
+      /* create database models */
+      appLocals.models = {} as any;
+      appLocals.models.tests = createModelTests(database);
+      appLocals.models.members = createModelMembers(database);
     } else {
       logger.error(modulename + ': database failed to connect');
     }
@@ -232,7 +230,13 @@ async function runApp() {
         process.send('Server is running');
       }
 
-      logger.info(`\n*** SERVER LISTENING ON PORT ${config.PORT} ***\n`);
+      if (isDbReady === DBReadyState.Connected) {
+        logger.info(`\n*** DATABASE CONNECTED ***`);
+      } else {
+        logger.error(`\n*** DATABASE NOT CONNECTED ***`);
+      }
+
+      logger.info(`\n*** SERVER LISTENING ON PORT ${config.PORT} ***`);
     } catch (err) {
       logger.error(modulename + ': server start up error - exiting');
       dumpError(err);

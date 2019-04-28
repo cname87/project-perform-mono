@@ -8,18 +8,18 @@ const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-import { Document, DocumentToObjectOptions, Model, Schema } from 'mongoose';
+import { Document, DocumentToObjectOptions, Schema } from 'mongoose';
 import { autoIncrement } from 'mongoose-plugin-autoinc';
 
 /* internal dependencies */
-import { Database } from './configModels';
+import { Database, IModelExtended } from './configModels';
 
 /**
  * Creates a Members schema and returns a Mongoose model.
  * @returns A Mongoose model.
  * @param database connection to a mongoDB database.
  */
-function createModel(database: Database): Model<Document> {
+function createModel(database: Database): IModelExtended {
   debug(modulename + ': running createModel');
 
   /* set up schema, collection, and model name */
@@ -38,9 +38,12 @@ function createModel(database: Database): Model<Document> {
     startAt: 1,
   });
 
-  /* create the model */
-  const ModelMembers
-    = database.createModel(ModelName, memberSchema, collection);
+  /* create the model - extended above by autoinc plugin */
+  const ModelMembers = database.createModel(
+    ModelName,
+    memberSchema,
+    collection,
+  ) as IModelExtended;
 
   /* set toObject option so _id, and __v deleted */
   ModelMembers.schema.set('toObject', {

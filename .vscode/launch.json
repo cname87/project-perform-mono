@@ -249,12 +249,13 @@
       /* include testSetup.js to load .env */
       "${workspaceFolder}/backend/dist/test/testSetup.js",
       /* comment out files to select tests */
-      // "${workspaceFolder}/backend/dist/database/test/*.test.js",
-      // "${workspaceFolder}/backend/dist/models/test/*.test.js",
-      // "${workspaceFolder}/backend/dist/utils/test/*.test.js",
+      "${workspaceFolder}/backend/dist/database/test/*.test.js",
+      "${workspaceFolder}/backend/dist/models/test/*.test.js",
+      "${workspaceFolder}/backend/dist/utils/test/*.test.js",
       "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
-      // "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
-      // "${workspaceFolder}/backend/server/test/*.js",
+      "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
+      "${workspaceFolder}/backend/server/test/*.js",
+      "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
     ],
     "env": {
       /* set before all tests so test database used */
@@ -295,6 +296,7 @@
         "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
         "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
         "${workspaceFolder}/backend/server/test/*.js",
+        "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
       ],
       "env": {
         /* set before all tests so test database used */
@@ -329,8 +331,8 @@
         /* include testSetup.js to load .env */
         "${workspaceFolder}/backend/dist/test/testSetup.js",
         /* comment out files to select a test */
-        "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
-        // "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
+        // "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
+        "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
       ],
       "env": {
         /* set before all tests so test database used */
@@ -338,6 +340,7 @@
         /* set to 'true' to automatically run chrome and set tp 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "false",
       },
+      "cwd": "${workspaceFolder}/backend",
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
@@ -347,7 +350,6 @@
         "${workspaceFolder}/backend/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
-      // "preLaunchTask": "Taskkill node.exe", // can't use in compound calls
     },
     // https://localhost:1337/testServer/xxx/loadMocha.html
     {

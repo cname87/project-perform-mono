@@ -36,6 +36,10 @@ debug(`Starting ${modulename}`);
  */
 import winston = require('winston');
 
+// type DumpError {
+//   (err: any) => void;
+// }
+
 class DumpError {
   /* holds the singleton instance */
   public static instance: (err: any) => void;

@@ -209,9 +209,10 @@ export interface IControllers {
   [key: string]: Router;
 }
 
-/* models object */
-export interface IModels {
-  [key: string]: Model<Document, {}>;
+/* extend Model to include autoinc resetCounter() */
+interface IModelExtended extends Model<Document, {}> {
+  resetCount: () => void;
+  nextCount: () => number;
 }
 
 /* appLocals object */
@@ -237,7 +238,10 @@ export interface IAppLocals {
   membersApi: typeof membersApi;
   memberhandlers: typeof membersHandlers;
   /* database models object */
-  models: IModels;
+  models: {
+    tests: Model<Document, {}>;
+    members: IModelExtended;
+  };
   /* morgan server logger */
   serverLogger: ServerLogger;
   /* created http(s) servers */
@@ -287,7 +291,7 @@ interface IProcessExtended {
 export type processExtended = IProcessExtended & NodeJS.Process;
 
 export type typeSigInt = () => Promise<void>;
-export type typeUncaught = (err: IErr) => Promise<void>;
+export type typeUncaught = (err: any) => Promise<void>;
 
 /* create type for the index.ts export (for mocha) */
 export interface IServerIndex {

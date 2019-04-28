@@ -366,7 +366,7 @@ describe('Application tests', function() {
       expect(response).not.to.be.instanceof(Error);
 
       expect(
-        spyLoggerError.lastCall.calledWith(
+        spyLoggerError.calledWith(
           '\\index.js: database start up error - continuing',
         ),
       ).to.be.true;

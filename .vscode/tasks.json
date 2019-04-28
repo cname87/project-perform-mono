@@ -48,7 +48,7 @@
         "panel": "shared"
       }
     },
-    //  "npm build:dev frontend"
+    // "npm build:dev frontend"
     {
       "label": "npm build:dev frontend",
       "type": "shell",
