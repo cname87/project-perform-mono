@@ -4,7 +4,35 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-
+    // ng serve http:localhost:4200 - does not connect to backend db
+    {
+      "name": "ng serve http:localhost:4200",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "npm start frontend",
+      "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "runtimeArgs": [
+        "--remote-debugging-port=9222",
+        "--incognito",
+        "--start-maximized",
+        "--new-window",
+        "--disable-popup-blocking", // necessary for window.open() to work
+      ],
+      "userDataDir": true,
+      "url": "http://localhost:4200/#",
+      // tell vscode where to find scripts on the server
+      "pathMapping": {
+        "/": "${workspaceFolder}/frontend/dist/",
+        "/testServer": "${workspaceFolder}/backend/server/test/client/",
+      },
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${workspaceFolder}/frontend/*",
+      },
+      "smartStep": true,
+      "disableNetworkCache": true,
+      "showAsyncStacks": true,
+      "sourceMaps": true,
+    },
     // ng test
     {
       "name": "ng test",
@@ -21,9 +49,9 @@
       "userDataDir": true,
       "url": "http://localhost:9876/debug.html",
       // tell vscode where to find scripts on the server
-      "webRoot": "${workspaceFolder}/frontend/dist/",
+      "webRoot": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-members",
+        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
         "/testServer": "${workspaceFolder}/backend/server/test/client/browser",
       },
       "sourceMapPathOverrides": {
@@ -37,6 +65,23 @@
       "disableNetworkCache": true,
       "showAsyncStacks": true,
       "sourceMaps": true,
+    },
+    // ng e2e
+    {
+      "name": "ng e2e",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/frontend//node_modules/protractor/bin/protractor",
+      "protocol": "inspector",
+      "args": ["${workspaceFolder}/frontend/e2e/protractor.conf.js"],
+      "outputCapture": "std",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/frontend/node_modules/**/*",
+        "${workspaceFolder}/frontend/node_modules/**/*.js",
+      ],
     },
     // Current .js file
     {
@@ -180,11 +225,16 @@
       "url": "https://localhost:1337/",
       // tell vscode where to find scripts on the server
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-members",
+        "/": "${workspaceFolder}/frontend/dist/",
         "/testServer": "${workspaceFolder}/backend/dist/server/test/client/",
       },
       "sourceMapPathOverrides": {
         "webpack:///./*": "${workspaceFolder}/frontend/*",
+        "./*": "${workspacefolder}/frontend/*",
+        "/./*": "${workspacefolder}/frontend/*",
+        "/src/*": "${workspacefolder}/frontend/src/*",
+        "/*": "*",
+        "/./~/*": "${workspacefolder}/frontend/node_modules/*"
       },
       "smartStep": true,
       "disableNetworkCache": true,
@@ -327,11 +377,15 @@
       // "url": "https://localhost:1337/testServer/errors/static/loadmocha.html",
       // tell vscode where to find scripts on the server
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-members",
+        "/": "${workspaceFolder}/frontend/dist/",
         "/testServer": "${workspaceFolder}/backend/dist/server/test/client",
       },
       "sourceMapPathOverrides": {
         "webpack:///./*": "${workspaceFolder}/frontend/*",
+        "/./*": "${workspacefolder}/frontend/*",
+        "/src/*": "${workspacefolder}/frontend/src/*",
+        "/*": "*",
+        "/./~/*": "${workspacefolder}/frontend/node_modules/*"
       },
       "smartStep": true,
       "disableNetworkCache": true,
