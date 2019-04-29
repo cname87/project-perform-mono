@@ -2,7 +2,8 @@
   "linterOptions": {
     "exclude": [
       "./frontend/src/karma.conf.js",
-      "./frontend/src/polyfills.ts"
+      "./frontend/src/polyfills.ts",
+      "./frontend/e2e/**/*.*"
     ]
   },
   "rulesDirectory": [ // custom rules you can use

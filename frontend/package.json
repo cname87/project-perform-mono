@@ -22,9 +22,11 @@
     "prettierBase": "prettier",
     "prettierCheck": "npm run prettierBase -- --list-different \"./**/*.{ts,tsx}\"",
     "prettierWrite": "npm run prettierBase -- --write \"./**/*.{ts,tsx}\"",
-    "tslint": "tslint ./src/**/*.ts --format verbose --project tsconfig.json --config tslint.json",
-    "build:dev": "ng build && npm run prettierWrite && npm run tslint",
-    "build:prod": "ng build --prod && npm run prettierWrite && npm run tslint"
+    "tslint:app": "tslint ./src/**/*.ts --format verbose --project ./src/tsconfig.app.json --config ./src/tslint.json",
+    "tslint:spec": "tslint ./src/**/*.ts --format verbose --project ./src/tsconfig.spec.json --config ./src/tslint.json",
+    "tslint": "npm run tslint:app && npm run tslint:apec",
+    "build:dev": "ng build && npm run prettierWrite && npm run tslint:app",
+    "build:prod": "ng build --prod && npm run prettierWrite && npm run tslint:app"
   },
   "dependencies": {
     "@angular/animations": "^7.2.9",

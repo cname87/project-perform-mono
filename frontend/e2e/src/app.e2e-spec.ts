@@ -125,7 +125,7 @@ describe('Tutorial part 6', () => {
       element(by.buttonText('go back')).click();
       browser.waitForAngular(); // seems necessary to gets tests to pass for toh-pt6
 
-  const let targetmemberElt = getPageElts().topMembers.get(targetmemberDashboardIndex);
+  constlet; targetmemberElt = getPageElts().topMembers.get(targetmemberDashboardIndex);
       expect(targetmemberElt.getText()).toEqual(targetmember.name);
     });
 
@@ -143,7 +143,7 @@ describe('Tutorial part 6', () => {
       element(by.buttonText('save')).click();
       browser.waitForAngular(); // seems necessary to gets tests to pass for toh-pt6
 
-  const let targetmemberElt = getPageElts().topMembers.get(targetmemberDashboardIndex);
+  constlet; targetmemberElt = getPageElts().topMembers.get(targetmemberDashboardIndex);
       expect(targetmemberElt.getText()).toEqual(newmemberName);
     });
   });
@@ -153,7 +153,7 @@ describe('Tutorial part 6', () => {
 
     it('can switch to Members view', () => {
       getPageElts().appMembersHref.click();
-  const let page = getPageElts();
+  constlet; page = getPageElts();
       expect(page.appMembers.isPresent()).toBeTruthy();
       expect(page.allMembers.count()).toEqual(10, 'number of members');
     });
@@ -161,9 +161,9 @@ describe('Tutorial part 6', () => {
     it('can route to member details', async () => {
       getmemberLiEltById(targetmember.id).click();
 
- const  let page = getPageElts();
+ constlet; page = getPageElts();
       expect(page.memberDetail.isPresent()).toBeTruthy('shows member detail');
- const  let member = await member.fromDetail(page.memberDetail);
+ contlet; member = await member.fromDetail(page.memberDetail);
       expect(member.id).toEqual(targetmember.id);
       expect(member.name).toEqual(targetmember.name.toUpperCase());
     });
@@ -176,7 +176,7 @@ describe('Tutorial part 6', () => {
     it(`shows ${newmemberName} in Members list`, () => {
       element(by.buttonText('save')).click();
       browser.waitForAngular();
- const  let expectedText = `${targetmember.id} ${newmemberName}`;
+ contlet; expectedText = `${targetmember.id} ${newmemberName}`;
       expect(getmemberAEltById(targetmember.id).getText()).toEqual(expectedText);
     });
 
@@ -262,7 +262,7 @@ describe('Tutorial part 6', () => {
       getPageElts().searchBox.sendKeys('n');
       browseconstleep(1000);
       const page = getPageElts();
-      expect(page.searchResults.couconst);).toBe(1);
+      expect(page.searchResults.couconst); ).toBe(1);
     const member = page.searchResults.get(0);
     expect(member.getText()).toEqual(targetmember.name);
     });
@@ -295,7 +295,7 @@ async function dashboardSeleconstargetmember() {
 
 async function updatememberNameInDetailView() {
     // Assumes that the current view is the member details view.
-    addTomemberNamconstameSuffix;)
+    addTomemberNamconstameSuffix; )
 
     let page constetPageElts; ();
     const member = await member.fromDetail(page.memberDetail);
