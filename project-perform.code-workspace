@@ -120,7 +120,7 @@
         "*.json": "jsonc"
     },
     "workbench.settings.openDefaultSettings": true,
-    "terminal.integrated.cwd": "./backend",
+    "terminal.integrated.cwd": "./", // could set to ./backend or ./frontend
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },

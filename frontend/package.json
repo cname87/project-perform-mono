@@ -16,18 +16,18 @@
     "C:\\Users\\syoung\\Dropbox\\Software\\MEAN\\projects\\project_perform"
   },
   "scripts": {
+    "build": "ng build",
     "start": "ng serve --proxy-config proxy.conf.json",
     "test": "ng test",
     "e2e": "ng e2e",
-    "ng": "ng",
     "prettierBase": "prettier",
     "prettierCheck": "npm run prettierBase -- --list-different \"./**/*.{ts,tsx}\"",
     "prettierWrite": "npm run prettierBase -- --write \"./**/*.{ts,tsx}\"",
     "tslint:app": "tslint ./src/**/*.ts --format verbose --project ./src/tsconfig.app.json --config ./src/tslint.json",
     "tslint:spec": "tslint ./src/**/*.ts --format verbose --project ./src/tsconfig.spec.json --config ./src/tslint.json",
     "tslint": "npm run tslint:app && npm run tslint:apec",
-    "build:dev": "ng build && npm run prettierWrite && npm run tslint:app",
-    "build:prod": "ng build --prod && npm run prettierWrite && npm run tslint:app"
+    "build:dev": "npm run build && npm run prettierWrite && npm run tslint:app",
+    "build:prod": "npm run build --prod && npm run prettierWrite && npm run tslint:app"
   },
   "dependencies": {
     "@angular/animations": "^7.2.9",

@@ -11,7 +11,13 @@
       "request": "launch",
       "preLaunchTask": "npm start frontend",
       "url": "http://localhost:4200/",
-      "webRoot": "${workspaceFolder}"
+      "webRoot": "${workspaceFolder}",
+      "sourceMapPathOverrides": {
+        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
+        "webpack:///./*": "${workspaceFolder}/frontend/*",
+        "webpack:///*":     "frontend/*",
+        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
+      },
     },
     // ng test
     {
@@ -35,11 +41,10 @@
         "/testServer": "${workspaceFolder}/backend/server/test/client/browser",
       },
       "sourceMapPathOverrides": {
+        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
         "webpack:///./*": "${workspaceFolder}/frontend/*",
-        "/./*": "${workspacefolder}/frontend/*",
-        "/src/*": "${workspacefolder}/frontend/*",
-        "/*": "*",
-        "/./~/*": "${workspacefolder}/frontend/node_modules/*"
+        "webpack:///*":     "frontend/*",
+        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
       "smartStep": true,
       "disableNetworkCache": true,
@@ -209,12 +214,10 @@
         "/testServer": "${workspaceFolder}/backend/dist/server/test/client/",
       },
       "sourceMapPathOverrides": {
+        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
         "webpack:///./*": "${workspaceFolder}/frontend/*",
-        "./*": "${workspacefolder}/frontend/*",
-        "/./*": "${workspacefolder}/frontend/*",
-        "/src/*": "${workspacefolder}/frontend/src/*",
-        "/*": "*",
-        "/./~/*": "${workspacefolder}/frontend/node_modules/*"
+        "webpack:///*":     "frontend/*",
+        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
       "smartStep": true,
       "disableNetworkCache": true,
@@ -361,11 +364,10 @@
         "/testServer": "${workspaceFolder}/backend/dist/server/test/client",
       },
       "sourceMapPathOverrides": {
+        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
         "webpack:///./*": "${workspaceFolder}/frontend/*",
-        "/./*": "${workspacefolder}/frontend/*",
-        "/src/*": "${workspacefolder}/frontend/src/*",
-        "/*": "*",
-        "/./~/*": "${workspacefolder}/frontend/node_modules/*"
+        "webpack:///*":     "frontend/*",
+        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
       "smartStep": true,
       "disableNetworkCache": true,
@@ -376,13 +378,22 @@
     },
   ],
   "compounds": [
-    /* Run backend server and frontend app */
+    /* Run backend server and chrome */
     {
-      /* To debug angular go into Chrome and ensure filesystem added. If you have difficulty setting breakpoints in vscode then set them in Chrome. */
+      /* To debug angular you may need to go into Chrome and ensure filesystem added. If you have difficulty setting breakpoints in vscode then set them in Chrome. */
       "name": "Backend/Frontend",
       "configurations": [
         "Launch server index.js",
         "Launch https://localhost:1337/",
+      ]
+
+    },
+    /* Run backend server and ng serve */
+    {
+      "name": "Server/ng serve",
+      "configurations": [
+        "Launch server index.js",
+        "ng serve",
       ]
 
     },
