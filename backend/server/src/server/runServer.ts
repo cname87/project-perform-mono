@@ -147,6 +147,16 @@ async function runServer(
       verbose: true,
     },
     handlers: {
+      getIsTestDatabase:  (
+        _context,
+        req: IRequestApp,
+        _res: Response,
+        _next: NextFunction,
+      ) => {
+        return (
+          req.app.appLocals.database.dbConnection.db.databaseName === process.env.DB_DATABASE_TEST
+        );
+      },
       getMember: (
         context,
         req: IRequestApp,
