@@ -3,7 +3,7 @@
   "info" : {
     "title" : "Project Perform API V1",
     "version" : "1.0.0",
-    "description" : "V1.x.x cover the API for one team",
+    "description" : "V1.x.x cover the API for one team of members.",
     "contact" : {
       "name" : "Sean Young",
       "email" : "cname@yahoo.com"
@@ -18,16 +18,46 @@
     "description" : "Development server"
   } ],
   "paths" : {
+    "/isTestDatabase" : {
+      "get" : {
+        "summary" : "Returns whether the test database is in use.",
+        "operationId" : "getIsTestDatabase",
+        "x-swagger-router-controller" : "members",
+        "description" : "Returns whether the test database is in use.\nIf the test database is in use then it is safe to run the api tests.\n",
+        "responses" : {
+          "200" : {
+            "description" : "Test mode returned.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IsTestDatabase"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/members" : {
       "get" : {
-        "summary" : "Returns the members of a team",
+        "summary" : "Returns all the members, or as determined by a query string.",
         "operationId" : "getMembers",
         "x-swagger-router-controller" : "members",
-        "description" : "Returns all team members\n",
+        "description" : "Returns all the members\n",
         "parameters" : [ {
           "in" : "query",
           "name" : "name",
-          "description" : "Pass an optional name search string to limit the returned list",
+          "description" : "An optional name search string to limit the returned list.\nAll members with the name property starting with 'name' will be returned. \n",
           "required" : false,
           "schema" : {
             "type" : "string",
@@ -36,7 +66,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "Members returned",
+            "description" : "Members returned.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -49,7 +79,7 @@
             }
           },
           "400" : {
-            "description" : "The request is not valid",
+            "description" : "The request is not valid.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -59,7 +89,7 @@
             }
           },
           "404" : {
-            "description" : "The supplied match string does not match any team member",
+            "description" : "The supplied match string does not match any member.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -69,7 +99,7 @@
             }
           },
           "503" : {
-            "description" : "The database service is not available now",
+            "description" : "The database service is not available now.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -79,7 +109,7 @@
             }
           },
           "default" : {
-            "description" : "Unexpected error",
+            "description" : "Unexpected error.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -91,12 +121,12 @@
         }
       },
       "post" : {
-        "summary" : "Adds a member to a team",
+        "summary" : "Adds a member.",
         "operationId" : "addMember",
         "x-swagger-router-controller" : "members",
-        "description" : "Adds a supplied member to the team.\nA member object must be supplied in the body.\nAn error (409) will be returned if a member with the same id as the id in the supplied member object already exists. \n",
+        "description" : "Adds a supplied member.\nA member object must be supplied in the body.\nAn error (409) will be returned if a member with the same id as the id in the supplied member object already exists. \n",
         "requestBody" : {
-          "description" : "Team member detail (without id field)",
+          "description" : "Mmber detail (without id field).",
           "x-name" : "member",
           "required" : true,
           "content" : {
@@ -119,7 +149,7 @@
             }
           },
           "400" : {
-            "description" : "The request is not a valid",
+            "description" : "The request is not a valid request.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -129,7 +159,7 @@
             }
           },
           "503" : {
-            "description" : "The database service is not available now",
+            "description" : "The database service is not available now.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -151,12 +181,12 @@
         }
       },
       "put" : {
-        "summary" : "Updates a member in a team",
-        "description" : "Updates the data on a member of the team\n",
+        "summary" : "Updates a member (based on the id property of the member).",
+        "description" : "Updates the data on a member.\n",
         "operationId" : "updateMember",
         "x-swagger-router-controller" : "members",
         "requestBody" : {
-          "description" : "Team member to be updated detail",
+          "description" : "Updates a member.\nA member object is supplied which must have an id property.\nThe member with that id is updated.\n",
           "x-name" : "member",
           "required" : true,
           "content" : {
@@ -169,7 +199,7 @@
         },
         "responses" : {
           "200" : {
-            "description" : "Member updated",
+            "description" : "Member updated.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -179,7 +209,7 @@
             }
           },
           "400" : {
-            "description" : "The request is not a valid",
+            "description" : "The request is not a valid request.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -189,7 +219,7 @@
             }
           },
           "404" : {
-            "description" : "A member with the supplied member ID was not found",
+            "description" : "A member with the supplied member ID was not found.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -199,7 +229,7 @@
             }
           },
           "503" : {
-            "description" : "The database service is not available now",
+            "description" : "The database service is not available now.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -221,10 +251,10 @@
         }
       },
       "delete" : {
-        "summary" : "Deletes all members of a team",
+        "summary" : "Deletes all members.",
         "operationId" : "deleteMembers",
         "x-swagger-router-controller" : "members",
-        "description" : "Deletes all team members\n",
+        "description" : "Deletes all members.\n",
         "responses" : {
           "200" : {
             "description" : "Members deleted",
@@ -237,7 +267,7 @@
             }
           },
           "400" : {
-            "description" : "The request is not valid",
+            "description" : "The request is not a valid request.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -247,7 +277,7 @@
             }
           },
           "503" : {
-            "description" : "The database service is not available now",
+            "description" : "The database service is not available now.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -271,14 +301,14 @@
     },
     "/members/{id}" : {
       "get" : {
-        "summary" : "Returns a specific team member",
-        "description" : "Obtain information about a specific team member\n",
+        "summary" : "Returns a specific member.",
+        "description" : "Get a specific member.\n",
         "operationId" : "getMember",
         "x-swagger-router-controller" : "members",
         "parameters" : [ {
           "in" : "path",
           "name" : "id",
-          "description" : "The ID of the team member",
+          "description" : "The value of the id property of the member.",
           "required" : true,
           "schema" : {
             "type" : "integer",
@@ -289,7 +319,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "Member information returned",
+            "description" : "Member information returned.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -299,7 +329,7 @@
             }
           },
           "400" : {
-            "description" : "The request is not valid",
+            "description" : "The request is not a valid request.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -341,14 +371,14 @@
         }
       },
       "delete" : {
-        "summary" : "Deletes a member from a team",
-        "description" : "Deletes a member from the team\n",
+        "summary" : "Deletes a member.",
+        "description" : "Deletes a member.\n",
         "operationId" : "deleteMember",
         "x-swagger-router-controller" : "members",
         "parameters" : [ {
           "in" : "path",
           "name" : "id",
-          "description" : "The ID of the team member",
+          "description" : "The value of the id property of the member.",
           "required" : true,
           "schema" : {
             "type" : "integer",
@@ -415,7 +445,7 @@
   "components" : {
     "schemas" : {
       "Member" : {
-        "description" : "Team member information",
+        "description" : "Member information",
         "required" : [ "id", "name" ],
         "type" : "object",
         "properties" : {
@@ -435,7 +465,7 @@
         }
       },
       "MemberWithoutId" : {
-        "description" : "Team member information without the id field",
+        "description" : "Member information without the id field",
         "required" : [ "name" ],
         "type" : "object",
         "properties" : {
@@ -465,14 +495,25 @@
         }
       },
       "Count" : {
-        "description" : "Count of documents",
-        "required" : [ "count" ],
+        "description" : "Count of documents.",
         "type" : "object",
+        "required" : [ "count" ],
         "properties" : {
           "count" : {
             "type" : "integer",
             "format" : "int32",
             "example" : 5
+          }
+        }
+      },
+      "IsTestDatabase" : {
+        "description" : "boolean 'true' => test database is in use.",
+        "type" : "object",
+        "required" : [ "isTestDatabase" ],
+        "properties" : {
+          "isTestDatabase" : {
+            "type" : "boolean",
+            "example" : false
           }
         }
       }

@@ -48,6 +48,21 @@ async function sendMessage(number: number, message: string) {
   });
 }
 
+/* tests that the datbase is use */
+before('Test that the test database is in use', async () => {
+  console.log('Testing that test datbase is in use');
+  const url = 'https://localhost:1337/api-v1/isTestDatabase';
+  const response = await sendRequest(url, 'GET');
+  chai.expect(response.ok).to.eql(true);
+
+  const readBody = await response.json();
+  console.log('Page body : ', readBody);
+  /* the server sends { isTestDatabase: true/false } */
+  if (!readBody.isTestDatabase) {
+    throw new Error('Test database not in use');
+  }
+});
+
 /* tells the server that tests are ending */
 after('Signal tests ending', async () => {
   console.log('Ending tests');
@@ -67,7 +82,7 @@ describe('api requests', () => {
     await sendMessage(2, 'API tests end');
   });
 
-  it('should delete all members', async () => {
+  it.skip('should delete all members', async () => {
     const url = 'https://localhost:1337/api-v1/members';
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(true);

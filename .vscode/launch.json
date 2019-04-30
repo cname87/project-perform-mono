@@ -319,8 +319,8 @@
         /* include testSetup.js to load .env */
         "${workspaceFolder}/backend/dist/test/testSetup.js",
         /* comment out files to select a test */
-        // "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
-        "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
+        "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
+        // "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
       ],
       "env": {
         /* set before all tests so test database used */
@@ -404,6 +404,7 @@
       /* use when debugging client-side mocha scripts */
       /* You must set RUN_CHROME to 'false' and disable Taskkill on Mocha Client-fired server Tests before running this */
       /* you must close Chrome manually afterwards */
+      /* you must match the tests in both configurations below */
       "configurations": [
         "Mocha Client-fired Server Tests",
         "Launch https://localhost:1337/testServer/xxx/loadMocha.html",
