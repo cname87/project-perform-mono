@@ -37,7 +37,7 @@ class Configuration {
 }
 
 export const membersConfiguration = new Configuration({
-  basePath: 'https://localhost:1337/api-v1',
+  basePath: 'api-v1',
   servicePath: 'members',
   defaultHeaders: new HttpHeaders(),
 });

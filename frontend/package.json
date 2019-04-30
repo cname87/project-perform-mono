@@ -12,10 +12,11 @@
   "main": "./index.js",
   "repository": {
     "type": "git",
-    "url": "C:\\Users\\syoung\\Dropbox\\Software\\MEAN\\projects\\project_perform"
+    "url":
+    "C:\\Users\\syoung\\Dropbox\\Software\\MEAN\\projects\\project_perform"
   },
   "scripts": {
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "test": "ng test",
     "e2e": "ng e2e",
     "ng": "ng",
@@ -68,6 +69,7 @@
     "ts-node": "~8.0.3",
     "tslint": "~5.14.0",
     "tslint-angular": "^1.1.2",
+    "tslint-no-unused-expression-chai": "^0.1.4",
     "typescript": "^3.2.4"
   }
 }
