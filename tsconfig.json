@@ -12,7 +12,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "extendedDiagnostics": true,
-    "forceConsistentCasingInFileNames": true,
+    // "forceConsistentCasingInFileNames": true,  // causes ng test error
     "importHelpers": true,
     "listEmittedFiles": true,
     "moduleResolution": "node",
@@ -30,7 +30,7 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "suppressImplicitAnyIndexErrors":true,
-    // "traceResolution": true,,
+    // "traceResolution": true,
     "typeRoots": [
       "node_modules/@types"
     ],

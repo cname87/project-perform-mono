@@ -3,6 +3,6 @@
     "tslint:latest",
     "tslint-no-unused-expression-chai",
     "../tslint.json"
-
   ]
 }
+

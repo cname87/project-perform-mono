@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { MembersApi, Member } from '../membersApi/membersApi';
+import { MembersService } from '../members.service';
+import { Member } from '../membersApi/membersApi';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css'],
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
   members: Member[] = [];
 
-  constructor(private membersService: MembersApi) {}
+  constructor(private membersService: MembersService) {}
 
   ngOnInit() {
     this.getMembers();

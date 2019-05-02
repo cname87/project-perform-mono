@@ -20,37 +20,5 @@
 
     /* module option */
     "module": "es2015",  // module loader format (independent of target) - es2015 for angular
-
-    // /* All other compiler options */
-    // "allowJs": true,
-    // "alwaysStrict": true,
-    // "declaration": false, // generates declaration .d.ts files
-    // // "declarationMap": true, // generates map files for declaration files
-    // // "diagnostics": true,
-    // "esModuleInterop": true,
-    // "emitDecoratorMetadata": true,
-    // "experimentalDecorators": true,
-    // "extendedDiagnostics": true,
-    // "forceConsistentCasingInFileNames": true,
-    // "importHelpers": true,
-    // "listEmittedFiles": true,
-    // "moduleResolution": "node",
-    // "noFallthroughCasesInSwitch": true,
-    // "noImplicitAny": true,
-    // "noImplicitReturns": true,
-    // "noImplicitThis": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "showConfig": true,
-    // "sourceMap": true,
-    // "strict": true,
-    // "strictBindCallApply": true,
-    // "strictFunctionTypes": true,
-    // "strictNullChecks": true,
-    // "strictPropertyInitialization": true,
-    // // "traceResolution": true,,
-    // "typeRoots": [
-    //   "node_modules/@types"
-    // ]
   }
 }

@@ -8,18 +8,25 @@ import { of } from 'rxjs';
 import { members } from '../mock-members';
 import { MembersService } from '../members.service';
 
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
   let memberService;
-  let getMembersSpy;
+  let getMembersSpy: jasmine.Spy;
 
   beforeEach(async(() => {
     memberService = jasmine.createSpyObj('memberService', ['getMembers']);
     getMembersSpy = memberService.getMembers.and.returnValue(of(members));
     TestBed.configureTestingModule({
       declarations: [DashboardComponent, MemberSearchComponent],
-      imports: [RouterTestingModule.withRoutes([])],
+      imports: [
+        HttpClientModule,
+        HttpClientTestingModule,
+        RouterTestingModule.withRoutes([]),
+      ],
       providers: [{ provide: MembersService, useValue: memberService }],
     }).compileComponents();
   }));

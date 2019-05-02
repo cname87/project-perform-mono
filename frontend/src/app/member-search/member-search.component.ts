@@ -10,7 +10,7 @@ import { Member } from '../membersApi/membersApi';
 @Component({
   selector: 'app-member-search',
   templateUrl: './member-search.component.html',
-  styleUrls: ['./member-search.component.css'],
+  styleUrls: ['./member-search.component.scss'],
 })
 export class MemberSearchComponent implements OnInit {
   members$: Observable<Member[]> | undefined;

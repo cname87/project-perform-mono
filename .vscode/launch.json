@@ -21,9 +21,13 @@
     },
     // ng test
     {
+      /* runs 'npm run test' first and then runs this */
+      /* run 'npm run test' manually first if problems with preLaunch task */
+      /* you can debug spec.ts files using breakpoints then. */
       "name": "ng test",
       "type": "chrome",
       "request": "launch",
+      "preLaunchTask": "npm test frontend",
       "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "runtimeArgs": [
         "--remote-debugging-port=9222",
@@ -35,10 +39,10 @@
       "userDataDir": true,
       "url": "http://localhost:9876/debug.html",
       // tell vscode where to find scripts on the server
-      "webRoot": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
+      "webRoot": "${workspaceFolder}/frontend/dist/",
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/angular-tour-of-heroes",
-        "/testServer": "${workspaceFolder}/backend/server/test/client/browser",
+        "/": "${workspaceFolder}/frontend/dist/",
+        "/testServer": "${workspaceFolder}/backend/server/test/client",
       },
       "sourceMapPathOverrides": {
         "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
