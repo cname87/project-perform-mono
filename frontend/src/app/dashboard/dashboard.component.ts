@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import { MembersService } from '../members.service';
 import { Member } from '../membersApi/membersApi';
 
@@ -19,6 +20,13 @@ export class DashboardComponent implements OnInit {
   getMembers(): void {
     this.membersService
       .getMembers()
-      .subscribe((members) => (this.members = members.slice(1, 5)));
+      .subscribe((members) => (this.members = members.slice(0, 4)));
+  }
+
+  trackByFn(_index: number, member: Member) {
+    if (!member) {
+      return null;
+    }
+    return member.id;
   }
 }

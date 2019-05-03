@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import { MessageService } from './message.service';
 import { MembersApi } from './membersApi/membersApi';
 import { ICount, IMember } from './membersApi/model/models';
+import { MessageService } from './message.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class MembersService {
@@ -16,27 +17,25 @@ export class MembersService {
   /** GET members from the server */
   getMembers(): Observable<IMember[]> {
     return this.membersApi.getMembers().pipe(
-      tap((_) => this.log('fetched members')),
+      tap((_) => {
+        this.log('Fetched members');
+      }),
       catchError(this.handleError('getMembers', [])),
     );
   }
 
-  /** GET member by id. Return `undefined` when id not found */
-  getMemberNo404(id: number): Observable<IMember> {
-    return this.membersApi.getMember(id).pipe(
-      tap((m) => {
-        const outcome = m ? `fetched` : `did not find`;
-        this.log(`${outcome} member id=${id}`);
-      }),
-      catchError(this.handleError<IMember>(`getMember id=${id}`)),
-    );
-  }
-
-  /** GET member by id. Will 404 if id not found */
+  /** GET member by id */
   getMember(id: number): Observable<IMember> {
     return this.membersApi.getMember(id).pipe(
-      tap((_) => this.log(`fetched member id=${id}`)),
-      catchError(this.handleError<IMember>(`getMember id=${id}`)),
+      tap((_) => {
+        this.log(`Fetched member id=${id}`);
+      }),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 404) {
+          this.log(`Did not find member id=${id}`);
+        }
+        return this.handleError<IMember>()(err);
+      }),
     );
   }
 
@@ -47,18 +46,18 @@ export class MembersService {
       return of([]);
     }
     return this.membersApi.getMembers(term).pipe(
-      tap((_) => this.log(`found members matching "${term}"`)),
+      tap((_) => {
+        this.log(`Found members matching "${term}"`);
+      }),
       catchError(this.handleError<IMember[]>('searchMembers', [])),
     );
   }
-
-  //////// Save methods //////////
 
   /** POST: add a new member to the server */
   addMember(member: IMember): Observable<IMember> {
     return this.membersApi.addMember(member).pipe(
       tap((newMember: IMember) => {
-        this.log(`added member with id=${newMember.id}`);
+        this.log(`Added member with id=${newMember.id}`);
       }),
       catchError(this.handleError<IMember>('addMember')),
     );
@@ -68,7 +67,9 @@ export class MembersService {
   deleteMember(member: IMember | number): Observable<ICount> {
     const id = typeof member === 'number' ? member : member.id;
     return this.membersApi.deleteMember(id).pipe(
-      tap((_) => this.log(`deleted member id=${id}`)),
+      tap((_) => {
+        this.log(`Deleted member id=${id}`);
+      }),
       catchError(this.handleError<ICount>('deleteMember')),
     );
   }
@@ -76,7 +77,9 @@ export class MembersService {
   /** PUT: update the member on the server */
   updateMember(member: IMember): Observable<IMember> {
     return this.membersApi.updateMember(member).pipe(
-      tap((_) => this.log(`updated member id=${member.id}`)),
+      tap((_) => {
+        this.log(`Updated member id=${member.id}`);
+      }),
       catchError(this.handleError<IMember>('updateMember')),
     );
   }
@@ -87,13 +90,15 @@ export class MembersService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
+  private handleError<T>(operation?: string, result?: T) {
+    return (error: HttpErrorResponse): Observable<T> => {
       // TODO: send the error to remote logging infrastructure
       console.error(error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
-      this.log(`${operation} failed: ${error.message}`);
+      if (operation) {
+        this.log(`${operation} Failed: ${error.message}`);
+      }
 
       // Let the app keep running by returning an empty result.
       return of(result as T);

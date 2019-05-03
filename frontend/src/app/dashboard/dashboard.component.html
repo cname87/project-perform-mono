@@ -1,6 +1,6 @@
 <h3>Top Members</h3>
 <div class="grid-pad">
-  <a *ngFor="let member of members" class="col-1-4"
+  <a *ngFor="let member of members; trackBy: trackByFn" class="col-1-4"
       routerLink="/detail/{{member.id}}">
     <div class="module member">
       <h4>{{ member.name }}</h4>

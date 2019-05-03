@@ -6,6 +6,8 @@
   "configurations": [
     //ng serve
     {
+      /* backend server needs to be started first */
+      /* see compound configuration */
       "name": "ng serve",
       "type": "chrome",
       "request": "launch",
@@ -392,9 +394,9 @@
       ]
 
     },
-    /* Run backend server and ng serve */
+    /* Run backend server and ng serve i.e. rebuilds on change*/
     {
-      "name": "Server/ng serve",
+      "name": "Backend/ng serve",
       "configurations": [
         "Launch server index.js",
         "ng serve",

@@ -10,4 +10,8 @@ export class MessagesComponent implements OnInit {
   constructor(public messageService: MessageService) {}
 
   ngOnInit() {}
+
+  trackByFn(index: number, _message: string) {
+    return index;
+  }
 }

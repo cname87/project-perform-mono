@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
 import { Observable, Subject } from 'rxjs';
-
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 import { MembersService } from '../members.service';
@@ -19,11 +17,11 @@ export class MemberSearchComponent implements OnInit {
   constructor(private membersService: MembersService) {}
 
   // Push a search term into the observable stream.
-  search(term: string): void {
+  search(term: string) {
     this.searchTerms.next(term);
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.members$ = this.searchTerms.pipe(
       // wait 300ms after each keystroke before considering the term
       debounceTime(300),
@@ -34,5 +32,12 @@ export class MemberSearchComponent implements OnInit {
       // switch to new search observable each time the term changes
       switchMap((term: string) => this.membersService.searchMembers(term)),
     );
+  }
+
+  trackByFn(_index: number, member: Member) {
+    if (!member) {
+      return null;
+    }
+    return member.id;
   }
 }

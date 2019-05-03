@@ -39,4 +39,8 @@ export class MembersComponent implements OnInit {
     this.membersService.deleteMember(member.id).subscribe();
     this.members = this.members.filter((m) => m.id !== member.id);
   }
+
+  trackByFn(_index: number, member: Member) {
+    return member.id; // or index
+  }
 }
