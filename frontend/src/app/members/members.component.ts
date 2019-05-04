@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { MembersService } from '../members.service';
-import { Member } from '../membersApi/membersApi';
+import { IMember, IMemberWithoutId } from '../membersApi/membersApi';
 
 @Component({
   selector: 'app-members',
@@ -9,7 +9,7 @@ import { Member } from '../membersApi/membersApi';
   styleUrls: ['./members.component.scss'],
 })
 export class MembersComponent implements OnInit {
-  members: Member[];
+  members: IMember[];
 
   constructor(private membersService: MembersService) {
     this.members = [];
@@ -19,28 +19,32 @@ export class MembersComponent implements OnInit {
     this.getMembers();
   }
 
-  getMembers(): void {
+  getMembers() {
     this.membersService.getMembers().subscribe((members) => {
       this.members = members;
     });
   }
 
-  add(name: string): void {
+  add(name: string) {
     name = name.trim();
     if (!name) {
       return;
     }
-    this.membersService.addMember({ name } as Member).subscribe((member) => {
-      this.members.push(member);
+    const member: IMemberWithoutId = { name };
+    this.membersService.addMember(member).subscribe((addedMember) => {
+      this.members.push(addedMember);
     });
   }
 
-  delete(member: Member): void {
+  delete(member: IMember) {
     this.membersService.deleteMember(member.id).subscribe();
     this.members = this.members.filter((m) => m.id !== member.id);
   }
 
-  trackByFn(_index: number, member: Member) {
-    return member.id; // or index
+  trackByFn(_index: number, member: IMember) {
+    if (!member) {
+      return null;
+    }
+    return member.id;
   }
 }

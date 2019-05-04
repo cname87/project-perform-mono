@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import { MembersApi } from './membersApi/membersApi';
-import { ICount, IMember } from './membersApi/model/models';
+import { ICount, IMember, IMemberWithoutId } from './membersApi/model/models';
 import { MessageService } from './message.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -15,12 +15,33 @@ export class MembersService {
   ) {}
 
   /** GET members from the server */
-  getMembers(): Observable<IMember[]> {
-    return this.membersApi.getMembers().pipe(
+  getMembers(term?: string): Observable<IMember[]> {
+    // tslint:disable-next-line: quotemark
+    if (typeof term === 'string' && term.trim() === '') {
+      /* if search term exists but is blank then return an empty member array */
+      return of([]);
+    }
+    return this.membersApi.getMembers(term).pipe(
       tap((_) => {
-        this.log('Fetched members');
+        if (term) {
+          this.log(`Found members matching "${term}"`);
+        } else {
+          this.log('Fetched all members');
+        }
       }),
-      catchError(this.handleError('getMembers', [])),
+      catchError((err: HttpErrorResponse) => {
+        /* handle 404 - not an unexpected error */
+        if (err.status === 404) {
+          if (term) {
+            this.log(`Did not find any members matching "${term}"`);
+            return this.handleError<IMember[]>()(err);
+          } else {
+            this.log('There are no members to fetch');
+            return this.handleError<IMember[]>()(err);
+          }
+        }
+        return this.handleError<IMember[]>('getMembers', [])(err);
+      }),
     );
   }
 
@@ -28,33 +49,21 @@ export class MembersService {
   getMember(id: number): Observable<IMember> {
     return this.membersApi.getMember(id).pipe(
       tap((_) => {
-        this.log(`Fetched member id=${id}`);
+        this.log(`Fetched member with id=${id}`);
       }),
       catchError((err: HttpErrorResponse) => {
+        /* handle 404 - unexpected error */
         if (err.status === 404) {
-          this.log(`Did not find member id=${id}`);
+          this.log(`Did not find member with id=${id}`);
+          return this.handleError<IMember>('getMember')(err);
         }
-        return this.handleError<IMember>()(err);
+        return this.handleError<IMember>('getMember')(err);
       }),
-    );
-  }
-
-  /* GET members whose name contains search term */
-  searchMembers(term: string): Observable<IMember[]> {
-    if (!term.trim()) {
-      // if not search term, return empty member array.
-      return of([]);
-    }
-    return this.membersApi.getMembers(term).pipe(
-      tap((_) => {
-        this.log(`Found members matching "${term}"`);
-      }),
-      catchError(this.handleError<IMember[]>('searchMembers', [])),
     );
   }
 
   /** POST: add a new member to the server */
-  addMember(member: IMember): Observable<IMember> {
+  addMember(member: IMemberWithoutId): Observable<IMember> {
     return this.membersApi.addMember(member).pipe(
       tap((newMember: IMember) => {
         this.log(`Added member with id=${newMember.id}`);
@@ -68,9 +77,16 @@ export class MembersService {
     const id = typeof member === 'number' ? member : member.id;
     return this.membersApi.deleteMember(id).pipe(
       tap((_) => {
-        this.log(`Deleted member id=${id}`);
+        this.log(`Deleted member with id=${id}`);
       }),
-      catchError(this.handleError<ICount>('deleteMember')),
+      catchError((err: HttpErrorResponse) => {
+        /* handle 404 - unexpected error */
+        if (err.status === 404) {
+          this.log(`Did not find member with id=${id}`);
+          return this.handleError<ICount>('deleteMember')(err);
+        }
+        return this.handleError<ICount>('deleteMember')(err);
+      }),
     );
   }
 
@@ -78,7 +94,7 @@ export class MembersService {
   updateMember(member: IMember): Observable<IMember> {
     return this.membersApi.updateMember(member).pipe(
       tap((_) => {
-        this.log(`Updated member id=${member.id}`);
+        this.log(`Updated member with id=${member.id}`);
       }),
       catchError(this.handleError<IMember>('updateMember')),
     );
@@ -87,8 +103,8 @@ export class MembersService {
   /**
    * Handle Http operation that failed.
    * Let the app continue.
-   * @param operation - name of the operation that failed
-   * @param result - optional value to return as the observable result
+   * @param operation - name of the operation that failed - an operation should only passed in if the error is unexpected.
+   * @param result - optional value to return as the observable result.
    */
   private handleError<T>(operation?: string, result?: T) {
     return (error: HttpErrorResponse): Observable<T> => {
@@ -96,6 +112,7 @@ export class MembersService {
       console.error(error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
+      /* log only if a messgage is passed in i.e. the error was unexpected */
       if (operation) {
         this.log(`${operation} Failed: ${error.message}`);
       }

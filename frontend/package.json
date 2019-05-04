@@ -7,6 +7,7 @@
   "bugs": {
     "email": "cname87@yahoo.com"
   },
+
   "license": "MIT",
   "author": "Seán A. Young <cname87@yahoo.com>",
   "main": "./index.js",
@@ -17,7 +18,7 @@
   "scripts": {
     "build": "ng build",
     "start": "ng serve --proxy-config proxy.conf.json",
-    "test": "ng test --no-watch --code-coverage",
+    "test": "ng test --code-coverage",
     "e2e": "ng e2e",
     "prettierBase": "prettier",
     "prettierCheck": "npm run prettierBase -- --list-different \"./**/*.{ts,tsx}\"",

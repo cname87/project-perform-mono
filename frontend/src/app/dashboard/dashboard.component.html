@@ -1,9 +1,10 @@
-<h3>Top Members</h3>
+<h3 id=title>{{ title }}</h3>
 <div class="grid-pad">
-  <a *ngFor="let member of members; trackBy: trackByFn" class="col-1-4"
+  <a *ngFor="let member of members; trackBy: trackByFn"
+      class="col-1-4"
       routerLink="/detail/{{member.id}}">
     <div class="module member">
-      <h4>{{ member.name }}</h4>
+      <h4 id="m">{{ showProperty(member) }}</h4>
     </div>
   </a>
 </div>

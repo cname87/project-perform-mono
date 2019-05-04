@@ -4,7 +4,7 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-    //ng serve
+    //ng serve - use with backend compound config - use for frontend run debug
     {
       /* backend server needs to be started first */
       /* see compound configuration */
@@ -21,7 +21,7 @@
         "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
     },
-    // ng test
+    // ng test - use for froentend test debug
     {
       /* runs 'npm run test' first and then runs this */
       /* run 'npm run test' manually first if problems with preLaunch task */

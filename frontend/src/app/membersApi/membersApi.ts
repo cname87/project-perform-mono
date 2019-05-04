@@ -16,7 +16,7 @@ import { Observable } from 'rxjs';
 import { membersConfiguration } from './configuration';
 import { CustomHttpUrlEncodingCodec } from './encoder';
 import { ICount, IMember, IMemberWithoutId } from './model/models';
-export { IMember as Member, IMemberWithoutId as MemberWithoutId };
+export { IMember, IMemberWithoutId };
 
 @Injectable({
   providedIn: 'root',

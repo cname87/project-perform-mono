@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { MembersService } from '../members.service';
-import { Member } from '../membersApi/membersApi';
+import { IMember } from '../membersApi/membersApi';
 
 @Component({
   selector: 'app-member-detail',
@@ -11,7 +11,7 @@ import { Member } from '../membersApi/membersApi';
   styleUrls: ['./member-detail.component.scss'],
 })
 export class MemberDetailComponent implements OnInit {
-  @Input() member: Member;
+  @Input() member: IMember;
 
   constructor(
     private route: ActivatedRoute,
@@ -24,22 +24,22 @@ export class MemberDetailComponent implements OnInit {
     };
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.getMember();
   }
 
-  getMember(): void {
+  getMember() {
     const id = +(this.route.snapshot.paramMap.get('id') as string);
     this.membersService
       .getMember(id)
       .subscribe((member) => (this.member = member));
   }
 
-  goBack(): void {
+  goBack() {
     this.location.back();
   }
 
-  save(): void {
+  save() {
     this.membersService
       .updateMember(this.member)
       .subscribe(() => this.goBack());

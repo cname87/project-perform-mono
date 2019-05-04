@@ -1,19 +1,29 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { MembersComponent } from './members/members.component';
+import { config } from './config';
 import { MemberDetailComponent } from './member-detail/member-detail.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
-const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent },
+const appRoutes: Routes = [
+  {
+    path: '',
+    redirectTo: `/${config.routes.dashboard.path}`,
+    pathMatch: 'full',
+  },
+  config.routes.dashboard,
+  config.routes.members,
   { path: 'detail/:id', component: MemberDetailComponent },
-  { path: 'members', component: MembersComponent },
+  { path: '**', component: PageNotFoundComponent },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [
+    RouterModule.forRoot(
+      appRoutes,
+      { enableTracing: true }, // <-- debugging purposes only
+    ),
+  ],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

@@ -13,6 +13,7 @@ import { MembersComponent } from './members/members.component';
 import { MemberSearchComponent } from './member-search/member-search.component';
 import { MemberDetailComponent } from './member-detail/member-detail.component';
 import { MessagesComponent } from './messages/messages.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 @NgModule({
   imports: [
@@ -35,6 +36,7 @@ import { MessagesComponent } from './messages/messages.component';
     MemberSearchComponent,
     MemberDetailComponent,
     MessagesComponent,
+    PageNotFoundComponent,
   ],
   bootstrap: [AppComponent],
 })

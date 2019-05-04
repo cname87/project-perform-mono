@@ -3,7 +3,7 @@ import { Observable, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 import { MembersService } from '../members.service';
-import { Member } from '../membersApi/membersApi';
+import { IMember } from '../membersApi/membersApi';
 
 @Component({
   selector: 'app-member-search',
@@ -11,7 +11,8 @@ import { Member } from '../membersApi/membersApi';
   styleUrls: ['./member-search.component.scss'],
 })
 export class MemberSearchComponent implements OnInit {
-  members$: Observable<Member[]> | undefined;
+  title = 'Member Search';
+  members$: Observable<IMember[]> | undefined;
   private searchTerms = new Subject<string>();
 
   constructor(private membersService: MembersService) {}
@@ -30,14 +31,13 @@ export class MemberSearchComponent implements OnInit {
       distinctUntilChanged(),
 
       // switch to new search observable each time the term changes
-      switchMap((term: string) => this.membersService.searchMembers(term)),
+      switchMap((term: string) => {
+        return this.membersService.getMembers(term);
+      }),
     );
   }
 
-  trackByFn(_index: number, member: Member) {
-    if (!member) {
-      return null;
-    }
-    return member.id;
+  trackByFn(_index: number, member: IMember) {
+    return member ? member.id : null;
   }
 }

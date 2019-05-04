@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { MembersService } from '../members.service';
-import { Member } from '../membersApi/membersApi';
+import { IMember } from '../membersApi/membersApi';
 
 @Component({
   selector: 'app-dashboard',
@@ -9,7 +9,11 @@ import { Member } from '../membersApi/membersApi';
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-  members: Member[] = [];
+  members: IMember[] = [];
+  title = 'Top Members';
+  propertyToDisplay = 'name';
+  firstMemberOnDisplay = 1;
+  lastMemberOnDisplay = 4;
 
   constructor(private membersService: MembersService) {}
 
@@ -17,16 +21,20 @@ export class DashboardComponent implements OnInit {
     this.getMembers();
   }
 
-  getMembers(): void {
-    this.membersService
-      .getMembers()
-      .subscribe((members) => (this.members = members.slice(0, 4)));
+  getMembers() {
+    this.membersService.getMembers().subscribe((members) => {
+      this.members = members.slice(
+        this.firstMemberOnDisplay - 1,
+        this.lastMemberOnDisplay,
+      );
+    });
   }
 
-  trackByFn(_index: number, member: Member) {
-    if (!member) {
-      return null;
-    }
-    return member.id;
+  showProperty(member: IMember) {
+    return member[this.propertyToDisplay];
+  }
+
+  trackByFn(_index: number, member: IMember) {
+    return member ? member.id : null;
   }
 }
