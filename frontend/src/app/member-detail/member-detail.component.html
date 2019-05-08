@@ -1,11 +1,15 @@
 <div *ngIf="member">
-  <h2>{{ member.name | uppercase }} Details</h2>
-  <div><span>id: </span>{{ member.id }}</div>
+  <h2 id="memberName">{{ member.name | uppercase }} Details</h2>
   <div>
-    <label>name:
-      <input [(ngModel)]="member.name" placeholder="name"/>
+    <span>id: </span>
+    <span id="memberId">{{ member.id }}</span>
+  </div>
+  <div>
+    <label>
+      Edit name:
+      <input id="nameInput" [(ngModel)]="member.name" placeholder="name"/>
     </label>
   </div>
-  <button class="link" (click)="goBack()">go back</button>
-  <button (click)="save()">save</button>
+  <button id="goBackBtn" class="link" (click)="goBack()">Go back</button>
+  <button id="saveBtn" (click)="save()">Save</button>
 </div>

@@ -23,9 +23,9 @@ describe('DashboardComponent', () => {
     TestBed.configureTestingModule({
       declarations: [DashboardComponent, MemberSearchComponent],
       imports: [
-        HttpClientModule,
-        HttpClientTestingModule,
         RouterTestingModule.withRoutes([]),
+        HttpClientTestingModule,
+        HttpClientModule,
       ],
       providers: [
         {
@@ -68,6 +68,7 @@ describe('DashboardComponent', () => {
         .innerText,
     ).toEqual(members[member - 1].name);
   }));
+
   it('should display last member', async(() => {
     const member = component.lastMemberOnDisplay;
     expect(

@@ -47,6 +47,8 @@
         "/testServer": "${workspaceFolder}/backend/server/test/client",
       },
       "sourceMapPathOverrides": {
+        "webpack:///webpack/*": "${workspaceFolder}/frontend/node_modules/webpack/*",
+        "webpack:///(webpack)/*": "${workspaceFolder}/frontend/node_modules/webpack/*",
         "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
         "webpack:///./*": "${workspaceFolder}/frontend/*",
         "webpack:///*":     "frontend/*",
@@ -384,7 +386,7 @@
     },
   ],
   "compounds": [
-    /* Run backend server and chrome */
+    /* Run backend server and browse to root */
     {
       /* To debug angular you may need to go into Chrome and ensure filesystem added. If you have difficulty setting breakpoints in vscode then set them in Chrome. */
       "name": "Backend/Frontend",

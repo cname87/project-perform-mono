@@ -5,8 +5,8 @@
 
   <ul class="search-result">
     <li *ngFor="let member of members$ | async; trackBy: trackByFn" >
-      <a routerLink="/detail/{{member.id}}">
-        {{ member.name }}
+      <a class="m" routerLink="/{{detail.path}}/{{member.id}}">
+        {{ showProperty(member) }}
       </a>
     </li>
   </ul>

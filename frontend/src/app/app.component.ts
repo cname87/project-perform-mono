@@ -11,7 +11,7 @@ export class AppComponent {
   /* main title */
   title = 'Team Members';
 
-  /* module routing elements */
+  /* component routing elements */
   dashboard = config.routes.dashboard;
   members = config.routes.members;
 }

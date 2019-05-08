@@ -4,6 +4,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 import { MembersService } from '../members.service';
 import { IMember } from '../membersApi/membersApi';
+import { config } from '../config';
 
 @Component({
   selector: 'app-member-search',
@@ -11,7 +12,13 @@ import { IMember } from '../membersApi/membersApi';
   styleUrls: ['./member-search.component.scss'],
 })
 export class MemberSearchComponent implements OnInit {
+  /* main title */
   title = 'Member Search';
+  /* component routing elements */
+  detail = config.routes.detail;
+  /* detail to display */
+  propertyToDisplay = 'name';
+  /* local variables */
   members$: Observable<IMember[]> | undefined;
   private searchTerms = new Subject<string>();
 
@@ -35,6 +42,10 @@ export class MemberSearchComponent implements OnInit {
         return this.membersService.getMembers(term);
       }),
     );
+  }
+
+  showProperty(member: IMember) {
+    return member[this.propertyToDisplay];
   }
 
   trackByFn(_index: number, member: IMember) {

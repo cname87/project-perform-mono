@@ -30,9 +30,9 @@ export class MemberDetailComponent implements OnInit {
 
   getMember() {
     const id = +(this.route.snapshot.paramMap.get('id') as string);
-    this.membersService
-      .getMember(id)
-      .subscribe((member) => (this.member = member));
+    this.membersService.getMember(id).subscribe((member) => {
+      this.member = member;
+    });
   }
 
   goBack() {
@@ -40,8 +40,8 @@ export class MemberDetailComponent implements OnInit {
   }
 
   save() {
-    this.membersService
-      .updateMember(this.member)
-      .subscribe(() => this.goBack());
+    this.membersService.updateMember(this.member).subscribe(() => {
+      this.goBack();
+    });
   }
 }
