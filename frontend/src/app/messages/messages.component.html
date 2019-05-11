@@ -1,8 +1,16 @@
-<div *ngIf="messageService.messages.length">
+<div id="mainDiv" *ngIf="messageService.messages.length">
 
-  <h2>Messages</h2>
-  <button class="clear"
-          (click)="messageService.clear()">clear</button>
-  <div *ngFor="let message of messageService.messages; trackBy: trackByFn"> {{ message }} </div>
+  <h2 id="header">Messages</h2>
+
+  <button id="clearBtn"
+          class="clear"
+          (click)="messageService.clear()">
+    clear
+  </button>
+
+  <div id="div2"
+      *ngFor="let message of messageService.messages; trackBy: trackByFn">
+    {{ message }}
+  </div>
 
 </div>

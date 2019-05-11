@@ -2,7 +2,6 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF, Location } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
-import { of } from 'rxjs/internal/observable/of';
 
 import { AppModule } from '../app.module';
 import { MemberDetailComponent } from './member-detail.component';
@@ -13,6 +12,8 @@ import {
   ActivatedRouteSnapshotStub,
   click,
 } from '../tests';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { IMember } from '../membersApi/membersApi';
 
 interface IMembersServiceSpy {
   getMember: jasmine.Spy;
@@ -21,6 +22,7 @@ interface IMembersServiceSpy {
 interface ILocationSpy {
   back: jasmine.Spy;
 }
+
 describe('memberDetailComponent', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
@@ -112,7 +114,8 @@ describe('memberDetailComponent', () => {
       await fixture.whenStable();
       /* manually call save() */
       component.save();
-      /* test save() */
+      /* await async data return */
+      await fixture.whenStable();
       expect(updateMemberSpy).toHaveBeenCalledTimes(1);
       expect(updateMemberSpy).toHaveBeenCalledWith({
         id: routeId,
@@ -168,6 +171,8 @@ describe('memberDetailComponent', () => {
       await fixture.whenStable();
       /* click the save button */
       click(page.saveBtn);
+      /* await async data return */
+      await fixture.whenStable();
       expect(updateMemberSpy).toHaveBeenCalledTimes(1);
       expect(updateMemberSpy).toHaveBeenCalledWith({
         id: routeId,
@@ -227,8 +232,8 @@ describe('memberDetailComponent', () => {
       await fixture.whenStable();
       expect(component.member.name).toEqual(name);
     });
-    it('should have member name heading in uppercase', async () => {
-      const { fixture, component, page, activatedRouteStub } = await setup();
+    it('should translate input name to uppercase in header', async () => {
+      const { fixture, page, activatedRouteStub } = await setup();
       /* set up route that the component will get */
       const routeId = 7;
       activatedRouteStub.setId(routeId);
@@ -237,15 +242,81 @@ describe('memberDetailComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       /* test name field before changing component */
-      expect(page.header.textContent)
-        .toEqual('test'.toUpperCase() + routeId + ' Details');
-      /* set the component member name */
+      expect(page.header.textContent).toEqual(
+        'test'.toUpperCase() + routeId + ' Details',
+      );
+      /* set the name input field */
       const name = 'testName';
-      component.member.name = name;
+      page.nameInput.value = name;
+      page.nameInput.dispatchEvent(new Event('input'));
       fixture.detectChanges();
       await fixture.whenStable();
-      expect(page.header.textContent)
-        .toEqual(name.toUpperCase() + ' Details');
+      expect(page.header.textContent).toEqual(name.toUpperCase() + ' Details');
+    });
+  });
+
+  describe('errors', async () => {
+    /* setup function run by each sub test function */
+    async function setup() {
+      await mainSetup();
+      return createComponent();
+    }
+
+    it('should go back on path with no id', async () => {
+      const {
+        fixture,
+        getMemberSpy,
+        backSpy,
+        activatedRouteStub,
+      } = await setup();
+      /* set up route that no id */
+      const routeId = '';
+      activatedRouteStub.setId(routeId);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(getMemberSpy).toHaveBeenCalledTimes(1);
+      expect(backSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should go back on getMember error', async () => {
+      const {
+        fixture,
+        getMemberSpy,
+        backSpy,
+        activatedRouteStub,
+      } = await setup();
+      /* set up route that will trigger error */
+      const routeId = -1;
+      activatedRouteStub.setId(routeId);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(getMemberSpy).toHaveBeenCalledTimes(1);
+      expect(backSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should go back on updateMember error', async () => {
+      const {
+        fixture,
+        component,
+        updateMemberSpy,
+        backSpy,
+        activatedRouteStub,
+      } = await setup();
+      const routeId = 6;
+      activatedRouteStub.setId(routeId);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      /* set member id that will trigger an error */
+      component.member = { id: 9, name: 'testError' };
+      component.save();
+      expect(updateMemberSpy).toHaveBeenCalledTimes(1);
+      expect(backSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
@@ -285,10 +356,26 @@ function createSpies(
   locationSpy: ILocationSpy,
 ) {
   const getMemberSpy = memberServiceSpy.getMember.and.callFake((id: number) => {
+    /* return no member to simulate memberService 404 */
+    if (!id) {
+      return asyncData('');
+    }
+    /* throw error to simulate unexpected error */
+    if (id === -1) {
+      return throwError(new Error('Fake getMember error'));
+    }
+    /* return a member as expected */
     return asyncData({ id, name: 'test' + id });
   });
-  const updateMemberSpy = memberServiceSpy.updateMember.and.returnValue(
-    of(null),
+  const updateMemberSpy = memberServiceSpy.updateMember.and.callFake(
+    (member: IMember) => {
+      /* throw error to simulate unexpected error */
+      if (member.id === 9) {
+        return throwError(new Error('Fake updateMember error'));
+      }
+      /* return as expected */
+      return asyncData('');
+    },
   );
 
   const backSpy = locationSpy.back.and.stub();

@@ -5,10 +5,9 @@
  * Must call `tick()` when test with `fakeAsync()`.
  *
  * THE FOLLOWING DON'T WORK
- * Using `of().delay()` triggers TestBed errors;
- * see https://github.com/angular/angular/issues/10127 .
- *
- * Using `asap` scheduler - as in `of(value, asap)` - doesn't work either.
+ * .of() is a synchronous observable.
+ * Using `of().delay()` triggers TestBed errors.
+ * Using 'asap' scheduler - as in 'of(value, asap)' - doesn't work either.
  */
 
 import { defer } from 'rxjs';

@@ -10,7 +10,7 @@ export { ActivatedRoute } from '@angular/router';
  */
 export class ActivatedRouteSnapshotStub {
   /* default parameter is 0 */
-  constructor(public id = 0) {}
+  constructor(public id: number | string = 0) {}
 
   /* dummy snapshot */
   snapshot = {
@@ -20,7 +20,7 @@ export class ActivatedRouteSnapshotStub {
   };
 
   /* set id paramater */
-  setId(idNew: number) {
+  setId(idNew: number | string) {
     this.id = idNew;
   }
 }
