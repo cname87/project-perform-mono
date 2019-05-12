@@ -1,7 +1,7 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { APP_BASE_HREF } from '@angular/common';
-import { RouterTestingModule } from '@angular/router/testing';
+import { Location, APP_BASE_HREF } from '@angular/common';
 import { By } from '@angular/platform-browser';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppModule } from '../app.module';
 import { MembersComponent } from './members.component';
@@ -11,6 +11,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { IMember, IMemberWithoutId } from '../membersApi/membersApi';
 import { members } from '../mock-members';
 import { DebugElement } from '@angular/core';
+import { SpyLocation } from '@angular/common/testing';
 
 interface IMembersServiceSpy {
   getMembers: jasmine.Spy;
@@ -31,8 +32,8 @@ describe('membersComponent', () => {
     /* set up Testbed */
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule.withRoutes([]),
-        AppModule, // import AppModule to pull in all dependencies in one go.
+        AppModule,
+        RouterTestingModule,
       ],
       declarations: [],
       providers: [
@@ -40,6 +41,118 @@ describe('membersComponent', () => {
         { provide: MembersService, useValue: membersServiceSpy },
       ],
     }).compileComponents();
+  }
+
+  /**
+   * Gets key DOM elements.
+   */
+  class Page {
+    get header() {
+      return this.findId<HTMLHeadingElement>('header');
+    }
+    get nameInput() {
+      return this.findId<HTMLInputElement>('nameInput');
+    }
+    get addButton() {
+      return this.findId<HTMLButtonElement>('addBtn');
+    }
+    get linksArray() {
+      return this.findElements('a');
+    }
+    get memberIdArray() {
+      return this.findElements('span.badge');
+    }
+    get deleteBtnArray() {
+      return this.findElements('button.delete');
+    }
+
+    constructor(readonly fixture: ComponentFixture<MembersComponent>) {}
+
+    private findId<T>(id: string): T {
+      const element = this.fixture.debugElement.query(By.css('#' + id));
+      return element.nativeElement;
+    }
+    private findElements(el: string): DebugElement[] {
+      const elements = this.fixture.debugElement.queryAll(By.css(el));
+      return elements;
+    }
+  }
+
+  function createSpies(
+    memberServiceSpy: IMembersServiceSpy,
+    membersArray: IMember[],
+  ) {
+    const getMembersSpy = memberServiceSpy.getMembers.and.callFake(() => {
+      /* note: replace members to return null or an error */
+      /* return members as expected */
+      return asyncData(membersArray);
+    });
+    const addMemberSpy = memberServiceSpy.addMember.and.callFake(
+      (member: IMemberWithoutId) => {
+        /* throw error to simulate unexpected error */
+        if (member.name === 'error') {
+          return throwError(new Error('Fake addMember error'));
+        }
+        /* return added member as expected */
+        const newMember = { id: 21, name: member.name };
+        return asyncData(newMember);
+      },
+    );
+    const deleteMemberSpy = memberServiceSpy.deleteMember.and.callFake(
+      (id: number) => {
+        /* throw error to simulate unexpected error */
+        if (id === 9) {
+          return throwError(new Error('Fake deleteMember error'));
+        }
+        /* return nothing as expected */
+        return asyncData(null);
+      },
+    );
+
+    return {
+      getMembersSpy,
+      addMemberSpy,
+      deleteMemberSpy,
+    };
+  }
+
+  /**
+   * Create the component, initialize it & set test variables.
+   */
+  async function createComponent() {
+    /* create the fixture */
+    const fixture = TestBed.createComponent(MembersComponent);
+
+    /* get the injected instances */
+    const injector = fixture.debugElement.injector;
+    const spyLocation = injector.get<SpyLocation>(Location as any);
+    const membersServiceSpy = injector.get<
+      IMembersServiceSpy
+    >(MembersService as any);
+
+    /* create the component instance */
+    const component = fixture.componentInstance;
+
+    /* create a page to access the DOM elements */
+    const page = new Page(fixture);
+
+    const membersArray = JSON.parse(JSON.stringify(members));
+
+    const { getMembersSpy, addMemberSpy, deleteMemberSpy } = createSpies(
+      membersServiceSpy,
+      membersArray,
+    );
+
+    return {
+      fixture,
+      component,
+      page,
+      getMembersSpy,
+      addMemberSpy,
+      deleteMemberSpy,
+      membersArray,
+      spyLocation,
+    };
   }
 
   describe('component', async () => {
@@ -266,116 +379,35 @@ describe('membersComponent', () => {
       expect(shouldBeEmpty).toEqual([]);
       expect(component.members.length).toEqual(startMembersCount - 1);
     });
+
+    it('should navigate to "/detail" on click', async () => {
+      const { fixture, page, membersArray, spyLocation } = await setup();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(page.header.textContent).toEqual('My Members');
+      expect(page.nameInput.value).toEqual('');
+      expect(page.linksArray.length).toEqual(0);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(page.header.textContent).toEqual('My Members');
+      expect(page.nameInput.value).toEqual('');
+      expect(page.linksArray.length).toEqual(membersArray.length);
+      expect(page.linksArray[2].nativeElement.textContent).toEqual(
+        membersArray[2].id.toString() + ' ' + membersArray[2].name + ' ',
+      );
+      expect(page.memberIdArray[2].nativeElement.textContent).toEqual(
+        membersArray[2].id.toString(),
+      );
+      expect(page.deleteBtnArray.length).toEqual(membersArray.length);
+      fixture.ngZone!.run(() => {
+        click(page.linksArray[2]);
+      });
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const id = membersArray[2].id;
+      expect(spyLocation.path())
+        .toEqual(`/detail/${id}`, 'after clicking members link');
+
+    });
   });
 });
-
-//// Helpers ////
-
-/**
- * Gets key DOM elements.
- */
-class Page {
-  get header() {
-    return this.findId<HTMLHeadingElement>('header');
-  }
-  get nameInput() {
-    return this.findId<HTMLInputElement>('nameInput');
-  }
-  get addButton() {
-    return this.findId<HTMLButtonElement>('addBtn');
-  }
-  get linksArray() {
-    return this.findElements('a');
-  }
-  get memberIdArray() {
-    return this.findElements('span.badge');
-  }
-  get deleteBtnArray() {
-    return this.findElements('button.delete');
-  }
-
-  constructor(readonly fixture: ComponentFixture<MembersComponent>) {}
-
-  private findId<T>(id: string): T {
-    const element = this.fixture.debugElement.query(By.css('#' + id));
-    return element.nativeElement;
-  }
-  private findElements(el: string): DebugElement[] {
-    const elements = this.fixture.debugElement.queryAll(By.css(el));
-    return elements;
-  }
-}
-
-function createSpies(
-  memberServiceSpy: IMembersServiceSpy,
-  membersArray: IMember[],
-) {
-  const getMembersSpy = memberServiceSpy.getMembers.and.callFake(() => {
-    /* note: replace members to return null or an error */
-    /* return members as expected */
-    return asyncData(membersArray);
-  });
-  const addMemberSpy = memberServiceSpy.addMember.and.callFake(
-    (member: IMemberWithoutId) => {
-      /* throw error to simulate unexpected error */
-      if (member.name === 'error') {
-        return throwError(new Error('Fake addMember error'));
-      }
-      /* return added member as expected */
-      const newMember = { id: 21, name: member.name };
-      return asyncData(newMember);
-    },
-  );
-  const deleteMemberSpy = memberServiceSpy.deleteMember.and.callFake(
-    (id: number) => {
-      /* throw error to simulate unexpected error */
-      if (id === 9) {
-        return throwError(new Error('Fake deleteMember error'));
-      }
-      /* return nothing as expected */
-      return asyncData(null);
-    },
-  );
-
-  return {
-    getMembersSpy,
-    addMemberSpy,
-    deleteMemberSpy,
-  };
-}
-
-/**
- * Create the component, initialize it & set test variables.
- */
-async function createComponent() {
-  /* create the fixture */
-  const fixture = TestBed.createComponent(MembersComponent);
-
-  /* get the injected instances */
-  const membersServiceSpy = fixture.debugElement.injector.get<
-    IMembersServiceSpy
-  >(MembersService as any);
-
-  /* create the component instance */
-  const component = fixture.componentInstance;
-
-  /* create a page to access the DOM elements */
-  const page = new Page(fixture);
-
-  const membersArray = JSON.parse(JSON.stringify(members));
-
-  const { getMembersSpy, addMemberSpy, deleteMemberSpy } = createSpies(
-    membersServiceSpy,
-    membersArray,
-  );
-
-  return {
-    fixture,
-    component,
-    page,
-    getMembersSpy,
-    addMemberSpy,
-    deleteMemberSpy,
-    membersArray,
-  };
-}

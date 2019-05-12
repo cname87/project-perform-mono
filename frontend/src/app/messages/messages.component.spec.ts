@@ -108,17 +108,17 @@ describe('messagesComponent', () => {
     };
   }
 
+  /* setup function run by each sub test function */
+  async function setup() {
+    await mainSetup();
+    return createComponent();
+  }
+
   /* run the component-level tests */
   describe('component', async () => {
-    /* setup function run by each it test function */
-    async function setup() {
-      await mainSetup();
-      return createComponent();
-    }
-
     it('should be created', async () => {
       const { component } = await setup();
-      expect(component).toBeTruthy();
+      expect(component).toBeTruthy('component should be created');
     });
 
     it('should have the messageService setup', async () => {
@@ -142,12 +142,6 @@ describe('messagesComponent', () => {
 
   /* run the page-level tests */
   describe('page', async () => {
-    /* setup function run by each sub test function */
-    async function setup() {
-      await mainSetup();
-      return createComponent();
-    }
-
     it('should not show when no messages', async () => {
       const { fixture, page } = await setup();
       fixture.detectChanges();

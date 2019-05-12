@@ -52,6 +52,108 @@ describe('memberDetailComponent', () => {
     }).compileComponents();
   }
 
+  class Page {
+    /* get DOM elements */
+    get header() {
+      return this.findId<HTMLHeadingElement>('memberName');
+    }
+    get idDisplay() {
+      return this.findId<HTMLSpanElement>('memberId');
+    }
+    get nameInput() {
+      return this.findId<HTMLInputElement>('nameInput');
+    }
+    get goBackButton() {
+      return this.findId<HTMLButtonElement>('goBackBtn');
+    }
+    get saveBtn() {
+      return this.findId<HTMLButtonElement>('saveBtn');
+    }
+
+    constructor(readonly fixture: ComponentFixture<MemberDetailComponent>) {
+      // const component = fixture.componentInstance;
+    }
+
+    private findId<T>(id: string): T {
+      const element = this.fixture.debugElement.query(By.css('#' + id));
+      return element.nativeElement;
+    }
+  }
+
+  function createSpies(
+    memberServiceSpy: IMembersServiceSpy,
+    locationSpy: ILocationSpy,
+  ) {
+    const getMemberSpy = memberServiceSpy.getMember.and.callFake(
+      (id: number) => {
+        /* return no member to simulate memberService 404 */
+        if (!id) {
+          return asyncData('');
+        }
+        /* throw error to simulate unexpected error */
+        if (id === -1) {
+          return throwError(new Error('Fake getMember error'));
+        }
+        /* return a member as expected */
+        return asyncData({ id, name: 'test' + id });
+      },
+    );
+    const updateMemberSpy = memberServiceSpy.updateMember.and.callFake(
+      (member: IMember) => {
+        /* throw error to simulate unexpected error */
+        if (member.id === 9) {
+          return throwError(new Error('Fake updateMember error'));
+        }
+        /* return as expected */
+        return asyncData('');
+      },
+    );
+
+    const backSpy = locationSpy.back.and.stub();
+
+    return { getMemberSpy, updateMemberSpy, backSpy };
+  }
+
+  /**
+   * Create the MemberDetailComponent, initialize it, set test variables.
+   */
+  async function createComponent() {
+    /* create the fixture */
+    const fixture = TestBed.createComponent(MemberDetailComponent);
+
+    /* get the injected instances */
+    /* angular.io guide suggests you need to get these from injector.get.  It seemed to work when I just used the 'useValues' in configureTestingModule but now implementing as per guide */
+
+    const membersServiceSpy = fixture.debugElement.injector.get<
+      IMembersServiceSpy
+    >(MembersService as any);
+    const locationSpy = fixture.debugElement.injector.get<ILocationSpy>(
+      Location as any,
+    );
+    const activatedRouteStub = fixture.debugElement.injector.get<
+      ActivatedRouteSnapshotStub
+    >(ActivatedRoute as any);
+    /* create the component instance */
+    const component = fixture.componentInstance;
+    /* create a page to access the DOM elements */
+    const page = new Page(fixture);
+
+    const { getMemberSpy, updateMemberSpy, backSpy } = createSpies(
+      membersServiceSpy,
+      locationSpy,
+    );
+
+    return {
+      fixture,
+      component,
+      page,
+      getMemberSpy,
+      updateMemberSpy,
+      backSpy,
+      activatedRouteStub,
+    };
+  }
+
   describe('component', async () => {
     /* setup function run by each sub test function */
     async function setup() {
@@ -320,105 +422,3 @@ describe('memberDetailComponent', () => {
     });
   });
 });
-
-//// Helpers ////
-
-class Page {
-  /* get DOM elements */
-  get header() {
-    return this.findId<HTMLHeadingElement>('memberName');
-  }
-  get idDisplay() {
-    return this.findId<HTMLSpanElement>('memberId');
-  }
-  get nameInput() {
-    return this.findId<HTMLInputElement>('nameInput');
-  }
-  get goBackButton() {
-    return this.findId<HTMLButtonElement>('goBackBtn');
-  }
-  get saveBtn() {
-    return this.findId<HTMLButtonElement>('saveBtn');
-  }
-
-  constructor(readonly fixture: ComponentFixture<MemberDetailComponent>) {
-    // const component = fixture.componentInstance;
-  }
-
-  private findId<T>(id: string): T {
-    const element = this.fixture.debugElement.query(By.css('#' + id));
-    return element.nativeElement;
-  }
-}
-
-function createSpies(
-  memberServiceSpy: IMembersServiceSpy,
-  locationSpy: ILocationSpy,
-) {
-  const getMemberSpy = memberServiceSpy.getMember.and.callFake((id: number) => {
-    /* return no member to simulate memberService 404 */
-    if (!id) {
-      return asyncData('');
-    }
-    /* throw error to simulate unexpected error */
-    if (id === -1) {
-      return throwError(new Error('Fake getMember error'));
-    }
-    /* return a member as expected */
-    return asyncData({ id, name: 'test' + id });
-  });
-  const updateMemberSpy = memberServiceSpy.updateMember.and.callFake(
-    (member: IMember) => {
-      /* throw error to simulate unexpected error */
-      if (member.id === 9) {
-        return throwError(new Error('Fake updateMember error'));
-      }
-      /* return as expected */
-      return asyncData('');
-    },
-  );
-
-  const backSpy = locationSpy.back.and.stub();
-
-  return { getMemberSpy, updateMemberSpy, backSpy };
-}
-
-/**
- * Create the MemberDetailComponent, initialize it, set test variables.
- */
-async function createComponent() {
-  /* create the fixture */
-  const fixture = TestBed.createComponent(MemberDetailComponent);
-
-  /* get the injected instances */
-  /* angular.io guide suggests you need to get these from injector.get.  It seemed to work when I just used the 'useValues' in configureTestingModule but now implementing as per guide */
-
-  const membersServiceSpy = fixture.debugElement.injector.get<
-    IMembersServiceSpy
-  >(MembersService as any);
-  const locationSpy = fixture.debugElement.injector.get<ILocationSpy>(
-    Location as any,
-  );
-  const activatedRouteStub = fixture.debugElement.injector.get<
-    ActivatedRouteSnapshotStub
-  >(ActivatedRoute as any);
-  /* create the component instance */
-  const component = fixture.componentInstance;
-  /* create a page to access the DOM elements */
-  const page = new Page(fixture);
-
-  const { getMemberSpy, updateMemberSpy, backSpy } = createSpies(
-    membersServiceSpy,
-    locationSpy,
-  );
-
-  return {
-    fixture,
-    component,
-    page,
-    getMemberSpy,
-    updateMemberSpy,
-    backSpy,
-    activatedRouteStub,
-  };
-}
