@@ -1,111 +1,42 @@
 import { TestBed } from '@angular/core/testing';
-
-import { MembersService } from './members.service';
-import { MessageService } from './message.service';
-import { MembersApi, IMemberWithoutId, IMember } from './membersApi/membersApi';
-import { asyncData, asyncError } from './tests';
-import { members } from './mock-members';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ICount } from './membersApi/model/count';
 
-interface IMembersApiStub {
-  getMembers: jasmine.Spy;
-  getMember: jasmine.Spy;
-  addMember: jasmine.Spy;
-  deleteMember: jasmine.Spy;
-  updateMember: jasmine.Spy;
-}
+import {
+  MembersApi,
+  ICount,
+  IMemberWithoutId,
+  IMember,
+} from './api-members.service';
+import { asyncData, asyncError } from '../tests';
+import { members } from '../mock-members';
 
-interface IMessageServiceStub {
-  messages: string[];
-  add: jasmine.Spy;
-  clear: jasmine.Spy;
+interface IHttpClientStub {
+  post: jasmine.Spy;
 }
 
 describe('MembersService', () => {
   async function mainSetup() {
     /* create stub instances with spies for injection */
     const mockMembers = members;
-    const membersApiStub: IMembersApiStub = {
-      getMembers: jasmine
-        .createSpy('getMembers')
-        .and.callFake((str: string): Observable<IMember[]> => {
-          /* test both types of 404 errors */
-          if (str === null || str === 'errorTest404') {
-            return asyncError(new HttpErrorResponse({ status: 404 }));
-          }
-          if (str === 'errorTest') {
-            return asyncError(new HttpErrorResponse({ status: 500 }));
-          }
-          return asyncData(mockMembers);
-        }),
-      getMember: jasmine.createSpy('getMember').and
-        .callFake((id: number): Observable<IMember> => {
-        if (id === 0) {
-          return asyncError(new HttpErrorResponse({ status: 404 }));
-        }
-        if (id === -1) {
-          return asyncError(new HttpErrorResponse({ status: 500 }));
-        }
-        return asyncData(mockMembers[0]);
-      }),
-      addMember: jasmine
-        .createSpy('addMember')
-        .and.callFake((member: IMemberWithoutId) => {
-          if (member.name === 'errorTest') {
-            return asyncError(new HttpErrorResponse({ status: 500 }));
-          }
-          return asyncData({ id: 21, name: member.name });
-        }),
-      deleteMember: jasmine.createSpy('deleteMember').and
-        .callFake((member: IMember | number): Observable<ICount> => {
-        if (member === 0) {
-          return asyncError(new HttpErrorResponse({ status: 404 }));
-        }
-        if (member === -1) {
-          return asyncError(new HttpErrorResponse({ status: 500 }));
-        }
-        return asyncData({ count: 1  });
-      }),
-      updateMember: jasmine.createSpy('updateMember').and
-      .callFake((member: IMember): Observable<IMember> => {
-      if (member.id === 0) {
-        return asyncError(new HttpErrorResponse({ status: 404 }));
-      }
-      if (member.id === -1) {
-        return asyncError(new HttpErrorResponse({ status: 500 }));
-      }
-      return asyncData(mockMembers[0]);
-    }),
-    };
-    const messageServiceStub: IMessageServiceStub = {
-      messages: [],
-      add: jasmine
-        .createSpy('add')
-        .and.callFake(function add(this: IMessageServiceStub, message: string) {
-          console.log('MessageService: ' + message);
-          this.messages.push(message);
-        }),
-      clear: jasmine
-        .createSpy('clear')
-        .and.callFake(function clear(this: IMessageServiceStub) {
-          this.messages = [];
+    const membersApiStub: IHttpClientStub = {
+      post: jasmine.createSpy('post').and.callFake(
+        (_url: string, m: IMemberWithoutId, _opt: any): Observable<IMember> => {
+          return asyncData({ id: 21, name: m.name });
         }),
     };
-    const consoleErrorSpy = spyOn(console, 'error');
 
     await TestBed.configureTestingModule({
       imports: [],
       declarations: [],
       providers: [
-        MembersService,
+        MembersApi,
         { provide: MessageService, useValue: messageServiceStub },
         { provide: MembersApi, useValue: membersApiStub },
       ],
     }).compileComponents();
 
-    const membersService: MembersService = TestBed.get(MembersService);
+    const membersService: MembersApi = TestBed.get(MembersApi);
     const membersApi: IMembersApiStub = TestBed.get(MembersApi);
     const messageService: IMessageServiceStub = TestBed.get(MessageService);
 
@@ -405,13 +336,14 @@ describe('MembersService', () => {
         'MembersService: Deleted member with id = 1',
         'the message logged',
       );
-      expect(result).toEqual({count: 1}, 'count returned');
+      expect(result).toEqual({ count: 1 }, 'count returned');
     });
 
     it('should have deleteMember(member) return count', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService
-        .deleteMember({ id: 1, name: 'testName'}).toPromise();
+        .deleteMember({ id: 1, name: 'testName' })
+        .toPromise();
       expect(membersApi.deleteMember.calls.count()).toEqual(
         1,
         'deleteMember() called once',
@@ -428,7 +360,7 @@ describe('MembersService', () => {
         'MembersService: Deleted member with id = 1',
         'the message logged',
       );
-      expect(result).toEqual({count: 1}, 'count returned');
+      expect(result).toEqual({ count: 1 }, 'count returned');
     });
 
     it('should have deleteMember(0) fail', async () => {
@@ -507,7 +439,8 @@ describe('MembersService', () => {
         consoleErrorSpy,
       } = await setup();
       const result = await membersService
-        .updateMember({ id: 0, name: 'testName'}).toPromise();
+        .updateMember({ id: 0, name: 'testName' })
+        .toPromise();
       expect(membersApi.updateMember.calls.count()).toEqual(
         1,
         'updateMember() called once',
@@ -532,7 +465,8 @@ describe('MembersService', () => {
         consoleErrorSpy,
       } = await setup();
       const result = await membersService
-        .updateMember({ id: -1, name: 'testName' }).toPromise();
+        .updateMember({ id: -1, name: 'testName' })
+        .toPromise();
       expect(membersApi.updateMember.calls.count()).toEqual(
         1,
         'updateMember() called once',

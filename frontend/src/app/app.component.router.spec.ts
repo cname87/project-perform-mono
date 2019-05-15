@@ -13,7 +13,7 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MembersComponent } from './members/members.component';
 import { MembersService } from './members.service';
-import { IMember } from './membersApi/model/models';
+import { IMember } from './api-members/model/models';
 import { of, Observable } from 'rxjs';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { MemberDetailComponent } from './member-detail/member-detail.component';

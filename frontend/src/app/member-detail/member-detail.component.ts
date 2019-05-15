@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { MembersService } from '../members.service';
-import { IMember } from '../membersApi/membersApi';
+import { IMember } from '../api-members/api-members.service';
 
 @Component({
   selector: 'app-member-detail',

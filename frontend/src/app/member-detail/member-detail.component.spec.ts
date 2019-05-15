@@ -13,7 +13,7 @@ import {
   click,
 } from '../tests';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { IMember } from '../membersApi/membersApi';
+import { IMember } from '../api-members/api-members.service';
 
 interface IMembersServiceSpy {
   getMember: jasmine.Spy;

@@ -9,7 +9,7 @@ import { MemberSearchComponent } from '../member-search/member-search.component'
 /* members contains an array of 10 dummy members */
 import { members } from '../mock-members';
 import { MembersService } from '../members.service';
-import { IMember } from '../membersApi/model/models';
+import { IMember } from '../api-members/model/models';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;

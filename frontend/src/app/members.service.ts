@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import { MembersApi } from './membersApi/membersApi';
-import { ICount, IMember, IMemberWithoutId } from './membersApi/model/models';
+import { MembersApi } from './api-members/api-members.service';
+import { ICount, IMember, IMemberWithoutId } from './api-members/model/models';
 import { MessageService } from './message.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -98,7 +98,9 @@ export class MembersService {
           this.log(`Did not find member with id = ${member.id}`);
           return this.handleError<IMember>('', { id: 0, name: '' })(err);
         }
-        return this.handleError<IMember>('updateMember', { id: 0, name: '' })(err);
+        return this.handleError<IMember>('updateMember', { id: 0, name: '' })(
+          err,
+        );
       }),
     );
   }
