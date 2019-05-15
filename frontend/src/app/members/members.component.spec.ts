@@ -31,10 +31,7 @@ describe('membersComponent', () => {
 
     /* set up Testbed */
     await TestBed.configureTestingModule({
-      imports: [
-        AppModule,
-        RouterTestingModule,
-      ],
+      imports: [AppModule, RouterTestingModule],
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
@@ -126,9 +123,9 @@ describe('membersComponent', () => {
     /* get the injected instances */
     const injector = fixture.debugElement.injector;
     const spyLocation = injector.get<SpyLocation>(Location as any);
-    const membersServiceSpy = injector.get<
-      IMembersServiceSpy
-    >(MembersService as any);
+    const membersServiceSpy = injector.get<IMembersServiceSpy>(
+      MembersService as any,
+    );
 
     /* create the component instance */
     const component = fixture.componentInstance;
@@ -405,9 +402,10 @@ describe('membersComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       const id = membersArray[2].id;
-      expect(spyLocation.path())
-        .toEqual(`/detail/${id}`, 'after clicking members link');
-
+      expect(spyLocation.path()).toEqual(
+        `/detail/${id}`,
+        'after clicking members link',
+      );
     });
   });
 });

@@ -16,7 +16,6 @@ export class MembersService {
 
   /** GET members from the server */
   getMembers(term?: string): Observable<IMember[]> {
-    // tslint:disable-next-line: quotemark
     if (typeof term === 'string' && term.trim() === '') {
       /* if search term exists but is blank then return an empty member array */
       return of([]);
@@ -34,10 +33,10 @@ export class MembersService {
         if (err.status === 404) {
           if (term) {
             this.log(`Did not find any members matching "${term}"`);
-            return this.handleError<IMember[]>()(err);
+            return this.handleError<IMember[]>('', [])(err);
           } else {
             this.log('There are no members to fetch');
-            return this.handleError<IMember[]>()(err);
+            return this.handleError<IMember[]>('', [])(err);
           }
         }
         return this.handleError<IMember[]>('getMembers', [])(err);
@@ -49,15 +48,14 @@ export class MembersService {
   getMember(id: number): Observable<IMember> {
     return this.membersApi.getMember(id).pipe(
       tap((_) => {
-        this.log(`Fetched member with id=${id}`);
+        this.log(`Fetched member with id = ${id}`);
       }),
       catchError((err: HttpErrorResponse) => {
-        /* handle 404 - unexpected error */
         if (err.status === 404) {
-          this.log(`Did not find member with id=${id}`);
-          return this.handleError<IMember>('getMember')(err);
+          this.log(`Did not find member with id = ${id}`);
+          return this.handleError<IMember>('', { id: 0, name: '' })(err);
         }
-        return this.handleError<IMember>('getMember')(err);
+        return this.handleError<IMember>('getMember', { id: 0, name: '' })(err);
       }),
     );
   }
@@ -66,9 +64,9 @@ export class MembersService {
   addMember(member: IMemberWithoutId): Observable<IMember> {
     return this.membersApi.addMember(member).pipe(
       tap((newMember: IMember) => {
-        this.log(`Added member with id=${newMember.id}`);
+        this.log(`Added member with id = ${newMember.id}`);
       }),
-      catchError(this.handleError<IMember>('addMember')),
+      catchError(this.handleError<IMember>('addMember', { id: 0, name: '' })),
     );
   }
 
@@ -77,15 +75,14 @@ export class MembersService {
     const id = typeof member === 'number' ? member : member.id;
     return this.membersApi.deleteMember(id).pipe(
       tap((_) => {
-        this.log(`Deleted member with id=${id}`);
+        this.log(`Deleted member with id = ${id}`);
       }),
       catchError((err: HttpErrorResponse) => {
-        /* handle 404 - unexpected error */
         if (err.status === 404) {
-          this.log(`Did not find member with id=${id}`);
-          return this.handleError<ICount>('deleteMember')(err);
+          this.log(`Did not find member with id = ${id}`);
+          return this.handleError<ICount>('', { count: 0 })(err);
         }
-        return this.handleError<ICount>('deleteMember')(err);
+        return this.handleError<ICount>('deleteMember', { count: 0 })(err);
       }),
     );
   }
@@ -94,16 +91,22 @@ export class MembersService {
   updateMember(member: IMember): Observable<IMember> {
     return this.membersApi.updateMember(member).pipe(
       tap((_) => {
-        this.log(`Updated member with id=${member.id}`);
+        this.log(`Updated member with id = ${member.id}`);
       }),
-      catchError(this.handleError<IMember>('updateMember')),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 404) {
+          this.log(`Did not find member with id = ${member.id}`);
+          return this.handleError<IMember>('', { id: 0, name: '' })(err);
+        }
+        return this.handleError<IMember>('updateMember', { id: 0, name: '' })(err);
+      }),
     );
   }
 
   /**
-   * Handle Http operation that failed.
+   * Handle a Http operation that failed.
    * Let the app continue.
-   * @param operation - name of the operation that failed - an operation should only passed in if the error is unexpected.
+   * @param operation - name of the operation that failed - an operation should only passed in if the error is unexpected, e.g not 404.
    * @param result - optional value to return as the observable result.
    */
   private handleError<T>(operation?: string, result?: T) {
@@ -114,7 +117,7 @@ export class MembersService {
       // TODO: better job of transforming error for user consumption
       /* log only if a messgage is passed in i.e. the error was unexpected */
       if (operation) {
-        this.log(`${operation} Failed: ${error.message}`);
+        this.log(`${operation} unexpected failure`);
       }
 
       // Let the app keep running by returning an empty result.

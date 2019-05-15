@@ -5,25 +5,34 @@ const { SpecReporter } = require('jasmine-spec-reporter');
 
 exports.config = {
   allScriptsTimeout: 11000,
-  specs: [
-    './src/**/*.e2e-spec.ts'
-  ],
-  chromeDriver: '../node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver.exe',
-  capabilities: {
-    'browserName': 'chrome',
-  },
+  specs: ['./src/**/*.e2e-spec.ts'],
   directConnect: true,
+  chromeDriver:
+    '../node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.46.exe',
+  capabilities: {
+    browserName: 'chrome',
+    'chromeOptions': {
+      'args': [
+        "--incognito",
+        "--start-maximized",
+        "--new-window",
+        "--disable-popup-blocking",
+      ]
+    },
+  },
   baseUrl: 'https://localhost:1337/',
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,
     defaultTimeoutInterval: 30000,
-    print: function() {}
+    print: function() {},
   },
   onPrepare() {
     require('ts-node').register({
-      project: require('path').join(__dirname, './tsconfig.e2e.json')
+      project: require('path').join(__dirname, './tsconfig.e2e.json'),
     });
-    jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
-  }
+    jasmine
+      .getEnv()
+      .addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
+  },
 };
