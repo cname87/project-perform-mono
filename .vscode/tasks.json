@@ -3,7 +3,7 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
-    // npm test frontend
+    // npm run test frontend
     {
       "label": "npm test frontend",
       "type": "shell",
@@ -11,7 +11,7 @@
       "args": [
         "run",
         "--prefix", "${workspaceRoot}/frontend",
-        "test"
+        "test",
       ],
       "isBackground": true,
       "presentation": {
@@ -42,7 +42,7 @@
         }
       }
     },
-    // npm start frontend
+    // npm run start frontend
     {
       "label": "npm start frontend",
       "type": "shell",
@@ -50,7 +50,7 @@
       "args": [
         "run",
         "--prefix", "${workspaceRoot}/frontend",
-        "start"
+        "start",
       ],
       "isBackground": true,
       "presentation": {
@@ -76,14 +76,14 @@
             "regexp": "(.*?)"
           },
           "endsPattern": {
-            "regexp": "Compiled |Failed to compile."
+            "regexp": "Compiled | Failed to compile."
           }
         }
       }
     },
-    // "npm run backend server index.js"
+    // "npm run start backend server index.js"
     {
-      "label": "npm run backend server index.js",
+      "label": "npm run start backend server index.js",
       "type": "npm",
       "script": "start",
       "path": "backend/",

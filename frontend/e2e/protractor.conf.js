@@ -5,7 +5,9 @@ const { SpecReporter } = require('jasmine-spec-reporter');
 
 exports.config = {
   allScriptsTimeout: 11000,
-  specs: ['./src/**/*.e2e-spec.ts'],
+  specs: [
+    './src/**/*.e2e-spec.ts',
+  ],
   directConnect: true,
   chromeDriver:
     '../node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.46.exe',
@@ -21,6 +23,7 @@ exports.config = {
     },
   },
   baseUrl: 'https://localhost:1337/',
+  SELENIUM_PROMISE_MANAGER: false,
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,

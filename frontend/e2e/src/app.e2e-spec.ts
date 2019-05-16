@@ -108,8 +108,9 @@ describe('Project Perform', () => {
     beforeAll(() => browser.get(''));
 
     it('has top members', async () => {
-      let page = getPageElements();
-      expect(await page.topMembers.count()).toEqual(4);
+      const page = getPageElements();
+      const count = await page.topMembers.count()
+      expect(count).toEqual(4);
     });
 
     it(
@@ -289,7 +290,8 @@ describe('Project Perform', () => {
     let targetMemberElt = getPageElements().topMembers.get(
       targetMemberDashboardIndex,
     );
-    expect(await targetMemberElt.getText()).toEqual(targetMember.name);
+    const name = await targetMemberElt.getText()
+    expect(name).toEqual(targetMember.name);
     targetMemberElt.click();
     browser.waitForAngular(); // seems necessary to gets tests to pass for toh-pt6
 
