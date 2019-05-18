@@ -10,7 +10,7 @@ export { ActivatedRoute } from '@angular/router';
  */
 export class ActivatedRouteSnapshotStub {
   /* default parameter is 0 */
-  constructor(public id: number | string = 0) {}
+  constructor(public id: number | string) {}
 
   /* dummy snapshot */
   snapshot = {

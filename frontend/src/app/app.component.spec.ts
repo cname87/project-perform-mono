@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { MessagesComponent } from './messages/messages.component';
-import { ButtonClickEvents, RouterLinkDirectiveStub } from './tests';
+import { RouterLinkDirectiveStub, click } from './tests';
 import { DebugElement } from '@angular/core';
 
 describe('AppComponent', () => {
@@ -73,7 +73,7 @@ describe('AppComponent', () => {
     expect(membersLink.navigatedTo).toBeNull('should not have navigated yet');
 
     fixture.ngZone!.run(() => {
-      membersLinkDe.triggerEventHandler('click', ButtonClickEvents.left);
+      click(membersLinkDe);
     });
     fixture.detectChanges();
 

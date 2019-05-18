@@ -4,7 +4,6 @@
  *
  * OpenAPI spec version: 1.0.0
  * Contact: cname@yahoo.com
- *
  */
 
 /* external dependencies */
@@ -67,10 +66,11 @@ export class MembersApi {
    * All members with the name property starting with 'name' will be returned.
    */
   public getMembers(name?: string): Observable<IMember[]> {
-    let queryParameters = new HttpParams({
-      encoder: new CustomHttpUrlEncodingCodec(),
-    });
+    let queryParameters = new HttpParams();
     if (name !== undefined && name !== null) {
+      /* custom encoder handles + properly */
+      const encoder = new CustomHttpUrlEncodingCodec();
+      name = encoder.encodeValue(name);
       queryParameters = queryParameters.set('name', name);
     }
 
@@ -179,9 +179,12 @@ export class MembersApi {
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
 
-    return this.httpClient.delete<ICount>(`${this.basePath}/members`, {
-      withCredentials: this.withCredentials,
-      headers,
-    });
+    return this.httpClient.delete<ICount>(
+      `${this.basePath}/${this.membersPath}`,
+      {
+        withCredentials: this.withCredentials,
+        headers,
+      },
+    );
   }
 }

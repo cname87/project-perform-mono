@@ -16,7 +16,8 @@
       "isBackground": true,
       "presentation": {
         "focus": true,
-        "panel": "dedicated"
+        "panel": "dedicated",
+        // "revealProblems": "onProblem"
       },
       "group": {
         "kind": "build",
