@@ -4,7 +4,7 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-    //ng serve - use for frontend debug with watch
+    // ng serve - use for frontend debug with watch
     {
       /* proxy.conf configured in angular.json => backend server needs to be started first => use the configured compound configuration */
       "name": "ng serve",
@@ -73,7 +73,7 @@
       "args": [
         "${workspaceFolder}/frontend/e2e/protractor.conf.js",
       ],
-      "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
+      "preLaunchTask": "Start Server",
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -83,32 +83,17 @@
         "${workspaceFolder}/frontend/node_modules/**/*.js",
       ],
     },
-    // Current .js file
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch the currently opened .js file",
-      "program": "${file}",
-      "env": {},
-      "outputCapture": "std",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "skipFiles": [
-        "<node_internals>/**/*.js",
-        "${workspaceFolder}/backend/node_modules/**/*",
-        "${workspaceFolder}/backend/node_modules/**/*.js",
-      ],
-      "autoAttachChildProcesses": true,
-    },
     // server index.js
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch server index.js",
-      "protocol": "inspector",
-      "program": "${workspaceFolder}/backend/server/src/index.ts",
+      "name": "Launch backend index.js",
+      "program": "${workspaceFolder}/backend/index.ts",
       "cwd": "${workspaceFolder}/backend",
-      "env": {},
+      "env": {
+        /* set before all tests so test database used */
+        "TEST_MODE": "false",
+      },
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -124,15 +109,14 @@
       ],
       "smartStep": false,
     },
-    // NPM server index.js
+    // npm run server index.js
     {
       /* Runs an npm script to start index.js.
       * Note that CTRL+C does not exit without manual intervention.
       * Click on the VSCode 'stop' icon to exit without manual intervention */
       "type": "node",
       "request": "launch",
-      "name": "NPM server index.js",
-      "cwd": "${workspaceFolder}/backend",
+      "name": "Launch npm backend index.js",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run-script",
@@ -140,10 +124,11 @@
         "--silent"
       ],
       "port": 9229,
-      "outFiles": [
-        "${workspaceFolder}/backend/dist/**/*.js"
-      ],
-      "env": {},
+      "cwd": "${workspaceFolder}/backend",
+      "env": {
+        /* set before all tests so test database used */
+        "TEST_MODE": "false",
+      },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
@@ -154,6 +139,10 @@
       ],
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/backend/dist/**/*.js"
+      ],
+      "smartStep": false,
     },
     // monitor.js
     {
@@ -206,7 +195,7 @@
     {
       // starts Chrome and connect to the home page
       // the server must be started in advance of running this
-      "name": "Launch https://localhost:1337/",
+      "name": "Open https://localhost:1337/",
       "type": "chrome",
       "request": "launch",
       "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -237,11 +226,11 @@
       "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
       "trace": true,
     },
-    // Mocha Backend
+    // Mocha backend tests
     {
       "type": "node",
       "request": "launch",
-      "name": "Mocha Backend",
+      "name": "Run Mocha backend tests",
       "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
       "args": [
         "--config",
@@ -250,17 +239,17 @@
         "${workspaceFolder}/backend/dist/test/testSetup.js",
         /* comment out files to select tests */
         "${workspaceFolder}/backend/dist/database/test/*.test.js",
-        // "${workspaceFolder}/backend/dist/models/test/*.test.js",
-        // "${workspaceFolder}/backend/dist/utils/test/*.test.js",
-        // "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
-        // "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
-        // "${workspaceFolder}/backend/server/test/*.js",
-        // "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
+        "${workspaceFolder}/backend/dist/models/test/*.test.js",
+        "${workspaceFolder}/backend/dist/utils/test/*.test.js",
+        "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
+        "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
+        "${workspaceFolder}/backend/server/test/*.js",
+        "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
       ],
       "env": {
         /* set before all tests so test database used */
         "TEST_MODE": "true",
-        /* set to 'true' to automatically run chrome and set tp 'false' when using a compound configuration to launch chrome */
+        /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "true",
       },
       "cwd": "${workspaceFolder}/backend",
@@ -275,11 +264,11 @@
       "autoAttachChildProcesses": true,
       // "preLaunchTask": "Taskkill node.exe", // kill any previously failed node runs
     },
-    // Mocha Backend with istanbul
+    // Mocha backend tests with Istanbul
     {
       "type": "node",
       "request": "launch",
-      "name": "Mocha Backend with istanbul",
+      "name": "Run Mocha backend with Istanbul",
       "program": "${workspaceFolder}/backend/node_modules/nyc/bin/nyc",
       "args": [
         "--reporter=text",
@@ -303,7 +292,7 @@
       "env": {
         /* set before all tests so test database used */
         "TEST_MODE": "true",
-        /* set to 'true' to automatically run chrome and set tp 'false' when using a compound configuration to launch chrome */
+        /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "true",
       },
       "cwd": "${workspaceFolder}/backend",
@@ -322,11 +311,11 @@
     // Mocha Client-fired server tests - for use in compound for client-side debug
     {
       /* This runs a server-side mocha client test file to test the server-side behaviour during client-side fired tests. */
-      /* If Run_Chrome is set true it kicks off the browser tests that fire the client-side tests.  Otherwise you can load testServer/loadmocha.html manually, or if you need debug of the browser-side then use a launch configuration to load the matching loadMocha.html. */
-      /* A compound configuration set up for use when debugging client-side test scripts */
+      /* If Run_Chrome is set true it kicks off the browser tests that fire the client-side tests.  Otherwise you can load testServer/loadmocha.html manually after running this, or if you need debug of the browser-side then use a launch configuration to load the matching loadMocha.html. */
+      /* A compound configuration is set up for use when debugging client-side test scripts */
       "type": "node",
       "request": "launch",
-      "name": "Mocha Client-fired Server Tests",
+      "name": "Run Mocha client-fired backend tests",
       "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
       "args": [
         "--config",
@@ -340,7 +329,7 @@
       "env": {
         /* set before all tests so test database used */
         "TEST_MODE": "true",
-        /* set to 'true' to automatically run chrome and set tp 'false' when using a compound configuration to launch chrome */
+        /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "false",
       },
       "cwd": "${workspaceFolder}/backend",
@@ -358,7 +347,7 @@
     {
       // starts Chrome and loads the a client-side browser test runner.
       // the equivalent server-side client tests (with Run Chrome disabled) must be started in advance of running this
-      "name": "Launch https://localhost:1337/testServer/xxx/loadMocha.html",
+      "name": "Open https://localhost:1337/testServer/xxx/loadMocha.html",
       "type": "chrome",
       "request": "launch",
       "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -391,6 +380,23 @@
       "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
       "trace": true,
     },
+    // current .js file
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch the currently opened .js file",
+      "program": "${file}",
+      "env": {},
+      "outputCapture": "std",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**/*.js",
+        "${workspaceFolder}/backend/node_modules/**/*",
+        "${workspaceFolder}/backend/node_modules/**/*.js",
+      ],
+      "autoAttachChildProcesses": true,
+    },
   ],
   "compounds": [
     /* Run backend server and browse to root */
@@ -398,8 +404,8 @@
       /* To debug angular you may need to go into Chrome and ensure filesystem added. If you have difficulty setting breakpoints in vscode then set them in Chrome. */
       "name": "Backend/Frontend",
       "configurations": [
-        "Launch server index.js",
-        "Launch https://localhost:1337/",
+        "Launch backend index.js",
+        "Open https://localhost:1337/",
       ]
     },
     /* Run backend server and ng serve - debug frontend with watch */
@@ -407,7 +413,7 @@
       /* relies on ng serve taking some time.  If it has previously been launched and is still running in the background then the browser will start too fast for the server => refresh the browser */
       "name": "Backend/ng serve",
       "configurations": [
-        "Launch server index.js",
+        "Launch backend index.js",
         "ng serve",
       ]
     },
@@ -416,11 +422,11 @@
       /* relies on Is ServerUp in 'ng e2e' launch to hold browser start until the server is up */
       "name": "Backend/ng e2e",
       "configurations": [
-        "Launch server index.js",
+        "Launch backend index.js",
         "ng e2e",
       ]
     },
-    /* Mocha client tests Backend/Frontend */
+    /* Mocha client tests backend/frontend */
     /* Useful for debugging client-side test scripts */
     {
       "name": "Mocha client tests Backend/Frontend",
@@ -429,8 +435,8 @@
       /* you must close Chrome manually afterwards */
       /* you must match the tests in both configurations below */
       "configurations": [
-        "Mocha Client-fired Server Tests",
-        "Launch https://localhost:1337/testServer/xxx/loadMocha.html",
+        "Run Mocha client-fired backend tests",
+        "Open https://localhost:1337/testServer/xxx/loadMocha.html",
       ]
     },
   ],

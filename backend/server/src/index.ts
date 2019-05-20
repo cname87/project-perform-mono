@@ -14,9 +14,9 @@
  */
 
 /* import configuration parameters into process.env */
-/* the .env file must be in process.cwd() */
+import * as path from 'path';
 import * as dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 /* file header */
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
@@ -359,7 +359,7 @@ if (process.send) {
 /* create the server */
 runApp();
 
-/* All exports are for mocha. */
+/* exports for unit test */
 export const index: IServerIndex = {
   appLocals,
   event,

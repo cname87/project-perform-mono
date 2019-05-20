@@ -30,12 +30,19 @@ exports.config = {
     defaultTimeoutInterval: 30000,
     print: function() {},
   },
-  onPrepare() {
+  onPrepare: () => {
+
     require('ts-node').register({
       project: require('path').join(__dirname, './tsconfig.e2e.json'),
     });
+
+    /* set up jasmine reporter */
     jasmine
       .getEnv()
       .addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
+
+    return;
+
   },
+
 };

@@ -37,3 +37,7 @@ ul.search-result {
 .search-result li a:active {
   color: blue;
 }
+/* the search component does not follow floated dashboard when there are 1 to 3 members */
+#search-component {
+  clear: left;
+}

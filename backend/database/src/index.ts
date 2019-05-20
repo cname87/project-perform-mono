@@ -4,7 +4,7 @@
  *
  */
 
-/* import configuration parameters into process.env */
+/* import configuration parameters into process.env first */
 /* the .env file must be in process.cwd() */
 import * as dotenv from 'dotenv';
 dotenv.config();

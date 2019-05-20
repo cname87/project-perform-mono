@@ -3,47 +3,7 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
-    // npm run test frontend
-    {
-      "label": "npm test frontend",
-      "type": "shell",
-      "command": "npm",
-      "args": [
-        "run",
-        "--prefix", "${workspaceRoot}/frontend",
-        "test",
-      ],
-      "isBackground": true,
-      "presentation": {
-        "focus": true,
-        "panel": "dedicated",
-        // "revealProblems": "onProblem"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "problemMatcher": {
-        "owner": "typescript",
-        "source": "ts",
-        "applyTo": "closedDocuments",
-        "fileLocation": [
-          "relative",
-          "${cwd}"
-        ],
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "TOTAL:"
-          }
-        }
-      }
-    },
-    // npm run start frontend
+    // npm run start frontend - used by ng test launch configuration
     {
       "label": "npm start frontend",
       "type": "shell",
@@ -74,7 +34,7 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": {
-            "regexp": "(.*?)"
+            "regexp": "(.*?)" // matches any word to first sapace
           },
           "endsPattern": {
             "regexp": "Compiled | Failed to compile."
@@ -82,17 +42,65 @@
         }
       }
     },
-    // "npm run start backend server index.js"
+    // npm run test frontend - used by ng test launch configuration
     {
-      "label": "npm run start backend server index.js",
-      "type": "npm",
-      "script": "start",
-      "path": "backend/",
-      "group": "build",
+      "label": "npm test frontend",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "--prefix", "${workspaceRoot}/frontend",
+        "test",
+      ],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": [
+          "relative",
+          "${cwd}"
+        ],
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "(.*?)"
+          },
+          "endsPattern": {
+            "regexp": "TOTAL:"
+          }
+        }
+      }
+    },
+    // "npm run start backend index.js"
+    {
+      "label": "npm start backend index.js",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "--prefix", "${workspaceRoot}/backend",
+        "start",
+      ],
+      // "isBackground": true,
       "presentation": {
         "reveal": "always",
         "focus": true,
         "panel": "dedicated"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
       },
       "problemMatcher": []
     },
@@ -193,7 +201,7 @@
       },
       "problemMatcher": []
     },
-    // "Is Server Up?"
+    // "Is server up?"
     {
       "label": "Is Server Up?",
       "type": "process",
@@ -215,6 +223,51 @@
         "panel": "shared"
       },
       "problemMatcher": []
+    },
+    // "Start server
+    /* used as a preLaunchTask in a launch configuration (e.g. ng e2e) to start the server and wait until it is up, or just to pass back if the server is already started  */
+    {
+      "label": "Start Server",
+      "type": "process",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/backend/dist/utils/utils-build/startServer.js"
+      ],
+       /* Server running is a background task */
+      "isBackground": true,
+      "options": {
+        "env": {
+          "NODE_ENV": "development",
+          "DEBUG": "PP*",
+          "DEBUG_COLORS": "true"
+        }
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      },
+      /* Background task so it needs a problem matcher to know when to pass control on to the launch configuration */
+      "problemMatcher": [
+        {
+          "pattern": [
+            { // dummy problem matcher (as we're not looking for problems)
+              "regexp": ".",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": {
+              "regexp": "(.*?)" // i.e. starts on anything from startServer - not important - I think it just starts looking for probems from here.
+            },
+            "endsPattern": "Connected to", // i.e. passes control on to the  launch configuration when it sees 'Connected to' from startServer.js, i.e. when 'Connected to newly-started server' or 'Connected to previously-started server' is output to console.log from startServer.js
+          }
+        }
+      ]
     },
     // "npm delete nyc file"
     {
