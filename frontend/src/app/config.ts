@@ -1,5 +1,5 @@
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { MembersComponent } from './members/members.component';
+import { MembersListComponent } from './members-list/members-list.component';
 import { MemberDetailComponent } from './member-detail/member-detail.component';
 
 /* module routing elements */
@@ -9,8 +9,8 @@ const dashboard = {
   displayName: 'Dashboard',
 };
 const members = {
-  path: 'members',
-  component: MembersComponent,
+  path: 'memberslist',
+  component: MembersListComponent,
   displayName: 'Members',
 };
 const detail = {

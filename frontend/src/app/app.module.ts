@@ -9,7 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { MembersComponent } from './members/members.component';
+import { MembersListComponent } from './members-list/members-list.component';
 import { MemberSearchComponent } from './member-search/member-search.component';
 import { MemberDetailComponent } from './member-detail/member-detail.component';
 import { MessagesComponent } from './messages/messages.component';
@@ -32,7 +32,7 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
   declarations: [
     AppComponent,
     DashboardComponent,
-    MembersComponent,
+    MembersListComponent,
     MemberSearchComponent,
     MemberDetailComponent,
     MessagesComponent,

@@ -2,7 +2,6 @@ import { Location, APP_BASE_HREF } from '@angular/common';
 import { DebugElement, Type } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { Router, RouterLinkWithHref } from '@angular/router';
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SpyLocation } from '@angular/common/testing';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -11,12 +10,13 @@ import { click } from './tests';
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { MembersComponent } from './members/members.component';
+import { MembersListComponent } from './members-list/members-list.component';
 import { MembersService } from './members.service';
 import { IMember } from './api-members/model/models';
 import { of, Observable } from 'rxjs';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { MemberDetailComponent } from './member-detail/member-detail.component';
+import { config } from './config';
 
 interface IMembersServiceStub {
   getMembers: () => Observable<IMember[]>;
@@ -145,8 +145,12 @@ describe('AppComponent & RouterTestingModule', () => {
     });
     fixture.detectChanges();
     await fixture.whenStable();
-    expectPathToBe(spyLocation, '/members', 'after clicking members link');
-    expectElementOf(fixture, MembersComponent);
+    expectPathToBe(
+      spyLocation,
+      '/' + config.routes.members.path,
+      'after clicking members link',
+    );
+    expectElementOf(fixture, MembersListComponent);
   });
 
   it('should navigate to "/dashboard" on click', async () => {
@@ -163,8 +167,12 @@ describe('AppComponent & RouterTestingModule', () => {
     });
     fixture.detectChanges();
     await fixture.whenStable();
-    expectPathToBe(spyLocation, '/members', 'after clicking members link');
-    expectElementOf(fixture, MembersComponent);
+    expectPathToBe(
+      spyLocation,
+      '/' + config.routes.members.path,
+      'after clicking members link',
+    );
+    expectElementOf(fixture, MembersListComponent);
     fixture.ngZone!.run(() => {
       click(page.dashboardLinkDe);
     });
@@ -184,12 +192,16 @@ describe('AppComponent & RouterTestingModule', () => {
     );
     expectElementOf(fixture, DashboardComponent);
     fixture.ngZone!.run(() => {
-      spyLocation.go('/members');
+      spyLocation.go('/' + config.routes.members.path);
     });
     fixture.detectChanges();
     await fixture.whenStable();
-    expectPathToBe(spyLocation, '/members', 'after clicking members link');
-    expectElementOf(fixture, MembersComponent);
+    expectPathToBe(
+      spyLocation,
+      '/' + config.routes.members.path,
+      'after clicking members link',
+    );
+    expectElementOf(fixture, MembersListComponent);
   });
 
   it('should navigate to "/detail/id"', async () => {
