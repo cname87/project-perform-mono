@@ -268,7 +268,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Run Mocha backend with Istanbul",
+      "name": "Run Mocha backend tests with Istanbul",
       "program": "${workspaceFolder}/backend/node_modules/nyc/bin/nyc",
       "args": [
         "--reporter=text",

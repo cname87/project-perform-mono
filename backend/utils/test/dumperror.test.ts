@@ -158,10 +158,7 @@ describe('dumpError tests', () => {
     unhookIntercept();
 
     /* test that info is not redumped */
-    expect(
-      capturedConsoleLog.includes('error already dumped'),
-      'error not redumped',
-    ).to.be.true;
+    /* note: cannot test dumpError debug messages are included in console.log as debug messages are not sent to concole when Istanbul used.*/
     expect(capturedConsoleLog.includes('Error Message'), 'error not redumped')
       .to.be.false;
 

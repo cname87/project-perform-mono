@@ -268,6 +268,7 @@ export const deleteMember = (
 
 /**
  * Deletes all the members in a team.
+ * Resets the autoincrement id function so the next member created will have an id of 1.
  * @param req The http request being actioned (used to retrieve the data model).
  * @param matchString A string to match members to return.
  * @rejects Resolves to a reported error.
@@ -285,6 +286,8 @@ export const deleteMembers = (req: IRequestApp): Promise<number> => {
       .deleteMany({})
       .exec()
       .then((docs) => {
+        /* reset id autoincrement count to 1 */
+        modelMembers.resetCount();
         /* return number of members deleted */
         return resolve(docs.n);
       })

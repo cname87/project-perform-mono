@@ -2,7 +2,7 @@
 /* the .env file must be in process.cwd() */
 import * as dotenv from 'dotenv';
 dotenv.config();
-/* doublecheck TEST_MODE is set to load the test database */
+/* set TEST_MODE to true to load the test database */
 process.env.TEST_MODE = 'true';
 
 /* file header */

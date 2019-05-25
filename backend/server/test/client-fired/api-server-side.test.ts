@@ -12,7 +12,7 @@
  * The following parameters should be set in config.ts:
  * config.IS_NO_DB_OK = false; i.e. a database is required.
  *
- * The database used up by the server must be 'test' (as driven by the process.env variable 'TEST_MODE') or the test run will abort.
+ * The database used up by the server is checked below to ensure it is 'test' (as driven by the process.env variable 'TEST_MODE')  If it isn't the test run will abort.
  *
  */
 

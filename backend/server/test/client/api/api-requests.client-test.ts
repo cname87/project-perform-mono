@@ -82,7 +82,7 @@ describe('api requests', () => {
     await sendMessage(2, 'API tests end');
   });
 
-  it.skip('should delete all members', async () => {
+  it('should delete all members', async () => {
     const url = 'https://localhost:1337/api-v1/members';
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(true);

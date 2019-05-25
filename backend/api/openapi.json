@@ -126,7 +126,7 @@
         "x-swagger-router-controller" : "members",
         "description" : "Adds a supplied member.\nA member object must be supplied in the body.\nAn error (409) will be returned if a member with the same id as the id in the supplied member object already exists. \n",
         "requestBody" : {
-          "description" : "Mmber detail (without id field).",
+          "description" : "Member detail (without id field).",
           "x-name" : "member",
           "required" : true,
           "content" : {

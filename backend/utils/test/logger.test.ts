@@ -149,7 +149,6 @@ describe('logger', () => {
     await sleep(100);
 
     /* read tail of both log files */
-    /* Note: will fail if log files roll over to <name>1.log when full */
     const infoLogged = fs
       .readFileSync(infoLog)
       .toString()
@@ -158,6 +157,7 @@ describe('logger', () => {
       .readFileSync(errorLog)
       .toString()
       .slice(-logTail);
+    /* Note: will fail if log files roll over to <name>1.log when full */
     expect(infoLogged === expectedLogged, 'info log file addition').to.be.true;
     expect(errorLogged === expectedLogged, 'error log file addition').to.be
       .true;
