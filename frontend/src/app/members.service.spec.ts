@@ -128,7 +128,7 @@ describe('MembersService', () => {
     return mainSetup();
   }
 
-  fdescribe('setup', () => {
+  describe('setup', () => {
     it('should be created', async () => {
       const { membersService } = await setup();
       expect(membersService).toBeTruthy();

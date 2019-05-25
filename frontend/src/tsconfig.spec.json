@@ -1,12 +1,7 @@
 {
   "extends": "../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "../out-tsc/spec",
-    "types": [
-      "jasmine",
-      "node"
-    ],
-  },
+
+  /* If no 'files' or 'include' property is present in a tsconfig.json, the compiler defaults to including all files in the containing directory and subdirectories except those specified by 'exclude'. When a 'files' property is specified, only those files and those specified by 'include' are included */
   "files": [
     "test.ts",
     "polyfills.ts"
@@ -15,4 +10,14 @@
     "**/*.spec.ts",
     "**/*.d.ts"
   ],
+
+  "compilerOptions": {
+
+    "outDir": "../out-tsc/spec",
+
+    "types": [
+      "jasmine",
+      "node"
+    ],
+  },
 }

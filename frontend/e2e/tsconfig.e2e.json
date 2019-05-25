@@ -1,9 +1,16 @@
 {
   "extends": "../tsconfig.json",
+
   "compilerOptions": {
+
     "outDir": "../out-tsc/e2e",
-    "module": "commonjs",
+
     "target": "es5",
+
+    /* note - common.js for e2e */
+    "module": "commonjs",
+
+    /* required types for e2e */
     "types": [
       "jasmine",
       "jasminewd2",

@@ -1,19 +1,21 @@
 /**
- * Utility to delete a dist directory.
+ * * Utility to delete a dist directory *
  *
- * Usage:
+ * * Usage:
+ *
  * Used in package.com.
+ *
  * The dist directory to be deleted is passed in as a parameter.
  * package.com script: "npm run delDistDir.ts <pathToDistDir>".
  *
- * The root of <pathToDistDir> is the directory that package.json is in.
+ * <pathToDistDir> is relative to the directory that the node_modules directory (that contains 'app-root-path') is in.
  *
  * <pathToDistDir> must end in /dist.
  *
  */
 
 import * as appRootObject from 'app-root-path';
-import fs from 'fs';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as shell from 'shelljs';
 

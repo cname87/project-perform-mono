@@ -12,7 +12,7 @@ import { getMessagesElement } from './elements/messages.element';
  * - member detail page containing app-root, app-member-detail and app-messages.
  * - page not found page containing app-root and app-page-not-found.
  *
- * ElementFinders for all needed elements that appear on the page are exported below.
+ * The elements that appear on the page are exported, along with helper functions.
  *
  * The elements need to be on the DOM when an action is called, i.e. only call the get dashboard page function when the dashboard page is being displayed.
  *

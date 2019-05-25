@@ -44,7 +44,6 @@
         "mockTypeScriptVersion": false,
         "jsEnable": false,
         "exclude": [
-          // "./server/test/client/**.*"
         ]
       }
     ]
