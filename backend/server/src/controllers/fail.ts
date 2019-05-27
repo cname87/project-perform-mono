@@ -9,10 +9,10 @@ const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-import express from 'express';
+import express = require('express');
 const router = express.Router();
-import asyncHandler from 'express-async-handler';
-import createError from 'http-errors';
+import asyncHandler = require('express-async-handler');
+import createError = require('http-errors');
 
 /**
  * Tests various error scenarios: If the url query matches...

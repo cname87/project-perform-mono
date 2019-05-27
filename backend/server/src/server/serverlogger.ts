@@ -8,8 +8,8 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-import morgan from 'morgan';
-import rfs from 'rotating-file-stream';
+import morgan = require('morgan');
+import rfs = require('rotating-file-stream');
 
 /**
  * Usage:

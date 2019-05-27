@@ -14,10 +14,10 @@
  *
  */
 
-import * as appRootObject from 'app-root-path';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as shell from 'shelljs';
+import appRootObject = require('app-root-path');
+import fs = require('fs');
+import path = require('path');
+import shell = require('shelljs');
 
 const appRoot = appRootObject.toString();
 

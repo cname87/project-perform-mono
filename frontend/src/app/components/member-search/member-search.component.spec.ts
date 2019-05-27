@@ -4,9 +4,9 @@ import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { MemberSearchComponent } from './member-search.component';
-import { MembersService } from '../members.service';
-import { members } from '../mock-members';
-import { IMember } from '../api-members/model/models';
+import { MembersService } from '../../shared/services/members.service';
+import { members } from '../../shared/mocks/mock-members';
+import { IMember } from '../../api-members/model/models';
 
 describe('memberSearchComponent', () => {
   async function setup() {

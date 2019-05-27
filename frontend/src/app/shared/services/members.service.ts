@@ -2,8 +2,12 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import { MembersApi } from './api-members/api-members.service';
-import { ICount, IMember, IMemberWithoutId } from './api-members/model/models';
+import { MembersApi } from '../../api-members/api-members.service';
+import {
+  ICount,
+  IMember,
+  IMemberWithoutId,
+} from '../../api-members/model/models';
 import { MessageService } from './message.service';
 import { HttpErrorResponse } from '@angular/common/http';
 

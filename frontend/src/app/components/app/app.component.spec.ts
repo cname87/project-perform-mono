@@ -3,8 +3,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import { MessagesComponent } from './messages/messages.component';
-import { RouterLinkDirectiveStub, click } from './tests';
+import { MessagesComponent } from '../messages/messages.component';
+import { RouterLinkDirectiveStub, click } from '../../shared/test-helpers';
 import { DebugElement } from '@angular/core';
 
 describe('AppComponent', () => {

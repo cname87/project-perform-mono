@@ -23,5 +23,15 @@
 
     /* module loader format (independent of target) - es2015 for angular */
     "module": "es2015",
+
+    /* workaround for core.js - see https://github.com/angular/angular-cli/issues/13954 */
+    "paths": {
+      "core-js/es7/reflect": [
+        "node_modules/core-js/proposals/reflect-metadata"
+      ],
+      "core-js/es6/*": [
+        "node_modules/core-js/es/*"
+      ]
+    }
   }
 }

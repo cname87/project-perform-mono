@@ -14,8 +14,8 @@
  */
 
 /* import configuration parameters into process.env */
-import * as path from 'path';
-import * as dotenv from 'dotenv';
+import path = require('path');
+import dotenv = require('dotenv');
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 /* file header */
@@ -27,8 +27,8 @@ debug(`Starting ${modulename}`);
 /* external dependencies */
 import { strict } from 'assert';
 import { EventEmitter } from 'events';
-import express from 'express';
-import * as winston from 'winston';
+import express = require('express');
+import winston = require('winston');
 
 /* import configuration object */
 import {

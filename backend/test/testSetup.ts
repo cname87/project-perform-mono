@@ -1,6 +1,6 @@
 /* import configuration parameters into process.env */
 /* the .env file must be in process.cwd() */
-import * as dotenv from 'dotenv';
+import dotenv = require('dotenv');
 dotenv.config();
 /* set TEST_MODE to true to load the test database */
 process.env.TEST_MODE = 'true';

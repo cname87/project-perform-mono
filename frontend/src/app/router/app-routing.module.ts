@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { config } from './config';
-import { MemberDetailComponent } from './member-detail/member-detail.component';
-import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { config } from '../config';
+import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
+import { PageNotFoundComponent } from '../components/page-not-found/page-not-found.component';
 
 const appRoutes: Routes = [
   {

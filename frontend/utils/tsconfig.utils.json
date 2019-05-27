@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+
+  "compilerOptions": {
+
+    "outDir": "../out-tsc/utils",
+
+    "target": "es5",
+
+    /* note - common.js for utils */
+    "module": "commonjs",
+
+  }
+}

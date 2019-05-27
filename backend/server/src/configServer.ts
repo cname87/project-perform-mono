@@ -15,8 +15,8 @@ debug(`Starting ${modulename}`);
 import { EventEmitter } from 'events';
 import { Request, Router, Application } from 'express';
 import { Connection, Document, Model } from 'mongoose';
-import * as appRootObject from 'app-root-path';
-import * as path from 'path';
+import appRootObject = require('app-root-path');
+import path = require('path');
 const appRoot = appRootObject.toString();
 
 /* import all required modules */

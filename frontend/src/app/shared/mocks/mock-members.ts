@@ -1,4 +1,4 @@
-import { IMember } from './api-members/api-members.service';
+import { IMember } from '../../api-members/api-members.service';
 
 export const members: IMember[] = [
   { id: 11, name: 'test11' },

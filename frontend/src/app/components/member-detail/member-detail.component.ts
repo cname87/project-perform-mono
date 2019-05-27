@@ -2,8 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
-import { MembersService } from '../members.service';
-import { IMember } from '../api-members/api-members.service';
+import { MembersService } from '../../shared/services/members.service';
+import { IMember } from '../../api-members/api-members.service';
 
 @Component({
   selector: 'app-member-detail',

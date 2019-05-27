@@ -18,7 +18,7 @@
 
 /* import configuration parameters into process.env */
 /* the .env file must be in process.cwd() */
-import * as dotenv from 'dotenv';
+import dotenv = require('dotenv');
 dotenv.config();
 
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
@@ -31,7 +31,7 @@ import { config, IChild, IMonitor } from './configMonitor';
 export { config };
 
 /* external dependencies */
-import * as forever from 'forever-monitor';
+import forever = require('forever-monitor');
 import winston = require('winston');
 
 /* create instances of logger and dumpError for monitor

@@ -3,17 +3,17 @@ import { APP_BASE_HREF, Location } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 
-import { AppModule } from '../app.module';
+import { AppModule } from '../../app.module';
 import { MemberDetailComponent } from './member-detail.component';
-import { MembersService } from '../members.service';
+import { MembersService } from '../../shared/services/members.service';
 import {
   asyncData,
   ActivatedRoute,
   ActivatedRouteSnapshotStub,
   click,
-} from '../tests';
+} from '../../shared/test-helpers';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { IMember } from '../api-members/api-members.service';
+import { IMember } from '../../api-members/api-members.service';
 
 interface IMembersServiceSpy {
   getMember: jasmine.Spy;

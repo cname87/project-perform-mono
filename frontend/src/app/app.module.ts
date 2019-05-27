@@ -2,18 +2,16 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-// import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
-// import { InMemoryDataService } from './in-memory-data.service';
-
-import { AppComponent } from './app.component';
-import { AppRoutingModule } from './app-routing.module';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { MembersListComponent } from './members-list/members-list.component';
-import { MemberSearchComponent } from './member-search/member-search.component';
-import { MemberDetailComponent } from './member-detail/member-detail.component';
-import { MessagesComponent } from './messages/messages.component';
-import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { AppComponent } from './components/app/app.component';
+import { AppRoutingModule } from './router/app-routing.module';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { MembersListComponent } from './components/members-list/members-list.component';
+import { MemberSearchComponent } from './components/member-search/member-search.component';
+import { MemberDetailComponent } from './components/member-detail/member-detail.component';
+import { MessagesComponent } from './components/messages/messages.component';
+import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 
 @NgModule({
   imports: [
@@ -21,13 +19,7 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
     FormsModule,
     AppRoutingModule,
     HttpClientModule,
-
-    // The HttpClientInMemoryWebApiModule module intercepts HTTP requests
-    // and returns simulated server responses.
-    // Remove it when a real server is ready to receive requests.
-    // HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, {
-    //   dataEncapsulation: false,
-    // }),
+    BrowserAnimationsModule,
   ],
   declarations: [
     AppComponent,

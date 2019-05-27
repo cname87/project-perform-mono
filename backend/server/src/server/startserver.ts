@@ -1,5 +1,4 @@
-'use strict';
-
+/// <reference types="../../types/types" />
 /**
  * This module starts a http(s) server.
  * It relies on a server object with methods in a separate module.
@@ -13,11 +12,11 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-import express from 'express';
-import secure from 'express-force-ssl';
-import fs from 'fs';
-import http from 'http';
-import https from 'https';
+import express = require('express');
+import secure = require('express-force-ssl');
+import fs = require('fs');
+import http = require('http');
+import https = require('https');
 
 /**
  * Starts the http(s) server.

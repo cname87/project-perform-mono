@@ -1,6 +1,6 @@
 /* import configuration parameters into process.env */
 /* the .env file must be in process.cwd() */
-import * as dotenv from 'dotenv';
+import dotenv = require('dotenv');
 dotenv.config();
 
 /* file header */
@@ -10,7 +10,7 @@ export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-// import * as minimist from 'minimist';
+// import minimist = require('minimist');
 
 /* run the server */
 import('./server/src/index');

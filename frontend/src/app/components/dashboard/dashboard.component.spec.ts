@@ -7,9 +7,9 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { DashboardComponent } from './dashboard.component';
 import { MemberSearchComponent } from '../member-search/member-search.component';
 /* members contains an array of 10 dummy members */
-import { members } from '../mock-members';
-import { MembersService } from '../members.service';
-import { IMember } from '../api-members/model/models';
+import { members } from '../../shared/mocks/mock-members';
+import { MembersService } from '../../shared/services/members.service';
+import { IMember } from '../../api-members/model/models';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { MembersApi, IMemberWithoutId, IMember } from './api-members.service';
-import { asyncData } from '../tests';
+import { asyncData } from '../shared/test-helpers';
 import { membersConfiguration } from './configuration';
 import { ICount } from './model/count';
 

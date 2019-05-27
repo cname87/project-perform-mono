@@ -42,6 +42,7 @@
     "lcovonly",
     "mocha",
     "mongodb",
+    "nopts",
     "nreq",
     "openapitools",
     "parens",

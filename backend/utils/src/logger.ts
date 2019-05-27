@@ -11,9 +11,9 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-import * as fs from 'fs';
-import * as path from 'path';
-import * as winston from 'winston';
+import fs = require('fs');
+import path = require('path');
+import winston = require('winston');
 const { createLogger, format, transports } = winston;
 const { combine, timestamp, label, printf } = format;
 

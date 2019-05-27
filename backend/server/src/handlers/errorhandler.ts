@@ -13,10 +13,10 @@ debug(`Starting ${modulename}`);
  * Import external dependencies
  */
 import { NextFunction, Response } from 'express';
-import createError from 'http-errors';
-import urlParser from 'url';
-import util from 'util';
-import * as winston from 'winston';
+import createError = require('http-errors');
+import urlParser = require('url');
+import util = require('util');
+import winston = require('winston');
 
 /**
  * Import types

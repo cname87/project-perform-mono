@@ -22,7 +22,8 @@ const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
 /* external type dependencies */
-import mongoose, {
+import mongoose = require('mongoose');
+import {
   Connection,
   ConnectionOptions,
   Document,

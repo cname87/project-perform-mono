@@ -6,17 +6,17 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SpyLocation } from '@angular/common/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { click } from './tests';
-import { AppModule } from './app.module';
-import { AppComponent } from './app.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { MembersListComponent } from './members-list/members-list.component';
-import { MembersService } from './members.service';
-import { IMember } from './api-members/model/models';
+import { click } from '../shared/test-helpers';
+import { AppModule } from '../app.module';
+import { AppComponent } from '../components/app/app.component';
+import { DashboardComponent } from '../components/dashboard/dashboard.component';
+import { MembersListComponent } from '../components/members-list/members-list.component';
+import { MembersService } from '../shared/services/members.service';
+import { IMember } from '../api-members/model/models';
 import { of, Observable } from 'rxjs';
-import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
-import { MemberDetailComponent } from './member-detail/member-detail.component';
-import { config } from './config';
+import { PageNotFoundComponent } from '../components/page-not-found/page-not-found.component';
+import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
+import { config } from '../config';
 
 interface IMembersServiceStub {
   getMembers: () => Observable<IMember[]>;

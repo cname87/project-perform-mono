@@ -36,7 +36,6 @@ sinon.assert.expose(chai.assert, {
 import proxyquireObject = require('proxyquire');
 /* ensure fresh load each time */
 const proxyquire = proxyquireObject.noPreserveCache();
-// import * as chromeLauncher from 'chrome-launcher';
 import { EventEmitter } from 'events';
 import puppeteer from 'puppeteer-core';
 import winston = require('winston');

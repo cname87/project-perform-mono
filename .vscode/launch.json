@@ -22,8 +22,11 @@
     },
     // ng test - use for frontend unit test debug
     {
-      /* runs 'npm run test' first and then runs this */
-      /* run 'npm run test' manually first if problems with preLaunch task */
+      /*
+      Runs 'npm run test, i.e. ng test, first and then runs Chrome and connects to the karma runner.
+      Run 'npm run test' manually first if problems with preLaunch task.
+      Close all open Chrome instances if Chrome won't start.
+       */
       "name": "ng test",
       "type": "chrome",
       "request": "launch",
@@ -64,7 +67,9 @@
     },
     // ng e2e - use for frontend e2e test debug
     {
-      /* baseUrl configured in protractor conf to be loclahost:1337  => backend server needs to be started first => use the configured compound configuration */
+      /*
+      baseUrl is configured in protractor.conf to be loclahost:1337 => backend server needs to be started first => use the 'Start Server'pre-laumch task of use the configured compound configuration.
+       */
       "name": "ng e2e",
       "type": "node",
       "request": "launch",

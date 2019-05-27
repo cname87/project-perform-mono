@@ -15,15 +15,16 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-import bodyParser from 'body-parser';
-import compression from 'compression';
-import cookieParser from 'cookie-parser';
-import express, { Request, NextFunction, Response } from 'express';
+import bodyParser = require('body-parser');
+import compression = require('compression');
+import cookieParser = require('cookie-parser');
+import express = require('express');
+import { Request, NextFunction, Response } from 'express';
 import { OpenAPIBackend } from 'openapi-backend';
-import path from 'path';
-import urlParser from 'url';
-import util from 'util';
-import uuidv1 from 'uuid/v1';
+import path = require('path');
+import urlParser = require('url');
+import util = require('util');
+import uuidv1 = require('uuid/v1');
 
 /* internal dependencies */
 import { IErr, IExpressApp, IRequestApp } from '../configServer';

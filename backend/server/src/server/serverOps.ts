@@ -19,8 +19,8 @@ debug(`Starting ${modulename}`);
 /**
  * Import external dependencies.
  */
-import http from 'http';
-import shutdownHelper from 'http-shutdown';
+import http = require('http');
+import shutdownHelper = require('http-shutdown');
 
 /**
  * Import local types.
@@ -87,8 +87,7 @@ function setupServer(
   /* start and return the http(s) server & load express as listener */
   this.expressServer = serverType.createServer(serverOptions, app);
 
-  /* wrap extra shutdown functionality into server
-   * to avoid shutdown issues when debug inspector listening */
+  /* wrap extra shutdown functionality into server  to avoid shutdown issues when debug inspector listening */
   this.expressServer = shutdownHelper(this.expressServer);
 
   /* store a count of the number server listen errors allowed */

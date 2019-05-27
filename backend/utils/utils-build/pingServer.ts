@@ -17,12 +17,12 @@ const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-import * as appRootObject from 'app-root-path';
+import appRootObject = require('app-root-path');
 const appRoot = appRootObject.toString();
-import fs from 'fs';
-import httpRequest from 'request-promise-native';
-import * as path from 'path';
-import util from 'util';
+import fs = require('fs');
+import request = require('request-promise-native');
+import path = require('path');
+import util = require('util');
 const sleep = util.promisify(setTimeout);
 
 /* internal dependencies */
@@ -51,7 +51,7 @@ const pingServer = (numRetries = 10) => {
             ': connect to local host' +
             ` - attempt ${tryConnectCount}`,
         );
-        response = await httpRequest(options);
+        response = await request.get(options);
         resolve(response);
         break; // loop will continue even though promise resolved
       } catch (err) {

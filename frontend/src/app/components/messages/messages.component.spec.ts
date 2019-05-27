@@ -2,10 +2,10 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { By } from '@angular/platform-browser';
 
-import { AppModule } from '../app.module';
+import { AppModule } from '../../app.module';
 import { MessagesComponent } from './messages.component';
-import { MessageService } from '../message.service';
-import { click } from '../tests';
+import { MessageService } from '../../shared/services/message.service';
+import { click } from '../../shared/test-helpers';
 
 /* create interfaces for stubs to be injected */
 interface IMessageServiceStub {

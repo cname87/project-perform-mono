@@ -14,7 +14,7 @@ debug(`Starting ${modulename}`);
  * Import external dependencies.
  */
 import { NextFunction, Response } from 'express';
-import * as util from 'util';
+import util = require('util');
 
 /**
  * Import local types

@@ -1,12 +1,15 @@
 {
   "extends": "../tsconfig.json",
   "include": [
-    "./index.ts",
-    "./**/src/**/*.ts",
-    "./**/test/**/*.test.ts",
-    "./utils/utils-build/*.ts",
+    "./**/*.ts",
+    // "./index.ts",
+    // "./**/src/**/*.nopts",
+    // "./**/test/**/*.test.ts",
+    // "./utils/utils-build/*.ts",
+    // "./test/testSetup.ts",
     "./**/types/*.d.ts",
-    "./test/testSetup.ts", "utils/types.d.ts",
+    "./server/types/types.d.ts",
+    "./utils/types.d.ts",
   ],
   "exclude": [
     "./server/test/client", // client-side files compiled separately

@@ -9,10 +9,10 @@ import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
-import * as appRootObject from 'app-root-path';
+import appRootObject = require('app-root-path');
 /* appRoot will be the directory containing the node_modules directory which includes app-root-path, i.e. should be in .../backend */
 const appRoot = appRootObject.toString();
-import * as path from 'path';
+import path = require('path');
 
 /***********************************************************************/
 /* Winston logger parameters                                           */

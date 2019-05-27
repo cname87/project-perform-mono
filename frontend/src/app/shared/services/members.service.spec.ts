@@ -8,10 +8,10 @@ import {
   MembersApi,
   IMemberWithoutId,
   IMember,
-} from './api-members/api-members.service';
-import { asyncData, asyncError } from './tests';
-import { members } from './mock-members';
-import { ICount } from './api-members/model/count';
+} from '../../api-members/api-members.service';
+import { asyncData, asyncError } from '../test-helpers';
+import { members } from '../mocks/mock-members';
+import { ICount } from '../../api-members/model/count';
 
 interface IMembersApiStub {
   getMembers: jasmine.Spy;

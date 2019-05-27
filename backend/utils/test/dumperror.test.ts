@@ -22,7 +22,7 @@ const proxyquire = proxyquireObject.noPreserveCache();
 import util = require('util');
 const sleep = util.promisify(setTimeout);
 import intercept = require('intercept-stdout');
-import * as winston from 'winston';
+import winston = require('winston');
 
 /*
  * internal dependencies
