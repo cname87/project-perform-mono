@@ -21,7 +21,7 @@ async function test() {
   try {
     await pingServer(1);
     console.log('Connected to previously-running server');
-    return;
+    return 0;
   } catch (err) {
     console.log('Trying to start server');
     /* start the server */
@@ -31,10 +31,10 @@ async function test() {
     console.log('starting ping');
     await pingServer();
     console.log('Connected to newly-started server');
-    return;
+    return 0;
   } catch (err) {
     console.log('Failed to start server');
-    return;
+    return 1;
   }
 }
 

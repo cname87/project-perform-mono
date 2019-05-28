@@ -8,10 +8,7 @@ import { MembersListComponent } from './members-list.component';
 import { MembersService } from '../../shared/services/members.service';
 import { asyncData, click } from '../../shared/test-helpers';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import {
-  IMember,
-  IMemberWithoutId,
-} from '../../api-members/api-members.service';
+import { IMember, IMemberWithoutId } from '../../api/api-members.service';
 import { members } from '../../shared/mocks/mock-members';
 import { DebugElement } from '@angular/core';
 import { SpyLocation } from '@angular/common/testing';

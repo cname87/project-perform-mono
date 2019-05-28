@@ -12,6 +12,8 @@ import { MemberSearchComponent } from './components/member-search/member-search.
 import { MemberDetailComponent } from './components/member-detail/member-detail.component';
 import { MessagesComponent } from './components/messages/messages.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import { RouterLinkDirectiveStub } from './shared/test-helpers/router-link-directive-stub';
+import { MaterialModule } from './modules/material/material.module';
 
 @NgModule({
   imports: [
@@ -20,6 +22,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    MaterialModule,
   ],
   declarations: [
     AppComponent,
@@ -29,6 +32,8 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
     MemberDetailComponent,
     MessagesComponent,
     PageNotFoundComponent,
+    /* imported to avoid ng build --prod error */
+    RouterLinkDirectiveStub,
   ],
   bootstrap: [AppComponent],
 })

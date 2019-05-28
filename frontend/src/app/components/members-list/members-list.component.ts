@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { MembersService } from '../../shared/services/members.service';
-import {
-  IMember,
-  IMemberWithoutId,
-} from '../../api-members/api-members.service';
+import { IMember, IMemberWithoutId } from '../../api/api-members.service';
 
 @Component({
   selector: 'app-members',

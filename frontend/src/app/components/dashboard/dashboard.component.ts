@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { MembersService } from '../../shared/services/members.service';
-import { IMember } from '../../api-members/api-members.service';
+import { IMember } from '../../api/api-members.service';
 
 @Component({
   selector: 'app-dashboard',

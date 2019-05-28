@@ -15,21 +15,26 @@
     "url": "C:\\Users\\syoung\\Dropbox\\Software\\MEAN\\projects\\project_perform"
   },
   "scripts": {
-    "build": "ng build",
-    "start": "ng serve --proxy-config proxy.conf.json",
-    "test": "ng test --code-coverage",
-    "e2e": "ng e2e",
-    "tscWatch": "tsc --watch --project ./tsconfig.json",
+
     "delDist": "ts-node --project ./utils/tsconfig.utils.json ./utils/delDistDir.ts ./dist",
-    "startServer": "ts-node --project ../backend/tsconfig.json ../backend/utils/utils-build/startServer",
-    "prettierBase": "prettier",
-    "prettierCheck": "npm run prettierBase -- --list-different \"./**/*.{ts,tsx}\"",
-    "prettierWrite": "npm run prettierBase -- --write \"./**/*.{ts,tsx}\"",
+    "ngBuild": "ng build",
+    "ngBuild:prod": "ng build --prod",
+    "prettier": "prettier --write \"./**/*.{ts,tsx}\"",
     "tslint:app": "tslint ./src/**/*.ts --format verbose --project ./src/tsconfig.app.json --config ./src/tslint.json",
     "tslint:spec": "tslint ./src/**/spec.ts --format verbose --project ./src/tsconfig.spec.json --config ./src/tslint.json",
-    "tslint": "npm run tslint:app && npm run tslint:spec",
-    "build:dev": "npm run delDist && npm run build && npm run prettierWrite && npm run tslint:app",
-    "build:prod": "npm run delDist && npm run build --prod && npm run prettierWrite && npm run tslint:app"
+    "tslint": "npm-run-all tslint:app tslint:spec",
+    "build:dev": "npm-run-all delDist ngBuild prettier tslint",
+    "build:prod": "npm-run-all delDist ngBuild:prod prettier tslint:app",
+
+    "startServer": "cd ../backend && npm run startServer",
+    "ngServe": "sleepms 1000 && ng serve --open=false --proxy-config proxy.conf.json",
+    "start": "npm-run-all -p -r startServer ngServe",
+
+    "test": "ng test --code-coverage",
+
+    "ngE2e": "sleepms 1000 && ng e2e",
+    "e2e": "npm-run-all -p -r startServer ngE2e"
+
   },
   "dependencies": {
     "@angular/animations": "^7.2.15",
@@ -74,12 +79,14 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "lodash": "^4.17.11",
     "node-sass": "^4.12.0",
+    "npm-run-all": "^4.1.5",
     "phantomjs-prebuilt": "^2.1.16",
     "prettier": "^1.17.1",
     "protractor": "^5.4.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "shelljs": "^0.8.3",
+    "sleep-ms": "^2.0.1",
     "ts-node": "~8.2.0",
     "tslint": "~5.16.0",
     "tslint-angular": "^3.0.2",

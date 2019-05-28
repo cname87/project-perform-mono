@@ -4,13 +4,16 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-    // ng serve - use for frontend debug with watch
+    // Start frontend - use for frontend debug with watch
     {
-      /* proxy.conf configured in angular.json => backend server needs to be started first => use the configured compound configuration */
-      "name": "ng serve",
+      /*
+      Runs npm run start.
+      proxy.conf is configured in angular.json => backend server needs to be started first => started in the script.
+      Close all open Chrome instances if Chrome won't start. */
+      "name": "Start frontend",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "npm start frontend", // this runs ng serve
+      "preLaunchTask": "npm start frontend",
       "url": "http://localhost:4200/", // proxy to 1337 for api calls
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {
@@ -20,17 +23,17 @@
         "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
     },
-    // ng test - use for frontend unit test debug
+    // Test frontend - use for frontend unit test debug
     {
       /*
       Runs 'npm run test, i.e. ng test, first and then runs Chrome and connects to the karma runner.
       Run 'npm run test' manually first if problems with preLaunch task.
       Close all open Chrome instances if Chrome won't start.
        */
-      "name": "ng test",
+      "name": "Test frontend",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "npm test frontend", // runs ng test
+      "preLaunchTask": "npm test frontend",
       "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "runtimeArgs": [
         "--remote-debugging-port=9222",
@@ -65,12 +68,13 @@
         "${workspaceFolder}/frontend/node_modules/**/*.js",
       ],
     },
-    // ng e2e - use for frontend e2e test debug
+    // Test e2e frontend - use for frontend e2e test debug
     {
       /*
-      baseUrl is configured in protractor.conf to be loclahost:1337 => backend server needs to be started first => use the 'Start Server'pre-laumch task of use the configured compound configuration.
+      Runs npm run e2e.
+      baseUrl is configured in protractor.conf to be loclahost:1337 => backend server needs to be started first => started in script.
        */
-      "name": "ng e2e",
+      "name": "Test e2e frontend",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/frontend//node_modules/protractor/bin/protractor",
@@ -419,7 +423,7 @@
       "name": "Backend/ng serve",
       "configurations": [
         "Launch backend index.js",
-        "ng serve",
+        "Start frontend",
       ]
     },
     /* Run backend server and ng e2e - debug e2e */
@@ -428,7 +432,7 @@
       "name": "Backend/ng e2e",
       "configurations": [
         "Launch backend index.js",
-        "ng e2e",
+        "Test e2e frontend",
       ]
     },
     /* Mocha client tests backend/frontend */

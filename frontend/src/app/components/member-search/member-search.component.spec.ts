@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MemberSearchComponent } from './member-search.component';
 import { MembersService } from '../../shared/services/members.service';
 import { members } from '../../shared/mocks/mock-members';
-import { IMember } from '../../api-members/model/models';
+import { IMember } from '../../api/model/models';
 
 describe('memberSearchComponent', () => {
   async function setup() {

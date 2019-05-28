@@ -3,7 +3,7 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
-    // npm run start frontend - used by ng test launch configuration
+    // npm run start frontend - used by Start frontend launch configurations
     {
       "label": "npm start frontend",
       "type": "shell",
@@ -42,7 +42,7 @@
         }
       }
     },
-    // npm run test frontend - used by ng test launch configuration
+    // npm run test frontend - used by T frontend launch configuration
     {
       "label": "npm test frontend",
       "type": "shell",

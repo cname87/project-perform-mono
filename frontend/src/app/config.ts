@@ -6,12 +6,12 @@ import { MemberDetailComponent } from './components/member-detail/member-detail.
 const dashboard = {
   path: 'dashboard',
   component: DashboardComponent,
-  displayName: 'Dashboard',
+  displayName: 'DASHBOARD',
 };
 const members = {
   path: 'memberslist',
   component: MembersListComponent,
-  displayName: 'Members',
+  displayName: 'MEMBERS',
 };
 const detail = {
   path: 'detail',

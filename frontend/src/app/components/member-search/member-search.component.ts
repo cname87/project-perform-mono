@@ -3,7 +3,7 @@ import { Observable, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 import { MembersService } from '../../shared/services/members.service';
-import { IMember } from '../../api-members/api-members.service';
+import { IMember } from '../../api/api-members.service';
 import { config } from '../../config';
 
 @Component({
