@@ -110,7 +110,7 @@ describe('Project Perform', () => {
       /* expected values */
       title: 'Team Members',
       header: 'Team Members',
-      linkNames: ['Dashboard', 'Members'],
+      linkNames: [ 'MEMBERS LIST' ],
       numTopMembers: 4,
       topMemberIndex: 2,
       member: { id: 0, name: '' },
@@ -270,7 +270,7 @@ describe('Project Perform', () => {
         .map((el?: ElementFinder) =>
           el!.getText(),
         );
-      expect(linkNames).toEqual(expected.linkNames, 'root links');
+      expect(linkNames).toEqual(expected.linkNames as any, 'root links');
     });
 
     it('a dashboard page with top members displayed', async() => {
@@ -543,7 +543,7 @@ describe('Project Perform', () => {
 
       it('clears the messages list', async() => {
         /* get expected values object */
-        const { expected } = testSetup();
+        const { } = testSetup();
         /* the member list page is displayed */
         let membersListPage = getMembersListPage();
         /* clear the messages list */

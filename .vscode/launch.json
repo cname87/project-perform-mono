@@ -209,11 +209,14 @@
       "request": "launch",
       "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "runtimeArgs": [
-        "--remote-debugging-port=9222",
+        // "--remote-debugging-port=9222",
         "--incognito",
         "--start-maximized",
         "--new-window",
         "--disable-popup-blocking", // necessary for window.open() to work
+        "--disable-application-cache",
+        "--media-cache-size=1",
+        "--disk-cache-size=1"
       ],
       "userDataDir": true,
       "url": "https://localhost:1337/",

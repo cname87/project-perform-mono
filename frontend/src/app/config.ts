@@ -6,12 +6,12 @@ import { MemberDetailComponent } from './components/member-detail/member-detail.
 const dashboard = {
   path: 'dashboard',
   component: DashboardComponent,
-  displayName: 'DASHBOARD',
+  displayName: 'MEMBERS DASHBOARD',
 };
-const members = {
+const membersList = {
   path: 'memberslist',
   component: MembersListComponent,
-  displayName: 'MEMBERS',
+  displayName: 'MEMBERS LIST',
 };
 const detail = {
   path: 'detail',
@@ -21,7 +21,7 @@ const detail = {
 export const config: any = {
   routes: {
     dashboard,
-    members,
+    membersList,
     detail,
   },
 };

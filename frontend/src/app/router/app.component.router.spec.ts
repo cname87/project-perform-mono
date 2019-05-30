@@ -131,7 +131,7 @@ describe('AppComponent & RouterTestingModule', () => {
     expectElementOf(fixture, DashboardComponent);
   });
 
-  it('should navigate to "/members" on click', async () => {
+  it('should navigate to "/memberslist" on click', async () => {
     const { fixture, page, spyLocation } = await setup();
     fixture.detectChanges();
     await fixture.whenStable();
@@ -147,7 +147,7 @@ describe('AppComponent & RouterTestingModule', () => {
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + config.routes.members.path,
+      '/' + config.routes.membersList.path,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);
@@ -169,7 +169,7 @@ describe('AppComponent & RouterTestingModule', () => {
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + config.routes.members.path,
+      '/' + config.routes.membersList.path,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);
@@ -192,13 +192,13 @@ describe('AppComponent & RouterTestingModule', () => {
     );
     expectElementOf(fixture, DashboardComponent);
     fixture.ngZone!.run(() => {
-      spyLocation.go('/' + config.routes.members.path);
+      spyLocation.go('/' + config.routes.membersList.path);
     });
     fixture.detectChanges();
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + config.routes.members.path,
+      '/' + config.routes.membersList.path,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);

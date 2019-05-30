@@ -1,74 +1,116 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { MessagesComponent } from '../messages/messages.component';
 import { RouterLinkDirectiveStub, click } from '../../shared/test-helpers';
-import { DebugElement } from '@angular/core';
+import { MaterialModule } from '../../modules/material/material.module';
 
 describe('AppComponent', () => {
-  let component: AppComponent;
-  let fixture: ComponentFixture<AppComponent>;
-  let linkDes: DebugElement[];
-  let routerLinks: RouterLinkDirectiveStub[];
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  /* setup function run by each 'it' test suite */
+  async function mainSetup() {
+    await TestBed.configureTestingModule({
       declarations: [AppComponent, MessagesComponent, RouterLinkDirectiveStub],
       imports: [
         RouterTestingModule.withRoutes([
-          { path: 'members', component: AppComponent }, // dummy path needed to avoid routing error warning
+          { path: 'memberslist', component: AppComponent }, // dummy path needed to avoid routing error warning
         ]),
+        MaterialModule,
       ],
       providers: [],
     }).compileComponents();
-  }));
+  }
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(AppComponent);
-    component = fixture.componentInstance;
-
+  class Page {
     /* find DebugElements with an attached RouterLinkStubDirective */
-    linkDes = fixture.debugElement.queryAll(
-      By.directive(RouterLinkDirectiveStub),
-    );
+    get linkDes() {
+      return this.fixture.debugElement.queryAll(
+        By.directive(RouterLinkDirectiveStub),
+      );
+    }
 
     /* get link directive instances using each DebugElement's injector */
-    routerLinks = linkDes.map((de) => de.injector.get(RouterLinkDirectiveStub));
+    get routerLinks() {
+      return this.linkDes.map((de) => de.injector.get(RouterLinkDirectiveStub));
+    }
+
+    get header() {
+      return this.findId<HTMLDivElement>('header') as HTMLDivElement;
+    }
+
+    get anchorLinks() {
+      return this.fixture.nativeElement.querySelectorAll('a');
+    }
+
+    constructor(readonly fixture: ComponentFixture<AppComponent>) {}
+
+    private findId<T>(id: string): T {
+      const element = this.fixture.debugElement.query(By.css('#' + id));
+      if (!element) {
+        return (null as unknown) as T;
+      }
+      return element.nativeElement;
+    }
+  }
+
+  /* create the component, initialize it & return test variables */
+  async function createComponent() {
+    const fixture = TestBed.createComponent(AppComponent);
 
     fixture.detectChanges();
+
+    /* create the component instance */
+    const component = fixture.componentInstance;
+
+    /* create a page to access the DOM elements */
+    const page = new Page(fixture);
+
+    return {
+      fixture,
+      component,
+      page,
+    };
+  }
+
+  /* setup function run by each sub test function */
+  async function setup() {
+    await mainSetup();
+    return createComponent();
+  }
+
+  it('should be created', async () => {
+    const { component } = await setup();
+    expect(component).toBeTruthy('component should be created');
   });
 
-  it('should be created', () => {
-    expect(component).toBeTruthy();
+  it('should display header', async () => {
+    const { component, page } = await setup();
+    expect(page.header.textContent).toEqual(component.header);
   });
 
-  it('should display "Top Members" as headline', () => {
-    expect(fixture.nativeElement.querySelector('h1').textContent).toEqual(
-      component.title,
-    );
+  it('should display 2 links', async () => {
+    const { page } = await setup();
+    expect(page.anchorLinks.length).toEqual(2, '2 anchor elements on DOM');
   });
 
-  it('should display 2 links', async(() => {
-    expect(fixture.nativeElement.querySelectorAll('a').length).toEqual(2);
-  }));
-
-  it('can get RouterLinks from template', () => {
-    expect(routerLinks.length).toBe(2, 'should have 2 routerLinks');
-    expect(routerLinks[0].linkParams).toBe(
+  it('can get RouterLinks from template', async () => {
+    const { component, page } = await setup();
+    expect(page.routerLinks.length).toBe(2, 'should have 2 routerLinks');
+    expect(page.routerLinks[0].linkParams).toBe(
       `/${component.dashboard.path}`,
       'dashboard route',
     );
-    expect(routerLinks[1].linkParams).toBe(
-      `/${component.members.path}`,
+    expect(page.routerLinks[1].linkParams).toBe(
+      `/${component.membersList.path}`,
       'members route',
     );
   });
 
-  it('can click Members link in template', () => {
-    const membersLinkDe = linkDes[1];
-    const membersLink = routerLinks[1];
+  it('can click Members link in template', async () => {
+    const { component, fixture, page } = await setup();
+    const membersLinkDe = page.linkDes[1];
+    const membersLink = page.routerLinks[1];
 
     expect(membersLink.navigatedTo).toBeNull('should not have navigated yet');
 
@@ -79,8 +121,35 @@ describe('AppComponent', () => {
 
     /* it attempts to route => dummy path configured above */
     expect(membersLink.navigatedTo).toBe(
-      `/${component.members.path}`,
+      `/${component.membersList.path}`,
       'members route',
     );
+
+    /* test only dashboard nav link is showing */
+    expect(page.routerLinks[0]).toBeDefined;
+    expect(page.routerLinks[1]).toBeUndefined;
+  });
+
+  it('can click Dashboard link in template', async () => {
+    const { component, fixture, page } = await setup();
+    const dashboardDe = page.linkDes[0];
+    const dashboardLink = page.routerLinks[0];
+
+    expect(dashboardLink.navigatedTo).toBeNull('should not have navigated yet');
+
+    fixture.ngZone!.run(() => {
+      click(dashboardDe);
+    });
+    fixture.detectChanges();
+
+    /* it attempts to route => dummy path configured above */
+    expect(dashboardLink.navigatedTo).toBe(
+      `/${component.dashboard.path}`,
+      'members route',
+    );
+
+    /* test only memberslist nav link is showing */
+    expect(page.routerLinks[0]).toBeUndefined;
+    expect(page.routerLinks[1]).toBeDefined;
   });
 });

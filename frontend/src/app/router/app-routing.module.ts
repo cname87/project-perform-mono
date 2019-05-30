@@ -12,7 +12,7 @@ const appRoutes: Routes = [
     pathMatch: 'full',
   },
   config.routes.dashboard,
-  config.routes.members,
+  config.routes.membersList,
   { path: 'detail/:id', component: MemberDetailComponent },
   { path: '**', component: PageNotFoundComponent },
 ];

@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 
 import { config } from '../../config';
-import { DashboardComponent } from '../dashboard/dashboard.component';
-import { MembersListComponent } from '../members-list/members-list.component';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -10,20 +8,18 @@ import { MembersListComponent } from '../members-list/members-list.component';
 })
 export class AppComponent {
   /* main title */
-  title = 'Team Members';
-  child = '';
+  header = 'Team Members';
 
-  /* component routing elements */
+  /* routerLink links */
   dashboard = config.routes.dashboard;
-  members = config.routes.members;
+  membersList = config.routes.membersList;
+  links = [
+    { path: '/' + this.dashboard.path,
+      display: this.dashboard.displayName },
+    {
+      path: '/' + this.membersList.path,
+      display: this.membersList.displayName,
+    },
+  ];
 
-  onActivate(componentRef: any) {
-    if (componentRef instanceof DashboardComponent) {
-      this.child = 'dashboard';
-    } else if (componentRef instanceof MembersListComponent) {
-      this.child = 'membersList';
-    } else {
-      this.child = '';
-    }
-  }
 }

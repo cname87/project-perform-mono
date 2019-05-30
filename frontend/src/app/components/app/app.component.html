@@ -1,34 +1,32 @@
-<h1>{{ title }}</h1>
+<h1 class="mat-display-1">{{ header }}</h1>
 
-<mat-toolbar color="primary">
-  <span>{{ title }}</span>
+<nav
+  mat-tab-nav-bar
+  color="primary"
+  dynamicHeight="true"
+>
+  <a
+    mat-tab-link
+    *ngFor="let link of links"
+    [routerLink]="link.path"
+    routerLinkActive #rla="routerLinkActive"
+    [active]="rla.isActive"
+  >
+    {{ link.display }}
+  </a>
 
-  <span class="toolbar-space"></span>
+  <a
+  mat-tab-link
+  routerLink="/detail"
+  routerLinkActive #rla="routerLinkActive"
+  [active]="rla.isActive"
+  disabled=true
+>
+  MEMBER DETAIL
+</a>
 
-  <span>
-    <a
-      *ngIf="!(child==='dashboard')"
-      mat-raised-button
-      class="btn"
-      color="accent"
-      routerLink="/{{dashboard.path}}">
-        {{ dashboard.displayName }}
-    </a>
-    <a
-      *ngIf="!(child==='membersList')"
-      mat-raised-button
-      class="btn"
-      color="accent"
-      routerLink="/{{members.path}}">
-        {{ members.displayName }}
-    </a>
-  </span>
-</mat-toolbar>
-
-<nav>
-  <a routerLink="/{{dashboard.path}}">{{ dashboard.displayName }}</a>
-  <a routerLink="/{{members.path}}">{{ members.displayName }}</a>
 </nav>
-<router-outlet (activate)='onActivate($event)'></router-outlet>
+
+<router-outlet></router-outlet>
 
 <app-messages></app-messages>
