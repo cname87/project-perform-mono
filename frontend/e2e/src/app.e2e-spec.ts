@@ -108,9 +108,13 @@ describe('Project Perform', () => {
   const testSetup = () => {
     const expected = {
       /* expected values */
-      title: 'Team Members',
+      title: 'Project Perform',
       header: 'Team Members',
-      linkNames: [ 'MEMBERS LIST' ],
+      linkNames: [
+        'MEMBERS DASHBOARD',
+        'MEMBERS LIST',
+        'MEMBER DETAIL',
+      ],
       numTopMembers: 4,
       topMemberIndex: 2,
       member: { id: 0, name: '' },

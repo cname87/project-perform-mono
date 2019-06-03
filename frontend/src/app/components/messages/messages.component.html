@@ -1,15 +1,35 @@
 <div id="mainDiv" *ngIf="messageService.messages.length">
 
-  <h2 id="header">Messages</h2>
+  <mat-toolbar
+  >
 
-  <button id="clearBtn"
-          class="clear"
-          (click)="messageService.clear()">
-    clear
-  </button>
+    <h2
+      id="header"
+    >
+      Messages
+    </h2>
 
-  <div id="div2"
-      *ngFor="let message of messageService.messages; trackBy: trackByFn">
+    <button
+      mat-icon-button
+      id="clearBtn"
+      aria-label="Example icon-button with a heart icon"
+      (click)="messageService.clear()"
+    >
+      <mat-icon
+        aria-hidden="false"
+        aria-label="Close icon"
+      >
+        close
+      </mat-icon>
+    </button>
+
+
+  </mat-toolbar>
+
+  <div
+    id="div2"
+    *ngFor="let message of messageService.messages; trackBy: trackByFn"
+  >
     {{ message }}
   </div>
 

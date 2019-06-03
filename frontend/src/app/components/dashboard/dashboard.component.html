@@ -1,12 +1,33 @@
-<h3 id=title>{{ title }}</h3>
-<div class="grid-pad">
-  <a *ngFor="let member of members; trackBy: trackByFn"
-      class="col-1-4"
-      routerLink="/detail/{{member.id}}">
-    <div class="module member">
-      <h4 id="m">{{ showProperty(member) }}</h4>
-    </div>
+<!-- set up a flex layout of member box displays -->
+<div
+  fxLayout="row wrap"
+  fxLayout.lt-sm="column"
+  fxLayoutGap="16px grid"
+  fxLayoutAlign="space-evenly"
+  fxLayoutAlign.lt-md="flex-start"
+>
+  <!-- produces a linked box for each displayed member -->
+  <a
+    *ngFor="let member of members; trackBy: trackByFn"
+    routerLink="/detail/{{member.id}}"
+    fxFlex="0 1 calc(25%)"
+    fxFlex.lt-md="0 1 calc(50%)"
+    fxFlex.lt-sm="100%"
+  >
+
+    <!-- the display box component -->
+		<app-card
+      [name] = "member.name"
+    >
+    </app-card>
+
   </a>
+
 </div>
 
+
+<mat-divider></mat-divider>
+
 <app-member-search></app-member-search>
+
+<mat-divider></mat-divider>

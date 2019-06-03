@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { AppComponent } from './components/app/app.component';
 import { AppRoutingModule } from './router/app-routing.module';
@@ -12,6 +13,7 @@ import { MemberSearchComponent } from './components/member-search/member-search.
 import { MemberDetailComponent } from './components/member-detail/member-detail.component';
 import { MessagesComponent } from './components/messages/messages.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import { MemberCardComponent } from './components/member-card/member-card.component';
 import { RouterLinkDirectiveStub } from './shared/test-helpers/router-link-directive-stub';
 import { MaterialModule } from './modules/material/material.module';
 
@@ -22,6 +24,8 @@ import { MaterialModule } from './modules/material/material.module';
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    FlexLayoutModule,
+    /* local modules */
     MaterialModule,
   ],
   declarations: [
@@ -32,6 +36,7 @@ import { MaterialModule } from './modules/material/material.module';
     MemberDetailComponent,
     MessagesComponent,
     PageNotFoundComponent,
+    MemberCardComponent,
     /* imported to avoid ng build --prod error */
     RouterLinkDirectiveStub,
   ],

@@ -13,7 +13,7 @@ import { config } from '../../config';
 })
 export class MemberSearchComponent implements OnInit {
   /* main title */
-  title = 'Member Search';
+  header = 'Member Search';
   /* component routing elements */
   detail = config.routes.detail;
   /* detail to display */
@@ -37,7 +37,7 @@ export class MemberSearchComponent implements OnInit {
       // ignore new term if same as previous term
       distinctUntilChanged(),
 
-      // switch to new search observable each time the term changes
+      // switch to a new memberService observable each time the term changes
       switchMap((term: string) => {
         return this.membersService.getMembers(term);
       }),

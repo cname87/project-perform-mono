@@ -1,0 +1,19 @@
+
+/* import theme with $primary and $accent variables */
+/* also imports default typography $config variable */
+@import 'src/styles/main-theme.scss';
+
+/* this selects the container holding the member info */
+:host {
+  /* needed as default flows incorrectly */
+  display: block;
+  /* inner padding */
+  padding: 16px;
+  border: 1px solid black;
+  border-radius: 6px;
+  /* set the background color to a variation of the theme primary */
+  background-color: mat-color($primary);
+  /* override anchor font color */
+  color: black;
+  font-size: 1.2em;
+}

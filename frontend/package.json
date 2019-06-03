@@ -15,7 +15,6 @@
     "url": "C:\\Users\\syoung\\Dropbox\\Software\\MEAN\\projects\\project_perform"
   },
   "scripts": {
-
     "delDist": "ts-node --project ./utils/tsconfig.utils.json ./utils/delDistDir.ts ./dist",
     "ngBuild": "ng build",
     "ngBuild:prod": "ng build --prod",
@@ -25,16 +24,12 @@
     "tslint": "npm-run-all tslint:app tslint:spec",
     "build:dev": "npm-run-all delDist ngBuild prettier tslint",
     "build:prod": "npm-run-all delDist ngBuild:prod prettier tslint:app",
-
     "startServer": "cd ../backend && npm run startServer",
     "ngServe": "sleepms 1000 && ng serve --open=false --proxy-config proxy.conf.json",
     "start": "npm-run-all -p -r startServer ngServe",
-
     "test": "ng test --code-coverage",
-
     "ngE2e": "sleepms 1000 && ng e2e",
     "e2e": "npm-run-all -p -r startServer ngE2e"
-
   },
   "dependencies": {
     "@angular/animations": "^7.2.15",
@@ -42,6 +37,7 @@
     "@angular/common": "^7.2.15",
     "@angular/compiler": "^7.2.15",
     "@angular/core": "^7.2.15",
+    "@angular/flex-layout": "^7.0.0-beta.24",
     "@angular/forms": "^7.2.15",
     "@angular/http": "^7.2.15",
     "@angular/material": "^7.3.7",

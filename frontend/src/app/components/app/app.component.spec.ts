@@ -36,7 +36,7 @@ describe('AppComponent', () => {
     }
 
     get header() {
-      return this.findId<HTMLDivElement>('header') as HTMLDivElement;
+      return this.findClass<HTMLDivElement>('mat-display-1') as HTMLDivElement;
     }
 
     get anchorLinks() {
@@ -45,8 +45,8 @@ describe('AppComponent', () => {
 
     constructor(readonly fixture: ComponentFixture<AppComponent>) {}
 
-    private findId<T>(id: string): T {
-      const element = this.fixture.debugElement.query(By.css('#' + id));
+    private findClass<T>(cls: string): T {
+      const element = this.fixture.debugElement.query(By.css('.' + cls));
       if (!element) {
         return (null as unknown) as T;
       }
@@ -86,17 +86,17 @@ describe('AppComponent', () => {
 
   it('should display header', async () => {
     const { component, page } = await setup();
-    expect(page.header.textContent).toEqual(component.header);
+    expect(page.header.textContent).toBe(component.header, 'page header');
   });
 
-  it('should display 2 links', async () => {
+  it('should display 3 links', async () => {
     const { page } = await setup();
-    expect(page.anchorLinks.length).toEqual(2, '2 anchor elements on DOM');
+    expect(page.anchorLinks.length).toBe(3, '3 anchor elements on DOM');
   });
 
   it('can get RouterLinks from template', async () => {
     const { component, page } = await setup();
-    expect(page.routerLinks.length).toBe(2, 'should have 2 routerLinks');
+    expect(page.routerLinks.length).toBe(3, 'should have 3 routerLinks');
     expect(page.routerLinks[0].linkParams).toBe(
       `/${component.dashboard.path}`,
       'dashboard route',
@@ -105,29 +105,10 @@ describe('AppComponent', () => {
       `/${component.membersList.path}`,
       'members route',
     );
-  });
-
-  it('can click Members link in template', async () => {
-    const { component, fixture, page } = await setup();
-    const membersLinkDe = page.linkDes[1];
-    const membersLink = page.routerLinks[1];
-
-    expect(membersLink.navigatedTo).toBeNull('should not have navigated yet');
-
-    fixture.ngZone!.run(() => {
-      click(membersLinkDe);
-    });
-    fixture.detectChanges();
-
-    /* it attempts to route => dummy path configured above */
-    expect(membersLink.navigatedTo).toBe(
-      `/${component.membersList.path}`,
-      'members route',
+    expect(page.routerLinks[2].linkParams).toBe(
+      `/${component.detail.path}`,
+      'detail route (disabled',
     );
-
-    /* test only dashboard nav link is showing */
-    expect(page.routerLinks[0]).toBeDefined;
-    expect(page.routerLinks[1]).toBeUndefined;
   });
 
   it('can click Dashboard link in template', async () => {
@@ -135,6 +116,8 @@ describe('AppComponent', () => {
     const dashboardDe = page.linkDes[0];
     const dashboardLink = page.routerLinks[0];
 
+    /* link is not disabled */
+    expect(await dashboardDe.attributes['ng-reflect-disabled']).toBeNull;
     expect(dashboardLink.navigatedTo).toBeNull('should not have navigated yet');
 
     fixture.ngZone!.run(() => {
@@ -145,11 +128,71 @@ describe('AppComponent', () => {
     /* it attempts to route => dummy path configured above */
     expect(dashboardLink.navigatedTo).toBe(
       `/${component.dashboard.path}`,
-      'members route',
+      'dashboard route passed to routerLink',
     );
 
-    /* test only memberslist nav link is showing */
-    expect(page.routerLinks[0]).toBeUndefined;
-    expect(page.routerLinks[1]).toBeDefined;
+    /* test only dashboard nav link is routed */
+    expect(page.routerLinks[1].navigatedTo).toBe(null);
+  });
+
+  it('can click Members link in template', async () => {
+    const { component, fixture, page } = await setup();
+    const membersLinkDe = page.linkDes[1];
+    const membersLink = page.routerLinks[1];
+
+    /* link is not disabled */
+    expect(await membersLinkDe.attributes['ng-reflect-disabled']).toBeNull;
+    expect(membersLink.navigatedTo).toBeNull('should not have navigated yet');
+
+    fixture.ngZone!.run(() => {
+      click(membersLinkDe);
+    });
+    fixture.detectChanges();
+
+    /* it attempts to route => dummy path configured above */
+    expect(membersLink.navigatedTo).toBe(
+      `/${component.membersList.path}`,
+      'members route passed to routerLink',
+    );
+
+    /* test only memberslist nav link is routed */
+    expect(page.routerLinks[0].navigatedTo).toBe(null);
+  });
+
+  it('can click Detail link but not route', async () => {
+    const { component, fixture, page } = await setup();
+    const detailDe = page.linkDes[2];
+    const detailLink = page.routerLinks[2];
+
+    /* disabled attribute should be true */
+    expect(await detailDe.attributes['ng-reflect-disabled']).toBe('true');
+    expect(detailLink.navigatedTo).toBeNull('should not have navigated yet');
+
+    fixture.ngZone!.run(() => {
+      click(detailDe);
+    });
+    fixture.detectChanges();
+
+    /* routerLink gets the route but it does not attempt to route (as disabled ) => no dummy path configured above */
+    expect(detailLink.navigatedTo).toEqual(
+      `/${component.detail.path}`,
+      'detail route passed to routerLInk',
+    );
+
+    /* test dashboard or memberslist not routed */
+    expect(page.routerLinks[0].navigatedTo).toBe(null);
+    expect(page.routerLinks[1].navigatedTo).toBe(null);
+  });
+
+  it('should test trackBy function returns link.path', async () => {
+    const { component } = await setup();
+    const result = component.trackByFn(0, component.links[0]);
+    expect(result).toBe(component.links[0].path, 'returns link path');
+  });
+
+  it('should test trackBy function returns null', async () => {
+    const { component } = await setup();
+    const result = component.trackByFn(0, null as any);
+    expect(result).toBeNull('returns null');
   });
 });

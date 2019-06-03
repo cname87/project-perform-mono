@@ -13,11 +13,11 @@ export function getRootElement() {
 
   /* DOM elements */
   const tag = element(by.css('app-root'));
-  const header =  element(by.css('app-root mat-toolbar #header'));
-  const navElements = element.all(by.css('app-root mat-toolbar a'));
-  /* note only 1 nav link is displayed */
+  const header =  element(by.css('app-root .mat-display-1'));
+  const navElements = element.all(by.css('app-root .mat-tab-nav-bar a'));
   const dashboardLink = navElements.get(0);
-  const membersLink = navElements.get(0);
+  const membersLink = navElements.get(1);
+  const detailLink = navElements.get(2);
 
   return {
     tag,
@@ -25,5 +25,6 @@ export function getRootElement() {
     navElements,
     dashboardLink,
     membersLink,
+    detailLink,
   }
 }

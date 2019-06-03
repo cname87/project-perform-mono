@@ -1,18 +1,17 @@
-/* AppComponent's private CSS styles */
-
+/* style the page header */
 .mat-display-1 {
   margin-top: 5rem;
   text-align: center;
 }
 
-.toolbar-space {
-  flex: 1 1 auto;
+/* keep a margin between nav bar and the routed components */
+nav {
+  margin-bottom: 16px;
 }
 
-.btn {
-  margin: 1rem;
+.item-active{
+  /* set opacity when a tab link is active via browser (and not via a click) */
+  opacity: 1.0;
+  /* override disabled color so the disabled detail tab appears selected */
+  color: rgba(0, 0, 0, 0.87);
 }
-
-// .mat-tab-link {
-//   color: greenyellow
-// }

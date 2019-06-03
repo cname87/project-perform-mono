@@ -1,13 +1,58 @@
-<div id="search-component">
-  <h4 id=title>{{ title }}</h4>
+<div>
 
-  <input #searchBox id="search-box" (input)="search(searchBox.value)" />
+<form>
+  <mat-form-field
+    appearance="outline"
+  >
 
-  <ul class="search-result">
-    <li *ngFor="let member of members$ | async; trackBy: trackByFn" >
-      <a class="m" routerLink="/{{detail.path}}/{{member.id}}">
-        {{ showProperty(member) }}
-      </a>
-    </li>
-  </ul>
+    <input
+      matInput
+      type=text
+      autocomplete="off"
+      id="search-box"
+      #searchBox
+      value=''
+      placeholder="Enter name search term"
+      (input)="search(searchBox.value)"
+    >
+
+    <mat-label>
+      {{ header }}
+    </mat-label>
+
+    <button
+      mat-button
+      matSuffix
+      mat-icon-button
+      aria-label="Clear"
+      *ngIf="searchBox.value"
+      (click)="searchBox.value=''; search(searchBox.value)"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <!-- show if members found > 1 -->
+    <mat-hint
+      *ngIf="(members$ | async)?.length > 0"
+    >
+      Click on a name below to see the member detail
+    </mat-hint>
+
+  </mat-form-field>
+</form>
+
+  <mat-nav-list>
+    <a
+      *ngFor="let member of members$ | async; trackBy: trackByFn"
+      mat-list-item
+      routerLink="/{{detail.path}}/{{member.id}}"
+    >
+      {{ showProperty(member) }}
+    </a>
+  </mat-nav-list>
+
 </div>
+
+
+
+

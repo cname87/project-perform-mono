@@ -16,7 +16,7 @@ const membersList = {
 const detail = {
   path: 'detail',
   component: MemberDetailComponent,
-  displayName: 'Detail',
+  displayName: 'MEMBER DETAIL',
 };
 export const config: any = {
   routes: {

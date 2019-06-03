@@ -1,0 +1,16 @@
+/* Need to keep this separate from file where mat-core is included so I can import it into component files */
+
+@import '~@angular/material/theming';
+
+/* create a custom theme - can match a prebuilt theme*/
+$primary: mat-palette($mat-deep-purple, 200, 100, 300);
+$accent: mat-palette($mat-amber, 100, 50, 300);
+$warn: mat-palette($mat-red);
+$theme: mat-light-theme(
+  $primary,
+  $accent,
+  $warn,
+);
+
+/* Create a config with the default typography levels */
+$config: mat-typography-config();
