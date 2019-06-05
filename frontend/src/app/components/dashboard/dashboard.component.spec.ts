@@ -1,88 +1,135 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
-import { HttpClientModule } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { DashboardComponent } from './dashboard.component';
-import { MemberSearchComponent } from '../member-search/member-search.component';
 /* members contains an array of 10 dummy members */
 import { members } from '../../shared/mocks/mock-members';
 import { MembersService } from '../../shared/services/members.service';
 import { IMember } from '../../api/model/models';
+import { AppModule } from '../../app.module';
+import { findAllTag } from '../../shared/test-helpers';
+
+interface IMembersServiceSpy {
+  getMembers: jasmine.Spy;
+}
 
 describe('DashboardComponent', () => {
-  let component: DashboardComponent;
-  let fixture: ComponentFixture<DashboardComponent>;
-  let memberService: any;
-  let getMembersSpy: jasmine.Spy;
+  /* setup function run by each sub test suite */
+  async function mainSetup() {
+    /* create spy objects */
+    const memberServiceSpy = jasmine.createSpyObj('memberService', [
+      'getMembers',
+    ]);
 
-  beforeEach(async(() => {
-    memberService = jasmine.createSpyObj('memberService', ['getMembers']);
-    getMembersSpy = memberService.getMembers.and.returnValue(of(members));
-    TestBed.configureTestingModule({
-      declarations: [DashboardComponent, MemberSearchComponent],
+    /* set up Testbed */
+    await TestBed.configureTestingModule({
+      declarations: [],
       imports: [
-        RouterTestingModule.withRoutes([]),
-        HttpClientTestingModule,
-        HttpClientModule,
+        AppModule, // import AppModule to pull in all dependencies in one go.
       ],
       providers: [
-        {
-          provide: MembersService,
-          useValue: memberService,
-        },
+        { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
+        { provide: MembersService, useValue: memberServiceSpy },
       ],
     }).compileComponents();
-  }));
+  }
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(DashboardComponent);
-    component = fixture.debugElement.componentInstance;
+  class Page {
+    constructor(readonly fixture: ComponentFixture<DashboardComponent>) {}
+
+    /* get DOM elements */
+    get membersDe() {
+      return findAllTag(this.fixture, 'app-card');
+    }
+    get anchorsDe() {
+      return findAllTag(this.fixture, 'a');
+    }
+  }
+
+  function createSpies(memberServiceSpy: IMembersServiceSpy) {
+    /* return the mock members array */
+    const getMembersSpy = memberServiceSpy.getMembers.and.returnValue(
+      of(members),
+    );
+    return { getMembersSpy };
+  }
+
+  async function createComponent() {
+    /* create the fixture */
+    const fixture = TestBed.createComponent(DashboardComponent);
+
+    /* get the injected instances */
+    /* angular.io guide suggests you need to get these from injector.get.  It seemed to work when I just used the 'useValues' in configureTestingModule but now implementing as per guide */
+    const membersServiceSpy = fixture.debugElement.injector.get<
+      IMembersServiceSpy
+    >(MembersService as any);
+
+    /* create the spies */
+    const { getMembersSpy } = createSpies(membersServiceSpy);
+
+    /* create the component instance */
+    const component = fixture.componentInstance;
+
+    /* ngOnInit */
     fixture.detectChanges();
-  });
 
-  it('should be created', () => {
+    /* create a page to access the DOM elements */
+    const page = new Page(fixture);
+
+    return {
+      fixture,
+      component,
+      page,
+      getMembersSpy,
+    };
+  }
+
+  /* setup function run by each sub test function */
+  async function setup() {
+    await mainSetup();
+    return createComponent();
+  }
+
+  it('should be created', async () => {
+    const { component } = await setup();
     expect(component).toBeTruthy();
   });
 
-  it('should display the title', () => {
-    const result = fixture.debugElement.query((de) => {
-      return de.nativeElement.id === 'title';
-    });
-    expect(result.nativeElement.innerText).toEqual(component.title);
+  it('should call memberService.getMembers', async () => {
+    const { getMembersSpy } = await setup();
+    expect(getMembersSpy.calls.count()).toBe(1);
   });
 
-  it('should call memberService.getMembers', async(() => {
-    expect(getMembersSpy.calls.count()).toBe(1);
-  }));
+  it('should display 4 links', async () => {
+    const { page } = await setup();
+    expect(page.anchorsDe.length).toEqual(4);
+  });
 
-  it('should display 4 links', async(() => {
-    expect(fixture.nativeElement.querySelectorAll('a').length).toEqual(4);
-  }));
-
-  it('should display 1st member', async(() => {
+  it('should display 1st member', async () => {
+    const { component, page } = await setup();
     const member = component.firstMemberOnDisplay;
-    expect(
-      fixture.nativeElement.getElementsByClassName('module member')[member - 1]
-        .innerText,
-    ).toEqual(members[member - 1].name);
-  }));
+    expect(page.membersDe[member - 1].nativeElement.innerText).toBe(
+      'Name: ' + members[member - 1].name,
+    );
+  });
 
-  it('should display last member', async(() => {
+  it('should display last member', async () => {
+    const { component, page } = await setup();
     const member = component.lastMemberOnDisplay;
-    expect(
-      fixture.nativeElement.getElementsByClassName('module member')[member - 1]
-        .innerText,
-    ).toEqual(members[member - 1].name);
-  }));
+    expect(page.membersDe[member - 1].nativeElement.innerText).toBe(
+      'Name: ' + members[member - 1].name,
+    );
+  });
 
-  it('should test trackBy function returns member.id', () => {
+  it('should test trackBy function returns member.id', async () => {
+    const { component } = await setup();
     const result = component.trackByFn(0, members[1]);
     expect(result).toEqual(members[1].id);
   });
 
-  it('should test trackBy function returns null', () => {
+  it('should test trackBy function returns null', async () => {
+    const { component } = await setup();
     const result = component.trackByFn(0, (null as unknown) as IMember);
     expect(result).toEqual(null);
   });

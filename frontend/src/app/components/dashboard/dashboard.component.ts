@@ -10,7 +10,6 @@ import { IMember } from '../../api/api-members.service';
 })
 export class DashboardComponent implements OnInit {
   members: IMember[] = [];
-  title = 'Top Members';
   propertyToDisplay = 'name';
   firstMemberOnDisplay = 1;
   lastMemberOnDisplay = 4;

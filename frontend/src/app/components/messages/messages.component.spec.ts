@@ -167,7 +167,8 @@ describe('messagesComponent', () => {
         component.messageService.messages[1].toString(),
       );
       expect(page.div2[2]).toBeFalsy;
-      expect(page.clearButton.innerText).toEqual('CLEAR');
+      /* the close icon has 'close' as innerText */
+      expect(page.clearButton.innerText).toEqual('close');
     });
 
     it('should click the clear button', async () => {

@@ -24,7 +24,7 @@ interface ILocationSpy {
 }
 
 describe('memberDetailComponent', () => {
-  /* setup function run by each sub test suite*/
+  /* setup function run by each sub test suite */
   async function mainSetup() {
     /* create spies on memberService methods */
     const membersServiceSpy = jasmine.createSpyObj('membersService', [
@@ -123,7 +123,6 @@ describe('memberDetailComponent', () => {
 
     /* get the injected instances */
     /* angular.io guide suggests you need to get these from injector.get.  It seemed to work when I just used the 'useValues' in configureTestingModule but now implementing as per guide */
-
     const membersServiceSpy = fixture.debugElement.injector.get<
       IMembersServiceSpy
     >(MembersService as any);
@@ -133,15 +132,19 @@ describe('memberDetailComponent', () => {
     const activatedRouteStub = fixture.debugElement.injector.get<
       ActivatedRouteSnapshotStub
     >(ActivatedRoute as any);
-    /* create the component instance */
-    const component = fixture.componentInstance;
-    /* create a page to access the DOM elements */
-    const page = new Page(fixture);
 
     const { getMemberSpy, updateMemberSpy, backSpy } = createSpies(
       membersServiceSpy,
       locationSpy,
     );
+
+    /* create the component instance */
+    const component = fixture.componentInstance;
+
+    /* do not run fixture.detectChanges (i.e. ngOnIt here) as included below */
+
+    /* create a page to access the DOM elements */
+    const page = new Page(fixture);
 
     return {
       fixture,

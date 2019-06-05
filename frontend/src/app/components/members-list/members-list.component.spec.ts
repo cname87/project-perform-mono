@@ -127,18 +127,18 @@ describe('membersComponent', () => {
       MembersService as any,
     );
 
-    /* create the component instance */
-    const component = fixture.componentInstance;
-
-    /* create a page to access the DOM elements */
-    const page = new Page(fixture);
-
     const membersArray = JSON.parse(JSON.stringify(members));
 
     const { getMembersSpy, addMemberSpy, deleteMemberSpy } = createSpies(
       membersServiceSpy,
       membersArray,
     );
+
+    /* create the component instance */
+    const component = fixture.componentInstance;
+
+    /* create a page to access the DOM elements */
+    const page = new Page(fixture);
 
     return {
       fixture,

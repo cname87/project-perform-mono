@@ -51,6 +51,7 @@
         "/testServer": "${workspaceFolder}/backend/server/test/client",
       },
       "sourceMapPathOverrides": {
+        "_karma_webpack_/webpack:*": "${workspaceFolder}/frontend/*",
         "webpack:///webpack/*": "${workspaceFolder}/frontend/node_modules/webpack/*",
         "webpack:///(webpack)/*": "${workspaceFolder}/frontend/node_modules/webpack/*",
         "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",

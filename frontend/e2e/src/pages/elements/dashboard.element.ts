@@ -1,17 +1,20 @@
 import { by, element, } from 'protractor';
+import { getMemberCardsElements } from './memberCard.element';
+
+const memberCardsElements = getMemberCardsElements();
 
 export function getDashboardElement() {
 
   /* DOM elements */
   const tag = element(by.css('app-dashboard'));
-  const title = element(by.css('app-dashboard #title'))
-  const topMembers = element.all(by.css('app-dashboard #m'));
+  const topMembers = element.all(by.css('app-dashboard a'));
   const memberSearchTag = element(by.css('app-dashboard app-member-search'));
 
   /* select a member from the dashboard top members */
   const selectMember = async(index: number) => {
-    const link = topMembers.get(index); // click on  link will bubble to <a>
-    const name = await link.getText()
+    const link = topMembers.get(index);
+    const content = memberCardsElements.cardContent.get(index);
+    const name = await content.getText();
     return {
       link,
       name,
@@ -20,7 +23,6 @@ export function getDashboardElement() {
 
   return {
     tag,
-    title,
     topMembers,
     memberSearchTag,
     selectMember,

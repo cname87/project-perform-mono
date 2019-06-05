@@ -58,10 +58,11 @@ describe('AppComponent', () => {
   async function createComponent() {
     const fixture = TestBed.createComponent(AppComponent);
 
-    fixture.detectChanges();
-
     /* create the component instance */
     const component = fixture.componentInstance;
+
+    /* ngOnInit */
+    fixture.detectChanges();
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);

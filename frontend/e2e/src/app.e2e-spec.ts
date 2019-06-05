@@ -159,7 +159,7 @@ describe('Project Perform', () => {
     /* get member link and name */
     const { name, link } = await dashboardPage.dashboardElement
       .selectMember(index);
-    expect(name).toEqual(expected.member.name);
+    expect(name).toEqual('Name: ' + expected.member.name);
 
     /* click on the selected member which brings up the member detail page */
     await link.click();
@@ -255,7 +255,7 @@ describe('Project Perform', () => {
       expect(await dashboardPage.dashboardElement.tag.isPresent()).toBeTruthy();
     });
 
-    it('a dashboard page with the expected title', async () => {
+    it('a web page with the expected title', async () => {
       const { expected } = testSetup();
       expect(await browser.getTitle()).toEqual(expected.title, 'browser tab title');
     });
@@ -403,7 +403,7 @@ describe('Project Perform', () => {
       /* confirm name of member on dashboard */
       const { name } = await dashboardPage.dashboardElement
         .selectMember(expected.topMemberIndex);
-      expect(name).toEqual(expected.member.name);
+      expect(name).toEqual('Name: ' + expected.member.name);
     });
 
     it(`selects a member and routes to the members details page`, async() => {
@@ -434,7 +434,7 @@ describe('Project Perform', () => {
       /* confirm name of member on dashboard */
       const { name } = await dashboardPage.dashboardElement
         .selectMember(expected.topMemberIndex);
-      expect(name).toEqual(expected.newName);
+      expect(name).toEqual('Name: ' + expected.newName);
     });
   });
 

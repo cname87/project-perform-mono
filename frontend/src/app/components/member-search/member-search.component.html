@@ -31,9 +31,9 @@
       <mat-icon>close</mat-icon>
     </button>
 
-    <!-- show if members found > 1 -->
+    <!-- show if members found -->
     <mat-hint
-      *ngIf="(members$ | async)?.length > 0"
+      *ngIf="members?.length > 0"
     >
       Click on a name below to see the member detail
     </mat-hint>
@@ -43,7 +43,7 @@
 
   <mat-nav-list>
     <a
-      *ngFor="let member of members$ | async; trackBy: trackByFn"
+      *ngFor="let member of members; trackBy: trackByFn"
       mat-list-item
       routerLink="/{{detail.path}}/{{member.id}}"
     >
