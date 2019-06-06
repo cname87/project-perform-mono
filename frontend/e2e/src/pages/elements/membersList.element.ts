@@ -7,8 +7,8 @@ export function getMembersListElement() {
   const tag = element(by.css('app-members'));
   const allMembers = element.all(by.css('app-members li'));
   const deleteBtns = tag.all(by.buttonText('x'));
-  const input = element(by.css('app-members #nameInput'));
-  const addBtn = tag.element(by.buttonText('add'));
+  const input = element(by.css('app-members #inputBox'));
+  const addBtn = tag.element(by.css('#addBtn'));
 
   /**
    * Assumes member list page is displayed.

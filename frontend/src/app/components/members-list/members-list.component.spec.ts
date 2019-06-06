@@ -44,11 +44,8 @@ describe('membersComponent', () => {
    * Gets key DOM elements.
    */
   class Page {
-    get header() {
-      return this.findId<HTMLHeadingElement>('header');
-    }
-    get nameInput() {
-      return this.findId<HTMLInputElement>('nameInput');
+    get inputBox() {
+      return this.findId<HTMLInputElement>('inputBox');
     }
     get addButton() {
       return this.findId<HTMLButtonElement>('addBtn');
@@ -295,14 +292,12 @@ describe('membersComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       /* default constructor member shown */
-      expect(page.header.textContent).toEqual('My Members');
-      expect(page.nameInput.value).toEqual('');
+      expect(page.inputBox.value).toEqual('');
       expect(page.linksArray.length).toEqual(0);
       /* data bind & display the async fetched data */
       fixture.detectChanges();
       await fixture.whenStable();
-      expect(page.header.textContent).toEqual('My Members');
-      expect(page.nameInput.value).toEqual('');
+      expect(page.inputBox.value).toEqual('');
       expect(page.linksArray.length).toEqual(membersArray.length);
       expect(page.linksArray[2].nativeElement.textContent).toEqual(
         membersArray[2].id.toString() + ' ' + membersArray[2].name + ' ',
@@ -317,22 +312,19 @@ describe('membersComponent', () => {
       const { fixture, page, addMemberSpy, membersArray } = await setup();
       /* set up route that the component will get */
       fixture.detectChanges();
-      await fixture.whenStable();
       fixture.detectChanges();
-      await fixture.whenStable();
       const startMembersCount = membersArray.length;
       /* enter a name */
       const testName = 'testInput';
-      page.nameInput.value = testName;
+      page.inputBox.value = testName;
+      fixture.detectChanges();
       /* click the add button */
-      click(page.addButton);
+      await click(page.addButton);
       /* await async data return  & data binding */
       fixture.detectChanges();
-      await fixture.whenStable();
       fixture.detectChanges();
-      await fixture.whenStable();
       /* input field was cleared */
-      expect(page.nameInput.value).toEqual('');
+      expect(page.inputBox.value).toEqual('');
       expect(addMemberSpy).toHaveBeenCalledTimes(1);
       expect(addMemberSpy).toHaveBeenCalledWith({
         name: testName,
@@ -381,13 +373,11 @@ describe('membersComponent', () => {
       const { fixture, page, membersArray, spyLocation } = await setup();
       fixture.detectChanges();
       await fixture.whenStable();
-      expect(page.header.textContent).toEqual('My Members');
-      expect(page.nameInput.value).toEqual('');
+      expect(page.inputBox.value).toEqual('');
       expect(page.linksArray.length).toEqual(0);
       fixture.detectChanges();
       await fixture.whenStable();
-      expect(page.header.textContent).toEqual('My Members');
-      expect(page.nameInput.value).toEqual('');
+      expect(page.inputBox.value).toEqual('');
       expect(page.linksArray.length).toEqual(membersArray.length);
       expect(page.linksArray[2].nativeElement.textContent).toEqual(
         membersArray[2].id.toString() + ' ' + membersArray[2].name + ' ',
