@@ -15,3 +15,8 @@ nav {
   /* override disabled color so the disabled detail tab appears selected */
   color: rgba(0, 0, 0, 0.87);
 }
+
+/* provide a margin above the divider */
+mat-divider.mat-divider {
+  margin-top: 16px;
+}

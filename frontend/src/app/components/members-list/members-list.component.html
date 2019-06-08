@@ -1,66 +1,90 @@
-<div
-  fxLayout="row"
-  fxLayoutGap="16px grid"
-  fxLayoutAlign="flex-start"
->
-  <form>
-    <mat-form-field
-      appearance="outline"
+
+<form>
+  <mat-form-field
+    appearance="outline"
+  >
+
+    <input
+      matInput
+      type=text
+      autocomplete="off"
+      id="inputBox"
+      #inputBox
+      value=''
+      (keyup.enter)="add(inputBox.value); inputBox.value=''"
     >
 
-      <input
-        matInput
-        type=text
-        autocomplete="off"
-        id="inputBox"
-        #inputBox
-        value=''
-        (keyup.enter)="add(inputBox.value); inputBox.value=''"
-      >
+    <mat-label>
+      Add Member
+    </mat-label>
 
-      <mat-label>
-        Add Member
-      </mat-label>
+    <button
+    mat-icon-button
+    matSuffix
+    #addBtn
+    id="addBtn"
+    aria-label="Save"
+    *ngIf="inputBox?.value"
+    (click)="add(inputBox.value); inputBox.value=''"
+    >
+      <mat-icon>save</mat-icon>
+    </button>
 
-      <button
-      mat-icon-button
-      matSuffix
-      #addBtn
-      id="addBtn"
-      aria-label="Save"
-      *ngIf="inputBox?.value"
-      (click)="add(inputBox.value); inputBox.value=''"
-      >
-        <mat-icon>save</mat-icon>
-      </button>
+    <mat-hint
+    >
+      Enter the new member name and click save or press Enter
+    </mat-hint>
 
-      <mat-hint
-      >
-        Enter the new member name and click save or press Enter
-      </mat-hint>
+    <!-- dummy input to prevent save button capturing 'Enter' by default -->
+    <!-- instead we explicitly capture the keyup above -->
+    <button
+      type="submit"
+      style = "display:none"
+    >
+    </button>
 
-      <!-- dummy input to prevent save button capturing 'Enter' by default -->
-      <!-- instead we explicitly capture the keyup above -->
-      <button
-        type="submit"
-        style = "display:none"
-      >
-      </button>
+  </mat-form-field>
 
-    </mat-form-field>
-
-  </form>
-
-</div>
+</form>
 
 <mat-divider></mat-divider>
 
-<ul class="members">
-  <li *ngFor="let member of members; trackBy: trackByFn">
-    <a id="link" routerLink="/detail/{{member.id}}">
-      <span id="memberId" class="badge">{{ member.id }}</span> {{ member.name }}
-    </a>
-    <button id="deleteBtn" class="delete" title="delete member"
-      (click)="delete(member)">x</button>
-  </li>
-</ul>
+<mat-nav-list>
+  <mat-list-item
+    *ngFor="let member of members; trackBy: trackByFn"
+    fxLayout="row"
+    fxLayoutAlign="start"
+  >
+
+      <a
+        mat-raised-button
+        color="primary"
+        fxFlex="0 0 auto"
+        routerLink="/detail/{{member.id}}"
+        id="memberId"
+        class="memberData"
+      >
+          {{member.id}}
+      </a>
+
+      <a
+        mat-raised-button
+        color="primary"
+        fxFlex="0 0 300px"
+        routerLink="/detail/{{member.id}}"
+        id="memberName"
+        class="memberData"
+      >
+          {{member.name}}
+      </a>
+
+      <button
+        mat-raised-button
+        fxFlex="0 0 auto"
+        color="accent"
+        id="deleteBtn"
+        (click)="delete(member)">
+          <mat-icon>delete</mat-icon>
+      </button>
+  </mat-list-item>
+</mat-nav-list>
