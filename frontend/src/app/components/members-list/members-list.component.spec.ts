@@ -54,10 +54,10 @@ describe('membersComponent', () => {
       return this.findElements('a');
     }
     get memberIdArray() {
-      return this.findElements('span.badge');
+      return this.findElements('#memberId');
     }
     get deleteBtnArray() {
-      return this.findElements('button.delete');
+      return this.findElements('#deleteBtn');
     }
 
     constructor(readonly fixture: ComponentFixture<MembersListComponent>) {}
@@ -298,11 +298,12 @@ describe('membersComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       expect(page.inputBox.value).toEqual('');
-      expect(page.linksArray.length).toEqual(membersArray.length);
-      expect(page.linksArray[2].nativeElement.textContent).toEqual(
-        membersArray[2].id.toString() + ' ' + membersArray[2].name + ' ',
+      /* 2 anchor links per member */
+      expect(page.linksArray.length).toEqual(membersArray.length * 2);
+      expect(page.linksArray[5].nativeElement.innerText).toEqual(
+        membersArray[2].name,
       );
-      expect(page.memberIdArray[2].nativeElement.textContent).toEqual(
+      expect(page.memberIdArray[2].nativeElement.innerText).toEqual(
         membersArray[2].id.toString(),
       );
       expect(page.deleteBtnArray.length).toEqual(membersArray.length);
@@ -330,7 +331,8 @@ describe('membersComponent', () => {
         name: testName,
       });
       expect(membersArray[membersArray.length - 1].name).toEqual(testName);
-      expect(page.linksArray.length).toEqual(startMembersCount + 1);
+      /* 2 anchors per member */
+      expect(page.linksArray.length).toEqual((startMembersCount + 1) * 2);
     });
 
     it('should click the delete button', async () => {
@@ -350,8 +352,8 @@ describe('membersComponent', () => {
       /* get a member to delete */
       const n = 2;
       const button = page.deleteBtnArray[n];
-      const id = +page.memberIdArray[n].nativeElement.textContent;
-      /* click the add button */
+      const id = +page.memberIdArray[n].nativeElement.innerText;
+      /* click the delete button */
       click(button);
       /* await async data return  & data binding */
       fixture.detectChanges();
@@ -378,16 +380,17 @@ describe('membersComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       expect(page.inputBox.value).toEqual('');
-      expect(page.linksArray.length).toEqual(membersArray.length);
-      expect(page.linksArray[2].nativeElement.textContent).toEqual(
-        membersArray[2].id.toString() + ' ' + membersArray[2].name + ' ',
+      /* 2 anchors per member */
+      expect(page.linksArray.length).toEqual(membersArray.length * 2);
+      expect(page.linksArray[5].nativeElement.innerText).toEqual(
+        membersArray[2].name,
       );
-      expect(page.memberIdArray[2].nativeElement.textContent).toEqual(
+      expect(page.memberIdArray[2].nativeElement.innerText).toEqual(
         membersArray[2].id.toString(),
       );
       expect(page.deleteBtnArray.length).toEqual(membersArray.length);
       fixture.ngZone!.run(() => {
-        click(page.linksArray[2]);
+        click(page.linksArray[4]);
       });
       fixture.detectChanges();
       await fixture.whenStable();

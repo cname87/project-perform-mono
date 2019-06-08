@@ -195,7 +195,7 @@ describe('Project Perform', () => {
       .isPresent())
       .toBeTruthy('shows member list');
     /* confirm count of members displayed */
-    expect(await membersListPage.memberListElement.allMembers
+    expect(await membersListPage.memberListElement.allMemberIds
       .count()).toEqual(
         expected.numMembers,
        'number of members'
@@ -248,12 +248,12 @@ describe('Project Perform', () => {
   describe('has', () => {
 
     /* set up database and load initial page */
-    beforeAll(loadDbAndRootPage);
+  beforeAll(loadDbAndRootPage);
 
     it('the dashboard page as the start page', async () => {
       const dashboardPage = getDashboardPage();
       expect(await dashboardPage.dashboardElement.tag.isPresent()).toBeTruthy();
-    });
+    })
 
     it('a web page with the expected title', async () => {
       const { expected } = testSetup();
@@ -306,24 +306,14 @@ describe('Project Perform', () => {
     it('a members list page which displays correctly styled buttons', async () => {
       /* the member detail page is still displayed */
       let membersListPage = getMembersListPage();
-      const deleteButtons = await membersListPage.memberListElement.deleteBtns;
+      const deleteButtons
+        = await  membersListPage.memberListElement.allDeleteBtns;
       /* test all delete buttons */
       for (const button of deleteButtons) {
-        /* inherited styles from styles.css */
-        expect(await button.getCssValue('font-family')).toBe('Arial');
+      /* 2 styles that material uses */
         expect(await button.getCssValue('border')).toContain('none');
-        expect(await  button.getCssValue('padding')).toBe('5px 10px');
         expect(await button.getCssValue('border-radius')).toBe('4px');
-        /* styles defined in members.component.css */
-        expect(await button.getCssValue('left')).toBe('194px');
-        expect(await button.getCssValue('top')).toBe('-34px');
       }
-      const addButton = membersListPage.memberListElement.addBtn;
-      /* inherited styles from styles.css */
-      expect(await addButton.getCssValue('font-family')).toBe('Arial');
-      expect(await addButton.getCssValue('border')).toContain('none');
-      expect(await addButton.getCssValue('padding')).toBe('5px 10px');
-      expect(await addButton.getCssValue('border-radius')).toBe('4px');
     });
 
     it('a link which routes back to the dashboard page', async () => {
@@ -452,10 +442,10 @@ describe('Project Perform', () => {
       /* the members list page should still be displayed */
       const membersPage = getMembersListPage();
       /* get the link of the selected member */
-      const { memberLink } = await membersPage.memberListElement
+      const { memberName } = await membersPage.memberListElement
         .selectMemberById(expected.member.id);
       /* click on the member which takes us to the member detail view */
-      await memberLink.click();
+      await memberName.click();
       const memberDetailPage = getMemberDetailPage();
       /* confirm member detail page is being displayed */
       expect(await memberDetailPage.memberDetailElement.tag
@@ -487,17 +477,16 @@ describe('Project Perform', () => {
       const membersPage = getMembersListPage();
       expect(await membersPage.memberListElement.tag.isPresent()).toBeTruthy();
       /* confirm count of members displayed */
-      expect(await membersPage.memberListElement.allMembers
+      expect(await membersPage.memberListElement.allMemberIds
         .count()).toEqual(
           expected.numMembers,
          'number of members'
         );
       /* confirm member id and member new name displayed */
-      let expectedText =
-        `${expected.member.id} ${expected.newName}`;
-      const { memberLink } = membersPage.memberListElement
+      const { memberId, memberName } = membersPage.memberListElement
         .selectMemberById(expected.member.id);
-      expect(await memberLink.getText()).toEqual(expectedText);
+      expect(await memberId.getText()).toEqual(`${expected.member.id}`);
+      expect(await memberName.getText()).toEqual(`${expected.newName}`);
     });
 
     it(`deletes a member from the members list page`, async () => {
@@ -517,7 +506,7 @@ describe('Project Perform', () => {
         .isPresent())
         .toBeTruthy('shows members list');
       /* confirm count of members displayed is down by one */
-      expect(await membersListPage.memberListElement.allMembers
+      expect(await membersListPage.memberListElement.allMemberIds
         .count()).toEqual(
           expected.numMembers - 1,
          'number of members'
@@ -545,18 +534,18 @@ describe('Project Perform', () => {
       expect(message).toEqual(expected.message3);
     });
 
-      it('clears the messages list', async() => {
-        /* get expected values object */
-        const { } = testSetup();
-        /* the member list page is displayed */
-        let membersListPage = getMembersListPage();
-        /* clear the messages list */
-        await membersListPage.messagesElement.clearBtn.click();
-        await browser.sleep(1000);
-        /* get the messages showing in the message element */
-        const count = await membersListPage.messagesElement.messages.count();
-        expect(count).toEqual(0, 'no messages');
-      });
+    it('clears the messages list', async() => {
+      /* get expected values object */
+      const { } = testSetup();
+      /* the member list page is displayed */
+      let membersListPage = getMembersListPage();
+      /* clear the messages list */
+      await membersListPage.messagesElement.clearBtn.click();
+      await browser.sleep(1000);
+      /* get the messages showing in the message element */
+      const count = await membersListPage.messagesElement.messages.count();
+      expect(count).toEqual(0, 'no messages');
+    });
 
 
     it(`adds a member on the members list page`, async () => {

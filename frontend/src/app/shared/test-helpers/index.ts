@@ -52,3 +52,11 @@ export function findAllTag(
   const DebugElements = fixture.debugElement.queryAll(By.css(tag));
   return DebugElements;
 }
+
+export function findElements(
+  fixture: ComponentFixture<any>,
+  el: string,
+): DebugElement[] {
+  const DebugElements = fixture.debugElement.queryAll(By.css(el));
+  return DebugElements;
+}
