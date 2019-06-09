@@ -26,10 +26,12 @@ export class MembersListComponent implements OnInit {
   }
 
   add(name: string) {
+    /* trim the input text */
     name = name.trim();
     if (!name) {
       return;
     }
+    /* add the new member */
     const member: IMemberWithoutId = { name };
     this.membersService.addMember(member).subscribe((addedMember) => {
       this.members.push(addedMember);

@@ -16,6 +16,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { MemberCardComponent } from './components/member-card/member-card.component';
 import { RouterLinkDirectiveStub } from './shared/test-helpers/router-link-directive-stub';
 import { MaterialModule } from './modules/material/material.module';
+import { MemberInputComponent } from './components/member-input/member-input.component';
 
 @NgModule({
   imports: [
@@ -37,6 +38,7 @@ import { MaterialModule } from './modules/material/material.module';
     MessagesComponent,
     PageNotFoundComponent,
     MemberCardComponent,
+    MemberInputComponent,
     /* imported to avoid ng build --prod error */
     RouterLinkDirectiveStub,
   ],

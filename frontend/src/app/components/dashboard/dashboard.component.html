@@ -3,13 +3,17 @@
   fxLayout="row wrap"
   fxLayout.lt-sm="column"
   fxLayoutGap="16px grid"
-  fxLayoutAlign="space-evenly"
+  fxLayoutAlign="space-between"
   fxLayoutAlign.lt-md="flex-start"
+  class="spacer"
 >
+
+
   <!-- produces a linked box for each displayed member -->
   <a
     *ngFor="let member of members; trackBy: trackByFn"
     routerLink="/detail/{{member.id}}"
+
     fxFlex="0 1 calc(25%)"
     fxFlex.lt-md="0 1 calc(50%)"
     fxFlex.lt-sm="100%"

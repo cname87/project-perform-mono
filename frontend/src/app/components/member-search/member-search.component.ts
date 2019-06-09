@@ -76,6 +76,10 @@ export class MemberSearchComponent implements OnInit, OnDestroy {
     this.searchTerms$.next(term);
   }
 
+  clear() {
+    this.members = undefined;
+  }
+
   /* return member property to display */
   showProperty(member: IMember) {
     return member[this.propertyToDisplay];

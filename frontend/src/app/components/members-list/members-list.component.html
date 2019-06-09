@@ -1,3 +1,44 @@
+<mat-nav-list>
+    <mat-list-item
+      *ngFor="let member of members; trackBy: trackByFn"
+      fxLayout="row"
+      fxLayoutAlign="start"
+    >
+
+    <a
+      mat-raised-button
+      color="primary"
+      fxFlex="0 0 auto"
+      routerLink="/detail/{{member.id}}"
+      id="memberId"
+      class="memberData"
+    >
+        {{member.id}}
+    </a>
+
+    <a
+      mat-raised-button
+      color="primary"
+      fxFlex="0 0 300px"
+      routerLink="/detail/{{member.id}}"
+      id="memberName"
+      class="memberData"
+    >
+        {{member.name}}
+    </a>
+
+    <button
+      mat-raised-button
+      fxFlex="0 0 auto"
+      color="accent"
+      id="deleteBtn"
+      (click)="delete(member)">
+        <mat-icon>delete</mat-icon>
+    </button>
+  </mat-list-item>
+</mat-nav-list>
+
+<mat-divider></mat-divider>
 
 <form>
   <mat-form-field
@@ -30,8 +71,7 @@
       <mat-icon>save</mat-icon>
     </button>
 
-    <mat-hint
-    >
+    <mat-hint>
       Enter the new member name and click save or press Enter
     </mat-hint>
 
@@ -47,44 +87,10 @@
 
 </form>
 
-<mat-divider></mat-divider>
 
-<mat-nav-list>
-  <mat-list-item
-    *ngFor="let member of members; trackBy: trackByFn"
-    fxLayout="row"
-    fxLayoutAlign="start"
-  >
-
-      <a
-        mat-raised-button
-        color="primary"
-        fxFlex="0 0 auto"
-        routerLink="/detail/{{member.id}}"
-        id="memberId"
-        class="memberData"
-      >
-          {{member.id}}
-      </a>
-
-      <a
-        mat-raised-button
-        color="primary"
-        fxFlex="0 0 300px"
-        routerLink="/detail/{{member.id}}"
-        id="memberName"
-        class="memberData"
-      >
-          {{member.name}}
-      </a>
-
-      <button
-        mat-raised-button
-        fxFlex="0 0 auto"
-        color="accent"
-        id="deleteBtn"
-        (click)="delete(member)">
-          <mat-icon>delete</mat-icon>
-      </button>
-  </mat-list-item>
-</mat-nav-list>
+<app-member-input
+mode="add"
+inputText=""
+(inputEnter)='add($event)'
+>
+</app-member-input>

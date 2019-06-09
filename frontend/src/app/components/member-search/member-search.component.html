@@ -1,5 +1,3 @@
-<div>
-
 <form>
   <mat-form-field
     appearance="outline"
@@ -12,7 +10,6 @@
       id="search-box"
       #searchBox
       value=''
-      placeholder="Enter name search term"
       (input)="search(searchBox.value)"
     >
 
@@ -26,14 +23,29 @@
       mat-icon-button
       aria-label="Clear"
       *ngIf="searchBox.value"
-      (click)="searchBox.value=''; search(searchBox.value)"
+      (click)="searchBox.value=''; clear()"
     >
       <mat-icon>close</mat-icon>
     </button>
 
+
+    <!-- show if no search yet or new search -->
+    <mat-hint
+      *ngIf="!members"
+    >
+      Enter a member name search term
+    </mat-hint>
+
+    <!-- show if no members found -->
+    <mat-hint
+      *ngIf="members && members.length === 0"
+    >
+      No member found
+    </mat-hint>
+
     <!-- show if members found -->
     <mat-hint
-      *ngIf="members?.length > 0"
+      *ngIf="members && members.length > 0"
     >
       Click on a name below to see the member detail
     </mat-hint>
@@ -41,17 +53,15 @@
   </mat-form-field>
 </form>
 
-  <mat-nav-list>
-    <a
-      *ngFor="let member of members; trackBy: trackByFn"
-      mat-list-item
-      routerLink="/{{detail.path}}/{{member.id}}"
-    >
-      {{ showProperty(member) }}
-    </a>
-  </mat-nav-list>
-
-</div>
+<mat-nav-list>
+  <a
+    *ngFor="let member of members; trackBy: trackByFn"
+    mat-list-item
+    routerLink="/{{detail.path}}/{{member.id}}"
+  >
+    {{ showProperty(member) }}
+  </a>
+</mat-nav-list>
 
 
 
