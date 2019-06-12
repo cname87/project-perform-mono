@@ -20,16 +20,19 @@ export function click(el: DebugElement | HTMLElement) {
 }
 
 /**
- * Simulate entering data in an <input. element.
- * @params text: The text to enter in the <input>.
+ * Simulate entering data in an <input> element.
+ *
+ * @param text: The text to enter in the <input>.
+ * @param isAppend: Append the text if true. Replace input if false. Defaults to false.
  */
 export function sendInput(
   fixture: ComponentFixture<any>,
   inputElement: HTMLInputElement,
   text: string,
+  isAppend = false,
 ) {
   fixture.detectChanges();
-  inputElement.value = text;
+  inputElement.value = isAppend ? inputElement.value + text : text;
   inputElement.dispatchEvent(new Event('input'));
   fixture.detectChanges();
   return fixture.whenStable();
@@ -43,6 +46,20 @@ export function findId<T>(fixture: ComponentFixture<any>, id: string): T {
 export function findTag<T>(fixture: ComponentFixture<any>, tag: string): T {
   const element = fixture.debugElement.query(By.css(tag));
   return element.nativeElement;
+}
+
+/**
+ * Use to find a html element that may or may not be present.
+ * @param fixture component fixture.
+ * @param css A valid css selector.
+ * @returns HTMLElement or null if element not found.
+ */
+export function findCssOrNot<T>(
+  fixture: ComponentFixture<any>,
+  css: string,
+): T {
+  const element = fixture.debugElement.query(By.css(css));
+  return element ? element.nativeElement : null;
 }
 
 export function findAllTag(

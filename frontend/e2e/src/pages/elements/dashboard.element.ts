@@ -14,7 +14,7 @@ export function getDashboardElement() {
   const selectMember = async(index: number) => {
     const link = topMembers.get(index);
     const content = memberCardsElements.cardContent.get(index);
-    const name = await content.getText();
+    const name = (await content.getText()).slice(6);
     return {
       link,
       name,

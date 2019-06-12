@@ -6,32 +6,31 @@ export function getMemberDetailElement() {
 
   /* DOM elements */
   const tag = element(by.css('app-member-detail'));
-  const header = element(by.css('app-member-detail #memberName'));
-  const memberId = element(by.css('app-member-detail #memberId'));
-  const input
-    = element(by.css('app-member-detail #nameInput'));
+  const header = element(by.css('mat-card-title'));
+  const memberId = element(by.css('#memberId'));
+  const memberName = element(by.css('#memberName'));
   const goBackBtn
-    =  element(by.css('app-member-detail #goBackBtn'));
-  const saveBtn
-    =  element(by.css('app-member-detail #saveBtn'));
+    =  element(by.css('#goBackBtn'));
+
+  /* get member name from header */
+  const getHeaderName = async(): Promise<string> => {
+    return (await header.getText());
+  }
 
   /* get the member object from the page */
   const getMember = async(): Promise<IMember> => {
+    let _name = await memberName.getText();
     let _id = await memberId.getText();
-    let _name = await header.getText();
     return {
-      id: +_id,
-      name: _name.substr(0, _name.lastIndexOf(' ')),
+      id: +(_id.slice(4)),
+      name: _name.slice(6),
     };
   }
 
   return {
     tag,
-    header,
-    memberId,
-    input,
     goBackBtn,
-    saveBtn,
     getMember,
+    getHeaderName,
   }
 }

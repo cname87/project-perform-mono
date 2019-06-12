@@ -202,7 +202,7 @@ describe('memberSearchComponent', () => {
     fixture.detectChanges();
     tick(350);
     fixture.detectChanges();
-    expect(getMembersSpy.calls.count()).toBe(2, 'searched again');
+    expect(getMembersSpy.calls.count()).toBe(1, 'did not search again');
     expect(page.anchors.length).toEqual(0, 'no members found');
     expect(page.searchInput.value).toBe('', 'search box cleared');
   }));
