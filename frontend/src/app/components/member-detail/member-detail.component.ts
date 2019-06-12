@@ -57,8 +57,12 @@ export class MemberDetailComponent implements OnInit {
     this.location.back();
   }
 
-  save(Inputvalue: string) {
-    this.member.name = Inputvalue;
+  save(name: string) {
+    /* ignore if the input text is empty */
+    if (!name) {
+      return;
+    }
+    this.member.name = name;
 
     this.membersService.updateMember(this.member).subscribe(
       () => {

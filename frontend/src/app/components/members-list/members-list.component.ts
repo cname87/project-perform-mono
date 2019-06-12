@@ -10,6 +10,8 @@ import { IMember, IMemberWithoutId } from '../../api/api-members.service';
 })
 export class MembersListComponent implements OnInit {
   members: IMember[];
+  /* mode for input box */
+  inputMode = 'add';
 
   constructor(private membersService: MembersService) {
     this.members = [];
@@ -26,11 +28,12 @@ export class MembersListComponent implements OnInit {
   }
 
   add(name: string) {
-    /* trim the input text */
-    name = name.trim();
+    /* ignore if the input text is empty */
     if (!name) {
       return;
     }
+    /* trim the input text */
+    name = name.trim();
     /* add the new member */
     const member: IMemberWithoutId = { name };
     this.membersService.addMember(member).subscribe((addedMember) => {

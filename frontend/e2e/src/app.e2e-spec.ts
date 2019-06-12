@@ -607,10 +607,10 @@ describe('Project Perform', () => {
         = await membersListPage.memberListElement.getMembersArray();
       const numMembers = membersBefore.length;
       /* enter new name in input box */
-      await membersListPage.memberListElement.input
+      await membersListPage.memberInputElement.inputBox
         .sendKeys(expected.addedMemberName);
       /* click on add which saves member and stays on members view */
-      await membersListPage.memberListElement.addBtn.click();
+      await membersListPage.memberInputElement.actionBtn.click();
       membersListPage = getMembersListPage();
       expect(await membersListPage.memberListElement.tag
         .isPresent())

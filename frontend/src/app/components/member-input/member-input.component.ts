@@ -33,6 +33,13 @@ export class MemberInputComponent implements OnInit {
     }
   }
 
+  /**
+   * The action button function.
+   * It resets the input box value to ''.
+   * It passes on the value in the input box via an event.
+   * If the input box is empty then no event is emitted, i.e. it is not possible to pass back '' as a input.
+   * @param value: The value in the input box when enter() is called.
+   */
   enter = (value: string) => {
     /* clear input box */
     this.inputText = '';

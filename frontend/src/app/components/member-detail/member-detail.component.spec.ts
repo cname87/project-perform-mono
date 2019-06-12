@@ -127,15 +127,14 @@ describe('memberDetailComponent', () => {
       ActivatedRouteSnapshotStub
     >(ActivatedRoute as any);
 
+    /* create the component instance */
+    const component = fixture.componentInstance;
+    /* do not run fixture.detectChanges (i.e. ngOnIt here) as included below */
+
     const { getMemberSpy, updateMemberSpy, backSpy } = createSpies(
       membersServiceSpy,
       locationSpy,
     );
-
-    /* create the component instance */
-    const component = fixture.componentInstance;
-
-    /* do not run fixture.detectChanges (i.e. ngOnIt here) as included below */
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
@@ -196,7 +195,7 @@ describe('memberDetailComponent', () => {
       expect(backSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('should call save()', async () => {
+    it('should call save() and update the member', async () => {
       const {
         component,
         fixture,
@@ -262,6 +261,26 @@ describe('memberDetailComponent', () => {
         'test' + routeId,
         'input box value is set to the supplied name',
       );
+    });
+
+    it('should respond to input event', async () => {
+      const { component, fixture, page, activatedRouteStub } = await setup();
+      /* set up route that the component will get */
+      const routeId = 2;
+      activatedRouteStub.setId(routeId);
+      /* page fields will be null before ngOnInit */
+      /* await component ngOnInit and data binding */
+      fixture.detectChanges();
+      await fixture.whenStable();
+      /* stub on the save() method */
+      const saveSpy = spyOn(component, 'save').and.stub();
+      /* get the input element */
+      const input = page.memberInput;
+      /* dispatch an 'inputEnter' event to the member input element */
+      const inputEvent = new Event('inputEnter');
+      input.dispatchEvent(inputEvent);
+      /* test that save() was called */
+      expect(saveSpy).toHaveBeenCalledWith(inputEvent);
     });
 
     it('should click the go back button', async () => {

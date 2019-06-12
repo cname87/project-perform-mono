@@ -40,56 +40,8 @@
 
 <mat-divider></mat-divider>
 
-<form>
-  <mat-form-field
-    appearance="outline"
-  >
-
-    <input
-      matInput
-      type=text
-      autocomplete="off"
-      id="inputBox"
-      #inputBox
-      value=''
-      (keyup.enter)="add(inputBox.value); inputBox.value=''"
-    >
-
-    <mat-label>
-      Add Member
-    </mat-label>
-
-    <button
-    mat-icon-button
-    matSuffix
-    #addBtn
-    id="addBtn"
-    aria-label="Save"
-    *ngIf="inputBox?.value"
-    (click)="add(inputBox.value); inputBox.value=''"
-    >
-      <mat-icon>save</mat-icon>
-    </button>
-
-    <mat-hint>
-      Enter the new member name and click save or press Enter
-    </mat-hint>
-
-    <!-- dummy input to prevent save button capturing 'Enter' by default -->
-    <!-- instead we explicitly capture the keyup above -->
-    <button
-      type="submit"
-      style = "display:none"
-    >
-    </button>
-
-  </mat-form-field>
-
-</form>
-
-
 <app-member-input
-mode="add"
+[mode]="inputMode"
 inputText=""
 (inputEnter)='add($event)'
 >

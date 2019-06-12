@@ -62,6 +62,20 @@ export function findCssOrNot<T>(
   return element ? element.nativeElement : null;
 }
 
+/**
+ * Use to find all html element that may or may not be present.
+ * @param fixture component fixture.
+ * @param css A valid css selector.
+ * @returns an array of HTMLElements or null if element not found.
+ */
+export function findAllCssOrNot(
+  fixture: ComponentFixture<any>,
+  css: string,
+): DebugElement[] | null {
+  const elements = fixture.debugElement.queryAll(By.css(css));
+  return elements ? elements : null;
+}
+
 export function findAllTag(
   fixture: ComponentFixture<any>,
   tag: string,
