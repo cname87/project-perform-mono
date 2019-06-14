@@ -6,7 +6,7 @@ import { AppModule } from '../../app.module';
 import { PageNotFoundComponent } from './page-not-found.component';
 import { findCssOrNot } from '../../shared/test-helpers';
 
-fdescribe('PageNotFoundComponent', () => {
+describe('PageNotFoundComponent', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
     /* set up Testbed */
