@@ -383,6 +383,7 @@ describe('Project Perform', () => {
     it('a page not found page', async () => {
       /* browse to a non-routed page */
       await browser.get('nonexistentPage');
+      /* await page not found display */
       browser.ignoreSynchronization = true;
       await browser.wait(() => {
         return browser.isElementPresent(by.css('app-page-not-found'));
@@ -394,7 +395,9 @@ describe('Project Perform', () => {
       expect(await pageNotFoundPage.pageNotFoundElement.tag
         .isPresent())
         .toBeTruthy('shows page not found page');
-      expect(await pageNotFoundPage.pageNotFoundElement.header.getText()).toEqual('Page not found')
+      /* shows the header and hint text */
+      expect(await pageNotFoundPage.pageNotFoundElement.header.getText()).toEqual('Page Not Found');
+      expect(await pageNotFoundPage.pageNotFoundElement.hint.getText()).toEqual('Click on a tab link above');
     });
   });
 

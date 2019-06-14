@@ -1,14 +1,14 @@
-/* import theme with $primary and $accent variables */
-/* also imports default typography $config variable */
+/* import theme with styling variables */
 @import 'src/styles/main-theme.scss';
 
 .member-card {
-  margin-left: 16px;
-  margin-right: 16px;
+  margin-left: $default-gap;
+  margin-right: $default-gap;
+  width: ($element-width - (2 * $default-gap));
   background-color: mat-color($primary);
 }
 mat-list-item.mat-list-item {
-  height: 32px;
+  height: $button-height;
 }
 
 #goBackBtn {
@@ -17,5 +17,5 @@ mat-list-item.mat-list-item {
 
 /* provide a margin around the divider */
 mat-divider.mat-divider {
-  margin: 16px;
+  margin: $default-gap;
 }

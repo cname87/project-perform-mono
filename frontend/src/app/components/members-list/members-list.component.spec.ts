@@ -1,6 +1,8 @@
 import { Location, APP_BASE_HREF } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SpyLocation } from '@angular/common/testing';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 import { AppModule } from '../../app.module';
 import { MembersListComponent } from './members-list.component';
@@ -11,10 +13,8 @@ import {
   asyncData,
   click,
 } from '../../shared/test-helpers';
-import { throwError } from 'rxjs/internal/observable/throwError';
 import { IMember, IMemberWithoutId } from '../../api/api-members.service';
 import { members } from '../../shared/mocks/mock-members';
-import { SpyLocation } from '@angular/common/testing';
 
 interface IMembersServiceSpy {
   getMembers: jasmine.Spy;
@@ -22,7 +22,7 @@ interface IMembersServiceSpy {
   deleteMember: jasmine.Spy;
 }
 
-describe('membersListComponent', () => {
+describe('MembersListComponent', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
     /* create spies on memberService methods */

@@ -1,5 +1,8 @@
+/* import theme with styling variables */
+@import 'src/styles/main-theme.scss';
+
 /* position and size the member add input */
 mat-form-field.mat-form-field {
-  margin-left: 16px;
-  width: 350px;
+  margin-left: $default-gap;
+  width: $element-width;
 }

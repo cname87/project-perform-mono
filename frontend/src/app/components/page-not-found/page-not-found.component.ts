@@ -6,6 +6,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./page-not-found.component.scss'],
 })
 export class PageNotFoundComponent implements OnInit {
+  /* not found header */
+  header = 'Page Not Found';
+  /* not found advice */
+  hint = 'Click on a tab link above';
+
   constructor() {}
 
   ngOnInit() {}

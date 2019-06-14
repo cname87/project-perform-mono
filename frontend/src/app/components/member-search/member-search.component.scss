@@ -1,5 +1,9 @@
-/* position and size the member add input */
+/* import theme with styling variables */
+@import 'src/styles/main-theme.scss';
+
+/* position and size the member search box */
 mat-form-field.mat-form-field {
-  margin-left: 16px;
-  width: 350px;
+  margin-top: $default-gap;
+  margin-left: $default-gap;
+  width: $element-width;
 }

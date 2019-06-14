@@ -1,6 +1,5 @@
 
-/* import theme with $primary and $accent variables */
-/* also imports default typography $config variable */
+/* import theme with styling variables */
 @import 'src/styles/main-theme.scss';
 
 /* this selects the container holding the member info */
@@ -8,7 +7,7 @@
   /* needed as default flows incorrectly */
   display: block;
   /* inner padding */
-  padding: 16px;
+  padding: $default-gap;
   border: 1px solid black;
   border-radius: 6px;
   /* set the background color to a variation of the theme primary */

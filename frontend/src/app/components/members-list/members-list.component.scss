@@ -1,31 +1,31 @@
-/* import theme with $primary and $accent variables */
-/* also imports default typography $config variable */
+/* import theme with styling variables */
 @import 'src/styles/main-theme.scss';
 
-/* provide a margin around the divider */
-mat-divider.mat-divider {
-  margin: 16px;
-}
-
-/* position and size the member add input */
-mat-form-field.mat-form-field {
-  margin-left: 16px;
-  width: 350px;
-}
-
 /* hide list item 'shadow' during mouse hover */
-mat-list-item.mat-list-item {
-  width: 0px;
+mat-list-item.mat-list-item.ng-star-inserted {
+  width: $element-width;
 }
 
-/* space between id and name */
-.memberData {
-  margin-right: 4px;
+#memberId {
+  height: $button-height;
+  width: $button-width;
+  /* space to the right of id element */
+  margin-right: $inner-spacing;
 }
 
-/* extra space between delete button */
+/* size central name element */
+#memberName {
+  height: $button-height;
+  width: ($element-width - (2 * $button-width) - (3 * $inner-spacing));
+  /* space to the right of name element */
+  margin-right: $inner-spacing;
+}
+
 #deleteBtn {
-  margin-left: 4px;
+  height: $button-height;
+  width: $button-width;
+  /* extra space to the left of the delete button */
+  margin-left: $inner-spacing;
 }
 
 /* hover darker */
@@ -36,4 +36,9 @@ mat-list-item.mat-list-item {
 /* hover darker */
 #deleteBtn:hover {
   background-color: mat-color($accent, darker);
+}
+
+/* provide a margin around the divider */
+mat-divider.mat-divider {
+  margin: $default-gap;
 }
