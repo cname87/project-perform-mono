@@ -1,5 +1,4 @@
-/* import theme with $primary and $accent variables */
-/* also imports default typography $config variable */
+/* import theme with styling variables */
 @import 'src/styles/main-theme.scss';
 
 /* margin around toolbar */
@@ -8,6 +7,6 @@ mat-toolbar {
   margin-bottom: 0.5rem;
 }
 
-#div2 {
-  margin-left: 16px;
+#messages-container {
+  margin-left: $default-gap;
 }

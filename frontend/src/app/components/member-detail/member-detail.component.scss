@@ -1,33 +1,21 @@
-/* memberDetailComponent's private CSS styles */
-label {
-  display: inline-block;
-  width: 3em;
-  margin: .5em 0;
-  color: #607D8B;
-  font-weight: bold;
+/* import theme with styling variables */
+@import 'src/styles/main-theme.scss';
+
+.member-card {
+  margin-left: $default-gap;
+  margin-right: $default-gap;
+  width: ($element-width - (2 * $default-gap));
+  background-color: mat-color($primary);
 }
-input {
-  height: 2em;
-  font-size: 1em;
-  padding-left: .4em;
+mat-list-item.mat-list-item {
+  height: $button-height;
 }
-button {
-  margin-top: 20px;
-  font-family: Arial;
-  background-color: #eee;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer; cursor: hand;
+
+#goBackBtn {
+  background-color: mat-color($accent);
 }
-button.link {
-  text-decoration: underline;
-}
-button:hover {
-  background-color: #cfd8dc;
-}
-button:disabled {
-  background-color: #eee;
-  color: #ccc;
-  cursor: auto;
+
+/* provide a margin around the divider */
+mat-divider.mat-divider {
+  margin: $default-gap;
 }

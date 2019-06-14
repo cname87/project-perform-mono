@@ -1,5 +1,4 @@
-/* Need to keep this separate from file where mat-core is included so I can import it into component files */
-
+/* Note: Need to keep this separate from file where mat-core is included so I can import it into component files */
 @import '~@angular/material/theming';
 
 /* create a custom theme - can match a prebuilt theme*/
@@ -12,5 +11,12 @@ $theme: mat-light-theme(
   $warn,
 );
 
-/* Create a config with the default typography levels */
+/* create a config with the default typography levels */
 $config: mat-typography-config();
+
+/* create variables for use throughout the app */
+$default-gap: 16px;
+$element-width: 450px;
+$button-height: 32px;
+$button-width: 64px;
+$inner-spacing: 4px;

@@ -6,7 +6,7 @@ export function getMessagesElement() {
   const tag = element(by.css('app-messages'));
   const header = element(by.css('app-messages #header'))
   const clearBtn = element(by.css('app-messages #clearBtn'));
-  const messages = element.all(by.css('app-messages #div2'));
+  const messages = element.all(by.css('app-messages #messages-container'));
 
   return {
     tag,

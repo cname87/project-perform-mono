@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatListModule } from '@angular/material/list';
+import { MatCardModule } from '@angular/material/card';
 
 const material = [
   MatToolbarModule,
@@ -17,6 +18,7 @@ const material = [
   MatDividerModule,
   MatSelectModule,
   MatListModule,
+  MatCardModule,
 ];
 
 @NgModule({

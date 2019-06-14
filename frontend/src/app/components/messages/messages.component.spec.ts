@@ -56,8 +56,8 @@ describe('messagesComponent', () => {
     get clearButton() {
       return this.findId<HTMLButtonElement>('clearBtn');
     }
-    get div2() {
-      return this.findIds<HTMLDivElement>('div2');
+    get messagesContainer2() {
+      return this.findIds<HTMLDivElement>('messages-container');
     }
 
     constructor(readonly fixture: ComponentFixture<MessagesComponent>) {}
@@ -148,7 +148,7 @@ describe('messagesComponent', () => {
       await fixture.whenStable();
       /* page fields will be null as messages is empty */
       expect(page.header).toBeFalsy();
-      expect(page.div2).toBeFalsy();
+      expect(page.messagesContainer2).toBeFalsy();
       expect(page.clearButton).toBeFalsy();
     });
 
@@ -160,13 +160,13 @@ describe('messagesComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       expect(page.header.innerText).toEqual('Messages');
-      expect(page.div2[0].innerText).toEqual(
+      expect(page.messagesContainer2[0].innerText).toEqual(
         component.messageService.messages[0].toString(),
       );
-      expect(page.div2[1].innerText).toEqual(
+      expect(page.messagesContainer2[1].innerText).toEqual(
         component.messageService.messages[1].toString(),
       );
-      expect(page.div2[2]).toBeFalsy;
+      expect(page.messagesContainer2[2]).toBeFalsy;
       /* the close icon has 'close' as innerText */
       expect(page.clearButton.innerText).toEqual('close');
     });
@@ -178,17 +178,17 @@ describe('messagesComponent', () => {
       component.messageService.add('testMessage2');
       fixture.detectChanges();
       await fixture.whenStable();
-      expect(page.div2[0].innerText).toEqual(
+      expect(page.messagesContainer2[0].innerText).toEqual(
         component.messageService.messages[0].toString(),
       );
-      expect(page.div2[1].innerText).toEqual(
+      expect(page.messagesContainer2[1].innerText).toEqual(
         component.messageService.messages[1].toString(),
       );
       click(page.clearButton);
       fixture.detectChanges();
       await fixture.whenStable();
       expect(component.messageService.clear).toHaveBeenCalled();
-      expect(page.div2).toBeFalsy;
+      expect(page.messagesContainer2).toBeFalsy;
     });
   });
 });

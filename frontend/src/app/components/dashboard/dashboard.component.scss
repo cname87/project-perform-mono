@@ -1,4 +1,11 @@
+/* import theme with styling variables */
+@import 'src/styles/main-theme.scss';
+
 a {
   /* removes anchor underline */
   text-decoration: none;
+}
+
+div.container {
+  padding: $default-gap;
 }

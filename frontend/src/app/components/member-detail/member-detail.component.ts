@@ -12,6 +12,8 @@ import { IMember } from '../../api/api-members.service';
 })
 export class MemberDetailComponent implements OnInit {
   @Input() member: IMember;
+  /* mode for input box */
+  inputMode = 'edit';
 
   constructor(
     private route: ActivatedRoute,
@@ -55,7 +57,13 @@ export class MemberDetailComponent implements OnInit {
     this.location.back();
   }
 
-  save() {
+  save(name: string) {
+    /* ignore if the input text is empty */
+    if (!name) {
+      return;
+    }
+    this.member.name = name;
+
     this.membersService.updateMember(this.member).subscribe(
       () => {
         this.goBack();

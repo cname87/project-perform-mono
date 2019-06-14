@@ -5,10 +5,6 @@ export function getMembersListElement() {
 
   /* DOM elements */
   const tag = element(by.css('app-members'));
-  const input = element(by.css('#inputBox'));
-  const inputLabel = element(by.css('mat-label'));
-  const addBtn = element(by.css('#addBtn'));
-  const inputHint = element(by.css('mat-hint'));
   const list = element(by.css('mat-nav-list'));
   const allListItems = element.all(by.css('mat-list-item'));
   const allMemberIds = element.all(by.css('#memberId'));
@@ -60,10 +56,6 @@ export function getMembersListElement() {
 
   return {
     tag,
-    input,
-    inputLabel,
-    addBtn,
-    inputHint,
     allListItems,
     allMemberIds,
     allMemberNames,

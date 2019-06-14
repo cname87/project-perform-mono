@@ -11,12 +11,17 @@ import path from 'path';
 const certFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem')
 const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem')
 const caFile = path.resolve(__dirname, '../certs/rootCA.crt')
-import { getDashboardPage }from './pages/dashboard.page';
+import { getDashboardPage } from './pages/dashboard.page';
 import { getMemberDetailPage } from './pages/memberDetail.page';
 import { getMembersListPage } from './pages/membersList.page';
 import { getPageNotFoundPage } from './pages/pageNotFound.page';
 
 describe('Project Perform', () => {
+
+  const enum Save {
+    False= 0,
+    True = 1,
+  }
 
   /* set timeout here - loaded in beforeAll below */
   const timeout = 120000;
@@ -116,8 +121,8 @@ describe('Project Perform', () => {
         'MEMBER DETAIL',
       ],
       numTopMembers: 4,
-      topMemberIndex: 2,
-      member: { id: 0, name: '' },
+      selectedMemberIndex: 2,
+      selectedMember: { id: 0, name: '' },
       nameSuffix: 'X',
       newName: '',
       numMembers: 5,
@@ -132,15 +137,15 @@ describe('Project Perform', () => {
       searchTest1: 3,
       searchTest13: 1,
     }
-    expected.member = {
+    expected.selectedMember = {
        /* database empty => id will start at 1 */
-      id: expected.topMemberIndex + 1,
-      name: mockMembers[expected.topMemberIndex].name,
+      id: expected.selectedMemberIndex + 1,
+      name: mockMembers[expected.selectedMemberIndex].name,
     }
     expected.newName
-      = expected.member.name + expected.nameSuffix;
-    expected.message2 = expected.message2 + expected.member.id;
-    expected.message3 = expected.message3 + expected.member.id;
+      = expected.selectedMember.name + expected.nameSuffix;
+    expected.message2 = expected.message2 + expected.selectedMember.id;
+    expected.message3 = expected.message3 + expected.selectedMember.id;
     return {
       expected,
     }
@@ -150,16 +155,14 @@ describe('Project Perform', () => {
    * Assumes the dashboard page is being displayed.
    * Selects a member from the top members dashboard based on a passed in index.
    * The appropriate member detail page is loaded.
-   * @param index Zero-based index which selects a member from the top members displayed in the dashboard.
+   * @param index: Index is zero-based and must correspond to a displayed member, i.e. if 2 is passed in then at least three members must be displayed (and the third member is selected).
    */
   async function dashboardClickMember(index: number) {
     const dashboardPage = getDashboardPage();
-    const { expected }= testSetup();
 
     /* get member link and name */
     const { name, link } = await dashboardPage.dashboardElement
       .selectMember(index);
-    expect(name).toEqual('Name: ' + expected.member.name);
 
     /* click on the selected member which brings up the member detail page */
     await link.click();
@@ -171,25 +174,22 @@ describe('Project Perform', () => {
     /* confirm member detail is as expected */
     const member
       = await memberDetailPage.memberDetailElement.getMember();
-    expect(member.id).toEqual(expected.member.id);
     expect(member.name)
-      .toEqual(expected.member.name
-      .toUpperCase());
+      .toEqual(name);
   }
 
     /**
    * Assumes the dashboard page is being displayed.
    * Clicks on the members link.
    * The members list page is loaded.
+   * @param numberExpected: The expected number of members that will be displayed.
    */
-  async function getMembersList() {
-    /* get expected values object */
-    const { expected } = testSetup();
+  async function getMembersList(numberExpected:number) {
     /* the dashboard page should be displayed */
     const dashboardPage = getDashboardPage();
     /* click on members nav link */
     await dashboardPage.rootElement.membersLink.click();
-    /* the list members page should be displayed */
+    /* the members list page should be displayed */
     const membersListPage = getMembersListPage();
     expect(await membersListPage.memberListElement.tag
       .isPresent())
@@ -197,36 +197,86 @@ describe('Project Perform', () => {
     /* confirm count of members displayed */
     expect(await membersListPage.memberListElement.allMemberIds
       .count()).toEqual(
-        expected.numMembers,
+        numberExpected,
        'number of members'
       );
   }
 
-  async function editName() {
+  /**
+   * The members detail page must be being displayed when this is called.
+   * Edits the member name in the members detail page.
+   * The expected.nameSuffix is added to the existing member name.
+   * @param: save: The save button if clicked if, and only if, the input parameter 'save' is true.
+   */
+  async function editNameInMemberDetails(save: Save = Save.True) {
     /* get expected values object */
     const { expected } = testSetup();
+    /* the member detail page must be displayed */
+    const memberDetailPage = getMemberDetailPage();
+    /* confirm member detail page is being displayed */
+    expect(await memberDetailPage.memberDetailElement.tag
+      .isPresent())
+      .toBeTruthy('shows member detail');
+    /* get the member name displayed */
+    const originalMember
+      = await memberDetailPage.memberDetailElement.getMember();
+    /* add a suffix to the name in the input field */
+    await memberDetailPage.memberInputElement.inputBox
+      .sendKeys(expected.nameSuffix);
+    /* show the member card does not update to match the input text */
+    const afterMember = await memberDetailPage.memberDetailElement.getMember();
+    expect(originalMember.name)
+      .toEqual(afterMember.name);
+    if (save) {
+      /* saves the new member name and routes back to the last page*/
+      await memberDetailPage.memberInputElement.actionBtn.click();
+
+    }
+  }
+
+  /**
+   * The dashboard page must be being displayed when this is called.
+   * Resets the member name in the members detail page.
+   * The name is reset to the expected default member.
+   */
+  async function resetNameInMemberDetails(index: number) {
+    /* get expected values object */
+    const { expected } = testSetup();
+    /* click on a member and go to the member detail page */
+    let dashboardPage = getDashboardPage();
+    /* get member link and name */
+    const { link } = await dashboardPage.dashboardElement
+      .selectMember(index);
+    await link.click();
     /* the member detail page is now displayed */
     const memberDetailPage = getMemberDetailPage();
     /* confirm member detail page is being displayed */
     expect(await memberDetailPage.memberDetailElement.tag
       .isPresent())
       .toBeTruthy('shows member detail');
-    /* confirm header is showing member name */
-    expect(await memberDetailPage.memberDetailElement.header.getText())
-      .toEqual(expected.member.name.toUpperCase() + ' Details');
-    /* confirm input is showing member name */
-    expect(await memberDetailPage.memberDetailElement.input
-      .getAttribute('value'))
-      .toEqual(expected.member.name);
-    /* add a suffix to the name in the input field */
-    await memberDetailPage.memberDetailElement.input
-      .sendKeys(expected.nameSuffix);
-    /* show the header updates to match the input text */
-    const member = await memberDetailPage.memberDetailElement.getMember();
-    expect(member.id).toEqual(expected.member.id);
-    expect(member.name)
-      .toEqual(expected.newName.toUpperCase());
+    /* get the member name */
+    const readMember
+      = await memberDetailPage.memberDetailElement.getMember();
+    /* clear input box */
+    await memberDetailPage.memberInputElement.inputBox
+      .clear();
+    /* slice off the last character of the member name */
+    await memberDetailPage.memberInputElement.inputBox
+      .sendKeys(readMember.name.slice(0, -1));
+    /* saves the new member name and routes back to the dashboard page */
+    await memberDetailPage.memberInputElement.actionBtn.click();
+    /* the dashboard page is now displayed */
+    dashboardPage = getDashboardPage();
+    /* confirm dashboard page is being displayed */
+    expect(await dashboardPage.dashboardElement.tag
+      .isPresent())
+      .toBeTruthy('shows dashboard page');
+    /* confirm name of member on dashboard has been updated */
+    const { name } = await dashboardPage.dashboardElement
+    .selectMember(expected.selectedMemberIndex);
+    expect(name).toEqual(expected.selectedMember.name);
   }
+
   /* check test database and set timeout */
   let originalTimeout: number;
   beforeAll(async() => {
@@ -299,9 +349,11 @@ describe('Project Perform', () => {
       expect(message).toEqual(expected.message1);
     });
 
-    it('a members list page with all members',
-      getMembersList,
-    );
+    it('a members list page with all members', async() => {
+      const { expected } = testSetup();
+      /* click on members list link and pass in number of members expected */
+      await getMembersList(expected.numMembers);
+    });
 
     it('a members list page which displays correctly styled buttons', async () => {
       /* the member detail page is still displayed */
@@ -316,7 +368,7 @@ describe('Project Perform', () => {
       }
     });
 
-    it('a link which routes back to the dashboard page', async () => {
+    it('a members list page with a link which routes back to the dashboard page', async () => {
       /* the member detail page is still displayed */
       const membersListPage = getMembersListPage();
       /* click on members nav link */
@@ -331,6 +383,7 @@ describe('Project Perform', () => {
     it('a page not found page', async () => {
       /* browse to a non-routed page */
       await browser.get('nonexistentPage');
+      /* await page not found display */
       browser.ignoreSynchronization = true;
       await browser.wait(() => {
         return browser.isElementPresent(by.css('app-page-not-found'));
@@ -342,7 +395,9 @@ describe('Project Perform', () => {
       expect(await pageNotFoundPage.pageNotFoundElement.tag
         .isPresent())
         .toBeTruthy('shows page not found page');
-      expect(await pageNotFoundPage.pageNotFoundElement.header.getText()).toEqual('Page not found')
+      /* shows the header and hint text */
+      expect(await pageNotFoundPage.pageNotFoundElement.header.getText()).toEqual('Page Not Found');
+      expect(await pageNotFoundPage.pageNotFoundElement.hint.getText()).toEqual('Click on a tab link above');
     });
   });
 
@@ -356,10 +411,22 @@ describe('Project Perform', () => {
       const { expected } = testSetup();
       /* the dashboard page is still displayed */
       /* click on a member and go to the member detail page */
-      await dashboardClickMember(expected.topMemberIndex);
+      await dashboardClickMember(expected.selectedMemberIndex);
+      const memberDetailPage = getMemberDetailPage();
+      /* confirm member detail page is being displayed */
+      expect(await memberDetailPage.memberDetailElement.tag
+        .isPresent())
+        .toBeTruthy('shows member detail');
+      /* confirm header is showing member name */
+      expect(await memberDetailPage.memberDetailElement.getHeaderName())
+      .toEqual(expected.selectedMember.name.toUpperCase());
+      /* confirm input is showing member name */
+      expect(await memberDetailPage.memberInputElement.inputBox
+      .getAttribute('value'))
+      .toEqual(expected.selectedMember.name);
     });
 
-    it('shows a message', async() => {
+    it('has a member detail page that shows a message', async() => {
     /* get expected values object */
     const { expected } = testSetup();
     /* the member detail page is now displayed */
@@ -373,13 +440,31 @@ describe('Project Perform', () => {
     expect(message).toEqual(expected.message2);
     });
 
-    it(`updates member name in members details page input box`,
-      editName,
-    );
-
-    it(`cancels member detail name change and routes back to the dashboard page`, async () => {
+    it('updates and saves a member name in members details page input box and routes back to the dashboard display and shows the new member name', async() => {
       /* get expected values object */
       const { expected } = testSetup();
+      /* edit member name in member detail page and click save */
+      await editNameInMemberDetails(Save.True);
+      /* the dashboard page is now displayed */
+      const dashboardPage = getDashboardPage();
+      /* confirm dashboard page is being displayed */
+      expect(await dashboardPage.dashboardElement.tag
+        .isPresent())
+        .toBeTruthy('shows dashboard page');
+      /* confirm name of member on dashboard has been updated */
+      const { name } = await dashboardPage.dashboardElement
+        .selectMember(expected.selectedMemberIndex);
+      expect(name).toEqual(expected.newName);
+      /* reset member name so next test starting fresh */
+      await resetNameInMemberDetails(expected.selectedMemberIndex)
+    });
+
+    it(`updates but cancels member detail name change and routes back to the dashboard page`, async () => {
+      /* get expected values object */
+      const { expected } = testSetup();
+      /* the dashboard page is now displayed */
+      /* click on a member and go to the member detail page */
+      await dashboardClickMember(expected.selectedMemberIndex);
       /* the member detail page is now displayed */
       const memberDetailPage = getMemberDetailPage();
       /* click go back, which cancels name change and goes back to the dashboard page */
@@ -392,39 +477,9 @@ describe('Project Perform', () => {
         .toBeTruthy('shows member detail');
       /* confirm name of member on dashboard */
       const { name } = await dashboardPage.dashboardElement
-        .selectMember(expected.topMemberIndex);
-      expect(name).toEqual('Name: ' + expected.member.name);
-    });
-
-    it(`selects a member and routes to the members details page`, async() => {
-      /* get expected values object */
-      const { expected } = testSetup();
-      /* the dashboard page is still displayed */
-      /* click on a member and go to the member detail page */
-      await dashboardClickMember(expected.topMemberIndex);
-    });
-
-    it(`updates member name in members details page input box`,
-      editName,
-    );
-
-    it(`saves and shows the new name in the dashboard page`, async () => {
-      /* get expected values object */
-      const { expected } = testSetup();
-      /* the member detail page is now displayed */
-      const memberDetailPage = getMemberDetailPage();
-      /* click save, which saves name and goes back to the dashboard page */
-      await memberDetailPage.memberDetailElement.saveBtn.click();
-      /* the dashboard page is now displayed */
-      const dashboardPage = getDashboardPage();
-      /* confirm dashboard page is being displayed */
-      expect(await dashboardPage.dashboardElement.tag
-        .isPresent())
-        .toBeTruthy('shows member detail');
-      /* confirm name of member on dashboard */
-      const { name } = await dashboardPage.dashboardElement
-        .selectMember(expected.topMemberIndex);
-      expect(name).toEqual('Name: ' + expected.newName);
+        .selectMember(expected.selectedMemberIndex);
+      /* the member name is unchanged */
+      expect(name).toEqual(expected.selectedMember.name);
     });
   });
 
@@ -432,18 +487,20 @@ describe('Project Perform', () => {
     /* set up database and load initial page */
     beforeAll(loadDbAndRootPage);
 
-    it('switches to the members list page',
-      getMembersList,
-    );
+    it('switches to the members list page', async() => {
+    const { expected } = testSetup();
+    /* click on members list link and pass in number of members expected */
+    await getMembersList(expected.numMembers);
+    });
 
-    it(`selects a member and routes to the members details view`, async() => {
+    it('selects a member and routes to the members details view', async() => {
       /* get expected values object */
       const { expected } = testSetup();
       /* the members list page should still be displayed */
       const membersPage = getMembersListPage();
       /* get the link of the selected member */
       const { memberName } = await membersPage.memberListElement
-        .selectMemberById(expected.member.id);
+        .selectMemberById(expected.selectedMember.id);
       /* click on the member which takes us to the member detail view */
       await memberName.click();
       const memberDetailPage = getMemberDetailPage();
@@ -453,27 +510,25 @@ describe('Project Perform', () => {
         .toBeTruthy('shows member detail');
       /* get the member from the member detail page */
       const member = await memberDetailPage.memberDetailElement.getMember();
-      expect(member.id).toEqual(expected.member.id, 'member id');
+      expect(member.id).toEqual(expected.selectedMember.id, 'member id');
       expect(member.name)
-        .toEqual(expected.member.name.toUpperCase(), 'member name');
+        .toEqual(expected.selectedMember.name, 'member name');
     });
 
-    it(`updates the member name in the members details page input box`,
-      editName,
-    );
+    it('updates and saves a member name in members details page input box and routes back to members list which shows the updated name', async() => {
+      /* edit member name in member detail page and click save */
+      await editNameInMemberDetails(Save.True);
+    /* the members list page is now displayed */
+    const membersListPage = getMembersListPage();
+    expect(await membersListPage.memberListElement.tag
+      .isPresent())
+      .toBeTruthy('shows member list');
+    });
 
-    it(`saves the new name and shows the member's new name in the members list page`, async () => {
+    it(`shows the member's new name in the members list page`, async () => {
       /* get expected values object */
       const { expected } = testSetup();
-      /* the member detail page is still displayed */
-      const memberDetailPage = getMemberDetailPage();
-      /* click save, which saves name and goes back to the dashboard page */
-      await memberDetailPage.memberDetailElement.saveBtn.click();
-      /* the dashboard page is now displayed */
-      const dashboardPage = getDashboardPage();
-      /* click on members nav link */
-      await dashboardPage.rootElement.membersLink.click();
-      /* the list members page should be displayed */
+      /* the members list page is still displayed */
       const membersPage = getMembersListPage();
       expect(await membersPage.memberListElement.tag.isPresent()).toBeTruthy();
       /* confirm count of members displayed */
@@ -484,9 +539,9 @@ describe('Project Perform', () => {
         );
       /* confirm member id and member new name displayed */
       const { memberId, memberName } = membersPage.memberListElement
-        .selectMemberById(expected.member.id);
-      expect(await memberId.getText()).toEqual(`${expected.member.id}`);
-      expect(await memberName.getText()).toEqual(`${expected.newName}`);
+        .selectMemberById(expected.selectedMember.id);
+      expect(+(await memberId.getText())).toBe(expected.selectedMember.id);
+      expect(await memberName.getText()).toEqual(expected.newName);
     });
 
     it(`deletes a member from the members list page`, async () => {
@@ -498,7 +553,7 @@ describe('Project Perform', () => {
       const membersBefore
         = await membersListPage.memberListElement.getMembersArray();
       const { deleteButton } = await membersListPage.memberListElement
-        .selectMemberById(expected.member.id);
+        .selectMemberById(expected.selectedMember.id);
       /* click 'delete' which deletes the member & stays on the members view */
       await deleteButton.click();
       membersListPage = getMembersListPage();
@@ -535,8 +590,6 @@ describe('Project Perform', () => {
     });
 
     it('clears the messages list', async() => {
-      /* get expected values object */
-      const { } = testSetup();
       /* the member list page is displayed */
       let membersListPage = getMembersListPage();
       /* clear the messages list */
@@ -546,7 +599,6 @@ describe('Project Perform', () => {
       const count = await membersListPage.messagesElement.messages.count();
       expect(count).toEqual(0, 'no messages');
     });
-
 
     it(`adds a member on the members list page`, async () => {
       /* get expected values object */
@@ -558,10 +610,10 @@ describe('Project Perform', () => {
         = await membersListPage.memberListElement.getMembersArray();
       const numMembers = membersBefore.length;
       /* enter new name in input box */
-      await membersListPage.memberListElement.input
+      await membersListPage.memberInputElement.inputBox
         .sendKeys(expected.addedMemberName);
       /* click on add which saves member and stays on members view */
-      await membersListPage.memberListElement.addBtn.click();
+      await membersListPage.memberInputElement.actionBtn.click();
       membersListPage = getMembersListPage();
       expect(await membersListPage.memberListElement.tag
         .isPresent())
@@ -627,10 +679,10 @@ describe('Project Perform', () => {
       expect(await dashboardPage.memberSearchElement.searchResults.count()).toEqual(expected.searchTest13);
       /* confirm member found */
       let member = dashboardPage.memberSearchElement.searchResults.get(0);
-      expect(await member.getText()).toEqual(expected.member.name);
+      expect(await member.getText()).toEqual(expected.selectedMember.name);
     });
 
-    it(`selects the found member and goes to the member details view`, async () => {
+    it('selects the found member and goes to the member details view', async () => {
       /* get expected values object */
       const { expected } = testSetup();
       /* the dashboard page is still displayed */
@@ -638,7 +690,7 @@ describe('Project Perform', () => {
       /* get the sole found member */
       const foundMember = dashboardPage.memberSearchElement.searchResults
         .get(0);
-      expect(await foundMember.getText()).toEqual(expected.member.name)
+      expect(await foundMember.getText()).toEqual(expected.selectedMember.name)
       /* click on the found member */
       await foundMember.click();
       /* the member detail page is now displayed */
@@ -648,9 +700,9 @@ describe('Project Perform', () => {
         .toBeTruthy('shows member detail');
       /* show the member matches the expected member */
       const member = await memberDetailPage.memberDetailElement.getMember();
-      expect(member.id).toEqual(expected.member.id);
+      expect(member.id).toEqual(expected.selectedMember.id);
       expect(member.name)
-        .toEqual(expected.member.name.toUpperCase());
+        .toEqual(expected.selectedMember.name);
     });
 
   });
