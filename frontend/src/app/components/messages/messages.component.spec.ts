@@ -123,10 +123,9 @@ describe('messagesComponent', () => {
 
     it('should have the messageService setup', async () => {
       const { component, fixture } = await setup();
-      /* initiate ngOnInit */
-      fixture.detectChanges();
-      /* await asyncData call */
-      await fixture.whenStable();
+      /* initiate ngOnInit and view changes etc */
+      await fixture.detectChanges();
+      await fixture.detectChanges();
       /* test */
       expect(component.messageService).toEqual(
         fixture.debugElement.injector.get(MessageService),
@@ -144,8 +143,9 @@ describe('messagesComponent', () => {
   describe('page', async () => {
     it('should not show when no messages', async () => {
       const { fixture, page } = await setup();
-      fixture.detectChanges();
-      await fixture.whenStable();
+      /* initiate ngOnInit and view changes etc */
+      await fixture.detectChanges();
+      await fixture.detectChanges();
       /* page fields will be null as messages is empty */
       expect(page.header).toBeFalsy();
       expect(page.messagesContainer2).toBeFalsy();
@@ -157,8 +157,9 @@ describe('messagesComponent', () => {
       /* add messages to the displayed messages array */
       component.messageService.add('testMessage1');
       component.messageService.add('testMessage2');
-      fixture.detectChanges();
-      await fixture.whenStable();
+      /* initiate ngOnInit and view changes etc */
+      await fixture.detectChanges();
+      await fixture.detectChanges();
       expect(page.header.innerText).toEqual('Messages');
       expect(page.messagesContainer2[0].innerText).toEqual(
         component.messageService.messages[0].toString(),
@@ -176,8 +177,9 @@ describe('messagesComponent', () => {
       /* add messages to the displayed messages array */
       component.messageService.add('testMessage1');
       component.messageService.add('testMessage2');
-      fixture.detectChanges();
-      await fixture.whenStable();
+      /* initiate ngOnInit and view changes etc */
+      await fixture.detectChanges();
+      await fixture.detectChanges();
       expect(page.messagesContainer2[0].innerText).toEqual(
         component.messageService.messages[0].toString(),
       );
@@ -185,8 +187,9 @@ describe('messagesComponent', () => {
         component.messageService.messages[1].toString(),
       );
       click(page.clearButton);
-      fixture.detectChanges();
-      await fixture.whenStable();
+      /* initiate ngOnInit and view changes etc */
+      await fixture.detectChanges();
+      await fixture.detectChanges();
       expect(component.messageService.clear).toHaveBeenCalled();
       expect(page.messagesContainer2).toBeFalsy;
     });

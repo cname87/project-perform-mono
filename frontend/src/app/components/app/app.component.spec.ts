@@ -61,8 +61,9 @@ describe('AppComponent', () => {
     /* create the component instance */
     const component = fixture.componentInstance;
 
-    /* ngOnInit */
-    fixture.detectChanges();
+    /* ngOnInit and any view, binding etc */
+    await fixture.detectChanges();
+    await fixture.detectChanges();
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
@@ -124,7 +125,7 @@ describe('AppComponent', () => {
     fixture.ngZone!.run(() => {
       click(dashboardDe);
     });
-    fixture.detectChanges();
+    await fixture.detectChanges();
 
     /* it attempts to route => dummy path configured above */
     expect(dashboardLink.navigatedTo).toBe(
@@ -148,7 +149,7 @@ describe('AppComponent', () => {
     fixture.ngZone!.run(() => {
       click(membersLinkDe);
     });
-    fixture.detectChanges();
+    await fixture.detectChanges();
 
     /* it attempts to route => dummy path configured above */
     expect(membersLink.navigatedTo).toBe(
@@ -172,7 +173,7 @@ describe('AppComponent', () => {
     fixture.ngZone!.run(() => {
       click(detailDe);
     });
-    fixture.detectChanges();
+    await fixture.detectChanges();
 
     /* routerLink gets the route but it does not attempt to route (as disabled ) => no dummy path configured above */
     expect(detailLink.navigatedTo).toEqual(

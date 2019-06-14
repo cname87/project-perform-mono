@@ -204,7 +204,7 @@ describe('memberInputComponent', () => {
       await fixture.detectChanges();
       /* call enter() with the button */
       page.actionBtn.click();
-      fixture.detectChanges();
+      await fixture.detectChanges();
       /* test that inputText cleared and event emitted */
       expect(component.inputText).toBe('', 'inputText cleared');
       expect(eventHandlerSpy).toHaveBeenCalledWith('initial input text');
@@ -223,7 +223,7 @@ describe('memberInputComponent', () => {
       await fixture.detectChanges();
       /* add text to input */
       sendInput(fixture, page.input, 'added', true);
-      fixture.detectChanges();
+      await fixture.detectChanges();
       expect(page.input.value).toBe('initialadded', 'confirm input text');
       /* text added to inputText variable via ngModel binding */
       expect(component.inputText).toBe('initialadded', 'confirm binding');
