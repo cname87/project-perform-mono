@@ -101,6 +101,17 @@ describe('MembersListComponent', () => {
     };
   }
 
+  function createExpected() {
+    return {
+      /* member used for tests */
+      memberIndex: 2,
+      /* anchor corresponding to memberIndex i.e. member[2] is the 3rd member and there are two links per member => anchor[5] */
+      anchorIndex: 5,
+      /* create members array from imported mock members array */
+      membersArray: JSON.parse(JSON.stringify(members)),
+    };
+  }
+
   /**
    * Create the component, initialize it & set test variables.
    */
@@ -115,14 +126,14 @@ describe('MembersListComponent', () => {
       MembersService as any,
     );
 
-    const membersArray = JSON.parse(JSON.stringify(members));
+    const expected = createExpected();
 
     /* create the component instance */
     const component = fixture.componentInstance;
 
     const { getMembersSpy, addMemberSpy, deleteMemberSpy } = createSpies(
       membersServiceSpy,
-      membersArray,
+      expected.membersArray,
     );
 
     /* create a page to access the DOM elements */
@@ -135,50 +146,64 @@ describe('MembersListComponent', () => {
       getMembersSpy,
       addMemberSpy,
       deleteMemberSpy,
-      membersArray,
       spyLocation,
+      expected,
     };
   }
 
-  describe('component', async () => {
-    /* setup function run by each sub test function */
-    async function setup() {
-      await mainSetup();
-      return createComponent();
-    }
+  /* setup function run by each it test function that needs to test before ngOnInit is run */
+  async function preSetup() {
+    await mainSetup();
+    const methods = await createComponent();
+    return  methods;
+  }
+
+  /* setup function run by each it test function that runs tests after the component and view are fully established */
+  async function setup() {
+    const methods = await preSetup();
+    /* initiate ngOnInit and view changes etc */
+    methods.fixture.detectChanges();
+    await methods.fixture.whenStable();
+    methods.fixture.detectChanges();
+    await methods.fixture.whenStable();
+    return methods;
+  }
+
+  describe('before ngOnInit', async () => {
+
+    it('should have the default member before ngOnInit called', async () => {
+      const { component } = await preSetup();
+      expect(component.members).toEqual([], 'initial members array is empty');
+    });
+
+  });
+
+  describe('after ngOnInit', async () => {
 
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component created');
     });
 
-    it('should have the default member before ngOnInit called', async () => {
-      const { component } = await setup();
-      expect(component.members).toEqual([], 'initial members array is empty');
-    });
-
     it('should have the members after ngOnInit called', async () => {
-      const { component, fixture, getMembersSpy, membersArray } = await setup();
+      const { component, fixture, getMembersSpy, expected } = await setup();
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
       await fixture.detectChanges();
       /* test */
       expect(getMembersSpy).toHaveBeenCalledTimes(1);
       expect(component.members.length).toEqual(
-        membersArray.length,
+        expected.membersArray.length,
         'members retrieved',
       );
     });
 
     it('should call getMembers()', async () => {
-      const { component, fixture, getMembersSpy, membersArray } = await setup();
-      /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
-      await fixture.detectChanges();
+      const { component, fixture, getMembersSpy, expected } = await setup();
       /* getMembersSpy called on ngOnInit */
       expect(getMembersSpy).toHaveBeenCalledTimes(1);
       /* increase members.length */
-      membersArray.push({ id: 21, name: 'test21' });
+      expected.membersArray.push({ id: 21, name: 'test21' });
       /* manually call getMembers() */
       component.getMembers();
       /* getMembersSpy called again after getMembers() */
@@ -186,16 +211,13 @@ describe('MembersListComponent', () => {
       /* await asyncData call */
       await fixture.whenStable();
       expect(component.members.length).toEqual(
-        membersArray.length,
+        expected.membersArray.length,
         'members retrieved',
       );
     });
 
     it('should call add()', async () => {
       const { component, fixture, addMemberSpy } = await setup();
-      /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
-      await fixture.detectChanges();
       /* call add() */
       const testName = 'testName';
       component.add(testName);
@@ -209,9 +231,6 @@ describe('MembersListComponent', () => {
 
     it('should trim name before calling addMember', async () => {
       const { component, fixture, addMemberSpy } = await setup();
-      /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
-      await fixture.detectChanges();
       /* call add() */
       const testName = '  testName  ';
       component.add(testName);
@@ -225,9 +244,6 @@ describe('MembersListComponent', () => {
 
     it('should not call addMember if no name', async () => {
       const { component, fixture, addMemberSpy } = await setup();
-      /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
-      await fixture.detectChanges();
       /* call add() */
       const testName = '';
       component.add(testName);
@@ -239,16 +255,12 @@ describe('MembersListComponent', () => {
     it('should call delete()', async () => {
       const {
         component,
-        fixture,
         deleteMemberSpy,
-        membersArray,
+        expected,
       } = await setup();
-      /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
-      await fixture.detectChanges();
       /* call component function */
-      const startMembersCount = membersArray.length;
-      const testMember = membersArray[0];
+      const startMembersCount = expected.membersArray.length;
+      const testMember = expected.membersArray[0];
       component.delete(testMember);
       expect(deleteMemberSpy).toHaveBeenCalledTimes(1);
       expect(deleteMemberSpy).toHaveBeenCalledWith(testMember.id);
@@ -257,9 +269,9 @@ describe('MembersListComponent', () => {
     });
 
     it('should test trackBy function returns member.id', async () => {
-      const { component, membersArray } = await setup();
-      const result = component.trackByFn(0, membersArray[1]);
-      expect(result).toEqual(membersArray[1].id);
+      const { component, expected } = await setup();
+      const result = component.trackByFn(0, expected.membersArray[1]);
+      expect(result).toEqual(expected.membersArray[1].id);
     });
 
     it('should test trackBy function returns null', async () => {
@@ -269,18 +281,14 @@ describe('MembersListComponent', () => {
     });
   });
 
-  describe('page', async () => {
-    /* setup function run by each sub test function */
-    async function setup() {
-      await mainSetup();
-      return createComponent();
-    }
+  describe('page setup', async () => {
 
     it('should show the right values on start up', async () => {
-      const { fixture, page, membersArray } = await setup();
+      const { fixture, page, expected } = await preSetup();
       /* page fields will be null before ngOnInit */
       /* await component ngOnInit only */
-      await fixture.detectChanges();
+      fixture.detectChanges();
+      await fixture.whenStable();
       /* default constructor member shown */
       expect(page.linksArray!.length).toEqual(0);
       /* get the mode attribute in the member input element */
@@ -292,24 +300,25 @@ describe('MembersListComponent', () => {
       );
       expect(text!.value).toBe('', "input box value is set to the '' ");
       /* data bind & display the async fetched data */
-      await fixture.detectChanges();
-      /* 2 anchor links per member */
-      expect(page.linksArray!.length).toEqual(membersArray.length * 2);
-      expect(page.linksArray![5].nativeElement.innerText).toEqual(
-        membersArray[2].name,
+      fixture.detectChanges();
+      await fixture.whenStable();
+      /* test a member link */
+      expect(page.linksArray!.length).toEqual(expected.membersArray.length * 2);
+      expect(page.linksArray![expected.anchorIndex].nativeElement.innerText).toEqual(
+        expected.membersArray[expected.memberIndex].name,
       );
-      expect(page.memberIdArray![2].nativeElement.innerText).toEqual(
-        membersArray[2].id.toString(),
+      expect(page.memberIdArray![expected.memberIndex].nativeElement.innerText).toEqual(
+        expected.membersArray[expected.memberIndex].id.toString(),
       );
-      expect(page.deleteBtnArray!.length).toEqual(membersArray.length);
+      expect(page.deleteBtnArray!.length).toEqual(expected.membersArray.length);
     });
 
+  });
+
+  describe('page', async () => {
+
     it('should respond to input event', async () => {
-      const { component, fixture, page } = await setup();
-      /* page fields will be null before ngOnInit */
-      /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
-      await fixture.detectChanges();
+      const { component, page } = await setup();
       /* stub on the add() method */
       const addSpy = spyOn(component, 'add').and.stub();
       /* get the input element */
@@ -327,12 +336,9 @@ describe('MembersListComponent', () => {
         component,
         page,
         deleteMemberSpy,
-        membersArray,
+        expected,
       } = await setup();
-      /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
-      await fixture.detectChanges();
-      const startMembersCount = membersArray.length;
+      const startMembersCount = expected.membersArray.length;
       /* get a member to delete */
       const n = 2;
       const button = page.deleteBtnArray![n];
@@ -354,28 +360,23 @@ describe('MembersListComponent', () => {
     });
 
     it('should navigate to "/detail" on click', async () => {
-      const { fixture, page, membersArray, spyLocation } = await setup();
-      /* initiate ngOnInit only etc */
-      await fixture.detectChanges();
-      expect(page.linksArray!.length).toEqual(0);
-      /* set up view and data binding */
-      await fixture.detectChanges();
-      /* 2 anchors per member */
-      expect(page.linksArray!.length).toEqual(membersArray.length * 2);
-      expect(page.linksArray![5].nativeElement.innerText).toEqual(
-        membersArray[2].name,
+      const { fixture, page, expected, spyLocation } = await setup();
+      /* test a member link */
+      expect(page.linksArray!.length).toEqual(expected.membersArray.length * 2);
+      expect(page.linksArray![expected.anchorIndex].nativeElement.innerText).toEqual(
+        expected.membersArray[expected.memberIndex].name,
       );
-      expect(page.memberIdArray![2].nativeElement.innerText).toEqual(
-        membersArray[2].id.toString(),
+      expect(page.memberIdArray![expected.memberIndex].nativeElement.innerText).toEqual(
+        expected.membersArray[expected.memberIndex].id.toString(),
       );
-      expect(page.deleteBtnArray!.length).toEqual(membersArray.length);
+      expect(page.deleteBtnArray!.length).toEqual(expected.membersArray.length);
       fixture.ngZone!.run(() => {
         click(page.linksArray![4]);
       });
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
       await fixture.detectChanges();
-      const id = membersArray[2].id;
+      const id = expected.membersArray[2].id;
       expect(spyLocation.path()).toEqual(
         `/detail/${id}`,
         'after clicking members link',

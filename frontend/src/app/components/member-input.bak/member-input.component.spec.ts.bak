@@ -6,7 +6,7 @@ import { AppModule } from '../../app.module';
 import { MemberInputComponent } from './member-input.component';
 import { findCssOrNot, sendInput } from '../../shared/test-helpers';
 
-describe('memberInputComponent', () => {
+fdescribe('memberInputComponent', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
     /* set up Testbed */
@@ -128,7 +128,7 @@ describe('memberInputComponent', () => {
       expect(page.hint.innerText).toBe(expected.addHint, 'hint value');
     });
 
-    it('should match mode "edit" ', async () => {
+    fit('should match mode "edit" ', async () => {
       const { component, fixture, page, expected } = await setup();
       /* set up 'edit' mode */
       component.mode = 'edit';
@@ -225,7 +225,6 @@ describe('memberInputComponent', () => {
       await fixture.detectChanges();
       /* add text to input */
       sendInput(fixture, page.input, 'added', true);
-      await fixture.detectChanges();
       await fixture.detectChanges();
       expect(page.input.value).toBe('initialadded', 'confirm input text');
       /* text added to inputText variable via ngModel binding */
