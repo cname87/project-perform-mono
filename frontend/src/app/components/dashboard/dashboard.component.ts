@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 
 import { MembersService } from '../../shared/services/members.service';
 import { IMember } from '../../api/api-members.service';
@@ -14,13 +15,18 @@ export class DashboardComponent implements OnInit {
   firstMemberOnDisplay = 1;
   lastMemberOnDisplay = 4;
 
-  constructor(private membersService: MembersService) {}
+  constructor(
+    private membersService: MembersService,
+    private logger: NGXLogger,
+  ) {}
 
   ngOnInit() {
     this.getMembers();
   }
 
   getMembers() {
+    throw new Error('Test error');
+    this.logger.trace(DashboardComponent.name + ': Calling getMembers');
     this.membersService.getMembers().subscribe((members) => {
       this.members = members.slice(
         this.firstMemberOnDisplay - 1,

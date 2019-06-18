@@ -14,6 +14,7 @@ const appRoutes: Routes = [
   config.routes.dashboard,
   config.routes.membersList,
   { path: 'detail/:id', component: MemberDetailComponent },
+  { path: 'pagenotfound', component: PageNotFoundComponent },
   { path: '**', component: PageNotFoundComponent },
 ];
 

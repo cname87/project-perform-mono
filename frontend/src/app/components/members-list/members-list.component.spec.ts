@@ -155,7 +155,7 @@ describe('MembersListComponent', () => {
   async function preSetup() {
     await mainSetup();
     const methods = await createComponent();
-    return  methods;
+    return methods;
   }
 
   /* setup function run by each it test function that runs tests after the component and view are fully established */
@@ -170,16 +170,13 @@ describe('MembersListComponent', () => {
   }
 
   describe('before ngOnInit', async () => {
-
     it('should have the default member before ngOnInit called', async () => {
       const { component } = await preSetup();
       expect(component.members).toEqual([], 'initial members array is empty');
     });
-
   });
 
   describe('after ngOnInit', async () => {
-
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component created');
@@ -253,11 +250,7 @@ describe('MembersListComponent', () => {
     });
 
     it('should call delete()', async () => {
-      const {
-        component,
-        deleteMemberSpy,
-        expected,
-      } = await setup();
+      const { component, deleteMemberSpy, expected } = await setup();
       /* call component function */
       const startMembersCount = expected.membersArray.length;
       const testMember = expected.membersArray[0];
@@ -282,7 +275,6 @@ describe('MembersListComponent', () => {
   });
 
   describe('page setup', async () => {
-
     it('should show the right values on start up', async () => {
       const { fixture, page, expected } = await preSetup();
       /* page fields will be null before ngOnInit */
@@ -304,19 +296,17 @@ describe('MembersListComponent', () => {
       await fixture.whenStable();
       /* test a member link */
       expect(page.linksArray!.length).toEqual(expected.membersArray.length * 2);
-      expect(page.linksArray![expected.anchorIndex].nativeElement.innerText).toEqual(
-        expected.membersArray[expected.memberIndex].name,
-      );
-      expect(page.memberIdArray![expected.memberIndex].nativeElement.innerText).toEqual(
-        expected.membersArray[expected.memberIndex].id.toString(),
-      );
+      expect(
+        page.linksArray![expected.anchorIndex].nativeElement.innerText,
+      ).toEqual(expected.membersArray[expected.memberIndex].name);
+      expect(
+        page.memberIdArray![expected.memberIndex].nativeElement.innerText,
+      ).toEqual(expected.membersArray[expected.memberIndex].id.toString());
       expect(page.deleteBtnArray!.length).toEqual(expected.membersArray.length);
     });
-
   });
 
   describe('page', async () => {
-
     it('should respond to input event', async () => {
       const { component, page } = await setup();
       /* stub on the add() method */
@@ -363,12 +353,12 @@ describe('MembersListComponent', () => {
       const { fixture, page, expected, spyLocation } = await setup();
       /* test a member link */
       expect(page.linksArray!.length).toEqual(expected.membersArray.length * 2);
-      expect(page.linksArray![expected.anchorIndex].nativeElement.innerText).toEqual(
-        expected.membersArray[expected.memberIndex].name,
-      );
-      expect(page.memberIdArray![expected.memberIndex].nativeElement.innerText).toEqual(
-        expected.membersArray[expected.memberIndex].id.toString(),
-      );
+      expect(
+        page.linksArray![expected.anchorIndex].nativeElement.innerText,
+      ).toEqual(expected.membersArray[expected.memberIndex].name);
+      expect(
+        page.memberIdArray![expected.memberIndex].nativeElement.innerText,
+      ).toEqual(expected.membersArray[expected.memberIndex].id.toString());
       expect(page.deleteBtnArray!.length).toEqual(expected.membersArray.length);
       fixture.ngZone!.run(() => {
         click(page.linksArray![4]);

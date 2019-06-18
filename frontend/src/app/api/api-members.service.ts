@@ -2,6 +2,7 @@
  * Project Perform API V1
  * V1.x.x cover the API for one team
  *
+ *
  * OpenAPI spec version: 1.0.0
  * Contact: cname@yahoo.com
  */
@@ -10,6 +11,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { NGXLogger } from 'ngx-logger';
 
 /* internal dependencies */
 import { membersConfiguration } from './configuration';
@@ -27,7 +29,16 @@ export class MembersApi {
   protected defaultHeaders = membersConfiguration.defaultHeaders;
   protected withCredentials = membersConfiguration.withCredentials;
 
-  constructor(protected httpClient: HttpClient) {}
+  constructor(
+    // private messageService: MessageService,
+    protected httpClient: HttpClient,
+    private logger: NGXLogger,
+  ) {}
+
+  // private log(message: string) {
+  //   this.logger.trace(MembersApi.name + ': Reporting: ' + message);
+  //   this.messageService.add(MembersApi.name + `: ${message}`);
+  // }
 
   /**
    * Adds a supplied member.
@@ -66,9 +77,12 @@ export class MembersApi {
    * All members with the name property starting with 'name' will be returned.
    */
   public getMembers(name?: string): Observable<IMember[]> {
+    this.logger.trace(MembersApi.name + ': getMembers called');
+
+    /* set up query parameter */
     let queryParameters = new HttpParams();
     if (name !== undefined && name !== null) {
-      /* custom encoder handles + properly */
+      /* custom encoder handles '+' properly */
       const encoder = new CustomHttpUrlEncodingCodec();
       name = encoder.encodeValue(name);
       queryParameters = queryParameters.set('name', name);
@@ -78,6 +92,11 @@ export class MembersApi {
 
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
+
+    this.logger.trace(
+      MembersApi.name +
+        `: Sending GET request to: ${this.basePath}/${this.membersPath}`,
+    );
 
     return this.httpClient.get<IMember[]>(
       `${this.basePath}/${this.membersPath}`,

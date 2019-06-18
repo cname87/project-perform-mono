@@ -1,0 +1,21 @@
+/* import theme with styling variables */
+@import 'src/styles/main-theme.scss';
+
+.member-card {
+  margin-left: $default-gap;
+  margin-right: $default-gap;
+  width: ($element-width - (2 * $default-gap));
+  background-color: mat-color($primary);
+}
+mat-list-item.mat-list-item {
+  height: $button-height;
+}
+
+#goBackBtn {
+  background-color: mat-color($accent);
+}
+
+/* provide a margin around the divider */
+mat-divider.mat-divider {
+  margin: $default-gap;
+}

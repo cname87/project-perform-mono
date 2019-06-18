@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 
 import { MembersService } from '../../shared/services/members.service';
 import { IMember, IMemberWithoutId } from '../../api/api-members.service';
@@ -13,7 +14,10 @@ export class MembersListComponent implements OnInit {
   /* mode for input box */
   inputMode = 'add';
 
-  constructor(private membersService: MembersService) {
+  constructor(
+    private membersService: MembersService,
+    private logger: NGXLogger,
+  ) {
     this.members = [];
   }
 
@@ -22,6 +26,7 @@ export class MembersListComponent implements OnInit {
   }
 
   getMembers() {
+    this.logger.trace(MembersListComponent.name + ': Calling getMembers');
     this.membersService.getMembers().subscribe((members) => {
       this.members = members;
     });
