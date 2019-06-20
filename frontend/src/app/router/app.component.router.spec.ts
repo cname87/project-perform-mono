@@ -14,9 +14,9 @@ import { MembersListComponent } from '../components/members-list/members-list.co
 import { MembersService } from '../shared/services/members.service';
 import { IMember } from '../api/model/models';
 import { of, Observable } from 'rxjs';
-import { PageNotFoundComponent } from '../components/page-not-found/page-not-found.component';
 import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
 import { config } from '../config';
+import { ErrorInformationComponent } from '../components/error-information/error-information.component';
 
 interface IMembersServiceStub {
   getMembers: () => Observable<IMember[]>;
@@ -222,7 +222,7 @@ describe('AppComponent & RouterTestingModule', () => {
     expectElementOf(fixture, MemberDetailComponent);
   });
 
-  it('should navigate to "Page Not Found"', async () => {
+  it('should navigate to error information page for page not found', async () => {
     const { fixture, spyLocation } = await setup();
     fixture.detectChanges();
     await fixture.whenStable();
@@ -237,6 +237,6 @@ describe('AppComponent & RouterTestingModule', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     expectPathToBe(spyLocation, '/dummyUrl', 'after clicking members link');
-    expectElementOf(fixture, PageNotFoundComponent);
+    expectElementOf(fixture, ErrorInformationComponent);
   });
 });

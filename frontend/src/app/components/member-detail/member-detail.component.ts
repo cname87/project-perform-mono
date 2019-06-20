@@ -32,25 +32,9 @@ export class MemberDetailComponent implements OnInit {
 
   getMember() {
     const id = +(this.route.snapshot.paramMap.get('id') as string);
-    this.membersService.getMember(id).subscribe(
-      (member) => {
-        if (!member) {
-          /* *** implement error handling and logging *** */
-          console.error(
-            'member-detail-component getMember error: no member received',
-          );
-          /* go back */
-          this.goBack();
-        }
-        this.member = member;
-      },
-      (err) => {
-        /* *** implement error handling and logging *** */
-        console.error('member-detail-component getMember error: ' + err);
-        /* go back */
-        this.goBack();
-      },
-    );
+    this.membersService.getMember(id).subscribe((member) => {
+      this.member = member;
+    });
   }
 
   goBack() {

@@ -33,6 +33,7 @@ export class MembersListComponent implements OnInit {
   }
 
   add(name: string) {
+    this.logger.trace(MembersListComponent.name + ': Calling addMember');
     /* ignore if the input text is empty */
     if (!name) {
       return;
@@ -47,6 +48,7 @@ export class MembersListComponent implements OnInit {
   }
 
   delete(member: IMember) {
+    this.logger.trace(MembersListComponent.name + ': Calling deleteMember');
     this.membersService.deleteMember(member.id).subscribe();
     this.members = this.members.filter((m) => m.id !== member.id);
   }

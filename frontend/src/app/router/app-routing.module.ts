@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { config } from '../config';
 import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
-import { PageNotFoundComponent } from '../components/page-not-found/page-not-found.component';
+import { ErrorInformationComponent } from '../components/error-information/error-information.component';
 
 const appRoutes: Routes = [
   {
@@ -14,8 +14,8 @@ const appRoutes: Routes = [
   config.routes.dashboard,
   config.routes.membersList,
   { path: 'detail/:id', component: MemberDetailComponent },
-  { path: 'pagenotfound', component: PageNotFoundComponent },
-  { path: '**', component: PageNotFoundComponent },
+  { path: 'pagenotfound/:mode', component: ErrorInformationComponent },
+  { path: '**', component: ErrorInformationComponent },
 ];
 
 @NgModule({

@@ -3,22 +3,26 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import { MessagesComponent } from '../messages/messages.component';
 import { RouterLinkDirectiveStub, click } from '../../shared/test-helpers';
 import { MaterialModule } from '../../modules/material/material.module';
+import { AppModule } from '../../app.module';
+import { APP_BASE_HREF } from '@angular/common';
 
 describe('AppComponent', () => {
   /* setup function run by each 'it' test suite */
   async function mainSetup() {
     await TestBed.configureTestingModule({
-      declarations: [AppComponent, MessagesComponent, RouterLinkDirectiveStub],
+      declarations: [],
       imports: [
+        AppModule,
         RouterTestingModule.withRoutes([
           { path: 'memberslist', component: AppComponent }, // dummy path needed to avoid routing error warning
         ]),
         MaterialModule,
       ],
-      providers: [],
+      providers: [
+        { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
+      ],
     }).compileComponents();
   }
 

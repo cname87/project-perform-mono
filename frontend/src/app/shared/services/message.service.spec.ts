@@ -1,13 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 
 import { MessageService } from './message.service';
+import { AppModule } from '../../app.module';
+import { APP_BASE_HREF } from '@angular/common';
 
 describe('MessageService', () => {
   async function mainSetup() {
     await TestBed.configureTestingModule({
-      imports: [],
+      imports: [AppModule],
       declarations: [],
-      providers: [MessageService],
+      providers: [
+        { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
+        MessageService,
+      ],
     }).compileComponents();
   }
 

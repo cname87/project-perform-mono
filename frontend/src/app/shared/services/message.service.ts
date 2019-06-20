@@ -6,7 +6,7 @@ export class MessageService {
   messages: string[] = [];
 
   constructor(private logger: NGXLogger) {
-    console.log('starting message service');
+    this.logger.trace(MessageService.name + ': Starting message service');
   }
 
   add(message: string) {

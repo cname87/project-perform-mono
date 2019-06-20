@@ -25,7 +25,6 @@ export class DashboardComponent implements OnInit {
   }
 
   getMembers() {
-    throw new Error('Test error');
     this.logger.trace(DashboardComponent.name + ': Calling getMembers');
     this.membersService.getMembers().subscribe((members) => {
       this.members = members.slice(

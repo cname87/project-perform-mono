@@ -12,6 +12,8 @@ import {
 import { asyncData, asyncError } from '../test-helpers';
 import { members } from '../mocks/mock-members';
 import { ICount } from '../../api/model/count';
+import { AppModule } from '../../app.module';
+import { APP_BASE_HREF } from '@angular/common';
 
 interface IMembersApiStub {
   getMembers: jasmine.Spy;
@@ -38,14 +40,14 @@ describe('MembersService', () => {
           if (str === null || str === 'errorTest404') {
             return asyncError(new HttpErrorResponse({ status: 404 }));
           }
-          if (str === 'errorTest') {
+          if (str === 'errorTest500') {
             return asyncError(new HttpErrorResponse({ status: 500 }));
           }
           return asyncData(mockMembers);
         },
       ),
       getMember: jasmine.createSpy('getMember').and.callFake(
-        (id: number): Observable<IMember> => {
+        (id: number): Observable<any> => {
           if (id === 0) {
             return asyncError(new HttpErrorResponse({ status: 404 }));
           }
@@ -58,7 +60,7 @@ describe('MembersService', () => {
       addMember: jasmine
         .createSpy('addMember')
         .and.callFake((member: IMemberWithoutId) => {
-          if (member.name === 'errorTest') {
+          if (member.name === 'errorTest500') {
             return asyncError(new HttpErrorResponse({ status: 500 }));
           }
           return asyncData({ id: 21, name: member.name });
@@ -103,10 +105,12 @@ describe('MembersService', () => {
     const consoleErrorSpy = spyOn(console, 'error');
 
     await TestBed.configureTestingModule({
-      imports: [],
+      imports: [
+        AppModule, // import AppModule to pull in all dependencies in one go.
+      ],
       declarations: [],
       providers: [
-        MembersService,
+        { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: MessageService, useValue: messageServiceStub },
         { provide: MembersApi, useValue: membersApiStub },
       ],
@@ -136,26 +140,24 @@ describe('MembersService', () => {
   });
   describe('getMembers', describeGetMembers);
   describe('getMember', describeGetMember);
-  describe('getMember', describeAddMember);
-  describe('getMember', describeDeleteMember);
-  describe('getMember', describeUpdateMember);
+  describe('addMember', describeAddMember);
+  describe('deleteMember', describeDeleteMember);
+  describe('updateMember', describeUpdateMember);
 
-  function describeGetMembers() {
+  async function describeGetMembers() {
     it('should have getMembers(" ") return []', async () => {
       const {
         membersService,
         membersApi,
         messageService,
-        consoleErrorSpy,
       } = await setup();
       const result = await membersService.getMembers(' ').toPromise();
       expect(membersApi.getMembers.calls.count()).toEqual(
         0,
-        'getMembers() not called',
+        'api getMembers() not called',
       );
       expect(messageService.add.calls.count()).toEqual(0, 'no message logged');
       expect(result.length).toEqual(0, 'no members returned');
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
 
     it('should have getMembers() return an array of members', async () => {
@@ -163,11 +165,11 @@ describe('MembersService', () => {
       const result = await membersService.getMembers().toPromise();
       expect(membersApi.getMembers.calls.count()).toEqual(
         1,
-        'getMembers() called once',
+        'api getMembers() called once',
       );
       expect(membersApi.getMembers.calls.argsFor(0)[0]).toEqual(
         undefined,
-        'getMembers() called with undefined',
+        'api getMembers() called with undefined',
       );
       expect(messageService.add.calls.count()).toEqual(1, 'message logged');
       expect(messageService.add.calls.argsFor(0)[0]).toEqual(
@@ -183,11 +185,11 @@ describe('MembersService', () => {
       const result = await membersService.getMembers('test').toPromise();
       expect(membersApi.getMembers.calls.count()).toEqual(
         1,
-        'getMembers() called once',
+        'api getMembers() called once',
       );
       expect(membersApi.getMembers.calls.argsFor(0)[0]).toEqual(
         'test',
-        'getMembers() called with "test"',
+        'api getMembers() called with "test"',
       );
       expect(messageService.add.calls.count()).toEqual(1, 'message logged');
       expect(messageService.add.calls.argsFor(0)[0]).toEqual(
@@ -199,18 +201,14 @@ describe('MembersService', () => {
     });
 
     it('should have getMembers("errorTest404") fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
+      const { membersService, membersApi, messageService } = await setup();
+      /* will return 404 as if no members matching a search term */
       const result = await membersService
         .getMembers('errorTest404')
         .toPromise();
       expect(membersApi.getMembers.calls.count()).toEqual(
         1,
-        'getMembers() called once',
+        'api getMembers() called once',
       );
       expect(messageService.add.calls.count()).toEqual(1, 'message logged');
       expect(messageService.add.calls.count()).toEqual(
@@ -222,20 +220,15 @@ describe('MembersService', () => {
         'error message logged',
       );
       expect(result.length).toEqual(0, 'empty array returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
     });
 
     it('should have getMembers(null) fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
+      const { membersService, membersApi, messageService } = await setup();
+      /* will return 404 as if members collection is empty */
       const result = await membersService.getMembers(null as any).toPromise();
       expect(membersApi.getMembers.calls.count()).toEqual(
         1,
-        'getMembers() called once',
+        'api getMembers() called once',
       );
       expect(messageService.add.calls.count()).toEqual(1, 'message logged');
       expect(messageService.add.calls.count()).toEqual(
@@ -247,42 +240,48 @@ describe('MembersService', () => {
         'error message logged',
       );
       expect(result.length).toEqual(0, 'empty array returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
     });
 
-    it('should have getMembers("errorTest") fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
+    it('should have getMembers("errorTest500") fail', async () => {
+      const { membersService, membersApi, messageService } = await setup();
 
-      const result = await membersService.getMembers('errorTest').toPromise();
-      expect(membersApi.getMembers.calls.count()).toEqual(
-        1,
-        'getMembers() called once',
-      );
-      expect(messageService.add.calls.count()).toEqual(1, 'message logged');
-      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: getMembers unexpected failure',
-        'error message logged',
-      );
-      expect(result.length).toEqual(0, 'empty array returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      /* server will return 500 error */
+      membersService.getMembers('errorTest500').subscribe(
+        () => {
+          fail('Successfull response not expected');
+        },
+        (error: any) => {
+        /* 500 error is thrown by getMembers() */
+        expect(error.message).toBe(
+          'Http failure response for (unknown url): 500 undefined',
+        );
+        /* test err.isUserInformed is set */
+        expect(error.isUserInformed).toBe(true, 'User has been informed');
+        /* test getMembers() has been called */
+        expect(membersApi.getMembers.calls.count()).toEqual(
+          1,
+          'api getMembers() called once',
+        );
+        /* test user message */
+        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+          'MembersService: ERROR: Failed to get members from server',
+          'error message logged',
+        );
+      });
     });
   }
-  function describeGetMember() {
+  async function describeGetMember() {
     it('should have getMember(id) return a member', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService.getMember(1).toPromise();
       expect(membersApi.getMember.calls.count()).toEqual(
         1,
-        'getMember() called once',
+        'api getMember() called once',
       );
       expect(membersApi.getMember.calls.argsFor(0)[0]).toEqual(
         1,
-        'getMember() called with 1',
+        'api getMember() called with 1',
       );
       expect(messageService.add.calls.count()).toEqual(
         1,
@@ -295,55 +294,63 @@ describe('MembersService', () => {
       expect(result).toEqual(members[0], 'member returned');
     });
 
-    it('should have getMember(0) fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
-      const result = await membersService.getMember(0).toPromise();
-      expect(membersApi.getMember.calls.count()).toEqual(
-        1,
-        'getMember() called once',
-      );
-      expect(messageService.add.calls.count()).toEqual(
-        1,
-        'message log only called once',
-      );
-      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: Did not find member with id = 0',
-        'error message logged',
-      );
-      expect(result).toEqual({ id: 0, name: '' }, 'dummy member returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
+    it('should have getMember(0) / 404 fail', async () => {
+      const { membersService, membersApi, messageService } = await setup();
+
+      /* server will return 404 error */
+      membersService.getMember(0).subscribe(
+        () => {
+          fail('Successfull response not expected');
+        },
+        (error: any) => {
+        /* 404 error is thrown by getMembers() */
+        expect(error.message).toBe(
+          'Http failure response for (unknown url): 404 undefined',
+        );
+        /* test err.isUserInformed is set */
+        expect(error.isUserInformed).toBe(true, 'User has been informed');
+        /* test getMember() has been called */
+        expect(membersApi.getMember.calls.count()).toEqual(
+          1,
+          'api getMember() called once',
+        );
+        /* test user message */
+        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+          'MembersService: ERROR: Did not find member with id = 0',
+          'error message logged',
+        );
+      });
     });
 
     it('should have getMember(-1) fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
-      const result = await membersService.getMember(-1).toPromise();
+      const { membersService, membersApi, messageService } = await setup();
+      const result = await membersService
+        .getMember(-1)
+        .toPromise()
+        .catch((error) => {
+          /* error is thrown by getMember() */
+          expect(error.message).toBe(
+            'Http failure response for (unknown url): 500 undefined',
+          );
+          expect(error.isUserInformed).toBe(true, 'User has been informed');
+        });
       expect(membersApi.getMember.calls.count()).toEqual(
         1,
-        'getMember() called once',
+        'api getMember() called once (albeit with an error)',
       );
       expect(messageService.add.calls.count()).toEqual(
         1,
         'message log only called once',
       );
       expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: getMember unexpected failure',
+        'MembersService: ERROR: Failed to get member from server',
         'error message logged',
       );
-      expect(result).toEqual({ id: 0, name: '' }, 'dummy member returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      expect(result).toBe(undefined, 'no member returned');
     });
   }
-  function describeAddMember() {
+  async function describeAddMember() {
     it('should have addMember(memberWithoutId) return a member', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService
@@ -365,44 +372,47 @@ describe('MembersService', () => {
       expect(result).toEqual({ id: 21, name: 'testName' }, 'member returned');
     });
 
-    it('should have addMember({ "errorTest" }) fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
-      const result = await membersService
-        .addMember({ name: 'errorTest' })
-        .toPromise();
-      expect(membersApi.addMember.calls.count()).toEqual(
-        1,
-        'addMember() called once',
+    it('should have addMember({ "errorTest500" }) fail', async () => {
+      const { membersService, membersApi, messageService } = await setup();
+
+      await membersService.addMember({ name: 'errorTest500' }).subscribe(
+        () => {
+          fail('Successfull response not expected');
+        },
+        /* server will return 500 error */
+        (error: any) => {
+          /* 500 error is thrown by getMembers() */
+          expect(error.message).toBe(
+            'Http failure response for (unknown url): 500 undefined',
+          );
+          /* test err.isUserInformed is set */
+          expect(error.isUserInformed).toBe(true, 'User has been informed');
+          /* test getMembers() has been called */
+          expect(membersApi.addMember.calls.count()).toEqual(
+            1,
+            'api addMember() called once',
+          );
+          /* test user message */
+          expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+          expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+            'MembersService: ERROR: Failed to add member to server',
+            'error message logged',
+          );
+        },
       );
-      expect(messageService.add.calls.count()).toEqual(1, 'message logged');
-      expect(messageService.add.calls.count()).toEqual(
-        1,
-        'message log only called once',
-      );
-      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: addMember unexpected failure',
-        'error message logged',
-      );
-      expect(result).toEqual({ id: 0, name: '' }, 'dummy member returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
     });
   }
-  function describeDeleteMember() {
+  async function describeDeleteMember() {
     it('should have deleteMember(id) return count', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService.deleteMember(1).toPromise();
       expect(membersApi.deleteMember.calls.count()).toEqual(
         1,
-        'deleteMember() called once',
+        'api deleteMember() called once',
       );
       expect(membersApi.deleteMember.calls.argsFor(0)[0]).toEqual(
         1,
-        'deleteMember() called with 1',
+        'api deleteMember() called with 1',
       );
       expect(messageService.add.calls.count()).toEqual(
         1,
@@ -422,11 +432,11 @@ describe('MembersService', () => {
         .toPromise();
       expect(membersApi.deleteMember.calls.count()).toEqual(
         1,
-        'deleteMember() called once',
+        'api deleteMember() called once',
       );
       expect(membersApi.deleteMember.calls.argsFor(0)[0]).toEqual(
         1,
-        'deleteMember() called with 1',
+        'api deleteMember() called with 1',
       );
       expect(messageService.add.calls.count()).toEqual(
         1,
@@ -440,54 +450,62 @@ describe('MembersService', () => {
     });
 
     it('should have deleteMember(0) fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
-      const result = await membersService.deleteMember(0).toPromise();
-      expect(membersApi.deleteMember.calls.count()).toEqual(
-        1,
-        'deleteMember() called once',
-      );
-      expect(messageService.add.calls.count()).toEqual(
-        1,
-        'message log only called once',
-      );
-      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: Did not find member with id = 0',
-        'error message logged',
-      );
-      expect(result).toEqual({ count: 0 }, 'count of 0 returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      const { membersService, membersApi, messageService } = await setup();
+
+      /* server will return 404 error */
+      await membersService.deleteMember(0).subscribe(
+        () => {
+          fail('Successfull response not expected');
+        },
+        (error: any) => {
+        expect(error.message).toBe(
+          'Http failure response for (unknown url): 404 undefined',
+        );
+        /* test err.isUserInformed is set */
+        expect(error.isUserInformed).toBe(true, 'User has been informed');
+        /* test api has been called */
+        expect(membersApi.deleteMember.calls.count()).toEqual(
+          1,
+          'api deleteMember() called once',
+        );
+        /* test user message */
+        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+          'MembersService: ERROR: Did not find member with id = 0',
+          'error message logged',
+        );
+      });
     });
 
     it('should have deleteMember(-1) fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
-      const result = await membersService.deleteMember(-1).toPromise();
-      expect(membersApi.deleteMember.calls.count()).toEqual(
-        1,
-        'deleteMember() called once',
-      );
-      expect(messageService.add.calls.count()).toEqual(
-        1,
-        'message log only called once',
-      );
-      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: deleteMember unexpected failure',
-        'error message logged',
-      );
-      expect(result).toEqual({ count: 0 }, 'count of 0 returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      const { membersService, membersApi, messageService } = await setup();
+
+      /* server will return 500 error */
+      await membersService.deleteMember(-1).subscribe(
+        () => {
+          fail('Successfull response not expected');
+        },
+        (error: any) => {
+        expect(error.message).toBe(
+          'Http failure response for (unknown url): 500 undefined',
+        );
+        /* test err.isUserInformed is set */
+        expect(error.isUserInformed).toBe(true, 'User has been informed');
+        /* test api has been called */
+        expect(membersApi.deleteMember.calls.count()).toEqual(
+          1,
+          'api deleteMember() called once',
+        );
+        /* test user message */
+        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+          'MembersService: ERROR: Failed to delete member from server',
+          'error message logged',
+        );
+      });
     });
   }
-  function describeUpdateMember() {
+  async function describeUpdateMember() {
     it('should have updateMember(member) return a member', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService.updateMember(members[0]).toPromise();
@@ -508,55 +526,59 @@ describe('MembersService', () => {
     });
 
     it('should have updateMember(0) fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
-      const result = await membersService
-        .updateMember({ id: 0, name: 'testName' })
-        .toPromise();
-      expect(membersApi.updateMember.calls.count()).toEqual(
-        1,
-        'updateMember() called once',
-      );
-      expect(messageService.add.calls.count()).toEqual(
-        1,
-        'message log only called once',
-      );
-      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: Did not find member with id = 0',
-        'error message logged',
-      );
-      expect(result).toEqual({ id: 0, name: '' }, 'dummy member returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      const { membersService, membersApi, messageService } = await setup();
+
+      /* server will return 404 error */
+      await membersService.updateMember({id: 0, name: 'test'}).subscribe(
+        () => {
+          fail('Successfull response not expected');
+        },
+        (error: any) => {
+          expect(error.message).toBe(
+            'Http failure response for (unknown url): 404 undefined',
+          );
+          /* test err.isUserInformed is set */
+          expect(error.isUserInformed).toBe(true, 'User has been informed');
+          /* test api has been called */
+          expect(membersApi.updateMember.calls.count()).toEqual(
+            1,
+            'api updateMember() called once',
+          );
+          /* test user message */
+          expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+          expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+            'MembersService: ERROR: Did not find member with id = 0',
+            'error message logged',
+          );
+      });
     });
 
     it('should have updateMember(-1) fail', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-        consoleErrorSpy,
-      } = await setup();
-      const result = await membersService
-        .updateMember({ id: -1, name: 'testName' })
-        .toPromise();
-      expect(membersApi.updateMember.calls.count()).toEqual(
-        1,
-        'updateMember() called once',
-      );
-      expect(messageService.add.calls.count()).toEqual(
-        1,
-        'message log only called once',
-      );
-      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: updateMember unexpected failure',
-        'error message logged',
-      );
-      expect(result).toEqual({ id: 0, name: '' }, 'dummy member returned');
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      const { membersService, membersApi, messageService } = await setup();
+
+      /* server will return 500 error */
+      await membersService.updateMember({id: -1, name: 'test'}).subscribe(
+        () => {
+          fail('Successfull response not expected');
+        },
+        (error: any) => {
+        expect(error.message).toBe(
+          'Http failure response for (unknown url): 500 undefined',
+        );
+        /* test err.isUserInformed is set */
+        expect(error.isUserInformed).toBe(true, 'User has been informed');
+        /* test api has been called */
+        expect(membersApi.updateMember.calls.count()).toEqual(
+          1,
+          'api updateMember() called once',
+        );
+        /* test user message */
+        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+          'MembersService: ERROR: Failed to update member on server',
+          'error message logged',
+        );
+      });
     });
   }
 });

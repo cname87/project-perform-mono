@@ -6,6 +6,9 @@ import { MembersApi, IMemberWithoutId, IMember } from './api-members.service';
 import { asyncData } from '../shared/test-helpers';
 import { membersConfiguration } from './configuration';
 import { ICount } from './model/count';
+import { AppModule } from '../app.module';
+import { RouterTestingModule } from '@angular/router/testing';
+import { APP_BASE_HREF } from '@angular/common';
 
 interface IHttpClientStub {
   post: jasmine.Spy;
@@ -49,10 +52,10 @@ describe('MembersApi', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [],
+      imports: [AppModule, RouterTestingModule],
       declarations: [],
       providers: [
-        MembersApi,
+        { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: HttpClient, useValue: httpClientStub },
       ],
     }).compileComponents();

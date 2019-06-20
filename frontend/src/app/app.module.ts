@@ -19,11 +19,11 @@ import { MembersListComponent } from './components/members-list/members-list.com
 import { MemberSearchComponent } from './components/member-search/member-search.component';
 import { MemberDetailComponent } from './components/member-detail/member-detail.component';
 import { MessagesComponent } from './components/messages/messages.component';
-import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { MemberCardComponent } from './components/member-card/member-card.component';
 import { RouterLinkDirectiveStub } from './shared/test-helpers/router-link-directive-stub';
 import { MaterialModule } from './modules/material/material.module';
 import { MemberInputComponent } from './components/member-input/member-input.component';
+import { ErrorInformationComponent } from './components/error-information/error-information.component';
 import {
   CustomErrorHandler,
   RollbarService,
@@ -60,9 +60,9 @@ import { HttpErrorInterceptor } from './shared/error-handler/http-error-intercep
     MemberSearchComponent,
     MemberDetailComponent,
     MessagesComponent,
-    PageNotFoundComponent,
     MemberCardComponent,
     MemberInputComponent,
+    ErrorInformationComponent,
     /* imported to avoid ng build --prod error */
     RouterLinkDirectiveStub,
   ],

@@ -10,14 +10,7 @@ import { Observable, throwError } from 'rxjs';
 import { retry, catchError, tap } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
-interface IErrReport {
-  error: HttpErrorResponse; // the passed-in error
-  type: 'Http client-side' | 'Http server-side' | 'TBC';
-  message: string;
-  status?: number; // the status code of a server-side response e.g. 404
-  body?: object; // the body of a server-side error response
-  IsUserInformed?: boolean; // set true if user is informed
-}
+import { IErrReport } from '../../config';
 
 /**
  * See error-handler.ts for the error handling strategy:

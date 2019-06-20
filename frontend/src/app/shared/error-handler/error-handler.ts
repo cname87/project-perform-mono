@@ -121,12 +121,12 @@ export class CustomErrorHandler implements ErrorHandler {
     this.rollbar.error(error);
 
     /* inform user, if not already done  */
-    if (!error.IsUserInformed) {
+    if (!error.isUserInformed) {
       this.logger.trace(CustomErrorHandler.name + ': Informing user');
       /* using zone and injector.get above resolved some issues getting services */
       this.zone.run(() => {
         this.log('ERROR: An unknown error occurred');
-        this.router.navigateByUrl('/pagenotfound');
+        this.router.navigateByUrl('/pagenotfound/error');
         this.toastr.error('ERROR!', 'An unknown error has occurred');
       });
     }
