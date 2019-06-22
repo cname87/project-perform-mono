@@ -14,7 +14,7 @@ const appRoutes: Routes = [
   config.routes.dashboard,
   config.routes.membersList,
   { path: 'detail/:id', component: MemberDetailComponent },
-  { path: 'pagenotfound/:mode', component: ErrorInformationComponent },
+  { path: 'errorinformation/:mode', component: ErrorInformationComponent },
   { path: '**', component: ErrorInformationComponent },
 ];
 

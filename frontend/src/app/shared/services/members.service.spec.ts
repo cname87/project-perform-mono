@@ -146,11 +146,7 @@ describe('MembersService', () => {
 
   async function describeGetMembers() {
     it('should have getMembers(" ") return []', async () => {
-      const {
-        membersService,
-        membersApi,
-        messageService,
-      } = await setup();
+      const { membersService, membersApi, messageService } = await setup();
       const result = await membersService.getMembers(' ').toPromise();
       expect(membersApi.getMembers.calls.count()).toEqual(
         0,
@@ -251,24 +247,25 @@ describe('MembersService', () => {
           fail('Successfull response not expected');
         },
         (error: any) => {
-        /* 500 error is thrown by getMembers() */
-        expect(error.message).toBe(
-          'Http failure response for (unknown url): 500 undefined',
-        );
-        /* test err.isUserInformed is set */
-        expect(error.isUserInformed).toBe(true, 'User has been informed');
-        /* test getMembers() has been called */
-        expect(membersApi.getMembers.calls.count()).toEqual(
-          1,
-          'api getMembers() called once',
-        );
-        /* test user message */
-        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
-        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-          'MembersService: ERROR: Failed to get members from server',
-          'error message logged',
-        );
-      });
+          /* 500 error is thrown by getMembers() */
+          expect(error.message).toBe(
+            'Http failure response for (unknown url): 500 undefined',
+          );
+          /* test err.isUserInformed is set */
+          expect(error.isUserInformed).toBe(true, 'User has been informed');
+          /* test getMembers() has been called */
+          expect(membersApi.getMembers.calls.count()).toEqual(
+            1,
+            'api getMembers() called once',
+          );
+          /* test user message */
+          expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+          expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+            'MembersService: ERROR: Failed to get members from server',
+            'error message logged',
+          );
+        },
+      );
     });
   }
   async function describeGetMember() {
@@ -303,24 +300,25 @@ describe('MembersService', () => {
           fail('Successfull response not expected');
         },
         (error: any) => {
-        /* 404 error is thrown by getMembers() */
-        expect(error.message).toBe(
-          'Http failure response for (unknown url): 404 undefined',
-        );
-        /* test err.isUserInformed is set */
-        expect(error.isUserInformed).toBe(true, 'User has been informed');
-        /* test getMember() has been called */
-        expect(membersApi.getMember.calls.count()).toEqual(
-          1,
-          'api getMember() called once',
-        );
-        /* test user message */
-        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
-        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-          'MembersService: ERROR: Did not find member with id = 0',
-          'error message logged',
-        );
-      });
+          /* 404 error is thrown by getMembers() */
+          expect(error.message).toBe(
+            'Http failure response for (unknown url): 404 undefined',
+          );
+          /* test err.isUserInformed is set */
+          expect(error.isUserInformed).toBe(true, 'User has been informed');
+          /* test getMember() has been called */
+          expect(membersApi.getMember.calls.count()).toEqual(
+            1,
+            'api getMember() called once',
+          );
+          /* test user message */
+          expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+          expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+            'MembersService: ERROR: Did not find member with id = 0',
+            'error message logged',
+          );
+        },
+      );
     });
 
     it('should have getMember(-1) fail', async () => {
@@ -458,23 +456,24 @@ describe('MembersService', () => {
           fail('Successfull response not expected');
         },
         (error: any) => {
-        expect(error.message).toBe(
-          'Http failure response for (unknown url): 404 undefined',
-        );
-        /* test err.isUserInformed is set */
-        expect(error.isUserInformed).toBe(true, 'User has been informed');
-        /* test api has been called */
-        expect(membersApi.deleteMember.calls.count()).toEqual(
-          1,
-          'api deleteMember() called once',
-        );
-        /* test user message */
-        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
-        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-          'MembersService: ERROR: Did not find member with id = 0',
-          'error message logged',
-        );
-      });
+          expect(error.message).toBe(
+            'Http failure response for (unknown url): 404 undefined',
+          );
+          /* test err.isUserInformed is set */
+          expect(error.isUserInformed).toBe(true, 'User has been informed');
+          /* test api has been called */
+          expect(membersApi.deleteMember.calls.count()).toEqual(
+            1,
+            'api deleteMember() called once',
+          );
+          /* test user message */
+          expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+          expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+            'MembersService: ERROR: Did not find member with id = 0',
+            'error message logged',
+          );
+        },
+      );
     });
 
     it('should have deleteMember(-1) fail', async () => {
@@ -486,23 +485,24 @@ describe('MembersService', () => {
           fail('Successfull response not expected');
         },
         (error: any) => {
-        expect(error.message).toBe(
-          'Http failure response for (unknown url): 500 undefined',
-        );
-        /* test err.isUserInformed is set */
-        expect(error.isUserInformed).toBe(true, 'User has been informed');
-        /* test api has been called */
-        expect(membersApi.deleteMember.calls.count()).toEqual(
-          1,
-          'api deleteMember() called once',
-        );
-        /* test user message */
-        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
-        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-          'MembersService: ERROR: Failed to delete member from server',
-          'error message logged',
-        );
-      });
+          expect(error.message).toBe(
+            'Http failure response for (unknown url): 500 undefined',
+          );
+          /* test err.isUserInformed is set */
+          expect(error.isUserInformed).toBe(true, 'User has been informed');
+          /* test api has been called */
+          expect(membersApi.deleteMember.calls.count()).toEqual(
+            1,
+            'api deleteMember() called once',
+          );
+          /* test user message */
+          expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+          expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+            'MembersService: ERROR: Failed to delete member from server',
+            'error message logged',
+          );
+        },
+      );
     });
   }
   async function describeUpdateMember() {
@@ -529,7 +529,7 @@ describe('MembersService', () => {
       const { membersService, membersApi, messageService } = await setup();
 
       /* server will return 404 error */
-      await membersService.updateMember({id: 0, name: 'test'}).subscribe(
+      await membersService.updateMember({ id: 0, name: 'test' }).subscribe(
         () => {
           fail('Successfull response not expected');
         },
@@ -550,35 +550,37 @@ describe('MembersService', () => {
             'MembersService: ERROR: Did not find member with id = 0',
             'error message logged',
           );
-      });
+        },
+      );
     });
 
     it('should have updateMember(-1) fail', async () => {
       const { membersService, membersApi, messageService } = await setup();
 
       /* server will return 500 error */
-      await membersService.updateMember({id: -1, name: 'test'}).subscribe(
+      await membersService.updateMember({ id: -1, name: 'test' }).subscribe(
         () => {
           fail('Successfull response not expected');
         },
         (error: any) => {
-        expect(error.message).toBe(
-          'Http failure response for (unknown url): 500 undefined',
-        );
-        /* test err.isUserInformed is set */
-        expect(error.isUserInformed).toBe(true, 'User has been informed');
-        /* test api has been called */
-        expect(membersApi.updateMember.calls.count()).toEqual(
-          1,
-          'api updateMember() called once',
-        );
-        /* test user message */
-        expect(messageService.add.calls.count()).toEqual(1, 'message logged');
-        expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-          'MembersService: ERROR: Failed to update member on server',
-          'error message logged',
-        );
-      });
+          expect(error.message).toBe(
+            'Http failure response for (unknown url): 500 undefined',
+          );
+          /* test err.isUserInformed is set */
+          expect(error.isUserInformed).toBe(true, 'User has been informed');
+          /* test api has been called */
+          expect(membersApi.updateMember.calls.count()).toEqual(
+            1,
+            'api updateMember() called once',
+          );
+          /* test user message */
+          expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+          expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+            'MembersService: ERROR: Failed to update member on server',
+            'error message logged',
+          );
+        },
+      );
     });
   }
 });

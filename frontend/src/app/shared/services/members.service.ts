@@ -9,6 +9,9 @@ import { ICount, IMember, IMemberWithoutId } from '../../api/model/models';
 import { MessageService } from './message.service';
 import { IErrReport } from '../../config';
 
+/**
+ * This service provides functions to call all the api functions providing appropriate responses, messaging and errorhandling.
+ */
 @Injectable({ providedIn: 'root' })
 export class MembersService {
   constructor(
@@ -193,7 +196,7 @@ export class MembersService {
    * - Throws an observable with an error if any response other than a successful response is received from the server.
    */
   updateMember(member: IMember): Observable<IMember> {
-    this.logger.trace(MembersService.name + ': deleteMember called');
+    this.logger.trace(MembersService.name + ': updateMember called');
 
     return this.membersApi.updateMember(member).pipe(
       tap((_) => {
@@ -224,7 +227,7 @@ export class MembersService {
   /**
    * Displays a message on the web page message log.
    */
-  private log(message: string) {
+  private log(message: string): void {
     this.logger.trace(MembersService.name + ': Reporting: ' + message);
     this.messageService.add(`MembersService: ${message}`);
   }

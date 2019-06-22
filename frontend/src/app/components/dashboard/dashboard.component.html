@@ -11,7 +11,7 @@
 
   <!-- produces a linked box for each displayed member -->
   <a
-    *ngFor="let member of members; trackBy: trackByFn"
+    *ngFor="let member of ( members$ | async ); trackBy: trackByFn"
     routerLink="/detail/{{member.id}}"
 
     fxFlex="0 1 calc(25%)"

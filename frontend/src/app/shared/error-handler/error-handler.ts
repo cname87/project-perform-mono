@@ -6,7 +6,6 @@ import {
   NgZone,
 } from '@angular/core';
 import { Router } from '@angular/router';
-
 import Rollbar from 'rollbar';
 import { NGXLogger } from 'ngx-logger';
 import { ToastrService } from 'ngx-toastr';
@@ -26,22 +25,25 @@ export function rollbarFactory() {
 }
 
 /**
- * Error handling strategy:
- * Unexpected non-http errors will be handled here.
+ * This service provides a common error handling function.
+ *
+ * Error handling strategy
+ * -----------------------
+ *
+ * Unexpected non-http errors are passed directly to here.
  * Expected non-http errors may be handled elsewhere with a customised error report rethrown to be handled here.
  * Http errors are first handled by http-error-interceptor which retries and carries out other common handling routines e.g. authorization token refresh.
- * The http error is then passed back to the service method that handles the request from all requesters, e.g. the member-service methods such as getMembers.  The service method has four functions:
+ * The http error is then passed back to the service method that handles the api request from all requesters, e.g. the member-service methods such as getMembers.  This service method has four functions:
  * - handle errors specific to that request e.g. a 404 may require special handling.
  * - inform the user as appropriate.
  * - reply to the function that raised the request e.g. 'null' or whatever is appropriate.
  * - pass the error on if appropriate.
- * The http requester has no error handling function i.e. if it receives an error it passes it on to this handler.
+ * The original requesting function has no error handling function i.e. if it receives an error back from members.service it just passes it on to this handler.
  * This handler:
  * - logs the error with the logger service.
  * - logs the error with Rollbar.
  * - informs the user as appropriate.
  */
-
 @Injectable()
 export class CustomErrorHandler implements ErrorHandler {
   /* count variables */
@@ -50,6 +52,7 @@ export class CustomErrorHandler implements ErrorHandler {
 
   constructor(private injectors: Injector) {}
 
+  /* using gets (and zone below) resolved some issues getting services */
   get zone(): NgZone {
     return this.injectors.get<NgZone>(NgZone);
   }
@@ -77,7 +80,7 @@ export class CustomErrorHandler implements ErrorHandler {
   /**
    * Displays a message on the web page message log.
    */
-  private log(message: string) {
+  private log(message: string): void {
     this.logger.trace(CustomErrorHandler.name + ': Reporting: ' + message);
     this.messageService.add(CustomErrorHandler.name + `: ${message}`);
   }
@@ -87,14 +90,13 @@ export class CustomErrorHandler implements ErrorHandler {
   handleError(error: any): void {
     this.logger.trace(CustomErrorHandler.name + ': handleError called');
 
-    /* Note: For the error it handles, Angular sends a wrapper of the original error as a parameter. You can find the original error in the error.originalError property */
-
+    /* the object to be logged */
     let err;
 
     /* error.type is set if the error was caught in http-error-intercept */
     if (error.type) {
       this.logger.trace(CustomErrorHandler.name + ': Http error reported');
-      /* create err for logging from the http-interceptor error report */
+      /* create err for logging from the http-interceptor error report which will have a defined IErrReport type */
       err = {
         type: error.type,
         message: error.message,
@@ -105,6 +107,7 @@ export class CustomErrorHandler implements ErrorHandler {
       error = error.error;
     } else {
       this.logger.trace(CustomErrorHandler.name + ': Non-http error reported');
+      /* create err for logging from the error */
       err = {
         type: 'Non-http error',
         message: error.message ? error.message : error.toString(),
@@ -123,10 +126,10 @@ export class CustomErrorHandler implements ErrorHandler {
     /* inform user, if not already done  */
     if (!error.isUserInformed) {
       this.logger.trace(CustomErrorHandler.name + ': Informing user');
-      /* using zone and injector.get above resolved some issues getting services */
+      /* using zone (and gets above) resolved some issues getting services */
       this.zone.run(() => {
         this.log('ERROR: An unknown error occurred');
-        this.router.navigateByUrl('/pagenotfound/error');
+        this.router.navigateByUrl('/errorinformation/error');
         this.toastr.error('ERROR!', 'An unknown error has occurred');
       });
     }

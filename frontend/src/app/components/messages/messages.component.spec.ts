@@ -127,15 +127,16 @@ describe('messagesComponent', () => {
       await fixture.detectChanges();
       await fixture.detectChanges();
       /* test */
-      expect(component.messageService).toEqual(
-        fixture.debugElement.injector.get(MessageService),
+      expect(component['messageService']).toEqual(
+        fixture.debugElement.injector.get<MessageService>(MessageService),
       );
     });
 
     it('should test trackBy function returns input index', async () => {
       const { component } = await setup();
-      const result = component.trackByFn(9, 'test');
-      expect(result).toEqual(9);
+      const testIndex = 9;
+      const result = component.trackByFn(testIndex, 'test');
+      expect(result).toEqual(testIndex);
     });
   });
 
@@ -155,18 +156,19 @@ describe('messagesComponent', () => {
     it('should show the added messages', async () => {
       const { fixture, component, page } = await setup();
       /* add messages to the displayed messages array */
-      component.messageService.add('testMessage1');
-      component.messageService.add('testMessage2');
+      component['messageService'].add('testMessage1');
+      component['messageService'].add('testMessage2');
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
       await fixture.detectChanges();
       expect(page.header.innerText).toEqual('Messages');
       expect(page.messagesContainer2[0].innerText).toEqual(
-        component.messageService.messages[0].toString(),
+        component.messages[0].toString(),
       );
       expect(page.messagesContainer2[1].innerText).toEqual(
-        component.messageService.messages[1].toString(),
+        component.messages[1].toString(),
       );
+      // tslint:disable-next-line: no-magic-numbers
       expect(page.messagesContainer2[2]).toBeFalsy;
       /* the close icon has 'close' as innerText */
       expect(page.clearButton.innerText).toEqual('close');
@@ -175,22 +177,22 @@ describe('messagesComponent', () => {
     it('should click the clear button', async () => {
       const { fixture, component, page } = await setup();
       /* add messages to the displayed messages array */
-      component.messageService.add('testMessage1');
-      component.messageService.add('testMessage2');
+      component['messageService'].add('testMessage1');
+      component['messageService'].add('testMessage2');
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
       await fixture.detectChanges();
       expect(page.messagesContainer2[0].innerText).toEqual(
-        component.messageService.messages[0].toString(),
+        component.messages[0].toString(),
       );
       expect(page.messagesContainer2[1].innerText).toEqual(
-        component.messageService.messages[1].toString(),
+        component.messages[1].toString(),
       );
       click(page.clearButton);
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
       await fixture.detectChanges();
-      expect(component.messageService.clear).toHaveBeenCalled();
+      expect(component.clear).toHaveBeenCalled();
       expect(page.messagesContainer2).toBeFalsy;
     });
   });

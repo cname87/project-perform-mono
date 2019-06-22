@@ -6,12 +6,12 @@ export * from './async-observable-helpers';
 export * from './activated-route-snapshot-stub';
 export * from './router-link-directive-stub';
 
-// Short utilities //
+// Short test utilities //
 
 /**
  * Simulate a left mouse button element click.
  */
-export function click(el: DebugElement | HTMLElement) {
+export function click(el: DebugElement | HTMLElement): void {
   if (el instanceof HTMLElement) {
     el.click();
   } else {
@@ -30,7 +30,7 @@ export function sendInput(
   inputElement: HTMLInputElement,
   text: string,
   isAppend = false,
-) {
+): Promise<any> {
   fixture.detectChanges();
   inputElement.value = isAppend ? inputElement.value + text : text;
   inputElement.dispatchEvent(new Event('input'));
@@ -38,6 +38,9 @@ export function sendInput(
   return fixture.whenStable();
 }
 
+/**
+ * Find by CSS utilities for .spec files.
+ */
 export function findId<T>(fixture: ComponentFixture<any>, id: string): T {
   const element = fixture.debugElement.query(By.css('#' + id));
   return element.nativeElement;

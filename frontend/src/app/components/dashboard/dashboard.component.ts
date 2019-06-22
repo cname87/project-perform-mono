@@ -1,16 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
+import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 import { MembersService } from '../../shared/services/members.service';
 import { IMember } from '../../api/api-members.service';
 
+/**
+ * This component displays a dashboard showing key information on a number of members.
+ */
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-  members: IMember[] = [];
+  /* array of members from server */
+  members$: Observable<IMember[]> = of([]);
   propertyToDisplay = 'name';
   firstMemberOnDisplay = 1;
   lastMemberOnDisplay = 4;
@@ -18,20 +24,29 @@ export class DashboardComponent implements OnInit {
   constructor(
     private membersService: MembersService,
     private logger: NGXLogger,
-  ) {}
-
-  ngOnInit() {
-    this.getMembers();
+  ) {
+    this.logger.trace(
+      DashboardComponent.name + ': Starting DashboardComponent',
+    );
   }
 
-  getMembers() {
+  ngOnInit(): void {
+    this.members$ = this.getMembers();
+  }
+
+  /**
+   * Gets the members from the server by calling the membersService function.
+   */
+  getMembers(): Observable<IMember[]> {
     this.logger.trace(DashboardComponent.name + ': Calling getMembers');
-    this.membersService.getMembers().subscribe((members) => {
-      this.members = members.slice(
-        this.firstMemberOnDisplay - 1,
-        this.lastMemberOnDisplay,
-      );
-    });
+    return this.membersService.getMembers().pipe(
+      map((members) => {
+        return members.slice(
+          this.firstMemberOnDisplay - 1,
+          this.lastMemberOnDisplay,
+        );
+      }),
+    );
   }
 
   showProperty(member: IMember) {

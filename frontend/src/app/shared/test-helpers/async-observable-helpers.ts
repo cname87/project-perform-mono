@@ -1,4 +1,4 @@
-/*
+/**
  * Mock async observables that return asynchronously.
  * The observable either emits once and completes or errors.
  *

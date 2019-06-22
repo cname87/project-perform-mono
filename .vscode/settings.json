@@ -27,6 +27,7 @@
     "cname",
     "codelyzer",
     "colorize",
+    "cyclomatic",
     "daemonized",
     "destructured",
     "devkit",
