@@ -10,7 +10,7 @@ import {
   findTag,
   asyncData,
   ActivatedRoute,
-  ActivatedRouteSnapshotStub,
+  ActivatedRouteStub,
   click,
 } from '../../shared/test-helpers';
 import { throwError } from 'rxjs/internal/observable/throwError';
@@ -33,7 +33,7 @@ describe('memberDetailComponent', () => {
       'updateMember',
     ]);
     /* stub ActivatedRoute with a configurable path parameter */
-    const activatedRouteStub = new ActivatedRouteSnapshotStub(0);
+    const activatedRouteStub = new ActivatedRouteStub(0);
     /* stub Location service */
     const locationSpy = jasmine.createSpyObj('location', ['back']);
 
@@ -124,7 +124,7 @@ describe('memberDetailComponent', () => {
       Location as any,
     );
     const activatedRouteStub = fixture.debugElement.injector.get<
-      ActivatedRouteSnapshotStub
+      ActivatedRouteStub
     >(ActivatedRoute as any);
 
     /* create the component instance */

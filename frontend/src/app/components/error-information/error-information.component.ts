@@ -13,8 +13,8 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./error-information.component.scss'],
 })
 export class ErrorInformationComponent implements OnInit {
-  /* get the component mode from the query parameter */
-  private mode = this.route.snapshot.paramMap.get('mode') as string;
+  /* component mode determines text and prompts */
+  private mode = '';
 
   /* default information if no mode passed in, i.e. page not found */
   header = 'Page Not Found';
@@ -31,6 +31,8 @@ export class ErrorInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    /* get the component mode from the query parameter */
+    this.mode = this.route.snapshot.paramMap.get('mode') as string;
     /* set up error only if a mode query parameter of 'error' is passed in */
     if (this.mode === 'error') {
       /* main information */
