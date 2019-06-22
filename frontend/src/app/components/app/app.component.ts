@@ -19,16 +19,12 @@ interface ILink {
 })
 export class AppComponent {
   /* main header */
-  header = 'Team Members';
-
-  constructor(private logger: NGXLogger) {
-    this.logger.trace(AppComponent.name + ': Starting AppComponent');
-  }
+  public header = 'Team Members';
 
   /* routerLink links */
-  dashboard = config.routes.dashboard;
-  membersList = config.routes.membersList;
-  detail = config.routes.detail;
+  private dashboard = config.routes.dashboard;
+  private membersList = config.routes.membersList;
+  private detail = config.routes.detail;
   links: ILink[] = [
     {
       path: '/' + this.dashboard.path,
@@ -44,6 +40,9 @@ export class AppComponent {
       disabled: true,
     },
   ];
+  constructor(private logger: NGXLogger) {
+    this.logger.trace(AppComponent.name + ': Starting AppComponent');
+  }
 
   trackByFn(_index: number, link: ILink): string | null {
     return link ? link.path : null;

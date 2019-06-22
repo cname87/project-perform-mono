@@ -14,7 +14,7 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class ErrorInformationComponent implements OnInit {
   /* get the component mode from the query parameter */
-  mode = this.route.snapshot.paramMap.get('mode') as string;
+  private mode = this.route.snapshot.paramMap.get('mode') as string;
 
   /* default information if no mode passed in, i.e. page not found */
   header = 'Page Not Found';

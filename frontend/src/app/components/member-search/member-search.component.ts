@@ -27,17 +27,14 @@ export class MemberSearchComponent implements OnInit, OnDestroy {
   detail = config.routes.detail;
   /* member property to display in the list of found members */
   propertyToDisplay = 'name';
-  /* members observable from search term */
-  members$: Observable<IMember[]> | undefined;
   /* members stored locally from search term */
   members: IMember[] | undefined;
-  /* search debounce time in ms */
-  debounce = 300;
-
   /* subject observable to initiate search */
   private searchTerms$ = new Subject<string>();
   /* unsubscribe signal */
   private unsubscribeSignal$ = new Subject<void>();
+  /* search debounce time in ms */
+  private debounce = 300;
 
   constructor(
     private membersService: MembersService,

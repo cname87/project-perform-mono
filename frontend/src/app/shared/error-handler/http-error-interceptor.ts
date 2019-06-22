@@ -6,8 +6,8 @@ import {
   HttpRequest,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { retry, catchError, tap } from 'rxjs/operators';
+import { Observable, throwError, iif, of } from 'rxjs';
+import { catchError, retryWhen, delay, concatMap } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
 import { IErrReport } from '../../config';
@@ -23,8 +23,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   constructor(private logger: NGXLogger) {}
 
   /* retry parameters */
-  totalTries = 2;
-  tryNumber = 1;
+  private totalRetries = 3;
+  private retryDelay = 500; // retry delay in ms
 
   /**
    * This interceptor passes the request untouched.
@@ -36,23 +36,32 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
+    this.logger.trace(HttpErrorInterceptor.name + ': intercept called');
+
     return next.handle(request).pipe(
-      retry(this.totalTries - 1),
-      tap((data) => {
-        /* log retry count */
-        if (data.type === 0) {
-          this.logger.trace(
-            HttpErrorInterceptor.name +
-              `: Try ${this.tryNumber} of ${this.totalTries}`,
-          );
-          this.tryNumber++;
-          if (this.tryNumber > this.totalTries) {
-            this.tryNumber = 1;
-          }
-        } else {
-          /* valid data returned => reset count */
-          this.tryNumber = 1;
-        }
+      retryWhen((errors) => {
+        return errors.pipe(
+          /* concat map keeps errors in order and makes sure they aren't executed in parallel */
+          concatMap((e, i) => {
+            const errorsReceived = i + 1; // index is zero-based
+            this.logger.trace(
+              HttpErrorInterceptor.name +
+                `: Error ${errorsReceived} received - retry ${errorsReceived} of ${
+                  this.totalRetries
+                } to ${request.url}`,
+            );
+            return iif(
+              () => {
+                /* test for which function to run */
+                return errorsReceived === this.totalRetries;
+              },
+              /* if true we throw the last error */
+              throwError(e),
+              /* otherwise we trigger a retry after a delay */
+              of('trigger').pipe(delay(this.retryDelay)),
+            );
+          }),
+        );
       }),
       catchError((error: HttpErrorResponse) => {
         this.logger.trace(HttpErrorInterceptor.name + ': catchError called');

@@ -47,8 +47,8 @@ export function rollbarFactory() {
 @Injectable()
 export class CustomErrorHandler implements ErrorHandler {
   /* count variables */
-  unexpectedErrorCount = 0;
-  reloadCount = 3;
+  private unexpectedErrorCount = 0;
+  private reloadCount = 3;
 
   constructor(private injectors: Injector) {}
 

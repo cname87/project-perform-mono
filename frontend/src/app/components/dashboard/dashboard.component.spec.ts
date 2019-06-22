@@ -108,7 +108,7 @@ describe('DashboardComponent', () => {
 
   it('should display 1st member', async () => {
     const { component, page } = await setup();
-    const member = component.firstMemberOnDisplay;
+    const member = component['firstMemberOnDisplay'];
     expect(page.membersDe[member - 1].nativeElement.innerText).toBe(
       'Name: ' + members[member - 1].name,
     );
@@ -116,7 +116,7 @@ describe('DashboardComponent', () => {
 
   it('should display last member', async () => {
     const { component, page } = await setup();
-    const member = component.lastMemberOnDisplay;
+    const member = component['lastMemberOnDisplay'];
     expect(page.membersDe[member - 1].nativeElement.innerText).toBe(
       'Name: ' + members[member - 1].name,
     );

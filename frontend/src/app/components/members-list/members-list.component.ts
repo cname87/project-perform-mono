@@ -17,7 +17,7 @@ import { first } from 'rxjs/operators';
 })
 export class MembersListComponent implements OnInit {
   /* members to list */
-  members: IMember[];
+  members: IMember[] = [];
   /* mode for input box */
   inputMode = 'add';
 
@@ -28,7 +28,6 @@ export class MembersListComponent implements OnInit {
     this.logger.trace(
       MembersListComponent.name + ': Starting MembersListComponent',
     );
-    this.members = [];
   }
 
   ngOnInit(): void {

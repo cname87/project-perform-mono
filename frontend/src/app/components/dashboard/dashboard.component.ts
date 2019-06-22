@@ -18,8 +18,8 @@ export class DashboardComponent implements OnInit {
   /* array of members from server */
   members$: Observable<IMember[]> = of([]);
   propertyToDisplay = 'name';
-  firstMemberOnDisplay = 1;
-  lastMemberOnDisplay = 4;
+  private firstMemberOnDisplay = 1;
+  private lastMemberOnDisplay = 4;
 
   constructor(
     private membersService: MembersService,

@@ -104,15 +104,15 @@ describe('AppComponent', () => {
     const { component, page } = await setup();
     expect(page.routerLinks.length).toBe(3, 'should have 3 routerLinks');
     expect(page.routerLinks[0].linkParams).toBe(
-      `/${component.dashboard.path}`,
+      `/${component['dashboard'].path}`,
       'dashboard route',
     );
     expect(page.routerLinks[1].linkParams).toBe(
-      `/${component.membersList.path}`,
+      `/${component['membersList'].path}`,
       'members route',
     );
     expect(page.routerLinks[2].linkParams).toBe(
-      `/${component.detail.path}`,
+      `/${component['detail'].path}`,
       'detail route (disabled',
     );
   });
@@ -133,7 +133,7 @@ describe('AppComponent', () => {
 
     /* it attempts to route => dummy path configured above */
     expect(dashboardLink.navigatedTo).toBe(
-      `/${component.dashboard.path}`,
+      `/${component['dashboard'].path}`,
       'dashboard route passed to routerLink',
     );
 
@@ -157,7 +157,7 @@ describe('AppComponent', () => {
 
     /* it attempts to route => dummy path configured above */
     expect(membersLink.navigatedTo).toBe(
-      `/${component.membersList.path}`,
+      `/${component['membersList'].path}`,
       'members route passed to routerLink',
     );
 
@@ -181,7 +181,7 @@ describe('AppComponent', () => {
 
     /* routerLink gets the route but it does not attempt to route (as disabled ) => no dummy path configured above */
     expect(detailLink.navigatedTo).toEqual(
-      `/${component.detail.path}`,
+      `/${component['detail'].path}`,
       'detail route passed to routerLInk',
     );
 
