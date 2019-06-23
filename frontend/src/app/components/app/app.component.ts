@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 
 import { config } from '../../config';
-import { NGXLogger } from 'ngx-logger';
 
 interface ILink {
   path: string;

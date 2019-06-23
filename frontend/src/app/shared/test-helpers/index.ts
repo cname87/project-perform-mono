@@ -3,7 +3,7 @@ import { ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 export * from './async-observable-helpers';
-export * from './activated-route-snapshot-stub';
+export * from './activated-route-stub';
 export * from './router-link-directive-stub';
 
 // Short test utilities //

@@ -5,7 +5,8 @@ import { NGXLogger } from 'ngx-logger';
 
 import { MembersService } from '../../shared/services/members.service';
 import { IMember } from '../../api/api-members.service';
-import { first } from 'rxjs/operators';
+import { first, multicast, refCount } from 'rxjs/operators';
+import { Subject, of, Observable } from 'rxjs';
 
 /**
  * This member shows detail on a member whose id is passed in via the url id parameter.
@@ -16,11 +17,11 @@ import { first } from 'rxjs/operators';
   styleUrls: ['./member-detail.component.scss'],
 })
 export class MemberDetailComponent implements OnInit {
-  /* member to display initialised with dummy values*/
-  member: IMember = {
+  /* member to display initialised with dummy value*/
+  member$: Observable<IMember> = of({
     id: 0,
     name: '',
-  };
+  });
 
   /* mode for input box */
   inputMode = 'edit';
@@ -37,21 +38,23 @@ export class MemberDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getMember();
+    this.member$ = this.getMember();
   }
 
   /**
-   * Gets the member from the server based on the id supplied in the route and sets the local variable accordingly.
+   * Gets the member from the server based on the id supplied in the route and sets the local observable accordingly.
    */
-  getMember(): void {
+  getMember(): Observable<IMember> {
     this.logger.trace(MemberDetailComponent.name + ': Calling getMember');
+    /* get id of member to be displayed from the route */
     const id = +(this.route.snapshot.paramMap.get('id') as string);
-    this.membersService
-      .getMember(id)
-      .pipe(first())
-      .subscribe((member: any) => {
-        this.member = member;
-      });
+    /* create a subject to multicast to elements on html page */
+    const subject = new Subject<IMember>();
+    return this.membersService.getMember(id).pipe(
+      first(),
+      multicast(subject),
+      refCount(),
+    );
   }
 
   goBack(): void {
@@ -60,18 +63,19 @@ export class MemberDetailComponent implements OnInit {
 
   /**
    * Updates the name property of the member previously retrieved.
+   * Called by the input box when the user updates the input string and presses Enter (or clicks on the the Save icon).
+   * Note: members$ completes when page displayed => cannot get from members$ so got from page instead.
    * @param name
-   * - Called by the input box when the user updates the input string and presses Enter (or clicks on the the Save icon) - the input string is supplied as the name parameter.
+   * name: The input box string is supplied as the name parameter.
+   * id: The displayed member id is supplied as the member id.
    */
-  save(name: string): void {
+  save(name: string, id: string): void {
     /* ignore if the input text is empty */
     if (!name) {
       return;
     }
-    this.member.name = name;
-
     this.membersService
-      .updateMember(this.member)
+      .updateMember({ id: +id, name })
       .pipe(first())
       .subscribe(() => {
         this.goBack();

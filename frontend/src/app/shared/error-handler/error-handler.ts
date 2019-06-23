@@ -12,14 +12,13 @@ import { ToastrService } from 'ngx-toastr';
 
 import { MessageService } from '../services/message.service';
 
+/* set up the rollbar service */
 const rollbarConfig = {
   accessToken: '250417311abc413693bafa5c137de33c',
   captureUncaught: true,
   captureUnhandledRejections: true,
 };
-
 export const RollbarService = new InjectionToken<Rollbar>('rollbar');
-
 export function rollbarFactory() {
   return new Rollbar(rollbarConfig);
 }

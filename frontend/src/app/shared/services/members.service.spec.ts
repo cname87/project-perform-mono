@@ -93,7 +93,6 @@ describe('MembersService', () => {
       add: jasmine
         .createSpy('add')
         .and.callFake(function add(this: IMessageServiceStub, message: string) {
-          console.log('MessageService: ' + message);
           this.messages.push(message);
         }),
       clear: jasmine
@@ -102,7 +101,6 @@ describe('MembersService', () => {
           this.messages = [];
         }),
     };
-    const consoleErrorSpy = spyOn(console, 'error');
 
     await TestBed.configureTestingModule({
       imports: [
@@ -124,7 +122,6 @@ describe('MembersService', () => {
       membersService,
       membersApi,
       messageService,
-      consoleErrorSpy,
     };
   }
 

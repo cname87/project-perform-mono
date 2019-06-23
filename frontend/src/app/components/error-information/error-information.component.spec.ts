@@ -131,7 +131,7 @@ describe('ErrorInformationComponent', () => {
     it('should have mode set by route', async () => {
       const { component, fixture, activatedRouteStub } = await setup();
       const routeMode = 'test';
-      activatedRouteStub.setId(routeMode);
+      activatedRouteStub.setParameter(routeMode);
       /* initiate ngOnInit */
       fixture.detectChanges();
       /* await asyncData call */
@@ -164,7 +164,7 @@ describe('ErrorInformationComponent', () => {
       const { component, fixture, page, activatedRouteStub } = await setup();
       /* set up route that the component will get */
       const routeMode = '';
-      activatedRouteStub.setId(routeMode);
+      activatedRouteStub.setParameter(routeMode);
       /* page fields will be null before ngOnInit */
       /* await component ngOnInit and data binding */
       fixture.detectChanges();
@@ -178,7 +178,7 @@ describe('ErrorInformationComponent', () => {
       const { component, fixture, page, activatedRouteStub } = await setup();
       /* set up route that the component will get */
       const routeMode = 'edit';
-      activatedRouteStub.setId(routeMode);
+      activatedRouteStub.setParameter(routeMode);
       /* page fields will be null before ngOnInit */
       /* await component ngOnInit and data binding */
       fixture.detectChanges();
@@ -203,7 +203,7 @@ describe('ErrorInformationComponent', () => {
       const { fixture, page, backSpy, activatedRouteStub } = await setup();
       /* set up route that the component will get */
       const routeId = 'edit';
-      activatedRouteStub.setId(routeId);
+      activatedRouteStub.setParameter(routeId);
       fixture.detectChanges();
       await fixture.whenStable();
       /* click the go back button */

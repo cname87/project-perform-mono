@@ -1,4 +1,5 @@
 import { by, element, ElementFinder } from 'protractor';
+
 import { IMember } from 'src/app/api/model/member';
 
 export function getMembersListElement() {
@@ -44,15 +45,12 @@ export function getMembersListElement() {
   }
 
   async function debugPrint() {
-
     console.log('allListItems: ' + await allListItems.count());
     console.log('allMemberIds: ' + await allMemberIds.count());
     console.log('allMemberNames: ' + await allMemberNames.count());
-
   }
 
-  /* comment out by default */
-  // debugPrint()
+  debugPrint();
 
   return {
     tag,

@@ -1,7 +1,7 @@
 <mat-card class="member-card">
 
   <mat-card-header>
-    <mat-card-title>{{ member.name | uppercase }}</mat-card-title>
+    <mat-card-title>{{ (member$ | async)?.name | uppercase }}</mat-card-title>
     <mat-card-subtitle>Details</mat-card-subtitle>
   </mat-card-header>
 
@@ -11,8 +11,11 @@
         <span
           mat-line
           id="memberId"
+          #memberId
+          attr.data-displayed="{{(member$ | async)?.id}}"
+
         >
-          ID:  {{ member.id }}
+          ID:  {{ (member$ | async)?.id }}
         </span>
       </mat-list-item>
 
@@ -21,7 +24,7 @@
           mat-line
           id="memberName"
         >
-          NAME: {{ member.name }}
+          NAME: {{ (member$ | async)?.name }}
         </span>
       </mat-list-item>
 
@@ -46,7 +49,7 @@
 
 <app-member-input
   [mode]="inputMode"
-  [inputText]="member.name"
-  (inputEnter)='save($event)'
+  [inputText]="(member$ | async)?.name"
+  (inputEnter)='save($event, memberId.dataset.displayed)'
 >
 </app-member-input>
