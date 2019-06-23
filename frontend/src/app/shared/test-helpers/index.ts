@@ -41,15 +41,6 @@ export function sendInput(
 /**
  * Find by CSS utilities for .spec files.
  */
-export function findId<T>(fixture: ComponentFixture<any>, id: string): T {
-  const element = fixture.debugElement.query(By.css('#' + id));
-  return element.nativeElement;
-}
-
-export function findTag<T>(fixture: ComponentFixture<any>, tag: string): T {
-  const element = fixture.debugElement.query(By.css(tag));
-  return element.nativeElement;
-}
 
 /**
  * Use to find a html element that may or may not be present.
@@ -77,6 +68,15 @@ export function findAllCssOrNot(
 ): DebugElement[] | null {
   const elements = fixture.debugElement.queryAll(By.css(css));
   return elements ? elements : null;
+}
+export function findId<T>(fixture: ComponentFixture<any>, id: string): T {
+  const element = fixture.debugElement.query(By.css('#' + id));
+  return element.nativeElement;
+}
+
+export function findTag<T>(fixture: ComponentFixture<any>, tag: string): T {
+  const element = fixture.debugElement.query(By.css(tag));
+  return element.nativeElement;
 }
 
 export function findAllTag(

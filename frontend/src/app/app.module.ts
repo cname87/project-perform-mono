@@ -25,10 +25,10 @@ import { MaterialModule } from './modules/material/material.module';
 import { MemberInputComponent } from './components/member-input/member-input.component';
 import { ErrorInformationComponent } from './components/error-information/error-information.component';
 import {
-  CustomErrorHandler,
+  ErrorHandlerService,
   RollbarService,
   rollbarFactory,
-} from './shared/error-handler/error-handler';
+} from './shared/error-handler/error-handler.service';
 import { HttpErrorInterceptor } from './shared/error-handler/http-error-interceptor';
 
 @NgModule({
@@ -70,7 +70,7 @@ import { HttpErrorInterceptor } from './shared/error-handler/http-error-intercep
   providers: [
     {
       provide: ErrorHandler,
-      useClass: CustomErrorHandler,
+      useClass: ErrorHandlerService,
     },
     { provide: RollbarService, useFactory: rollbarFactory },
     {

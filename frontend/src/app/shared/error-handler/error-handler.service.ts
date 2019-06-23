@@ -44,7 +44,7 @@ export function rollbarFactory() {
  * - informs the user as appropriate.
  */
 @Injectable()
-export class CustomErrorHandler implements ErrorHandler {
+export class ErrorHandlerService implements ErrorHandler {
   /* count variables */
   private unexpectedErrorCount = 0;
   private reloadCount = 3;
@@ -80,21 +80,27 @@ export class CustomErrorHandler implements ErrorHandler {
    * Displays a message on the web page message log.
    */
   private log(message: string): void {
-    this.logger.trace(CustomErrorHandler.name + ': Reporting: ' + message);
-    this.messageService.add(CustomErrorHandler.name + `: ${message}`);
+    this.logger.trace(ErrorHandlerService.name + ': Reporting: ' + message);
+    this.messageService.add(ErrorHandlerService.name + `: ${message}`);
+  }
+
+  private reload() {
+    this.zone.runOutsideAngular(() => {
+      window.location.reload();
+    });
   }
 
   /* Note: You could extend ErrorHandler and use super(true) in the constructor to cause errors to be rethrown which causes things like bootstrap to fail if an error is thrown - otherwise bootstrap will never fail */
 
   handleError(error: any): void {
-    this.logger.trace(CustomErrorHandler.name + ': handleError called');
+    this.logger.trace(ErrorHandlerService.name + ': handleError called');
 
-    /* the object to be logged */
+    /* the report to be logged */
     let err;
 
     /* error.type is set if the error was caught in http-error-intercept */
     if (error.type) {
-      this.logger.trace(CustomErrorHandler.name + ': Http error reported');
+      this.logger.trace(ErrorHandlerService.name + ': Http error reported');
       /* create err for logging from the http-interceptor error report which will have a defined IErrReport type */
       err = {
         type: error.type,
@@ -105,7 +111,7 @@ export class CustomErrorHandler implements ErrorHandler {
       /* only include embedded error for passing to Rollbar */
       error = error.error;
     } else {
-      this.logger.trace(CustomErrorHandler.name + ': Non-http error reported');
+      this.logger.trace(ErrorHandlerService.name + ': Non-http error reported');
       /* create err for logging from the error */
       err = {
         type: 'Non-http error',
@@ -114,17 +120,17 @@ export class CustomErrorHandler implements ErrorHandler {
       };
     }
 
-    /* log error, including to the backend server, if so configured */
-    this.logger.trace(CustomErrorHandler.name + ': Logging error');
+    /* log error report, including to the backend server, if so configured */
+    this.logger.trace(ErrorHandlerService.name + ': Logging error');
     this.logger.error(err);
 
-    /* send the error to rollbar */
-    this.logger.trace(CustomErrorHandler.name + ': Sending error to Rollbar');
+    /* send the full error to rollbar */
+    this.logger.trace(ErrorHandlerService.name + ': Sending error to Rollbar');
     this.rollbar.error(error);
 
     /* inform user, if not already done  */
     if (!error.isUserInformed) {
-      this.logger.trace(CustomErrorHandler.name + ': Informing user');
+      this.logger.trace(ErrorHandlerService.name + ': Informing user');
       /* using zone (and gets above) resolved some issues getting services */
       this.zone.run(() => {
         this.log('ERROR: An unknown error occurred');
@@ -138,7 +144,7 @@ export class CustomErrorHandler implements ErrorHandler {
       this.unexpectedErrorCount++;
       if (this.unexpectedErrorCount >= this.reloadCount) {
         this.unexpectedErrorCount = 0;
-        window.location.reload();
+        this.reload();
       }
     }
   }

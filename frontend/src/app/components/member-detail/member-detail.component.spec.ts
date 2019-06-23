@@ -13,7 +13,6 @@ import {
   ActivatedRouteStub,
   click,
 } from '../../shared/test-helpers';
-import { throwError } from 'rxjs/internal/observable/throwError';
 import { IMember } from '../../api/api-members.service';
 
 interface IMembersServiceSpy {
@@ -23,9 +22,8 @@ interface IMembersServiceSpy {
 interface ILocationSpy {
   back: jasmine.Spy;
 }
-// TODO: Complete error tests or remove error element from spies
 
-describe('memberDetailComponent', () => {
+describe('MemberDetailComponent', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
     /* create spies on memberService methods */
@@ -81,7 +79,6 @@ describe('memberDetailComponent', () => {
   function expected() {
     return {
       memberName: 'test',
-      errorId: 9, // see updateMember spy below
     };
   }
 
@@ -92,23 +89,12 @@ describe('memberDetailComponent', () => {
     const getMemberSpy = memberServiceSpy.getMember.and.callFake(
       (id: number) => {
         /* return no member to simulate memberService 404 */
-        if (!id) {
-          return asyncData('');
-        }
-        /* throw error to simulate unexpected error */
-        if (id === -1) {
-          return throwError(new Error('Fake getMember error'));
-        }
         /* return a member as expected */
         return asyncData({ id, name: expected().memberName + id });
       },
     );
     const updateMemberSpy = memberServiceSpy.updateMember.and.callFake(
-      (member: IMember) => {
-        /* throw error to simulate unexpected error */
-        if (member.id === expected().errorId) {
-          return throwError(new Error('Fake updateMember error'));
-        }
+      () => {
         /* return as expected */
         return asyncData('');
       },
