@@ -2,7 +2,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 /* 3rd party */
@@ -29,9 +29,8 @@ import {
   RollbarService,
   rollbarFactory,
 } from './shared/error-handler/error-handler.service';
-import { HttpErrorInterceptor } from './shared/error-handler/http-error-interceptor';
 import { RequestCacheService } from '../app/shared/caching.service.ts/request-cache.service';
-import { CachingInterceptor } from '../app/shared/caching.service.ts/caching.interceptor';
+import { httpInterceptorProviders } from './shared/http-interceptors/';
 
 @NgModule({
   imports: [
@@ -75,17 +74,8 @@ import { CachingInterceptor } from '../app/shared/caching.service.ts/caching.int
       useClass: ErrorHandlerService,
     },
     { provide: RollbarService, useFactory: rollbarFactory },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HttpErrorInterceptor,
-      multi: true,
-    },
     RequestCacheService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: CachingInterceptor,
-      multi: true,
-    },
+    httpInterceptorProviders,
   ],
 })
 export class AppModule {}

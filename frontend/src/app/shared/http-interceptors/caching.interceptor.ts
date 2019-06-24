@@ -10,7 +10,7 @@ import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
-import { RequestCacheService } from './request-cache.service';
+import { RequestCacheService } from '../caching.service.ts/request-cache.service';
 
 @Injectable({ providedIn: 'root' })
 export class CachingInterceptor implements HttpInterceptor {
