@@ -5,8 +5,8 @@ import { NGXLogger } from 'ngx-logger';
 
 import { MembersService } from '../../shared/services/members.service';
 import { IMember } from '../../api/api-members.service';
-import { first, multicast, refCount } from 'rxjs/operators';
-import { Subject, of, Observable } from 'rxjs';
+import { first, shareReplay } from 'rxjs/operators';
+import { of, Observable } from 'rxjs';
 
 /**
  * This member shows detail on a member whose id is passed in via the url id parameter.
@@ -49,11 +49,9 @@ export class MemberDetailComponent implements OnInit {
     /* get id of member to be displayed from the route */
     const id = +(this.route.snapshot.paramMap.get('id') as string);
     /* create a subject to multicast to elements on html page */
-    const subject = new Subject<IMember>();
     return this.membersService.getMember(id).pipe(
       first(),
-      multicast(subject),
-      refCount(),
+      shareReplay(1),
     );
   }
 

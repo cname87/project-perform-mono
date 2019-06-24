@@ -4,7 +4,11 @@ import { NGXLogger } from 'ngx-logger';
 import { Router } from '@angular/router';
 
 import { AppModule } from '../../app.module';
-import { ErrorHandlerService, RollbarService, rollbarFactory } from './error-handler.service';
+import {
+  ErrorHandlerService,
+  RollbarService,
+  rollbarFactory,
+} from './error-handler.service';
 import { MessageService } from '../services/message.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -273,11 +277,10 @@ describe('ErrorHandlerService', () => {
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: Reporting: ERROR: An unknown error occurred',
       );
-      expect(navigateByUrlSpy).toHaveBeenCalledWith(
-        '/errorinformation/error',
-      );
+      expect(navigateByUrlSpy).toHaveBeenCalledWith('/errorinformation/error');
       expect(errorToastrSpy).toHaveBeenCalledWith(
-        'ERROR!', 'An unknown error has occurred',
+        'ERROR!',
+        'An unknown error has occurred',
       );
       /* count is not incremented by a http error */
       expect(initialErrorCount).toBe(initialErrorCount);
@@ -351,15 +354,11 @@ describe('ErrorHandlerService', () => {
       for (let i = 1; i < reloadCount; i++) {
         errorHandlerService.handleError(testError);
         /* count is incremented by a non-http error */
-        expect(errorHandlerService['unexpectedErrorCount']).toBe(
-          ++errorCount,
-        );
+        expect(errorHandlerService['unexpectedErrorCount']).toBe(++errorCount);
       }
       errorHandlerService.handleError(testError);
       /* count is reset */
-      expect(errorHandlerService['unexpectedErrorCount']).toBe(
-        0,
-      );
+      expect(errorHandlerService['unexpectedErrorCount']).toBe(0);
       expect(reloadSpy).toHaveBeenCalled();
     });
   });

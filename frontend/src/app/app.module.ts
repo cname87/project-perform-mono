@@ -30,6 +30,8 @@ import {
   rollbarFactory,
 } from './shared/error-handler/error-handler.service';
 import { HttpErrorInterceptor } from './shared/error-handler/http-error-interceptor';
+import { RequestCacheService } from '../app/shared/caching.service.ts/request-cache.service';
+import { CachingInterceptor } from '../app/shared/caching.service.ts/caching.interceptor';
 
 @NgModule({
   imports: [
@@ -76,6 +78,12 @@ import { HttpErrorInterceptor } from './shared/error-handler/http-error-intercep
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpErrorInterceptor,
+      multi: true,
+    },
+    RequestCacheService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CachingInterceptor,
       multi: true,
     },
   ],
