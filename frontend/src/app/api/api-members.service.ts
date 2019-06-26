@@ -32,7 +32,10 @@ export class MembersApi {
   private defaultHeaders = membersConfiguration.defaultHeaders;
   private withCredentials = membersConfiguration.withCredentials;
 
-  constructor(private httpClient: HttpClient, private logger: NGXLogger) {
+  constructor(
+    private httpClient: HttpClient,
+    private logger: NGXLogger,
+  ) {
     this.logger.trace(MembersApi.name + ': Starting MembersApi');
   }
 

@@ -103,9 +103,6 @@ describe('MemberDetailComponent', () => {
     return { getMemberSpy, updateMemberSpy, backSpy };
   }
 
-  /**
-   * Create the MemberDetailComponent, initialize it, set test variables.
-   */
   async function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(MemberDetailComponent);
@@ -134,18 +131,16 @@ describe('MemberDetailComponent', () => {
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
 
-    /* give access to expected magic vales */
-    const { memberName } = expected();
-
     return {
       fixture,
       component,
       page,
-      memberName,
       getMemberSpy,
       updateMemberSpy,
       backSpy,
       activatedRouteStub,
+      /* give access to expected magic vales */
+      ...expected(),
     };
   }
 

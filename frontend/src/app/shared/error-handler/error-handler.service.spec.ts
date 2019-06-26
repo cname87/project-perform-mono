@@ -66,14 +66,14 @@ describe('ErrorHandlerService', () => {
   function expected() {
     return {
       testHttpError: {
-        type: 'testType',
+        type: 'Http testType',
         message: 'test message',
         status: 'test status',
         body: 'test body',
         error: 'test error',
       },
       testHttpErrorReport: {
-        type: 'testType',
+        type: 'Http testType',
         message: 'test message',
         status: 'test status',
         body: 'test body',
@@ -124,7 +124,7 @@ describe('ErrorHandlerService', () => {
   }
 
   /**
-   * Create the MemberDetailComponent, initialize it, set test variables.
+   * Get the service, initialize it, set test variables.
    */
   async function getService() {
     /* create the fixture */

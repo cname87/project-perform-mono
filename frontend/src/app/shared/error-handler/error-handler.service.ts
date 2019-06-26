@@ -49,7 +49,11 @@ export class ErrorHandlerService implements ErrorHandler {
   private unexpectedErrorCount = 0;
   private reloadCount = 3;
 
-  constructor(private injectors: Injector) {}
+  constructor(private injectors: Injector) {
+    this.logger.trace(
+      ErrorHandlerService.name + ': Starting ErrorHandlerService',
+    );
+  }
 
   /* using gets (and zone below) resolved some issues getting services */
   get zone(): NgZone {
@@ -98,8 +102,9 @@ export class ErrorHandlerService implements ErrorHandler {
     /* the report to be logged */
     let err;
 
-    /* error.type is set if the error was caught in http-error-intercept */
-    if (error.type) {
+    /* error.type starts with 'Http' if the error was caught in http-error-intercept */
+    if (error.type &&
+      (error.type as string).slice(0, 'Http'.length) === 'Http') {
       this.logger.trace(ErrorHandlerService.name + ': Http error reported');
       /* create err for logging from the http-interceptor error report which will have a defined IErrReport type */
       err = {
