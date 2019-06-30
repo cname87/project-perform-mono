@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ErrorHandler } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
 
-import { MembersService } from '../../shared/services/members.service';
+import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../api/api-members.service';
-import { first, shareReplay } from 'rxjs/operators';
+import { first, catchError, refCount, publishReplay } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
 
 /**
@@ -18,10 +18,14 @@ import { of, Observable } from 'rxjs';
 })
 export class MemberDetailComponent implements OnInit {
   /* member to display initialised with dummy value*/
-  member$: Observable<IMember> = of({
+  private dummyMember = {
     id: 0,
     name: '',
-  });
+  };
+  member$: Observable<IMember> = of(this.dummyMember);
+
+  /* capture this for callbacks */
+  _this = this;
 
   /* mode for input box */
   inputMode = 'edit';
@@ -31,6 +35,7 @@ export class MemberDetailComponent implements OnInit {
     private membersService: MembersService,
     private location: Location,
     private logger: NGXLogger,
+    private errorHandler: ErrorHandler,
   ) {
     this.logger.trace(
       MemberDetailComponent.name + ': Starting MemberDetailComponent',
@@ -46,12 +51,29 @@ export class MemberDetailComponent implements OnInit {
    */
   getMember(): Observable<IMember> {
     this.logger.trace(MemberDetailComponent.name + ': Calling getMember');
+
     /* get id of member to be displayed from the route */
     const id = +(this.route.snapshot.paramMap.get('id') as string);
+
+    let errorHandlerCalled = false;
+    const _this = this._this;
+
     /* create a subject to multicast to elements on html page */
     return this.membersService.getMember(id).pipe(
-      first(),
-      shareReplay(1),
+      /* multicast */
+      /* using publish as share will resubscribe for each html call in case of unexpected error causing observable to complete (and I don't need to resubscribe on this page) */
+      publishReplay(1),
+      refCount(),
+
+      catchError((error: any) => {
+        /* only call the error handler once per ngOnInit even though the returned observable is multicast to multiple html elements */
+        if (!errorHandlerCalled) {
+          errorHandlerCalled = true;
+          this.errorHandler.handleError(error);
+        }
+        /* return dummy value to all html elements */
+        return of(_this.dummyMember);
+      }),
     );
   }
 

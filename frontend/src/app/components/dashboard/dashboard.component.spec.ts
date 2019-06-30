@@ -5,7 +5,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { DashboardComponent } from './dashboard.component';
 /* members contains an array of 10 dummy members */
 import { members } from '../../shared/mocks/mock-members';
-import { MembersService } from '../../shared/services/members.service';
+import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../api/model/models';
 import { AppModule } from '../../app.module';
 import { findAllTag } from '../../shared/test-helpers';
@@ -55,6 +55,12 @@ describe('DashboardComponent', () => {
     return { getMembersSpy };
   }
 
+  function expected() {
+    return {
+      numInDashboard: 4,
+    };
+  }
+
   async function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(DashboardComponent);
@@ -77,11 +83,14 @@ describe('DashboardComponent', () => {
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
 
+    const expectedValues = expected();
+
     return {
       fixture,
       component,
       page,
       getMembersSpy,
+      ...expectedValues,
     };
   }
 
@@ -101,9 +110,9 @@ describe('DashboardComponent', () => {
     expect(getMembersSpy.calls.count()).toBe(1);
   });
 
-  it('should display 4 links', async () => {
-    const { page } = await setup();
-    expect(page.anchorsDe.length).toEqual(4);
+  it('should display right number of links', async () => {
+    const { page, numInDashboard } = await setup();
+    expect(page.anchorsDe.length).toEqual(numInDashboard);
   });
 
   it('should display 1st member', async () => {

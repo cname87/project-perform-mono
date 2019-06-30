@@ -1,4 +1,4 @@
-<div id="mainDiv" *ngIf="messages.length">
+<div id="mainDiv" *ngIf="messageService.messages.length">
 
   <mat-toolbar
   >
@@ -12,8 +12,8 @@
     <button
       mat-icon-button
       id="clearBtn"
-      aria-label="Example icon-button with a heart icon"
-      (click)="clear()"
+      aria-label="Clear button"
+      (click)="messageService.clear()"
     >
       <mat-icon
         aria-hidden="false"
@@ -28,7 +28,7 @@
 
   <div
     id="messages-container"
-    *ngFor="let message of messages; trackBy: trackByFn"
+    *ngFor="let message of messageService.messages; trackBy: trackByFn"
   >
     {{ message }}
   </div>

@@ -2,11 +2,10 @@ import { Location, APP_BASE_HREF } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SpyLocation } from '@angular/common/testing';
-import { throwError } from 'rxjs/internal/observable/throwError';
 
 import { AppModule } from '../../app.module';
 import { MembersListComponent } from './members-list.component';
-import { MembersService } from '../../shared/services/members.service';
+import { MembersService } from '../../shared/members-service/members.service';
 import {
   findAllCssOrNot,
   findCssOrNot,
@@ -48,16 +47,16 @@ describe('MembersListComponent', () => {
    */
   class Page {
     get linksArray() {
-      return findAllCssOrNot(this.fixture, 'a');
+      return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'a');
     }
     get memberIdArray() {
-      return findAllCssOrNot(this.fixture, '#memberId');
+      return findAllCssOrNot<HTMLAnchorElement>(this.fixture, '#memberId');
     }
     get deleteBtnArray() {
-      return findAllCssOrNot(this.fixture, '#deleteBtn');
+      return findAllCssOrNot<HTMLButtonElement>(this.fixture, '#deleteBtn');
     }
     get memberInput() {
-      return findCssOrNot<HTMLElement>(this.fixture, 'app-member-input');
+      return findCssOrNot<HTMLInputElement>(this.fixture, 'app-member-input');
     }
 
     constructor(readonly fixture: ComponentFixture<MembersListComponent>) {}
@@ -74,21 +73,13 @@ describe('MembersListComponent', () => {
     });
     const addMemberSpy = memberServiceSpy.addMember.and.callFake(
       (member: IMemberWithoutId) => {
-        /* throw error to simulate unexpected error */
-        if (member.name === 'error') {
-          return throwError(new Error('Fake addMember error'));
-        }
         /* return added member as expected */
         const newMember = { id: 21, name: member.name };
         return asyncData(newMember);
       },
     );
     const deleteMemberSpy = memberServiceSpy.deleteMember.and.callFake(
-      (id: number) => {
-        /* throw error to simulate unexpected error */
-        if (id === 9) {
-          return throwError(new Error('Fake deleteMember error'));
-        }
+      (_id: number) => {
         /* return nothing as expected */
         return asyncData(null);
       },
@@ -109,6 +100,8 @@ describe('MembersListComponent', () => {
       anchorIndex: 5,
       /* create members array from imported mock members array */
       membersArray: JSON.parse(JSON.stringify(members)),
+      /* number of links per member */
+      numLinksPerMember: 2,
     };
   }
 
@@ -204,7 +197,8 @@ describe('MembersListComponent', () => {
       /* manually call getMembers() */
       component.getMembers();
       /* getMembersSpy called again after getMembers() */
-      expect(getMembersSpy).toHaveBeenCalledTimes(2);
+      const expectedCalls = 2;
+      expect(getMembersSpy).toHaveBeenCalledTimes(expectedCalls);
       /* await asyncData call */
       await fixture.whenStable();
       expect(component.members.length).toEqual(
@@ -282,12 +276,12 @@ describe('MembersListComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       /* default constructor member shown */
-      expect(page.linksArray!.length).toEqual(0);
+      expect(page.linksArray).toBeNull();
       /* get the mode attribute in the member input element */
-      const mode = page.memberInput.attributes.getNamedItem('ng-reflect-mode');
+      const mode = page.memberInput!.attributes.getNamedItem('ng-reflect-mode');
       expect(mode!.value).toBe('add', 'input box is set to add mode');
       /* get the inputText attribute in the member input element */
-      const text = page.memberInput.attributes.getNamedItem(
+      const text = page.memberInput!.attributes.getNamedItem(
         'ng-reflect-input-text',
       );
       expect(text!.value).toBe('', "input box value is set to the '' ");
@@ -295,13 +289,15 @@ describe('MembersListComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       /* test a member link */
-      expect(page.linksArray!.length).toEqual(expected.membersArray.length * 2);
-      expect(
-        page.linksArray![expected.anchorIndex].nativeElement.innerText,
-      ).toEqual(expected.membersArray[expected.memberIndex].name);
-      expect(
-        page.memberIdArray![expected.memberIndex].nativeElement.innerText,
-      ).toEqual(expected.membersArray[expected.memberIndex].id.toString());
+      expect(page.linksArray!.length).toEqual(
+        expected.membersArray.length * expected.numLinksPerMember,
+      );
+      expect(page.linksArray![expected.anchorIndex].innerText).toEqual(
+        expected.membersArray[expected.memberIndex].name,
+      );
+      expect(page.memberIdArray![expected.memberIndex].innerText).toEqual(
+        expected.membersArray[expected.memberIndex].id.toString(),
+      );
       expect(page.deleteBtnArray!.length).toEqual(expected.membersArray.length);
     });
   });
@@ -312,7 +308,7 @@ describe('MembersListComponent', () => {
       /* stub on the add() method */
       const addSpy = spyOn(component, 'add').and.stub();
       /* get the input element */
-      const input = page.memberInput;
+      const input = page.memberInput!;
       /* dispatch an 'inputEnter' event to the member input element */
       const inputEvent = new Event('inputEnter');
       input.dispatchEvent(inputEvent);
@@ -332,7 +328,7 @@ describe('MembersListComponent', () => {
       /* get a member to delete */
       const n = 2;
       const button = page.deleteBtnArray![n];
-      const id = +page.memberIdArray![n].nativeElement.innerText;
+      const id = +page.memberIdArray![n].innerText;
       /* click the delete button */
       click(button);
       /* initiate ngOnInit and view changes etc */
@@ -352,21 +348,26 @@ describe('MembersListComponent', () => {
     it('should navigate to "/detail" on click', async () => {
       const { fixture, page, expected, spyLocation } = await setup();
       /* test a member link */
-      expect(page.linksArray!.length).toEqual(expected.membersArray.length * 2);
-      expect(
-        page.linksArray![expected.anchorIndex].nativeElement.innerText,
-      ).toEqual(expected.membersArray[expected.memberIndex].name);
-      expect(
-        page.memberIdArray![expected.memberIndex].nativeElement.innerText,
-      ).toEqual(expected.membersArray[expected.memberIndex].id.toString());
+      expect(page.linksArray!.length).toEqual(
+        expected.membersArray.length * expected.numLinksPerMember,
+      );
+      expect(page.linksArray![expected.anchorIndex].innerText).toEqual(
+        expected.membersArray[expected.memberIndex].name,
+      );
+      expect(page.memberIdArray![expected.memberIndex].innerText).toEqual(
+        expected.membersArray[expected.memberIndex].id.toString(),
+      );
       expect(page.deleteBtnArray!.length).toEqual(expected.membersArray.length);
       fixture.ngZone!.run(() => {
-        click(page.linksArray![4]);
+        /* click on the configured member */
+        click(
+          page.linksArray![expected.memberIndex * expected.numLinksPerMember],
+        );
       });
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
       await fixture.detectChanges();
-      const id = expected.membersArray[2].id;
+      const id = expected.membersArray[expected.memberIndex].id;
       expect(spyLocation.path()).toEqual(
         `/detail/${id}`,
         'after clicking members link',

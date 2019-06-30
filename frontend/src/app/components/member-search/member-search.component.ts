@@ -8,7 +8,7 @@ import {
 } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
-import { MembersService } from '../../shared/services/members.service';
+import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../api/api-members.service';
 import { config } from '../../config';
 

@@ -12,7 +12,7 @@ import { DebugElement } from '@angular/core';
 
 import { AppModule } from '../../app.module';
 import { MemberSearchComponent } from './member-search.component';
-import { MembersService } from '../../shared/services/members.service';
+import { MembersService } from '../../shared/members-service/members.service';
 import { members } from '../../shared/mocks/mock-members';
 import { IMember } from '../../api/model/models';
 import { sendInput } from '../../shared/test-helpers/index';
@@ -85,6 +85,11 @@ describe('memberSearchComponent', () => {
     return { getMembersSpy };
   }
 
+  function expected() {
+    return {
+      debounceDelay: 300,
+    };
+  }
   async function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(MemberSearchComponent);
@@ -106,11 +111,15 @@ describe('memberSearchComponent', () => {
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
 
+    /* get he expected magic values */
+    const expectedValues = expected();
+
     return {
       fixture,
       component,
       page,
       getMembersSpy,
+      ...expectedValues,
     };
   }
 
@@ -126,15 +135,17 @@ describe('memberSearchComponent', () => {
   });
 
   it('should display the title', async(async () => {
-    const { component, page } = await setup();
+    const { component, page, debounceDelay } = await setup();
     expect(page.header.innerText).toBe(component.header, 'header');
+    /* check debounce delay against local variable */
+    expect(component['debounce']).toBe(debounceDelay, 'check delay');
   }));
 
   it('should take input and show search results', fakeAsync(async () => {
-    const { fixture, page, getMembersSpy } = await setup();
+    const { fixture, page, getMembersSpy, debounceDelay } = await setup();
     sendInput(fixture, page.searchInput, 'x');
     fixture.detectChanges();
-    tick(350);
+    tick(debounceDelay);
     fixture.detectChanges();
     expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
     expect(page.anchors.length).toEqual(members.length, 'members found');
@@ -143,7 +154,13 @@ describe('memberSearchComponent', () => {
   }));
 
   it('should not search when no delay', fakeAsync(async () => {
-    const { component, fixture, page, getMembersSpy } = await setup();
+    const {
+      component,
+      fixture,
+      page,
+      getMembersSpy,
+      debounceDelay,
+    } = await setup();
     component.search('x');
     fixture.detectChanges();
     tick(0);
@@ -154,14 +171,20 @@ describe('memberSearchComponent', () => {
     /* no hint shown */
     expect(page.hintDebugElement).toBeNull;
     /* clear timer */
-    tick(350);
+    tick(debounceDelay);
   }));
 
   it('should show not search with no change', fakeAsync(async () => {
-    const { component, fixture, page, getMembersSpy } = await setup();
+    const {
+      component,
+      fixture,
+      page,
+      getMembersSpy,
+      debounceDelay,
+    } = await setup();
     component.search('x');
     fixture.detectChanges();
-    tick(350);
+    tick(debounceDelay);
     fixture.detectChanges();
     expect(page.anchors.length).toEqual(members.length);
     expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
@@ -169,17 +192,17 @@ describe('memberSearchComponent', () => {
     /* second search */
     component.search('x');
     fixture.detectChanges();
-    tick(1000);
+    tick(debounceDelay);
     fixture.detectChanges();
     /* no change in getMemberSpy call count */
     expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
   }));
 
   it('should display 1st member', fakeAsync(async () => {
-    const { component, fixture, page } = await setup();
+    const { component, fixture, page, debounceDelay } = await setup();
     component.search('x');
     fixture.detectChanges();
-    tick(1000);
+    tick(debounceDelay);
     fixture.detectChanges();
 
     /* first listed will be the display property of the first member */
@@ -190,17 +213,17 @@ describe('memberSearchComponent', () => {
   }));
 
   it('should clear input when button clicked', fakeAsync(async () => {
-    const { fixture, page, getMembersSpy } = await setup();
+    const { fixture, page, getMembersSpy, debounceDelay } = await setup();
     sendInput(fixture, page.searchInput, 'x');
     fixture.detectChanges();
-    tick(400);
+    tick(debounceDelay);
     fixture.detectChanges();
     expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
     expect(page.anchors.length).toEqual(members.length, 'members found');
     /* click the input clear icon */
     page.clearBtn.click();
     fixture.detectChanges();
-    tick(350);
+    tick(debounceDelay);
     fixture.detectChanges();
     expect(getMembersSpy.calls.count()).toBe(1, 'did not search again');
     expect(page.anchors.length).toEqual(0, 'no members found');

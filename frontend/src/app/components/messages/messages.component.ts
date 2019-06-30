@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 
-import { MessageService } from '../../shared/services/message.service';
+import { MessageService } from '../../shared/message-service/message.service';
 
 /**
- * This component lists messages that are contained in the
+ * This component lists messages added by other components.
+ * This component imports messageService as a public property as the tamplate accesses that service's properties directly (as they are also updated by other components so can't use a local copy).
  */
 @Component({
   selector: 'app-messages',
@@ -12,20 +13,14 @@ import { MessageService } from '../../shared/services/message.service';
   styleUrls: ['./messages.component.scss'],
 })
 export class MessagesComponent implements OnInit {
-  messages: string[] = [];
-  clear: () => void = () => {};
-
   constructor(
-    private messageService: MessageService,
+    public messageService: MessageService,
     private logger: NGXLogger,
   ) {
     this.logger.trace(MessagesComponent.name + ': Starting MessagesComponent');
   }
 
-  ngOnInit(): void {
-    this.messages = this.messageService.messages;
-    this.clear = this.messageService.clear;
-  }
+  ngOnInit(): void {}
 
   trackByFn(index: number, _message: string): number {
     return index;

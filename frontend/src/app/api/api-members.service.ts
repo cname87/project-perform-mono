@@ -10,13 +10,14 @@
 /* external dependencies */
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 
 /* internal dependencies */
 import { membersConfiguration } from './configuration';
 import { CustomHttpUrlEncodingCodec } from './encoder';
 import { ICount, IMember, IMemberWithoutId } from './model/models';
+import { catchError, tap } from 'rxjs/operators';
 export { ICount, IMember, IMemberWithoutId };
 
 /**
@@ -32,10 +33,7 @@ export class MembersApi {
   private defaultHeaders = membersConfiguration.defaultHeaders;
   private withCredentials = membersConfiguration.withCredentials;
 
-  constructor(
-    private httpClient: HttpClient,
-    private logger: NGXLogger,
-  ) {
+  constructor(private httpClient: HttpClient, private logger: NGXLogger) {
     this.logger.trace(MembersApi.name + ': Starting MembersApi');
   }
 
@@ -137,16 +135,30 @@ export class MembersApi {
 
     this.logger.trace(
       MembersApi.name +
-        `: Sending GET request to: ${this.basePath}/${this.membersPath}`,
+        `: Sending GET request to: ${this.basePath}/${this.membersPath}/${id}`,
     );
 
-    return this.httpClient.get<IMember>(
-      `${this.basePath}/${this.membersPath}/${encodeURIComponent(String(id))}`,
-      {
-        withCredentials: this.withCredentials,
-        headers,
-      },
-    );
+    return this.httpClient
+      .get<IMember>(
+        `${this.basePath}/${this.membersPath}/${encodeURIComponent(
+          String(id),
+        )}`,
+        {
+          withCredentials: this.withCredentials,
+          headers,
+        },
+      )
+      .pipe(
+        tap((_) => {
+          this.logger.trace(MembersApi.name + ': Received response');
+        }),
+        catchError((errReport) => {
+          this.logger.trace(MembersApi.name + ': catchError called');
+          /* rethrow all errors */
+          this.logger.trace(MembersApi.name + ': Throwing the error on');
+          return throwError(errReport);
+        }),
+      );
   }
 
   /**
@@ -209,7 +221,9 @@ export class MembersApi {
 
     this.logger.trace(
       MembersApi.name +
-        `: Sending DELETE request to: ${this.basePath}/${this.membersPath}`,
+        `: Sending DELETE request to: ${this.basePath}/${
+          this.membersPath
+        }/${id}`,
     );
 
     return this.httpClient.delete<ICount>(

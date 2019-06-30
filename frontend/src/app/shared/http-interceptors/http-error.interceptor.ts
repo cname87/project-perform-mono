@@ -11,6 +11,7 @@ import { catchError, retryWhen, delay, concatMap } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
 import { IErrReport } from '../../config';
+import { RequestCacheService } from '../caching.service.ts/request-cache.service';
 
 /**
  * See error-handler.ts for the error handling strategy:
@@ -20,7 +21,10 @@ import { IErrReport } from '../../config';
 
 @Injectable({ providedIn: 'root' })
 export class HttpErrorInterceptor implements HttpInterceptor {
-  constructor(private logger: NGXLogger) {
+  constructor(
+    private logger: NGXLogger,
+    private requestCache: RequestCacheService,
+  ) {
     this.logger.trace(
       HttpErrorInterceptor.name + ': Starting HttpErrorInterceptor',
     );
@@ -67,35 +71,41 @@ export class HttpErrorInterceptor implements HttpInterceptor {
               /* issuing any non-error event trigger the retry */
               of('trigger').pipe(
                 /* issue after a delay */
-                delay(this.retryDelay)),
+                delay(this.retryDelay),
+              ),
             );
           }),
         );
       }),
-      catchError((error: HttpErrorResponse) => {
+      catchError((caughtError: HttpErrorResponse) => {
         this.logger.trace(HttpErrorInterceptor.name + ': catchError called');
 
-        /* construct an error report to pass on */
+        /* clear the cache */
+        this.requestCache.clearCache();
+
+        /* add an error type to identified errors  */
         const errReport: IErrReport = {
-          error,
-          type: 'TBC',
-          message: 'TBC',
+          error: caughtError, // pass on original error
+          allocatedType: 'TBC', // add a http error type
         };
-        if (error.error instanceof ErrorEvent) {
+
+        if (caughtError.error instanceof ErrorEvent) {
+          /* the caught error will be of type HttpErrorResponse and its error property will be an instance of ErrorEvent if the error is client-side e.g. a network error */
           this.logger.trace(
             HttpErrorInterceptor.name + ': Client-side or network error',
           );
-          errReport.type = 'Http client-side';
-          errReport.message = error.error.message;
-        } else {
+
+          errReport.allocatedType = 'Http client-side';
+        }
+
+        if (caughtError.status) {
+          /* if the caught error's error property is not of type ErrorEvent then the error is a server response e.g 500 error */
           this.logger.trace(
             HttpErrorInterceptor.name +
               ': Server returned an unsuccessful response code',
           );
-          errReport.type = 'Http server-side';
-          errReport.message = error.message;
-          errReport.status = error.status;
-          errReport.body = error.error;
+
+          errReport.allocatedType = 'Http server-side';
         }
 
         this.logger.trace(

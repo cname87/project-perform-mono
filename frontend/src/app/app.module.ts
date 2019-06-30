@@ -28,9 +28,10 @@ import {
   ErrorHandlerService,
   RollbarService,
   rollbarFactory,
-} from './shared/error-handler/error-handler.service';
+} from './shared/error-handler-service/error-handler.service';
 import { RequestCacheService } from '../app/shared/caching.service.ts/request-cache.service';
 import { httpInterceptorProviders } from './shared/http-interceptors/';
+import { E2E_TESTING } from './shared/http-interceptors/e2e-test.interceptor';
 
 @NgModule({
   imports: [
@@ -43,6 +44,7 @@ import { httpInterceptorProviders } from './shared/http-interceptors/';
     /* 3rd party modules */
     FlexLayoutModule,
     LoggerModule.forRoot({
+      /* log to server */
       // serverLoggingUrl: `${environment.apiUrl}api-v1/logs`,
       level: environment.logLevel,
       serverLogLevel: environment.serverLogLevel,
@@ -76,6 +78,7 @@ import { httpInterceptorProviders } from './shared/http-interceptors/';
     { provide: RollbarService, useFactory: rollbarFactory },
     RequestCacheService,
     httpInterceptorProviders,
+    { provide: E2E_TESTING, useValue: environment.e2eTesting },
   ],
 })
 export class AppModule {}

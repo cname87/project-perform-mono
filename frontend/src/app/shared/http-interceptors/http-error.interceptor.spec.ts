@@ -35,16 +35,16 @@ describe('HttpErrorInterceptor', () => {
    * List all expected 'magic' values here to be used in tests.
    */
   function expected() {
-
     const noError = 'No error';
 
     const errorEvent = new ErrorEvent('Test errorEvent');
     const clientError = {
+      allocatedType: 'Http server-side',
       error: errorEvent,
     };
 
     const serverError = {
-      type: 'Http server-side',
+      allocatedType: 'Http server-side',
       message: 'Server error message',
       status: 'Error status',
       error: 'Error property in test error',
@@ -155,17 +155,21 @@ describe('HttpErrorInterceptor', () => {
         nextServerError,
         serverError,
       } = await setup();
-      const result
-        = httpErrorInterceptor.intercept(requestUrl, nextServerError);
+      const result = httpErrorInterceptor.intercept(
+        requestUrl,
+        nextServerError,
+      );
       result.subscribe(
         (_ok: any) => {
           fail('Should never issue a non-error item');
         },
         (error: any) => {
           /* test an error report property */
-          expect(error.body).toEqual(serverError.error);
+          expect(error.error.status).toEqual(serverError.status);
           expect(traceLoggerSpy).toHaveBeenCalledWith(
-            `HttpErrorInterceptor: Error 1 received on try 1 of ${totalTries} to ${requestUrl.url}`,
+            `HttpErrorInterceptor: Error 1 received on try 1 of ${totalTries} to ${
+              requestUrl.url
+            }`,
           );
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Error 2 received on try 2 of 3 to testUrl',
@@ -191,18 +195,20 @@ describe('HttpErrorInterceptor', () => {
         requestUrl,
         nextOneError,
         noError,
-        traceCallsExErrors,
       } = await setup();
-      const result
-        = httpErrorInterceptor.intercept(requestUrl, nextOneError);
+      const result = httpErrorInterceptor.intercept(requestUrl, nextOneError);
       result.subscribe(
         (ok: any) => {
           expect(ok).toBe(noError);
           expect(traceLoggerSpy).toHaveBeenCalledWith(
-            `HttpErrorInterceptor: Error 1 received on try 1 of ${totalTries} to ${requestUrl.url}`,
+            `HttpErrorInterceptor: Error 1 received on try 1 of ${totalTries} to ${
+              requestUrl.url
+            }`,
           );
           /* check only one error message traced */
-          expect(traceLoggerSpy).toHaveBeenCalledTimes(traceCallsExErrors + 1);
+          const errorCalls = 1;
+          const extraCalls = 4; // starting 3 services + 'intercept called'
+          expect(traceLoggerSpy).toHaveBeenCalledTimes(errorCalls + extraCalls);
         },
         (_error: any) => {
           fail('Should never issue an error item');
@@ -212,7 +218,7 @@ describe('HttpErrorInterceptor', () => {
       tick(retryDelay);
     }));
 
-    it('constructs error report for a non-ErrorEvent', fakeAsync (async () => {
+    it('constructs error report for a non-ErrorEvent', fakeAsync(async () => {
       const {
         totalTries,
         retryDelay,
@@ -222,33 +228,33 @@ describe('HttpErrorInterceptor', () => {
         nextServerError,
         serverError,
       } = await setup();
-      const result
-        = httpErrorInterceptor.intercept(requestUrl, nextServerError);
+      const result = httpErrorInterceptor.intercept(
+        requestUrl,
+        nextServerError,
+      );
       result.subscribe(
         (_ok: any) => {},
         (error: any) => {
-
           /* non-ErrorEvent path*/
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Server returned an unsuccessful response code',
           );
           /* test an error report property */
-          expect(error.type).toBe('Http server-side');
-          expect(error.message).toBe(serverError.message);
-          expect(error.status).toBe(serverError.status);
-          expect(error.body).toEqual(serverError.error);
+          expect(error.allocatedType).toBe('Http server-side');
+          expect(error.error.message).toBe(serverError.message);
+          expect(error.error.status).toBe(serverError.status);
+          expect(error.error.error).toEqual(serverError.error);
 
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Throwing error report on',
           );
-
         },
       );
       /* delay to allow for the retries */
       tick((totalTries - 1) * retryDelay);
     }));
 
-    it('constructs an error report for an ErrorEvent', fakeAsync (async () => {
+    it('constructs an error report for an ErrorEvent', fakeAsync(async () => {
       const {
         totalTries,
         retryDelay,
@@ -256,31 +262,28 @@ describe('HttpErrorInterceptor', () => {
         traceLoggerSpy,
         requestUrl,
         nextClientError,
-        clientError,
       } = await setup();
-      const result
-        = httpErrorInterceptor.intercept(requestUrl, nextClientError);
+      const result = httpErrorInterceptor.intercept(
+        requestUrl,
+        nextClientError,
+      );
       result.subscribe(
         (_ok: any) => {},
         (error: any) => {
-
           /* non-ErrorEvent path*/
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Client-side or network error',
           );
           /* test error report properties */
-          expect(error.type).toBe('Http client-side');
-          expect(error.message).toBe(clientError.error.message);
+          expect(error.allocatedType).toBe('Http client-side');
 
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Throwing error report on',
           );
-
         },
       );
       /* delay to allow for the retries */
       tick((totalTries - 1) * retryDelay);
     }));
-
   });
 });

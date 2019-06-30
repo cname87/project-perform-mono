@@ -11,7 +11,7 @@ import { AppModule } from '../app.module';
 import { AppComponent } from '../components/app/app.component';
 import { DashboardComponent } from '../components/dashboard/dashboard.component';
 import { MembersListComponent } from '../components/members-list/members-list.component';
-import { MembersService } from '../shared/services/members.service';
+import { MembersService } from '../shared/members-service/members.service';
 import { IMember } from '../api/model/models';
 import { of, Observable } from 'rxjs';
 import { MemberDetailComponent } from '../components/member-detail/member-detail.component';

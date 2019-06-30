@@ -3,7 +3,7 @@ import { NGXLogger } from 'ngx-logger';
 import { map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
-import { MembersService } from '../../shared/services/members.service';
+import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../api/api-members.service';
 
 /**

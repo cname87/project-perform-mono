@@ -117,15 +117,15 @@ describe('memberInputComponent', () => {
       /* await button appearance */
       await fixture.detectChanges();
       /* test all elements, including button not displaying */
-      expect(page.input.value).toBe('', 'initial input value');
-      expect(page.input.getAttribute('placeholder')).toBe(
+      expect(page.input!.value).toBe('', 'initial input value');
+      expect(page.input!.getAttribute('placeholder')).toBe(
         expected.addPlaceholder,
         'placeholder value',
       );
-      expect(page.label.innerText).toBe(expected.addLabel, 'label value');
-      expect(page.actionBtn).toBeNull('no button displayed');
+      expect(page.label!.innerText).toBe(expected.addLabel, 'label value');
+      expect(page.actionBtn!).toBeNull('no button displayed');
       expect(page.icon).toBeNull('no button icon displayed');
-      expect(page.hint.innerText).toBe(expected.addHint, 'hint value');
+      expect(page.hint!!.innerText).toBe(expected.addHint, 'hint value');
     });
 
     it('should match mode "edit" ', async () => {
@@ -140,21 +140,21 @@ describe('memberInputComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       /* test all elements, including button not displaying */
-      expect(page.input.value).toBe('testName', 'initial input value');
-      expect(page.input.getAttribute('placeholder')).toBe(
+      expect(page.input!!.value).toBe('testName', 'initial input value');
+      expect(page.input!.getAttribute('placeholder')).toBe(
         expected.editPlaceholder,
         'placeholder value',
       );
-      expect(page.label.innerText).toBe(expected.editLabel, 'label value');
-      expect(page.actionBtn.attributes['aria-label'].value).toBe(
+      expect(page.label!.innerText).toBe(expected.editLabel, 'label value');
+      expect(page.actionBtn!.attributes['aria-label'].value).toBe(
         expected.editAriaLabel,
         'button displayed',
       );
-      expect(page.icon.innerText).toBe(
+      expect(page.icon!.innerText).toBe(
         expected.editIcon,
         'button icon displayed',
       );
-      expect(page.hint.innerText).toBe(expected.editHint, 'hint value');
+      expect(page.hint!.innerText).toBe(expected.editHint, 'hint value');
     });
 
     it('should call enter() but not emit', async () => {
@@ -205,7 +205,7 @@ describe('memberInputComponent', () => {
       /* await button appearance */
       await fixture.detectChanges();
       /* call enter() with the button */
-      page.actionBtn.click();
+      page.actionBtn!.click();
       await fixture.detectChanges();
       /* test that inputText cleared and event emitted */
       expect(component.inputText).toBe('', 'inputText cleared');
@@ -224,10 +224,10 @@ describe('memberInputComponent', () => {
       /* await button appearance */
       await fixture.detectChanges();
       /* add text to input */
-      sendInput(fixture, page.input, 'added', true);
+      sendInput(fixture, page.input!, 'added', true);
       await fixture.detectChanges();
       await fixture.detectChanges();
-      expect(page.input.value).toBe('initialadded', 'confirm input text');
+      expect(page.input!.value).toBe('initialadded', 'confirm input text');
       /* text added to inputText variable via ngModel binding */
       expect(component.inputText).toBe('initialadded', 'confirm binding');
       /* no enter() without click or press enter */
@@ -236,7 +236,7 @@ describe('memberInputComponent', () => {
       const keyupEnterEvent = new KeyboardEvent('keyup', {
         key: 'enter',
       });
-      page.input.dispatchEvent(keyupEnterEvent);
+      page.input!.dispatchEvent(keyupEnterEvent);
       await fixture.detectChanges();
       /* input has been cleared and event handler called */
       expect(component.inputText).toBe('', 'inputText cleared');

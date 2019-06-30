@@ -33,7 +33,7 @@ import { IErr, IExpressApp, IRequestApp } from '../configServer';
  * Sets up express middleware and responds to incoming requests.
  * @param app
  * The express app object
- * *** TO DO.
+ * TODO - complete doc.
  * @returns Void.
  */
 

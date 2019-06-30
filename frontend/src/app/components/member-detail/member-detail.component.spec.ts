@@ -4,7 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppModule } from '../../app.module';
 import { MemberDetailComponent } from './member-detail.component';
-import { MembersService } from '../../shared/services/members.service';
+import { MembersService } from '../../shared/members-service/members.service';
 import {
   findId,
   findTag,

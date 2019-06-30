@@ -51,7 +51,7 @@ export function sendInput(
 export function findCssOrNot<T>(
   fixture: ComponentFixture<any>,
   css: string,
-): T {
+): T | null {
   const element = fixture.debugElement.query(By.css(css));
   return element ? element.nativeElement : null;
 }
@@ -62,13 +62,22 @@ export function findCssOrNot<T>(
  * @param css A valid css selector.
  * @returns an array of HTMLElements or null if element not found.
  */
-export function findAllCssOrNot(
+export function findAllCssOrNot<T>(
   fixture: ComponentFixture<any>,
   css: string,
-): DebugElement[] | null {
+): T[] | null {
   const elements = fixture.debugElement.queryAll(By.css(css));
-  return elements ? elements : null;
+  if (elements.length === 0) {
+    return (null as unknown) as T[];
+  }
+  const htmlElements: T[] = [];
+  for (const element of elements) {
+    const htmlElement = element.nativeElement as T;
+    htmlElements.push(htmlElement);
+  }
+  return htmlElements;
 }
+
 export function findId<T>(fixture: ComponentFixture<any>, id: string): T {
   const element = fixture.debugElement.query(By.css('#' + id));
   return element.nativeElement;

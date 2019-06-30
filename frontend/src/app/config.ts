@@ -3,7 +3,7 @@ import { MembersListComponent } from './components/members-list/members-list.com
 import { MemberDetailComponent } from './components/member-detail/member-detail.component';
 import { HttpErrorResponse } from '@angular/common/http';
 
-/* module routing elements */
+/* app component routing elements */
 const dashboard = {
   path: 'dashboard',
   component: DashboardComponent,
@@ -29,10 +29,29 @@ export const config: any = {
 
 /* interface for bug report thrown from members.service */
 export interface IErrReport {
-  error: HttpErrorResponse; // the passed-in error
-  type: 'Http client-side' | 'Http server-side' | 'TBC';
-  message: string;
-  status?: number; // the status code of a server-side response e.g. 404
-  body?: object; // the body of a server-side error response
-  isUserInformed?: boolean; // set true if user is informed
+  /* the passed-in error is always stored here */
+  error: HttpErrorResponse;
+  /* every handled error will have allocatedType set */
+  allocatedType: 'Http client-side' | 'Http server-side' | 'TBC';
+  /* the key error message */
+  message?: string;
+  /*  set true if user is informed etc => errorHandlerService will not send error message etc */
+  isHandled?: boolean;
+  /* the status code of a server-side response (only) e.g. 404 */
+  status?: number;
+  /* Body of the http response for a server-side error (= HttpErrorResponse error propert) */
+  body?: string;
 }
+
+/* handled error types */
+export const errorTypes = {
+  httpClientSide: 'Http client-side',
+  httpServerSide: 'Http server-side',
+};
+
+/* test urls for E2eTestInterceptor */
+export const testUrls = {
+  httpErrorResponse: 'GET:api-v1/members/3',
+  httpErrorEvent: 'GET:api-v1/members/4',
+  unexpectedError: 'GET:api-v1/members/10',
+};
