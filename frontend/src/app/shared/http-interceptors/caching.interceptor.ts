@@ -12,6 +12,10 @@ import { NGXLogger } from 'ngx-logger';
 
 import { RequestCacheService } from '../caching.service.ts/request-cache.service';
 
+/**
+ * This service sends the request to the cache service and returns the cache response if one is provided.  If the cache does not return a response it passes on the request and the then sends the request and response to the cache service for its use.
+ */
+
 @Injectable({ providedIn: 'root' })
 export class CachingInterceptor implements HttpInterceptor {
   constructor(private cache: RequestCacheService, private logger: NGXLogger) {
@@ -20,11 +24,15 @@ export class CachingInterceptor implements HttpInterceptor {
     );
   }
 
+  /**
+   * Sends the request to the cache service and, if it receives a response from a cached response then it returns that as a response.
+   * Otherwise it passes the request to sendRequest.
+   */
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     this.logger.trace(CachingInterceptor.name + ': intercept called');
-    /* only look to cache for GET requests */
-    const cachedResponse =
-      req.method === 'GET' ? this.cache.get(req) : undefined;
+
+    /* check if there is for a cached response */
+    const cachedResponse = this.cache.get(req);
 
     if (cachedResponse) {
       this.logger.trace(CachingInterceptor.name + ': reading from cache');
@@ -36,8 +44,8 @@ export class CachingInterceptor implements HttpInterceptor {
   }
 
   /**
-   * Get server response observable by sending request to `next()`.
-   * Will add the response to the cache.
+   * Passes the request to 'next()'.
+   * Also sends the request and the response to the cache service.
    */
   sendRequest(
     req: HttpRequest<any>,
@@ -46,15 +54,10 @@ export class CachingInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     this.logger.trace(CachingInterceptor.name + ': reading from server');
     return next.handle(req).pipe(
-      /* check event is http response as there may be other events */
       tap((event) => {
-        /* if not a GET then clear the cache */
+        /* check event is http response as there may be other events */
         if (event instanceof HttpResponse) {
-          if (req.method === 'GET') {
-            cache.put(req, event);
-          } else {
-            cache.clearCache();
-          }
+          cache.put(req, event);
         }
       }),
     );

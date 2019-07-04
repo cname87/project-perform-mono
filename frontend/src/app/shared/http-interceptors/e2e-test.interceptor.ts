@@ -29,13 +29,13 @@ export class E2eTestInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     this.logger.trace(E2eTestInterceptor.name + ': intercept called');
 
+    this.logger.trace(
+      `${E2eTestInterceptor.name} + : isTesting is ${this.isTesting}`,
+    );
     /* pass through if not in e2e test mode */
     if (this.isTesting) {
-      this.logger.trace(
-        `${E2eTestInterceptor.name} + : isTesting is ${this.isTesting}`,
-      );
     }
-    // if (!this.isTesting) {
+    // if (this.isTesting) {
     if (true) {
       return next.handle(req);
     }

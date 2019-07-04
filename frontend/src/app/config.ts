@@ -29,18 +29,12 @@ export const config: any = {
 
 /* interface for bug report thrown from members.service */
 export interface IErrReport {
-  /* the passed-in error is always stored here */
+  /* the handled error is always stored here */
   error: HttpErrorResponse;
   /* every handled error will have allocatedType set */
   allocatedType: 'Http client-side' | 'Http server-side' | 'TBC';
-  /* the key error message */
-  message?: string;
   /*  set true if user is informed etc => errorHandlerService will not send error message etc */
   isHandled?: boolean;
-  /* the status code of a server-side response (only) e.g. 404 */
-  status?: number;
-  /* Body of the http response for a server-side error (= HttpErrorResponse error propert) */
-  body?: string;
 }
 
 /* handled error types */
@@ -55,3 +49,6 @@ export const testUrls = {
   httpErrorEvent: 'GET:api-v1/members/4',
   unexpectedError: 'GET:api-v1/members/10',
 };
+
+/* cache timeout in ms */
+export const maxAge = 300000;

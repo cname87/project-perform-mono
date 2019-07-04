@@ -4,7 +4,7 @@ import { Location } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
 
 import { MembersService } from '../../shared/members-service/members.service';
-import { IMember } from '../../api/api-members.service';
+import { IMember } from '../../data-providers/members.data-provider';
 import { first, catchError, refCount, publishReplay } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
 
@@ -23,9 +23,6 @@ export class MemberDetailComponent implements OnInit {
     name: '',
   };
   member$: Observable<IMember> = of(this.dummyMember);
-
-  /* capture this for callbacks */
-  _this = this;
 
   /* mode for input box */
   inputMode = 'edit';
@@ -56,11 +53,9 @@ export class MemberDetailComponent implements OnInit {
     const id = +(this.route.snapshot.paramMap.get('id') as string);
 
     let errorHandlerCalled = false;
-    const _this = this._this;
 
     /* create a subject to multicast to elements on html page */
     return this.membersService.getMember(id).pipe(
-      /* multicast */
       /* using publish as share will resubscribe for each html call in case of unexpected error causing observable to complete (and I don't need to resubscribe on this page) */
       publishReplay(1),
       refCount(),
@@ -72,7 +67,7 @@ export class MemberDetailComponent implements OnInit {
           this.errorHandler.handleError(error);
         }
         /* return dummy value to all html elements */
-        return of(_this.dummyMember);
+        return of(this.dummyMember);
       }),
     );
   }

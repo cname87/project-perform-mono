@@ -78,9 +78,6 @@ export class ErrorHandlerService implements ErrorHandler {
     return this.injectors.get<Rollbar>(RollbarService);
   }
 
-  /* capture for callbacks */
-  _this = this;
-
   /**
    * Displays a message on the web page message log.
    */
@@ -89,8 +86,10 @@ export class ErrorHandlerService implements ErrorHandler {
     this.messageService.add(ErrorHandlerService.name + `: ${message}`);
   }
 
-  /* Note: You could extend ErrorHandler and use super(true) in the constructor to cause errors to be rethrown which causes things like bootstrap to fail if an error is thrown - otherwise bootstrap will never fail */
-
+  /**
+   *
+   * @param errReport This is either a managed error and will thus meet the IErrReport interface but may also be any unexpected error.
+   */
   handleError(errReport: any): void {
     this.logger.trace(ErrorHandlerService.name + ': handleError called');
 
@@ -118,16 +117,16 @@ export class ErrorHandlerService implements ErrorHandler {
 
     /* navigate to an error page if the error has not been handled */
     if (!errReport.isHandled) {
-      const _this = this._this;
-      /* using zone (and gets above) resolved some issues getting services ? */
+      /* using zone (and the gets above) resolved some issues accessing the services, and also handling unexpected errors (?) */
+      /* "If a method is called from code that was invoked outside Angular's zone, everything runs outside the zone until this event is fully processed. With zone.run(...) you force execution back into Angular's zone." */
       this.zone.run(() => {
-        _this.log('ERROR: An unknown error occurred');
+        this.log('ERROR: An unknown error occurred');
         /* navigate to error information page and then show toastr message */
-        _this.router.navigateByUrl('/errorinformation/error').then(() => {
+        this.router.navigateByUrl('/errorinformation/error').then(() => {
           this.logger.trace(
             ErrorHandlerService.name + ': Showing toastr message',
           );
-          _this.toastr.error('ERROR!', 'An unknown error has occurred');
+          this.toastr.error('ERROR!', 'An unknown error has occurred');
         });
       });
     }

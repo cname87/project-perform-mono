@@ -20,6 +20,8 @@
     "workbench.sideBar.location": "right",
     "window.zoomLevel": -1,
 
+    "typescript.experimental.useSeparateSyntaxServer": true,
+
     "cSpell.language": "en-GB",
     "cSpell.allowCompoundWords": true,
     "cSpell.enabledLanguageIds": [

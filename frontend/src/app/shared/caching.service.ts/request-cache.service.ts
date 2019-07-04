@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpResponse } from '@angular/common/http';
 import { NGXLogger } from 'ngx-logger';
+import { OK, CREATED } from 'http-status-codes';
 
-const maxAge = 300000; // ms
+// import { maxAge } from '../../config';
+import { membersConfiguration } from '../../data-providers/configuration';
+import { ResponseStore } from './in-memory-store.';
 
 @Injectable({ providedIn: 'root' })
 export class RequestCacheService {
-  private cache = new Map();
-  private getReqId(req: HttpRequest<any>) {
-    /* cache requests must match url + params */
-    return req.urlWithParams + ':' + req.method;
-  }
+  private cache = new ResponseStore(this.logger);
+  private baseUrl =
+    membersConfiguration.basePath + '/' + membersConfiguration.servicePath;
 
   constructor(private logger: NGXLogger) {
     this.logger.trace(
@@ -18,33 +19,90 @@ export class RequestCacheService {
     );
   }
 
-  clearCache() {
+  public clearCache(): void {
     this.logger.trace(RequestCacheService.name + ': clearing cache');
-    this.cache.clear();
+    this.cache.clearCache();
   }
 
-  get(req: HttpRequest<any>): HttpResponse<any> | undefined {
-    const reqId = this.getReqId(req);
-    const cached = this.cache.get(reqId);
-
-    if (!cached) {
+  /**
+   * Called by a http interceptor asking for a cached http response to a http request.
+   * @param request: The http interceptor sends in the request for which a cached response is required.
+   * @returns
+   * - Returns a cached http response if it has one.
+   * - Returns undefined if there is no cached response.
+   */
+  public get(request: HttpRequest<any>): HttpResponse<any> | undefined {
+    /* return cache for /members, i.e. get all members */
+    if (request.method === 'GET' && request.urlWithParams === this.baseUrl) {
+      return this.cache.response;
+    } else {
+      /* otherwise return that the cache is empty */
       return undefined;
     }
-
-    return cached.response;
   }
 
-  put(req: HttpRequest<any>, response: HttpResponse<any>): void {
-    const reqId = this.getReqId(req);
-    const entry = { response, lastRead: Date.now() };
+  /**
+   * Called by a http interceptor sending in a http request and its external response in order for the cache service to update the cache appropriately.
+   * @param request, response
+   * - The http request/response pair.
+   * @returns void
+   */
+  put(request: HttpRequest<any>, response: HttpResponse<any>): void {
+    /* clear cache if anything other than a 200 or 201 response */
+    if (response.status !== OK && response.status !== CREATED) {
+      this.clearCache();
+      return;
+    }
 
-    this.cache.set(reqId, entry);
-
-    const expired = Date.now() - maxAge;
-    this.cache.forEach((expiredEntry) => {
-      if (expiredEntry.lastRead < expired) {
-        this.cache.delete(expiredEntry.url);
+    /* decide action based on the request method & url */
+    switch (request.method) {
+      case 'GET': {
+        /* set cache for /members, i.e. get all members */
+        if (request.urlWithParams === this.baseUrl) {
+          this.cache.setGetAll(response);
+        }
+        /* don't change cache for any other GET */
+        break;
       }
-    });
+
+      case 'POST': {
+        /* set cache for /members, ie. add a member */
+        if (request.urlWithParams === this.baseUrl) {
+          this.cache.setPostOne(response);
+        } else {
+          this.clearCache();
+        }
+        break;
+      }
+
+      case 'PUT': {
+        /* set cache for /members, ie. update a member */
+        if (request.urlWithParams === this.baseUrl) {
+          this.cache.setPutOne(response);
+        } else {
+          this.clearCache();
+        }
+        break;
+      }
+
+      case 'DELETE': {
+        const id = +request.urlWithParams.slice(this.baseUrl.length + 1);
+        /* set cache for /members, ie. delete all */
+        if (request.urlWithParams === this.baseUrl) {
+          this.cache.setDeleteAll();
+        } else if (!isNaN(id)) {
+          this.cache.setDeleteOne(request);
+        } else {
+          this.clearCache();
+        }
+        break;
+      }
+      /* all other request types */
+      default: {
+        /* otherwise clear the cache */
+        this.clearCache();
+        break;
+      }
+    }
   }
 }

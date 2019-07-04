@@ -4,8 +4,12 @@ import { catchError, tap } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 import { NOT_FOUND } from 'http-status-codes';
 
-import { MembersApi } from '../../api/api-members.service';
-import { ICount, IMember, IMemberWithoutId } from '../../api/model/models';
+import { MembersApi } from '../../data-providers/members.data-provider';
+import {
+  ICount,
+  IMember,
+  IMemberWithoutId,
+} from '../../data-providers/models/models';
 import { MessageService } from '../message-service/message.service';
 import { IErrReport } from '../../config';
 
@@ -54,12 +58,10 @@ export class MembersService {
         this.logger.trace(MembersService.name + ': catchError called');
 
         /* handle Not Found/404 - inform user and return an empty array */
-        if (err.status === NOT_FOUND) {
+        if (err.error && err.error.status === NOT_FOUND) {
           this.logger.trace(
             MembersService.name + ': Handling Not Found / 404 - not an error',
           );
-          /* mark as handled */
-          err.isHandled = true;
           if (term) {
             this.log(`Did not find any members matching "${term}"`);
             return of([]);
@@ -101,7 +103,7 @@ export class MembersService {
         /* handle only HttpErrorResponse errors */
         if (errReport.error && errReport.error.name === 'HttpErrorResponse') {
           /* handle Not Found/404 */
-          if (errReport.status === NOT_FOUND) {
+          if (errReport.error && errReport.error.status === NOT_FOUND) {
             this.logger.trace(
               MembersService.name + ': Handling a Not Found / 404 error',
             );
@@ -172,11 +174,11 @@ export class MembersService {
       tap((_) => {
         this.log(`Deleted member with id = ${id}`);
       }),
-      catchError((err: IErrReport) => {
+      catchError((errReport: IErrReport) => {
         this.logger.trace(MembersService.name + ': catchError called');
 
         /* handle Not Found/404 - inform user */
-        if (err.status === NOT_FOUND) {
+        if (errReport.error && errReport.error.status === NOT_FOUND) {
           this.logger.trace(
             MembersService.name + ': Handling a Not Found / 404 error',
           );
@@ -185,11 +187,11 @@ export class MembersService {
           /* otherwise inform user of a general error */
           this.log('ERROR: Failed to delete member from server');
         }
-        err.isHandled = true;
+        errReport.isHandled = true;
 
         /* rethrow all errors */
         this.logger.trace(MembersService.name + ': Throwing the error on');
-        return throwError(err);
+        return throwError(errReport);
       }),
     );
   }
@@ -210,11 +212,11 @@ export class MembersService {
       tap((_) => {
         this.log(`Updated member with id = ${member.id}`);
       }),
-      catchError((err: IErrReport) => {
+      catchError((errReport: IErrReport) => {
         this.logger.trace(MembersService.name + ': catchError called');
 
         /* handle Not Found/404 - inform user */
-        if (err.status === NOT_FOUND) {
+        if (errReport.error && errReport.error.status === NOT_FOUND) {
           this.logger.trace(
             MembersService.name + ': Handling a Not Found / 404 error',
           );
@@ -223,11 +225,11 @@ export class MembersService {
           /* otherwise inform user of a general error */
           this.log('ERROR: Failed to update member on server');
         }
-        err.isHandled = true;
+        errReport.isHandled = true;
 
         /* rethrow all errors */
         this.logger.trace(MembersService.name + ': Throwing the error on');
-        return throwError(err);
+        return throwError(errReport);
       }),
     );
   }

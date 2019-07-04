@@ -6,7 +6,7 @@ import { DashboardComponent } from './dashboard.component';
 /* members contains an array of 10 dummy members */
 import { members } from '../../shared/mocks/mock-members';
 import { MembersService } from '../../shared/members-service/members.service';
-import { IMember } from '../../api/model/models';
+import { IMember } from '../../data-providers/models/models';
 import { AppModule } from '../../app.module';
 import { findAllTag } from '../../shared/test-helpers';
 

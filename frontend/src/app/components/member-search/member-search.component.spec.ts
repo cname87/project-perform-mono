@@ -14,7 +14,7 @@ import { AppModule } from '../../app.module';
 import { MemberSearchComponent } from './member-search.component';
 import { MembersService } from '../../shared/members-service/members.service';
 import { members } from '../../shared/mocks/mock-members';
-import { IMember } from '../../api/model/models';
+import { IMember } from '../../data-providers/models/models';
 import { sendInput } from '../../shared/test-helpers/index';
 
 interface IMembersServiceSpy {
@@ -218,14 +218,19 @@ describe('memberSearchComponent', () => {
     fixture.detectChanges();
     tick(debounceDelay);
     fixture.detectChanges();
-    expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
+    let numSearches = 0;
+    expect(getMembersSpy.calls.count()).toBe(++numSearches, 'only one search');
     expect(page.anchors.length).toEqual(members.length, 'members found');
     /* click the input clear icon */
     page.clearBtn.click();
     fixture.detectChanges();
     tick(debounceDelay);
     fixture.detectChanges();
-    expect(getMembersSpy.calls.count()).toBe(1, 'did not search again');
+    expect(getMembersSpy.calls.count()).toBe(++numSearches, 'searches again');
+    expect(getMembersSpy.calls.allArgs()[1]).toEqual(
+      [''],
+      'called with empty string',
+    );
     expect(page.anchors.length).toEqual(0, 'no members found');
     expect(page.searchInput.value).toBe('', 'search box cleared');
   }));

@@ -1,6 +1,6 @@
 <mat-nav-list>
     <mat-list-item
-      *ngFor="let member of members; trackBy: trackByFn"
+      *ngFor="let member of (members$ | async); trackBy: trackByFn"
       fxLayout="row"
       fxLayoutAlign="start"
     >

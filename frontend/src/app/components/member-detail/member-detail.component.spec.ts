@@ -13,7 +13,7 @@ import {
   ActivatedRouteStub,
   click,
 } from '../../shared/test-helpers';
-import { IMember } from '../../api/api-members.service';
+import { IMember } from '../../data-providers/members.data-provider';
 
 interface IMembersServiceSpy {
   getMember: jasmine.Spy;

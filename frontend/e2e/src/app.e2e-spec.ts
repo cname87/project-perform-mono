@@ -99,7 +99,7 @@ describe('Project Perform', () => {
       message1: 'MembersService: Fetched all members',
       numMessages2: 2,
       message2: 'MembersService: Fetched member with id = ',
-      numMessages3: 6,
+      numMessages3: 7,
       message3: 'MembersService: Deleted member with id = ',
       addedMemberName: 'Added',
       searchTest: 5,
@@ -545,7 +545,8 @@ describe('Project Perform', () => {
         await membersListPage.memberListElement.allMemberIds.count(),
       ).toEqual(expected.numMembers - 1, 'number of members');
       /* get the updated list of members */
-      const membersAfter = await membersListPage.memberListElement.getMembersArray();
+      const membersAfter
+        = await membersListPage.memberListElement.getMembersArray();
       /* filter deleted member for the members before array and compare */
       const expectedMembers = membersBefore.filter(
         (h) => h.name !== expected.newName,
@@ -562,7 +563,7 @@ describe('Project Perform', () => {
       const count = await membersListPage.messagesElement.messages.count();
       expect(count).toEqual(expected.numMessages3, 'number of messages');
       const message = await membersListPage.messagesElement.messages
-        .get(count - 1)
+        .get(count - 2) // last message is the getMembers update
         .getText();
       expect(message).toEqual(expected.message3);
     });

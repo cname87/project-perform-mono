@@ -1,6 +1,6 @@
 import { by, element, ElementFinder } from 'protractor';
 
-import { IMember } from 'src/app/api/model/member';
+import { IMember } from 'src/app/data-providers/models/member';
 
 export function getMembersListElement() {
 

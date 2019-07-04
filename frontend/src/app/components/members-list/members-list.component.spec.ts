@@ -12,7 +12,10 @@ import {
   asyncData,
   click,
 } from '../../shared/test-helpers';
-import { IMember, IMemberWithoutId } from '../../api/api-members.service';
+import {
+  IMember,
+  IMemberWithoutId,
+} from '../../data-providers/members.data-provider';
 import { members } from '../../shared/mocks/mock-members';
 
 interface IMembersServiceSpy {
@@ -79,7 +82,8 @@ describe('MembersListComponent', () => {
       },
     );
     const deleteMemberSpy = memberServiceSpy.deleteMember.and.callFake(
-      (_id: number) => {
+      (id: number) => {
+        membersArray = membersArray.filter((m) => m.id !== id);
         /* return nothing as expected */
         return asyncData(null);
       },
@@ -176,20 +180,29 @@ describe('MembersListComponent', () => {
     });
 
     it('should have the members after ngOnInit called', async () => {
-      const { component, fixture, getMembersSpy, expected } = await setup();
+      const { fixture, page, getMembersSpy, expected } = await setup();
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
-      await fixture.detectChanges();
+      await fixture.whenStable();
       /* test */
       expect(getMembersSpy).toHaveBeenCalledTimes(1);
-      expect(component.members.length).toEqual(
+      /* await asyncData call */
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(page.memberIdArray!.length).toEqual(
         expected.membersArray.length,
         'members retrieved',
       );
     });
 
     it('should call getMembers()', async () => {
-      const { component, fixture, getMembersSpy, expected } = await setup();
+      const {
+        component,
+        fixture,
+        page,
+        getMembersSpy,
+        expected,
+      } = await setup();
       /* getMembersSpy called on ngOnInit */
       expect(getMembersSpy).toHaveBeenCalledTimes(1);
       /* increase members.length */
@@ -200,8 +213,11 @@ describe('MembersListComponent', () => {
       const expectedCalls = 2;
       expect(getMembersSpy).toHaveBeenCalledTimes(expectedCalls);
       /* await asyncData call */
+      fixture.detectChanges();
       await fixture.whenStable();
-      expect(component.members.length).toEqual(
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(page.memberIdArray!.length).toEqual(
         expected.membersArray.length,
         'members retrieved',
       );
@@ -246,13 +262,10 @@ describe('MembersListComponent', () => {
     it('should call delete()', async () => {
       const { component, deleteMemberSpy, expected } = await setup();
       /* call component function */
-      const startMembersCount = expected.membersArray.length;
       const testMember = expected.membersArray[0];
       component.delete(testMember);
       expect(deleteMemberSpy).toHaveBeenCalledTimes(1);
       expect(deleteMemberSpy).toHaveBeenCalledWith(testMember.id);
-      /* test a member was deleted */
-      expect(component.members.length).toEqual(startMembersCount - 1);
     });
 
     it('should test trackBy function returns member.id', async () => {
@@ -317,32 +330,31 @@ describe('MembersListComponent', () => {
     });
 
     it('should click the delete button', async () => {
-      const {
-        fixture,
-        component,
-        page,
-        deleteMemberSpy,
-        expected,
-      } = await setup();
+      const { fixture, page, deleteMemberSpy, expected } = await setup();
       const startMembersCount = expected.membersArray.length;
       /* get a member to delete */
       const n = 2;
       const button = page.deleteBtnArray![n];
       const id = +page.memberIdArray![n].innerText;
-      /* click the delete button */
+      /* click the delete button on the member */
       click(button);
-      /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
-      await fixture.detectChanges();
+      /* initiate view changes */
+      /* need to run deleteMember then getMembers */
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      await fixture.whenStable();
       /* input field was cleared */
       expect(deleteMemberSpy).toHaveBeenCalledTimes(1);
       expect(deleteMemberSpy).toHaveBeenCalledWith(id);
       /* test a member was deleted */
-      const shouldBeEmpty = component.members.filter(
-        (m: IMember) => m.id === id,
+      const shouldBeEmpty = page.memberIdArray!.filter(
+        (m) => +m.innerText === id,
       );
       expect(shouldBeEmpty).toEqual([]);
-      expect(component.members.length).toEqual(startMembersCount - 1);
+      expect(page.memberIdArray!.length).toEqual(startMembersCount - 1);
     });
 
     it('should navigate to "/detail" on click', async () => {

@@ -12,7 +12,7 @@ import { AppComponent } from '../components/app/app.component';
 import { DashboardComponent } from '../components/dashboard/dashboard.component';
 import { MembersListComponent } from '../components/members-list/members-list.component';
 import { MembersService } from '../shared/members-service/members.service';
-import { IMember } from '../api/model/models';
+import { IMember } from '../data-providers/models/models';
 import { of, Observable } from 'rxjs';
 import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
 import { config } from '../config';

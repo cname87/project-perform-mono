@@ -8,10 +8,10 @@ import {
   MembersApi,
   IMemberWithoutId,
   IMember,
-} from '../../api/api-members.service';
+} from '../../data-providers/members.data-provider';
 import { asyncData, asyncError } from '../test-helpers';
 import { members } from '../mocks/mock-members';
-import { ICount } from '../../api/model/count';
+import { ICount } from '../../data-providers/models/count';
 import { AppModule } from '../../app.module';
 import { APP_BASE_HREF } from '@angular/common';
 

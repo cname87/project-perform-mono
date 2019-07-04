@@ -150,18 +150,6 @@ export const getMembers = (
       .select({ _id: 0, __v: 0 }) // exclude _id and __v fields
       .exec()
       .then((docs: [IMember]) => {
-        /* return error if no member found */
-        if (!docs.length) {
-          logger.error(modulename + ': getMembers found no matching member');
-          const errNotFound: IErr = {
-            name: 'DATABASE_NOT_FOUND',
-            message:
-              'No members found: The supplied match string does not match any stored members, or no matchstring supplied and no members are stored',
-            statusCode: 404,
-            dumped: true,
-          };
-          return reject(errNotFound);
-        }
         /* return member objects array */
         return resolve(docs);
       })
