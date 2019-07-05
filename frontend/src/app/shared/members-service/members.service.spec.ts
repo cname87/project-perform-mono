@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { MembersService } from './members.service';
 import { MessageService } from '../message-service/message.service';
@@ -13,7 +14,7 @@ import { asyncData, asyncError } from '../test-helpers';
 import { members } from '../mocks/mock-members';
 import { ICount } from '../../data-providers/models/count';
 import { AppModule } from '../../app.module';
-import { APP_BASE_HREF } from '@angular/common';
+import { IErrReport } from '../../config';
 
 interface IMembersApiStub {
   getMembers: jasmine.Spy;
@@ -36,10 +37,6 @@ describe('MembersService', () => {
     const membersApiStub: IMembersApiStub = {
       getMembers: jasmine.createSpy('getMembers').and.callFake(
         (str: string): Observable<IMember[]> => {
-          /* test both types of 404 errors */
-          if (str === null || str === 'errorTest404') {
-            return asyncError(new HttpErrorResponse({ status: 404 }));
-          }
           if (str === 'errorTest500') {
             return asyncError(new HttpErrorResponse({ status: 500 }));
           }
@@ -49,11 +46,15 @@ describe('MembersService', () => {
       getMember: jasmine.createSpy('getMember').and.callFake(
         (id: number): Observable<any> => {
           if (id === 0) {
-            return asyncError(
-              new HttpErrorResponse({
+            const errReport: IErrReport = {
+              allocatedType: 'Http server-side',
+              error: new HttpErrorResponse({
                 error: { name: 'HttpErrorResponse' },
                 status: 404,
               }),
+            };
+            return asyncError(
+              errReport,
             );
           }
           if (id === -1) {
@@ -78,7 +79,16 @@ describe('MembersService', () => {
       deleteMember: jasmine.createSpy('deleteMember').and.callFake(
         (member: IMember | number): Observable<ICount> => {
           if (member === 0) {
-            return asyncError(new HttpErrorResponse({ status: 404 }));
+            const errReport: IErrReport = {
+              allocatedType: 'Http server-side',
+              error: new HttpErrorResponse({
+                error: { name: 'HttpErrorResponse' },
+                status: 404,
+              }),
+            };
+            return asyncError(
+              errReport,
+            );
           }
           if (member === -1) {
             return asyncError(new HttpErrorResponse({ status: 500 }));
@@ -89,7 +99,16 @@ describe('MembersService', () => {
       updateMember: jasmine.createSpy('updateMember').and.callFake(
         (member: IMember): Observable<IMember> => {
           if (member.id === 0) {
-            return asyncError(new HttpErrorResponse({ status: 404 }));
+            const errReport: IErrReport = {
+              allocatedType: 'Http server-side',
+              error: new HttpErrorResponse({
+                error: { name: 'HttpErrorResponse' },
+                status: 404,
+              }),
+            };
+            return asyncError(
+              errReport,
+            );
           }
           if (member.id === -1) {
             return asyncError(new HttpErrorResponse({ status: 500 }));
@@ -203,48 +222,6 @@ describe('MembersService', () => {
       expect(result[0]).toEqual(members[0], 'member returned');
     });
 
-    it('should have getMembers("errorTest404") fail', async () => {
-      const { membersService, membersApi, messageService } = await setup();
-      /* will return 404 as if no members matching a search term */
-      const result = await membersService
-        .getMembers('errorTest404')
-        .toPromise();
-      expect(membersApi.getMembers.calls.count()).toEqual(
-        1,
-        'api getMembers() called once',
-      );
-      expect(messageService.add.calls.count()).toEqual(1, 'message logged');
-      expect(messageService.add.calls.count()).toEqual(
-        1,
-        'message log only called once',
-      );
-      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: Did not find any members matching "errorTest404"',
-        'error message logged',
-      );
-      expect(result.length).toEqual(0, 'empty array returned');
-    });
-
-    it('should have getMembers(null) fail', async () => {
-      const { membersService, membersApi, messageService } = await setup();
-      /* will return 404 as if members collection is empty */
-      const result = await membersService.getMembers(null as any).toPromise();
-      expect(membersApi.getMembers.calls.count()).toEqual(
-        1,
-        'api getMembers() called once',
-      );
-      expect(messageService.add.calls.count()).toEqual(1, 'message logged');
-      expect(messageService.add.calls.count()).toEqual(
-        1,
-        'message log only called once',
-      );
-      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-        'MembersService: There are no members to fetch',
-        'error message logged',
-      );
-      expect(result.length).toEqual(0, 'empty array returned');
-    });
-
     it('should have getMembers("errorTest500") fail', async () => {
       const { membersService, membersApi, messageService } = await setup();
 
@@ -306,13 +283,13 @@ describe('MembersService', () => {
         () => {
           fail('Successful response not expected');
         },
-        (error: any) => {
-          /* 404 error is thrown by getMembers() */
-          expect(error.message).toBe(
+        (errReport: IErrReport) => {
+          /* 404 error is thrown by getMember     () */
+          expect(errReport.error.message).toBe(
             'Http failure response for (unknown url): 404 undefined',
           );
           /* test err.isHandled is set */
-          expect(error.isHandled).toBe(true, 'User has been informed');
+          expect(errReport.isHandled).toBe(true, 'User has been informed');
           /* test getMember() has been called */
           expect(membersApi.getMember.calls.count()).toEqual(
             1,
@@ -460,14 +437,14 @@ describe('MembersService', () => {
       /* server will return 404 error */
       await membersService.deleteMember(0).subscribe(
         () => {
-          fail('Successfull response not expected');
+          fail('Successful response not expected');
         },
-        (error: any) => {
-          expect(error.message).toBe(
+        (errReport: IErrReport) => {
+          expect(errReport.error.message).toBe(
             'Http failure response for (unknown url): 404 undefined',
           );
           /* test err.isHandled is set */
-          expect(error.isHandled).toBe(true, 'User has been informed');
+          expect(errReport.isHandled).toBe(true, 'User has been informed');
           /* test api has been called */
           expect(membersApi.deleteMember.calls.count()).toEqual(
             1,
@@ -540,12 +517,12 @@ describe('MembersService', () => {
         () => {
           fail('Successfull response not expected');
         },
-        (error: any) => {
-          expect(error.message).toBe(
+        (errReport: IErrReport) => {
+          expect(errReport.error.message).toBe(
             'Http failure response for (unknown url): 404 undefined',
           );
           /* test err.isHandled is set */
-          expect(error.isHandled).toBe(true, 'User has been informed');
+          expect(errReport.isHandled).toBe(true, 'User has been informed');
           /* test api has been called */
           expect(membersApi.updateMember.calls.count()).toEqual(
             1,

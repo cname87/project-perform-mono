@@ -47,36 +47,30 @@ export class MembersService {
       return of([]);
     }
     return this.membersApi.getMembers(term).pipe(
-      tap((_) => {
-        if (term) {
-          this.log(`Found members matching "${term}"`);
+      tap((members) => {
+        if (members.length > 0) {
+          if (term) {
+            this.log(`Found members matching "${term}"`);
+          } else {
+            this.log('Fetched all members');
+          }
         } else {
-          this.log('Fetched all members');
+          if (term) {
+            this.log(`Did not find any members matching "${term}"`);
+          } else {
+            this.log('There are no members to fetch');
+          }
         }
       }),
       catchError((err: IErrReport) => {
         this.logger.trace(MembersService.name + ': catchError called');
 
-        /* handle Not Found/404 - inform user and return an empty array */
-        if (err.error && err.error.status === NOT_FOUND) {
-          this.logger.trace(
-            MembersService.name + ': Handling Not Found / 404 - not an error',
-          );
-          if (term) {
-            this.log(`Did not find any members matching "${term}"`);
-            return of([]);
-          } else {
-            this.log('There are no members to fetch');
-            return of([]);
-          }
-        } else {
-          /* rethrow anything other than a 404 */
-          this.logger.trace(MembersService.name + ': Throwing the error on');
-          /* inform user and mark as handled */
-          err.isHandled = true;
-          this.log('ERROR: Failed to get members from server');
-          return throwError(err);
-        }
+        this.logger.trace(MembersService.name + ': Throwing the error on');
+        /* inform user and mark as handled */
+        err.isHandled = true;
+        this.log('ERROR: Failed to get members from server');
+        return throwError(err);
+
       }),
     );
   }
