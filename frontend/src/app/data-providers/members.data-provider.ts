@@ -34,7 +34,9 @@ export class MembersDataProvider {
   private withCredentials = membersConfiguration.withCredentials;
 
   constructor(private httpClient: HttpClient, private logger: NGXLogger) {
-    this.logger.trace(MembersDataProvider.name + ': Starting MembersDataProvider');
+    this.logger.trace(
+      MembersDataProvider.name + ': Starting MembersDataProvider',
+    );
   }
 
   /**
@@ -78,7 +80,9 @@ export class MembersDataProvider {
         catchError((errReport) => {
           this.logger.trace(MembersDataProvider.name + ': catchError called');
           /* rethrow all errors */
-          this.logger.trace(MembersDataProvider.name + ': Throwing the error on');
+          this.logger.trace(
+            MembersDataProvider.name + ': Throwing the error on',
+          );
           return throwError(errReport);
         }),
       );
@@ -125,7 +129,9 @@ export class MembersDataProvider {
         catchError((errReport) => {
           this.logger.trace(MembersDataProvider.name + ': catchError called');
           /* rethrow all errors */
-          this.logger.trace(MembersDataProvider.name + ': Throwing the error on');
+          this.logger.trace(
+            MembersDataProvider.name + ': Throwing the error on',
+          );
           return throwError(errReport);
         }),
       );
@@ -172,7 +178,9 @@ export class MembersDataProvider {
         catchError((errReport) => {
           this.logger.trace(MembersDataProvider.name + ': catchError called');
           /* rethrow all errors */
-          this.logger.trace(MembersDataProvider.name + ': Throwing the error on');
+          this.logger.trace(
+            MembersDataProvider.name + ': Throwing the error on',
+          );
           return throwError(errReport);
         }),
       );
@@ -219,7 +227,9 @@ export class MembersDataProvider {
         catchError((errReport) => {
           this.logger.trace(MembersDataProvider.name + ': catchError called');
           /* rethrow all errors */
-          this.logger.trace(MembersDataProvider.name + ': Throwing the error on');
+          this.logger.trace(
+            MembersDataProvider.name + ': Throwing the error on',
+          );
           return throwError(errReport);
         }),
       );
@@ -246,9 +256,7 @@ export class MembersDataProvider {
 
     this.logger.trace(
       MembersDataProvider.name +
-        `: Sending DELETE request to: ${this.basePath}/${
-          this.membersPath
-        }/${id}`,
+        `: Sending DELETE request to: ${this.basePath}/${this.membersPath}/${id}`,
     );
 
     return this.httpClient
@@ -268,7 +276,9 @@ export class MembersDataProvider {
         catchError((errReport) => {
           this.logger.trace(MembersDataProvider.name + ': catchError called');
           /* rethrow all errors */
-          this.logger.trace(MembersDataProvider.name + ': Throwing the error on');
+          this.logger.trace(
+            MembersDataProvider.name + ': Throwing the error on',
+          );
           return throwError(errReport);
         }),
       );
@@ -303,7 +313,9 @@ export class MembersDataProvider {
         catchError((errReport) => {
           this.logger.trace(MembersDataProvider.name + ': catchError called');
           /* rethrow all errors */
-          this.logger.trace(MembersDataProvider.name + ': Throwing the error on');
+          this.logger.trace(
+            MembersDataProvider.name + ': Throwing the error on',
+          );
           return throwError(errReport);
         }),
       );

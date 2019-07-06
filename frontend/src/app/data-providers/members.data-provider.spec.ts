@@ -207,24 +207,17 @@ describe('MembersDataProvider', () => {
       });
 
       it('should return a http error', async () => {
-        const {
-          mockMemberWithoutId,
-          membersDataProvider,
-        } = await setup();
+        const { mockMemberWithoutId, membersDataProvider } = await setup();
 
         /* set httpclient parameter to a dummy value to trigger error */
         membersDataProvider.basePath = 'error';
 
         /* call MembersDataProvider function */
         try {
-          await membersDataProvider
-          .addMember(mockMemberWithoutId)
-          .toPromise();
+          await membersDataProvider.addMember(mockMemberWithoutId).toPromise();
           fail('should not reach here');
         } catch (err) {
-          expect(err.message).toEqual(
-            'Test Error',
-          );
+          expect(err.message).toEqual('Test Error');
         }
       });
 
@@ -258,23 +251,17 @@ describe('MembersDataProvider', () => {
       });
 
       it('should return a http error', async () => {
-        const {
-          membersDataProvider,
-        } = await setup();
+        const { membersDataProvider } = await setup();
 
         /* set httpclient parameter to a dummy value to trigger error */
         membersDataProvider.basePath = 'error';
 
         /* call MembersDataProvider function */
         try {
-          await membersDataProvider
-          .getMembers()
-          .toPromise();
+          await membersDataProvider.getMembers().toPromise();
           fail('should not reach here');
         } catch (err) {
-          expect(err.message).toEqual(
-            'Test Error',
-          );
+          expect(err.message).toEqual('Test Error');
         }
       });
     };
@@ -296,23 +283,17 @@ describe('MembersDataProvider', () => {
       });
 
       it('should return a http error', async () => {
-        const {
-          membersDataProvider,
-        } = await setup();
+        const { membersDataProvider } = await setup();
 
         /* set httpclient parameter to a dummy value to trigger error */
         membersDataProvider.basePath = 'error';
 
         /* call MembersDataProvider function */
         try {
-          await membersDataProvider
-          .getMember(id)
-          .toPromise();
+          await membersDataProvider.getMember(id).toPromise();
           fail('should not reach here');
         } catch (err) {
-          expect(err.message).toEqual(
-            'Test Error',
-          );
+          expect(err.message).toEqual('Test Error');
         }
       });
 
@@ -339,23 +320,17 @@ describe('MembersDataProvider', () => {
       });
 
       it('should return a http error', async () => {
-        const {
-          membersDataProvider,
-        } = await setup();
+        const { membersDataProvider } = await setup();
 
         /* set httpclient parameter to a dummy value to trigger error */
         membersDataProvider.basePath = 'error';
 
         /* call MembersDataProvider function */
         try {
-          await membersDataProvider
-          .updateMember(member)
-          .toPromise();
+          await membersDataProvider.updateMember(member).toPromise();
           fail('should not reach here');
         } catch (err) {
-          expect(err.message).toEqual(
-            'Test Error',
-          );
+          expect(err.message).toEqual('Test Error');
         }
       });
 
@@ -380,23 +355,17 @@ describe('MembersDataProvider', () => {
       });
 
       it('should return a http error', async () => {
-        const {
-          membersDataProvider,
-        } = await setup();
+        const { membersDataProvider } = await setup();
 
         /* set httpclient parameter to a dummy value to trigger error */
         membersDataProvider.basePath = 'error';
 
         /* call MembersDataProvider function */
         try {
-          await membersDataProvider
-          .deleteMember(id)
-          .toPromise();
+          await membersDataProvider.deleteMember(id).toPromise();
           fail('should not reach here');
         } catch (err) {
-          expect(err.message).toEqual(
-            'Test Error',
-          );
+          expect(err.message).toEqual('Test Error');
         }
       });
 
@@ -421,23 +390,17 @@ describe('MembersDataProvider', () => {
       });
 
       it('should return a http error', async () => {
-        const {
-          membersDataProvider,
-        } = await setup();
+        const { membersDataProvider } = await setup();
 
         /* set httpclient parameter to a dummy value to trigger error */
         membersDataProvider.basePath = 'error';
 
         /* call MembersDataProvider function */
         try {
-          await membersDataProvider
-          .deleteMembers()
-          .toPromise();
+          await membersDataProvider.deleteMembers().toPromise();
           fail('should not reach here');
         } catch (err) {
-          expect(err.message).toEqual(
-            'Test Error',
-          );
+          expect(err.message).toEqual('Test Error');
         }
       });
     };

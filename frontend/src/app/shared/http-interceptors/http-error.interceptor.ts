@@ -57,9 +57,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             const errorsReceived = i + 1; // index is zero-based
             this.logger.trace(
               HttpErrorInterceptor.name +
-                `: Error ${errorsReceived} received on try ${errorsReceived} of ${
-                  this.totalTries
-                } to ${request.url}`,
+                `: Error ${errorsReceived} received on try ${errorsReceived} of ${this.totalTries} to ${request.url}`,
             );
             return iif(
               () => {

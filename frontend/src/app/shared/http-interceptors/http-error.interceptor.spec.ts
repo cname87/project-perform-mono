@@ -167,9 +167,7 @@ describe('HttpErrorInterceptor', () => {
           /* test an error report property */
           expect(error.error.status).toEqual(serverError.status);
           expect(traceLoggerSpy).toHaveBeenCalledWith(
-            `HttpErrorInterceptor: Error 1 received on try 1 of ${totalTries} to ${
-              requestUrl.url
-            }`,
+            `HttpErrorInterceptor: Error 1 received on try 1 of ${totalTries} to ${requestUrl.url}`,
           );
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Error 2 received on try 2 of 3 to testUrl',
@@ -201,9 +199,7 @@ describe('HttpErrorInterceptor', () => {
         (ok: any) => {
           expect(ok).toBe(noError);
           expect(traceLoggerSpy).toHaveBeenCalledWith(
-            `HttpErrorInterceptor: Error 1 received on try 1 of ${totalTries} to ${
-              requestUrl.url
-            }`,
+            `HttpErrorInterceptor: Error 1 received on try 1 of ${totalTries} to ${requestUrl.url}`,
           );
           /* check only one error message traced */
           const errorCalls = 1;

@@ -160,12 +160,9 @@ describe('DashboardComponent', () => {
   });
 
   it('should handle a getMembers error', async () => {
-    const {
-      component,
-      page,
-      getMembersSpy,
-      handleErrorSpy,
-    } = await setup(true);
+    const { component, page, getMembersSpy, handleErrorSpy } = await setup(
+      true,
+    );
     expect(getMembersSpy).toHaveBeenCalledTimes(1);
     let spyCalls = 1;
     expect(handleErrorSpy).toHaveBeenCalledTimes(spyCalls);
