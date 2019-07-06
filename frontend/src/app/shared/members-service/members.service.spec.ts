@@ -6,7 +6,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { MembersService } from './members.service';
 import { MessageService } from '../message-service/message.service';
 import {
-  MembersApi,
+  MembersDataProvider,
   IMemberWithoutId,
   IMember,
 } from '../../data-providers/members.data-provider';
@@ -53,9 +53,7 @@ describe('MembersService', () => {
                 status: 404,
               }),
             };
-            return asyncError(
-              errReport,
-            );
+            return asyncError(errReport);
           }
           if (id === -1) {
             return asyncError(
@@ -86,9 +84,7 @@ describe('MembersService', () => {
                 status: 404,
               }),
             };
-            return asyncError(
-              errReport,
-            );
+            return asyncError(errReport);
           }
           if (member === -1) {
             return asyncError(new HttpErrorResponse({ status: 500 }));
@@ -106,9 +102,7 @@ describe('MembersService', () => {
                 status: 404,
               }),
             };
-            return asyncError(
-              errReport,
-            );
+            return asyncError(errReport);
           }
           if (member.id === -1) {
             return asyncError(new HttpErrorResponse({ status: 500 }));
@@ -139,12 +133,12 @@ describe('MembersService', () => {
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: MessageService, useValue: messageServiceStub },
-        { provide: MembersApi, useValue: membersApiStub },
+        { provide: MembersDataProvider, useValue: membersApiStub },
       ],
     }).compileComponents();
 
     const membersService: MembersService = TestBed.get(MembersService);
-    const membersApi: IMembersApiStub = TestBed.get(MembersApi);
+    const membersApi: IMembersApiStub = TestBed.get(MembersDataProvider);
     const messageService: IMessageServiceStub = TestBed.get(MessageService);
 
     return {
@@ -560,7 +554,7 @@ describe('MembersService', () => {
           /* test user message */
           expect(messageService.add.calls.count()).toEqual(1, 'message logged');
           expect(messageService.add.calls.argsFor(0)[0]).toEqual(
-            'MembersService: ERROR: Failed to update member on server',
+            'MembersService: ERROR: Failed to update member on the server',
             'error message logged',
           );
         },

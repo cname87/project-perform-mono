@@ -2,8 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { MembersApi, IMemberWithoutId, IMember } from './members.data-provider';
-import { asyncData } from '../shared/test-helpers';
+import {
+  MembersDataProvider,
+  IMemberWithoutId,
+  IMember,
+} from './members.data-provider';
+import { asyncData, asyncError } from '../shared/test-helpers';
 import { membersConfiguration } from './configuration';
 import { ICount } from './models/count';
 import { AppModule } from '../app.module';
@@ -17,18 +21,24 @@ interface IHttpClientStub {
   delete: jasmine.Spy;
 }
 
-describe('MembersApi', () => {
+describe('MembersDataProvider', () => {
   async function mainSetup() {
     /* create stub instances with spies for injection */
     const mockMemberWithoutId = { name: 'testName' };
     const httpClientStub: IHttpClientStub = {
       post: jasmine.createSpy('post').and.callFake(
-        (_url: string, m: IMemberWithoutId, _opt: any): Observable<IMember> => {
+        (url: string, m: IMemberWithoutId, _opt: any): Observable<IMember> => {
+          if (url.slice(0, 'error'.length) === 'error') {
+            return asyncError(new Error('Test Error'));
+          }
           return asyncData({ id: 21, name: m.name });
         },
       ),
       get: jasmine.createSpy('get').and.callFake(
-        (_url: string, opts: any): Observable<IMember | IMember[]> => {
+        (url: string, opts: any): Observable<IMember | IMember[]> => {
+          if (url.slice(0, 'error'.length) === 'error') {
+            return asyncError(new Error('Test Error'));
+          }
           if (opts.params) {
             return asyncData([
               { id: 21, name: 'test21' },
@@ -40,12 +50,18 @@ describe('MembersApi', () => {
         },
       ),
       put: jasmine.createSpy('put').and.callFake(
-        (_url: string, m: IMember, _opt: any): Observable<IMember> => {
+        (url: string, m: IMember, _opt: any): Observable<IMember> => {
+          if (url.slice(0, 'error'.length) === 'error') {
+            return asyncError(new Error('Test Error'));
+          }
           return asyncData({ id: 21, name: m.name });
         },
       ),
       delete: jasmine.createSpy('delete').and.callFake(
-        (_url: string, _opts: any): Observable<ICount> => {
+        (url: string, _opts: any): Observable<ICount> => {
+          if (url.slice(0, 'error'.length) === 'error') {
+            return asyncError(new Error('Test Error'));
+          }
           return asyncData({ count: 3 });
         },
       ),
@@ -60,12 +76,12 @@ describe('MembersApi', () => {
       ],
     }).compileComponents();
 
-    const membersApi: MembersApi = TestBed.get(MembersApi);
+    const membersDataProvider = TestBed.get(MembersDataProvider);
     const httpClient: IHttpClientStub = TestBed.get(HttpClient);
 
     return {
       mockMemberWithoutId,
-      membersApi,
+      membersDataProvider,
       httpClient,
     };
   }
@@ -128,12 +144,14 @@ describe('MembersApi', () => {
 
   function testErrors(operation: string, httpMethod: string) {
     it('should have operation(null) throw an error', async () => {
-      const { membersApi, httpClient } = await setup();
+      const { membersDataProvider, httpClient } = await setup();
       try {
-        await membersApi[operation](null as any).toPromise();
+        await membersDataProvider[operation](null as any).toPromise();
         fail('should not reach this point');
       } catch (err) {
-        expect(err.message.substring(0, 18)).toEqual('Required parameter');
+        expect(err.message.substring(0, 'Required parameter'.length)).toEqual(
+          'Required parameter',
+        );
       }
       expect(httpClient[httpMethod].calls.count()).toEqual(
         0,
@@ -141,13 +159,15 @@ describe('MembersApi', () => {
       );
     });
 
-    it('should have operation(undefined) throw and error', async () => {
-      const { membersApi, httpClient } = await setup();
+    it('should have operation(undefined) throw an error', async () => {
+      const { membersDataProvider, httpClient } = await setup();
       try {
-        await membersApi[operation](undefined as any).toPromise();
+        await membersDataProvider[operation](undefined as any).toPromise();
         fail('should not reach this point');
       } catch (err) {
-        expect(err.message.substring(0, 18)).toEqual('Required parameter');
+        expect(err.message.substring(0, 'Required parameter'.length)).toEqual(
+          'Required parameter',
+        );
       }
       expect(httpClient[httpMethod].calls.count()).toEqual(
         0,
@@ -159,10 +179,14 @@ describe('MembersApi', () => {
   function testAddMember() {
     return () => {
       it('should have addMember(memberWithoutId) return a member', async () => {
-        const { mockMemberWithoutId, membersApi, httpClient } = await setup();
+        const {
+          mockMemberWithoutId,
+          membersDataProvider,
+          httpClient,
+        } = await setup();
 
-        /* call MembersApi function */
-        const result = await membersApi
+        /* call MembersDataProvider function */
+        const result = await membersDataProvider
           .addMember(mockMemberWithoutId)
           .toPromise();
 
@@ -182,6 +206,28 @@ describe('MembersApi', () => {
         );
       });
 
+      it('should return a http error', async () => {
+        const {
+          mockMemberWithoutId,
+          membersDataProvider,
+        } = await setup();
+
+        /* set httpclient parameter to a dummy value to trigger error */
+        membersDataProvider.basePath = 'error';
+
+        /* call MembersDataProvider function */
+        try {
+          await membersDataProvider
+          .addMember(mockMemberWithoutId)
+          .toPromise();
+          fail('should not reach here');
+        } catch (err) {
+          expect(err.message).toEqual(
+            'Test Error',
+          );
+        }
+      });
+
       /* test common error paths */
       testErrors('addMember', 'post');
     };
@@ -190,10 +236,10 @@ describe('MembersApi', () => {
   function testGetMembers(name: string | undefined, queryName: string | null) {
     return () => {
       it('should have getMembers() return an array of members', async () => {
-        const { membersApi, httpClient } = await setup();
+        const { membersDataProvider, httpClient } = await setup();
 
-        /* call MembersApi function */
-        const result = await membersApi.getMembers(name).toPromise();
+        /* call MembersDataProvider function */
+        const result = await membersDataProvider.getMembers(name).toPromise();
 
         /* use shared function to test http method call */
         testHttpMethodCall(httpClient, 'get');
@@ -210,22 +256,64 @@ describe('MembersApi', () => {
           'members returned',
         );
       });
+
+      it('should return a http error', async () => {
+        const {
+          membersDataProvider,
+        } = await setup();
+
+        /* set httpclient parameter to a dummy value to trigger error */
+        membersDataProvider.basePath = 'error';
+
+        /* call MembersDataProvider function */
+        try {
+          await membersDataProvider
+          .getMembers()
+          .toPromise();
+          fail('should not reach here');
+        } catch (err) {
+          expect(err.message).toEqual(
+            'Test Error',
+          );
+        }
+      });
     };
   }
 
   function testGetMember(id: number) {
     return () => {
       it('should have getMember() return a member', async () => {
-        const { membersApi, httpClient } = await setup();
+        const { membersDataProvider, httpClient } = await setup();
 
-        /* call MembersApi function */
-        const result = await membersApi.getMember(id).toPromise();
+        /* call MembersDataProvider function */
+        const result = await membersDataProvider.getMember(id).toPromise();
 
         /* use shared function to test http method call */
         testHttpMethodCall(httpClient, 'get', true);
 
         /* test response */
         expect(result).toEqual({ id: 21, name: 'test21' }, 'members returned');
+      });
+
+      it('should return a http error', async () => {
+        const {
+          membersDataProvider,
+        } = await setup();
+
+        /* set httpclient parameter to a dummy value to trigger error */
+        membersDataProvider.basePath = 'error';
+
+        /* call MembersDataProvider function */
+        try {
+          await membersDataProvider
+          .getMember(id)
+          .toPromise();
+          fail('should not reach here');
+        } catch (err) {
+          expect(err.message).toEqual(
+            'Test Error',
+          );
+        }
       });
 
       /* test common error paths */
@@ -236,16 +324,39 @@ describe('MembersApi', () => {
   function testUpdateMember(member: IMember) {
     return () => {
       it('should have updateMember(member) return a member', async () => {
-        const { membersApi, httpClient } = await setup();
+        const { membersDataProvider, httpClient } = await setup();
 
-        /* call MembersApi function */
-        const result = await membersApi.updateMember(member).toPromise();
+        /* call MembersDataProvider function */
+        const result = await membersDataProvider
+          .updateMember(member)
+          .toPromise();
 
         /* use shared function to test http method call */
         testHttpMethodCall(httpClient, 'put');
 
         /* test response */
         expect(result).toEqual(member, 'members returned');
+      });
+
+      it('should return a http error', async () => {
+        const {
+          membersDataProvider,
+        } = await setup();
+
+        /* set httpclient parameter to a dummy value to trigger error */
+        membersDataProvider.basePath = 'error';
+
+        /* call MembersDataProvider function */
+        try {
+          await membersDataProvider
+          .updateMember(member)
+          .toPromise();
+          fail('should not reach here');
+        } catch (err) {
+          expect(err.message).toEqual(
+            'Test Error',
+          );
+        }
       });
 
       /* test common error paths */
@@ -256,16 +367,37 @@ describe('MembersApi', () => {
   function testDeleteMember(id: number) {
     return () => {
       it('should have deleteMember() return a count', async () => {
-        const { membersApi, httpClient } = await setup();
+        const { membersDataProvider, httpClient } = await setup();
 
-        /* call MembersApi function */
-        const result = await membersApi.deleteMember(id).toPromise();
+        /* call MembersDataProvider function */
+        const result = await membersDataProvider.deleteMember(id).toPromise();
 
         /* use shared function to test http method call */
         testHttpMethodCall(httpClient, 'delete', true);
 
         /* test response */
         expect(result).toEqual({ count: 3 }, 'count returned');
+      });
+
+      it('should return a http error', async () => {
+        const {
+          membersDataProvider,
+        } = await setup();
+
+        /* set httpclient parameter to a dummy value to trigger error */
+        membersDataProvider.basePath = 'error';
+
+        /* call MembersDataProvider function */
+        try {
+          await membersDataProvider
+          .deleteMember(id)
+          .toPromise();
+          fail('should not reach here');
+        } catch (err) {
+          expect(err.message).toEqual(
+            'Test Error',
+          );
+        }
       });
 
       /* test common error paths */
@@ -276,10 +408,10 @@ describe('MembersApi', () => {
   function testDeleteMembers() {
     return () => {
       it('should have deleteMembers() return a count', async () => {
-        const { membersApi, httpClient } = await setup();
+        const { membersDataProvider, httpClient } = await setup();
 
-        /* call MembersApi function */
-        const result = await membersApi.deleteMembers().toPromise();
+        /* call MembersDataProvider function */
+        const result = await membersDataProvider.deleteMembers().toPromise();
 
         /* use shared function to test http method call */
         testHttpMethodCall(httpClient, 'delete');
@@ -287,12 +419,33 @@ describe('MembersApi', () => {
         /* test response */
         expect(result).toEqual({ count: 3 }, 'count returned');
       });
+
+      it('should return a http error', async () => {
+        const {
+          membersDataProvider,
+        } = await setup();
+
+        /* set httpclient parameter to a dummy value to trigger error */
+        membersDataProvider.basePath = 'error';
+
+        /* call MembersDataProvider function */
+        try {
+          await membersDataProvider
+          .deleteMembers()
+          .toPromise();
+          fail('should not reach here');
+        } catch (err) {
+          expect(err.message).toEqual(
+            'Test Error',
+          );
+        }
+      });
     };
   }
   describe('setup', () => {
     it('should be created', async () => {
-      const { membersApi } = await setup();
-      expect(membersApi).toBeTruthy();
+      const { membersDataProvider } = await setup();
+      expect(membersDataProvider).toBeTruthy();
     });
   });
 
@@ -306,5 +459,5 @@ describe('MembersApi', () => {
   describe('getMember', testGetMember(9));
   describe('updateMember', testUpdateMember({ id: 21, name: 'test21' }));
   describe('deleteMember', testDeleteMember(9));
-  describe('addMember', testDeleteMembers());
+  describe('deleteMembers', testDeleteMembers());
 });

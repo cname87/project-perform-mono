@@ -4,7 +4,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 import { NOT_FOUND } from 'http-status-codes';
 
-import { MembersApi } from '../../data-providers/members.data-provider';
+import { MembersDataProvider } from '../../data-providers/members.data-provider';
 import {
   ICount,
   IMember,
@@ -20,7 +20,7 @@ import { IErrReport } from '../../config';
 export class MembersService {
   constructor(
     private messageService: MessageService,
-    private membersApi: MembersApi,
+    private membersDataProvider: MembersDataProvider,
     private logger: NGXLogger,
   ) {
     this.logger.trace(MembersService.name + ': starting members.service');
@@ -46,7 +46,7 @@ export class MembersService {
       );
       return of([]);
     }
-    return this.membersApi.getMembers(term).pipe(
+    return this.membersDataProvider.getMembers(term).pipe(
       tap((members) => {
         if (members.length > 0) {
           if (term) {
@@ -62,15 +62,16 @@ export class MembersService {
           }
         }
       }),
+
       catchError((err: IErrReport) => {
         this.logger.trace(MembersService.name + ': catchError called');
 
-        this.logger.trace(MembersService.name + ': Throwing the error on');
         /* inform user and mark as handled */
-        err.isHandled = true;
         this.log('ERROR: Failed to get members from server');
-        return throwError(err);
+        err.isHandled = true;
 
+        this.logger.trace(MembersService.name + ': Throwing the error on');
+        return throwError(err);
       }),
     );
   }
@@ -87,32 +88,25 @@ export class MembersService {
   getMember(id: number): Observable<IMember> {
     this.logger.trace(MembersService.name + ': getMember called');
 
-    return this.membersApi.getMember(id).pipe(
+    return this.membersDataProvider.getMember(id).pipe(
       tap((_) => {
         this.log(`Fetched member with id = ${id}`);
       }),
+
       catchError((errReport: IErrReport) => {
         this.logger.trace(MembersService.name + ': catchError called');
 
-        /* handle only HttpErrorResponse errors */
-        if (errReport.error && errReport.error.name === 'HttpErrorResponse') {
-          /* handle Not Found/404 */
-          if (errReport.error && errReport.error.status === NOT_FOUND) {
-            this.logger.trace(
-              MembersService.name + ': Handling a Not Found / 404 error',
-            );
-            /* inform user that that member did not exist */
-            this.log(`ERROR: Did not find member with id = ${id}`);
-
-            /* otherwise inform user of general fail */
-          } else {
-            this.log('ERROR: Failed to get member from server');
-          }
-          /* mark as handled for errorHandler */
-          errReport.isHandled = true;
+        /* inform user */
+        if (errReport.error && errReport.error.status === NOT_FOUND) {
+          /* 404: member did not exist */
+          this.log(`ERROR: Did not find member with id = ${id}`);
+        } else {
+          /* otherwise a general fail */
+          this.log('ERROR: Failed to get member from server');
         }
+        /* mark as handled */
+        errReport.isHandled = true;
 
-        /* rethrow all errors */
         this.logger.trace(MembersService.name + ': Throwing the error on');
         return throwError(errReport);
       }),
@@ -131,7 +125,7 @@ export class MembersService {
   addMember(member: IMemberWithoutId): Observable<IMember> {
     this.logger.trace(MembersService.name + ': addMember called');
 
-    return this.membersApi.addMember(member).pipe(
+    return this.membersDataProvider.addMember(member).pipe(
       tap((newMember: IMember) => {
         this.log(`Added member with id = ${newMember.id}`);
       }),
@@ -139,11 +133,10 @@ export class MembersService {
       catchError((err: IErrReport) => {
         this.logger.trace(MembersService.name + ': catchError called');
 
-        /* inform user and set err corresponding flag */
+        /* inform user and mark as handled */
         this.log('ERROR: Failed to add member to server');
         err.isHandled = true;
 
-        /* rethrow all errors */
         this.logger.trace(MembersService.name + ': Throwing the error on');
         return throwError(err);
       }),
@@ -164,26 +157,25 @@ export class MembersService {
 
     const id = typeof memberOrId === 'number' ? memberOrId : memberOrId.id;
 
-    return this.membersApi.deleteMember(id).pipe(
+    return this.membersDataProvider.deleteMember(id).pipe(
       tap((_) => {
         this.log(`Deleted member with id = ${id}`);
       }),
+
       catchError((errReport: IErrReport) => {
         this.logger.trace(MembersService.name + ': catchError called');
 
-        /* handle Not Found/404 - inform user */
+        /* inform user */
         if (errReport.error && errReport.error.status === NOT_FOUND) {
-          this.logger.trace(
-            MembersService.name + ': Handling a Not Found / 404 error',
-          );
+          /* 404: member did not exist */
           this.log(`ERROR: Did not find member with id = ${id}`);
         } else {
-          /* otherwise inform user of a general error */
+          /* otherwise a general fail */
           this.log('ERROR: Failed to delete member from server');
         }
+        /* mark as handled */
         errReport.isHandled = true;
 
-        /* rethrow all errors */
         this.logger.trace(MembersService.name + ': Throwing the error on');
         return throwError(errReport);
       }),
@@ -202,26 +194,25 @@ export class MembersService {
   updateMember(member: IMember): Observable<IMember> {
     this.logger.trace(MembersService.name + ': updateMember called');
 
-    return this.membersApi.updateMember(member).pipe(
+    return this.membersDataProvider.updateMember(member).pipe(
       tap((_) => {
         this.log(`Updated member with id = ${member.id}`);
       }),
+
       catchError((errReport: IErrReport) => {
         this.logger.trace(MembersService.name + ': catchError called');
 
-        /* handle Not Found/404 - inform user */
+        /* inform user */
         if (errReport.error && errReport.error.status === NOT_FOUND) {
-          this.logger.trace(
-            MembersService.name + ': Handling a Not Found / 404 error',
-          );
+          /* 404: member did not exist */
           this.log(`ERROR: Did not find member with id = ${member.id}`);
         } else {
-          /* otherwise inform user of a general error */
-          this.log('ERROR: Failed to update member on server');
+          /* otherwise a general fail */
+          this.log('ERROR: Failed to update member on the server');
         }
+        /* mark as handled */
         errReport.isHandled = true;
 
-        /* rethrow all errors */
         this.logger.trace(MembersService.name + ': Throwing the error on');
         return throwError(errReport);
       }),

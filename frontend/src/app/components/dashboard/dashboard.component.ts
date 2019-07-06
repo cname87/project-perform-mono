@@ -17,7 +17,6 @@ import { IMember } from '../../data-providers/members.data-provider';
 export class DashboardComponent implements OnInit {
   /* array of members from server */
   members$: Observable<IMember[]> = of([]);
-  propertyToDisplay = 'name';
   private firstMemberOnDisplay = 1;
   private lastMemberOnDisplay = 4;
 
@@ -60,10 +59,6 @@ export class DashboardComponent implements OnInit {
         return of([]);
       }),
     );
-  }
-
-  showProperty(member: IMember) {
-    return member[this.propertyToDisplay];
   }
 
   trackByFn(_index: number, member: IMember) {
