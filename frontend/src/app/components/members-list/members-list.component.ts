@@ -20,8 +20,6 @@ import { Observable, of } from 'rxjs';
   styleUrls: ['./members-list.component.scss'],
 })
 export class MembersListComponent implements OnInit {
-  /* members to list */
-  members: IMember[] = [];
   /* observable of array of members returned from search */
   members$: Observable<IMember[]> = of([]);
   /* mode for input box */
@@ -40,13 +38,13 @@ export class MembersListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getMembers();
+    this.members$ = this.getMembers();
   }
 
-  getMembers(): void {
+  getMembers(): any {
     this.logger.trace(MembersListComponent.name + ': Calling getMembers');
 
-    this.members$ = this.membersService.getMembers().pipe(
+    return this.membersService.getMembers().pipe(
       /* using publish as share will resubscribe for each html call in case of unexpected error causing observable to complete */
       publishReplay(1),
       refCount(),
@@ -75,7 +73,8 @@ export class MembersListComponent implements OnInit {
     const member: IMemberWithoutId = { name };
 
     this.membersService.addMember(member).subscribe((_addedMember) => {
-      this.getMembers();
+      /* retrieve members list from server */
+      this.members$ = this.getMembers();
       /* allow errors go to errorHandler */
       /* httpclient observable => unsubscribe not necessary */
     });
@@ -84,7 +83,7 @@ export class MembersListComponent implements OnInit {
   delete(member: IMember): void {
     this.logger.trace(MembersListComponent.name + ': Calling deleteMember');
     this.membersService.deleteMember(member.id).subscribe((_count) => {
-      this.getMembers();
+      this.members$ = this.getMembers();
       /* allow errors go to errorHandler */
       /* httpclient observable => unsubscribe not necessary */
     });

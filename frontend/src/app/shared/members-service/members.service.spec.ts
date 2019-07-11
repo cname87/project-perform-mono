@@ -31,12 +31,15 @@ interface IMessageServiceStub {
 }
 
 describe('MembersService', () => {
-  async function mainSetup() {
+  async function mainSetup(mockMembers = members) {
     /* create stub instances with spies for injection */
-    const mockMembers = members;
+    // const mockMembers = members;
     const membersApiStub: IMembersApiStub = {
       getMembers: jasmine.createSpy('getMembers').and.callFake(
         (str: string): Observable<IMember[]> => {
+          if (str === 'returnNone') {
+            return asyncData([]);
+          }
           if (str === 'errorTest500') {
             return asyncError(new HttpErrorResponse({ status: 500 }));
           }
@@ -148,8 +151,8 @@ describe('MembersService', () => {
     };
   }
 
-  async function setup() {
-    return mainSetup();
+  async function setup(mockMembers = members) {
+    return mainSetup(mockMembers);
   }
 
   describe('setup', () => {
@@ -165,7 +168,7 @@ describe('MembersService', () => {
   describe('updateMember', describeUpdateMember);
 
   async function describeGetMembers() {
-    it('should have getMembers(" ") return []', async () => {
+    it('should have getMembers(" ") return [] without accessing the server', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService.getMembers(' ').toPromise();
       expect(membersApi.getMembers.calls.count()).toEqual(
@@ -173,6 +176,38 @@ describe('MembersService', () => {
         'api getMembers() not called',
       );
       expect(messageService.add.calls.count()).toEqual(0, 'no message logged');
+      expect(result.length).toEqual(0, 'no members returned');
+    });
+
+    it('should have getMembers(term) handle a returned []', async () => {
+      const { membersService, membersApi, messageService } = await setup();
+      /* dummy parameter will cause [] to be returned */
+      const result = await membersService.getMembers('returnNone').toPromise();
+      expect(membersApi.getMembers.calls.count()).toEqual(
+        1,
+        'api getMembers() called once',
+      );
+      expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+        'MembersService: Did not find any members matching "returnNone"',
+        'the message logged',
+      );
+      expect(result.length).toEqual(0, 'no members returned');
+    });
+
+    it('should have getMembers() handle a returned []', async () => {
+      /* call setup so getMembers() returns [] */
+      const { membersService, membersApi, messageService } = await setup([]);
+      const result = await membersService.getMembers().toPromise();
+      expect(membersApi.getMembers.calls.count()).toEqual(
+        1,
+        'api getMembers() called once',
+      );
+      expect(messageService.add.calls.count()).toEqual(1, 'message logged');
+      expect(messageService.add.calls.argsFor(0)[0]).toEqual(
+        'MembersService: There are no members to fetch',
+        'the message logged',
+      );
       expect(result.length).toEqual(0, 'no members returned');
     });
 

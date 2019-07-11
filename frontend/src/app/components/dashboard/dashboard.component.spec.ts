@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
 import { APP_BASE_HREF } from '@angular/common';
 import { ErrorHandler } from '@angular/core';
 
@@ -9,7 +8,11 @@ import { members } from '../../shared/mocks/mock-members';
 import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../data-providers/models/models';
 import { AppModule } from '../../app.module';
-import { findAllTag, asyncError } from '../../shared/test-helpers';
+import {
+  asyncError,
+  asyncData,
+  findAllCssOrNot,
+} from '../../shared/test-helpers';
 
 /* spy interfaces */
 interface IMembersServiceSpy {
@@ -48,11 +51,11 @@ describe('DashboardComponent', () => {
     constructor(readonly fixture: ComponentFixture<DashboardComponent>) {}
 
     /* get DOM elements */
-    get membersDe() {
-      return findAllTag(this.fixture, 'app-card');
+    get membersCards() {
+      return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'app-card');
     }
-    get anchorsDe() {
-      return findAllTag(this.fixture, 'a');
+    get membersLinks() {
+      return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'a');
     }
   }
 
@@ -65,9 +68,12 @@ describe('DashboardComponent', () => {
     const getMembersSpy = memberServiceSpy.getMembers.and.callFake(
       /* returns the mock members array unless an input flag parameter is set in which case an error is thrown. */
       () => {
-        return isError ? asyncError(new Error('Test Error')) : of(members);
+        return isError
+          ? asyncError(new Error('Test Error'))
+          : asyncData(members);
       },
     );
+
     /* mock the call to handleError */
     const handleErrorSpy = errorHandlerSpy.handleError.and.stub();
 
@@ -122,10 +128,22 @@ describe('DashboardComponent', () => {
     };
   }
 
-  /* setup function run by each sub test function */
-  async function setup(isError = false) {
+  /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
+  async function preSetup(isError = false) {
     await mainSetup();
-    return createComponent(isError);
+    const methods = await createComponent(isError);
+    return methods;
+  }
+
+  /* setup function run by each it test function that runs tests after the component and view are fully established */
+  async function setup(isError = false) {
+    const methods = await preSetup(isError);
+    /* initiate ngOnInit and view changes etc */
+    methods.fixture.detectChanges();
+    await methods.fixture.whenStable();
+    methods.fixture.detectChanges();
+    await methods.fixture.whenStable();
+    return methods;
   }
 
   it('should be created', async () => {
@@ -140,13 +158,13 @@ describe('DashboardComponent', () => {
 
   it('should display right number of links', async () => {
     const { page, numInDashboard } = await setup();
-    expect(page.anchorsDe.length).toEqual(numInDashboard);
+    expect(page.membersLinks!.length).toEqual(numInDashboard);
   });
 
   it('should display 1st member', async () => {
     const { component, page } = await setup();
     const member = component['firstMemberOnDisplay'];
-    expect(page.membersDe[member - 1].nativeElement.innerText).toBe(
+    expect(page.membersCards![member - 1].innerText).toBe(
       'Name: ' + members[member - 1].name,
     );
   });
@@ -154,31 +172,29 @@ describe('DashboardComponent', () => {
   it('should display last member', async () => {
     const { component, page } = await setup();
     const member = component['lastMemberOnDisplay'];
-    expect(page.membersDe[member - 1].nativeElement.innerText).toBe(
+    expect(page.membersCards![member - 1].innerText).toBe(
       'Name: ' + members[member - 1].name,
     );
   });
 
   it('should handle a getMembers error', async () => {
+    /* set getMembersSpy to return an error */
     const { component, page, getMembersSpy, handleErrorSpy } = await setup(
       true,
     );
     expect(getMembersSpy).toHaveBeenCalledTimes(1);
-    let spyCalls = 1;
+    const spyCalls = 1;
     expect(handleErrorSpy).toHaveBeenCalledTimes(spyCalls);
     /* test that handleError called with the thrown error */
     expect(handleErrorSpy.calls.argsFor(0)[0].message).toBe('Test Error');
     /* check no members in dashboard */
-    expect(page.anchorsDe.length).toEqual(0);
-    /* call component getMembers again */
-    const numReturned$ = component.getMembers();
-    /* check that getMembers was indeed called twice */
-    expect(getMembersSpy.calls.count()).toBe(++spyCalls);
+    expect(page.membersLinks).toBeNull();
+    /* subscribe to the getMembers observable again */
+    const numReturned = await component.members$.toPromise();
+    /* this time test that an empty array returned */
+    expect(numReturned).toEqual([]);
     /* check handleError still only called once */
     expect(handleErrorSpy).toHaveBeenCalledTimes(1);
-    /* this time test that an empty array returned */
-    const numReturned = await numReturned$.toPromise();
-    expect(numReturned).toEqual([]);
   });
 
   it('should test trackBy function returns member.id', async () => {

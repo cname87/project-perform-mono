@@ -5,7 +5,8 @@ import { NGXLogger } from 'ngx-logger';
 
 /**
  * This component displays key error information along with advice to the user to click on a tab to restart. It is routed to by the error handler after an error is thrown.
- * The default information displayed shows 'page not found'. If a mode of 'error' is passed in via a url query parameterthe information is suited to an unexpected error.
+ * The default information displayed shows 'page not found'.
+ * If a mode of 'error' is passed in via a url query parameter the information shown is relevant to an unexpected error.
  */
 @Component({
   selector: 'app-error-information',

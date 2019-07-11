@@ -29,7 +29,7 @@ import {
   RollbarService,
   rollbarFactory,
 } from './shared/error-handler-service/error-handler.service';
-import { RequestCacheService } from './shared/caching.service.ts/request-cache.service.old';
+import { RequestCacheService } from './shared/caching.service.ts/request-cache.service';
 import { httpInterceptorProviders } from './shared/http-interceptors/';
 import { E2E_TESTING } from './shared/http-interceptors/e2e-test.interceptor';
 

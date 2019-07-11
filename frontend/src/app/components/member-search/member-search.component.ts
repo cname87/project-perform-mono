@@ -71,6 +71,7 @@ export class MemberSearchComponent implements OnInit {
       publishReplay(1),
       refCount(),
 
+      /* note that an error will close the subject i.e. search will no longer work (but will go to error information page anyway) */
       catchError((error: any) => {
         /* only call the error handler once per ngOnInit even though the returned observable is multicast to multiple html elements */
         if (!this.errorHandlerCalled) {

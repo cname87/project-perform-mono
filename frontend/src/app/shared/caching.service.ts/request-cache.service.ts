@@ -5,15 +5,14 @@ import { OK, CREATED } from 'http-status-codes';
 
 // import { maxAge } from '../../config';
 import { membersConfiguration } from '../../data-providers/configuration';
-import { ResponseStore } from './in-memory-store.';
+import { GetMembersCache } from './get-members-cache.service';
 
 @Injectable({ providedIn: 'root' })
 export class RequestCacheService {
-  private cache = new ResponseStore(this.logger);
   private baseUrl =
     membersConfiguration.basePath + '/' + membersConfiguration.servicePath;
 
-  constructor(private logger: NGXLogger) {
+  constructor(private cache: GetMembersCache, private logger: NGXLogger) {
     this.logger.trace(
       RequestCacheService.name + ': Starting RequestCacheService',
     );
@@ -31,7 +30,9 @@ export class RequestCacheService {
    * - Returns a cached http response if it has one.
    * - Returns undefined if there is no cached response.
    */
-  public get(request: HttpRequest<any>): HttpResponse<any> | undefined {
+  public getCache(request: HttpRequest<any>): HttpResponse<any> | undefined {
+    this.logger.trace(RequestCacheService.name + ': getting cache');
+
     /* return cache for /members, i.e. get all members */
     if (request.method === 'GET' && request.urlWithParams === this.baseUrl) {
       return this.cache.response;
@@ -47,7 +48,12 @@ export class RequestCacheService {
    * - The http request/response pair.
    * @returns void
    */
-  put(request: HttpRequest<any>, response: HttpResponse<any>): void {
+  public putCache(
+    request: HttpRequest<any>,
+    response: HttpResponse<any>,
+  ): void {
+    this.logger.trace(RequestCacheService.name + ': putting cache');
+
     /* clear cache if anything other than a 200 or 201 response */
     if (response.status !== OK && response.status !== CREATED) {
       this.clearCache();
@@ -57,7 +63,7 @@ export class RequestCacheService {
     /* decide action based on the request method & url */
     switch (request.method) {
       case 'GET': {
-        /* set cache for /members, i.e. get all members */
+        /* set cache, i.e.store  get all members */
         if (request.urlWithParams === this.baseUrl) {
           this.cache.setGetAll(response);
         }
@@ -66,7 +72,7 @@ export class RequestCacheService {
       }
 
       case 'POST': {
-        /* set cache for /members, ie. add a member */
+        /* set cache, ie. add a member */
         if (request.urlWithParams === this.baseUrl) {
           this.cache.setPostOne(response);
         } else {
@@ -76,7 +82,7 @@ export class RequestCacheService {
       }
 
       case 'PUT': {
-        /* set cache for /members, ie. update a member */
+        /* set cache, ie. update a member */
         if (request.urlWithParams === this.baseUrl) {
           this.cache.setPutOne(response);
         } else {
@@ -87,10 +93,12 @@ export class RequestCacheService {
 
       case 'DELETE': {
         const id = +request.urlWithParams.slice(this.baseUrl.length + 1);
-        /* set cache for /members, ie. delete all */
+        /* set cache, ie. delete one or all */
         if (request.urlWithParams === this.baseUrl) {
+          /* if no /id parameter */
           this.cache.setDeleteAll();
-        } else if (!isNaN(id)) {
+        } else if (id && !isNaN(id)) {
+          /* if id != 0 and is a number */
           this.cache.setDeleteOne(request);
         } else {
           this.clearCache();

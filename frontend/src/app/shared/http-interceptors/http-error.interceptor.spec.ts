@@ -94,7 +94,7 @@ describe('HttpErrorInterceptor', () => {
    * Get the service, initialize it, set test variables.
    */
   async function getService() {
-    /* create the fixture */
+    /* create the service */
     const httpErrorInterceptor = TestBed.get(HttpErrorInterceptor);
 
     /* get the injected instances */
@@ -201,9 +201,10 @@ describe('HttpErrorInterceptor', () => {
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             `HttpErrorInterceptor: Error 1 received on try 1 of ${totalTries} to ${requestUrl.url}`,
           );
+
           /* check only one error message traced */
           const errorCalls = 1;
-          const extraCalls = 4; // starting 3 services + 'intercept called'
+          const extraCalls = 5; // starting 4 services + 'intercept called'
           expect(traceLoggerSpy).toHaveBeenCalledTimes(errorCalls + extraCalls);
         },
         (_error: any) => {

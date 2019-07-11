@@ -34,7 +34,7 @@ describe('Project Perform', () => {
   const isTestDatabase = async () => {
     await browser.waitForAngularEnabled(false);
     await browser.get('/isTestDatabase');
-    /* the page content is only { isTestDatabase: true/false } */
+    /* the page content is only { isTestDatabase: <true | false> } */
     const response = await element(by.css('body')).getText();
     await browser.waitForAngularEnabled(true);
     const result = response.substring(response.length - 5, response.length - 1);

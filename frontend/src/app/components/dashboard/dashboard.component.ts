@@ -50,7 +50,7 @@ export class DashboardComponent implements OnInit {
         );
       }),
       catchError((error: any) => {
-        /* only call the error handler once per ngOnInit even though the returned observable is multicast to multiple html elements */
+        /* only call the error handler once per ngOnInit even though the returned observable might be multicast to multiple html elements */
         if (!errorHandlerCalled) {
           errorHandlerCalled = true;
           this.errorHandler.handleError(error);

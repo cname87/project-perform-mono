@@ -161,7 +161,7 @@ describe('ErrorInformationComponent', () => {
     }
 
     it('should show the add mode values on start up', async () => {
-      const { component, fixture, page, activatedRouteStub } = await setup();
+      const { fixture, page, activatedRouteStub } = await setup();
       /* set up route that the component will get */
       const routeMode = '';
       activatedRouteStub.setParameter(routeMode);
@@ -170,22 +170,22 @@ describe('ErrorInformationComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       /* default constructor member shown */
-      expect(page.header.innerText).toBe(component.header.toUpperCase());
-      expect(page.hint.innerText).toBe(component.hint);
+      expect(page.header.innerText).toBe('PAGE NOT FOUND');
+      expect(page.hint.innerText).toBe('Click on a tab link above');
     });
 
     it('should show the edit mode values on start up', async () => {
-      const { component, fixture, page, activatedRouteStub } = await setup();
+      const { fixture, page, activatedRouteStub } = await setup();
       /* set up route that the component will get */
-      const routeMode = 'edit';
+      const routeMode = 'error';
       activatedRouteStub.setParameter(routeMode);
       /* page fields will be null before ngOnInit */
       /* await component ngOnInit and data binding */
       fixture.detectChanges();
       await fixture.whenStable();
       /* default constructor member shown */
-      expect(page.header.innerText).toBe(component.header.toUpperCase());
-      expect(page.hint.innerText).toBe(component.hint);
+      expect(page.header.innerText).toBe('UNEXPECTED ERROR!');
+      expect(page.hint.innerText).toBe('Click on a tab link above');
     });
 
     it('should show the header in uppercase', async () => {

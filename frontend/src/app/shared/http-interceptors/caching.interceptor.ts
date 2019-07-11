@@ -19,20 +19,18 @@ import { RequestCacheService } from '../caching.service.ts/request-cache.service
 @Injectable({ providedIn: 'root' })
 export class CachingInterceptor implements HttpInterceptor {
   constructor(private cache: RequestCacheService, private logger: NGXLogger) {
-    this.logger.trace(
-      CachingInterceptor.name + ': Starting CachingInterceptor',
-    );
+    this.logger.trace(CachingInterceptor.name + ': intercept called');
   }
 
   /**
    * Sends the request to the cache service and, if it receives a response from a cached response then it returns that as a response.
    * Otherwise it passes the request to sendRequest.
    */
-  intercept(req: HttpRequest<any>, next: HttpHandler) {
+  intercept(request: HttpRequest<any>, next: HttpHandler) {
     this.logger.trace(CachingInterceptor.name + ': intercept called');
 
     /* check if there is for a cached response */
-    const cachedResponse = this.cache.get(req);
+    const cachedResponse = this.cache.getCache(request);
 
     if (cachedResponse) {
       this.logger.trace(CachingInterceptor.name + ': reading from cache');
@@ -40,24 +38,24 @@ export class CachingInterceptor implements HttpInterceptor {
 
     return cachedResponse
       ? of(cachedResponse)
-      : this.sendRequest(req, next, this.cache);
+      : this.sendRequest(request, next, this.cache);
   }
 
   /**
    * Passes the request to 'next()'.
    * Also sends the request and the response to the cache service.
    */
-  sendRequest(
-    req: HttpRequest<any>,
+  private sendRequest(
+    request: HttpRequest<any>,
     next: HttpHandler,
     cache: RequestCacheService,
   ): Observable<HttpEvent<any>> {
     this.logger.trace(CachingInterceptor.name + ': reading from server');
-    return next.handle(req).pipe(
-      tap((event) => {
+    return next.handle(request).pipe(
+      tap((response) => {
         /* check event is http response as there may be other events */
-        if (event instanceof HttpResponse) {
-          cache.put(req, event);
+        if (response instanceof HttpResponse) {
+          cache.putCache(request, response);
         }
       }),
     );

@@ -87,19 +87,3 @@ export function findTag<T>(fixture: ComponentFixture<any>, tag: string): T {
   const element = fixture.debugElement.query(By.css(tag));
   return element.nativeElement;
 }
-
-export function findAllTag(
-  fixture: ComponentFixture<any>,
-  tag: string,
-): DebugElement[] {
-  const DebugElements = fixture.debugElement.queryAll(By.css(tag));
-  return DebugElements;
-}
-
-export function findElements(
-  fixture: ComponentFixture<any>,
-  el: string,
-): DebugElement[] {
-  const DebugElements = fixture.debugElement.queryAll(By.css(el));
-  return DebugElements;
-}
