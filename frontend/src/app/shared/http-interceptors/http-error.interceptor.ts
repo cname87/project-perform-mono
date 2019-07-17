@@ -87,6 +87,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           allocatedType: 'TBC', // add a http error type
         };
 
+        /* mark as client-side if error is an ErrorEvent */
         if (caughtError.error instanceof ErrorEvent) {
           /* the caught error will be of type HttpErrorResponse and its error property will be an instance of ErrorEvent if the error is client-side e.g. a network error */
           this.logger.trace(
@@ -94,9 +95,9 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           );
 
           errReport.allocatedType = 'Http client-side';
-        }
 
-        if (caughtError.status) {
+          /* else mark as server-side (if error.status exists) */
+        } else if (caughtError.status) {
           /* if the caught error's error property is not of type ErrorEvent then the error is a server response e.g 500 error */
           this.logger.trace(
             HttpErrorInterceptor.name +

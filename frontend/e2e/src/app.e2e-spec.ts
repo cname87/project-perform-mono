@@ -3,9 +3,9 @@ import request from 'request-promise-native';
 import fs from 'fs';
 import path from 'path';
 
-const certFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem');
-const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem');
-const caFile = path.resolve(__dirname, '../certs/rootCA.crt');
+const certFile = path.resolve(__dirname, '../../certs/nodeKeyAndCert.pem');
+const keyFile = path.resolve(__dirname, '../../certs/nodeKeyAndCert.pem');
+const caFile = path.resolve(__dirname, '../../certs/rootCA.crt');
 import { getDashboardPage } from './pages/dashboard.page';
 import { getMemberDetailPage } from './pages/memberDetail.page';
 import { getMembersListPage } from './pages/membersList.page';
@@ -354,9 +354,9 @@ describe('Project Perform', () => {
         return browser.isElementPresent(by.css('app-error-information'));
       }, 5000);
       browser.ignoreSynchronization = false;
-      /* the member detail page is still displayed */
+      /* the error information page is displayed */
       const pageErrorInformationPage = getErrorInformationPage();
-      /* shows the page not found page */
+      /* shows the error information page */
       expect(
         await pageErrorInformationPage.errorInformationElement.tag.isPresent(),
       ).toBeTruthy('shows error information - page not found page');
@@ -611,6 +611,20 @@ describe('Project Perform', () => {
         id: maxId + 1,
         name: expected.addedMemberName,
       });
+    });
+
+    it('shows a message again', async () => {
+      /* get expected values object */
+      const { expected } = testSetup();
+      /* the member list page is displayed */
+      let membersListPage = getMembersListPage();
+      /* get the messages showing in the message element */
+      const count = await membersListPage.messagesElement.messages.count();
+      expect(count).toEqual(2, 'two messages');
+      const message = await membersListPage.messagesElement.messages
+        .get(count - 1) // last message is the getMembers update
+        .getText();
+      expect(message).toEqual(expected.message1);
     });
   });
 

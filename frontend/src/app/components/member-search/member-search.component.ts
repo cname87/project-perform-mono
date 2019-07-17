@@ -12,7 +12,7 @@ import { NGXLogger } from 'ngx-logger';
 
 import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../data-providers/members.data-provider';
-import { config } from '../../config';
+import { routes } from '../../config';
 
 /**
  * This component supplies an input box that is used to find members on the server.  As the user enters text in the input box the component lists the members whose name starts with the entered text.  An interval is awaited after each keystroke before it requests a search from the server.
@@ -34,7 +34,7 @@ export class MemberSearchComponent implements OnInit {
   /* search debounce time in ms */
   private debounce = 300;
   /* base route to get member detail */
-  detail = config.routes.detail;
+  detail = routes.detail;
   /* member property to display in the list of found members */
   propertyToDisplay = 'name';
   /* controls that errorHandler only called once */

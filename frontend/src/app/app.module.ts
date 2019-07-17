@@ -31,7 +31,7 @@ import {
 } from './shared/error-handler-service/error-handler.service';
 import { RequestCacheService } from './shared/caching.service.ts/request-cache.service';
 import { httpInterceptorProviders } from './shared/http-interceptors/';
-import { E2E_TESTING } from './shared/http-interceptors/e2e-test.interceptor';
+import { E2E_TESTING } from './config';
 
 @NgModule({
   imports: [
@@ -51,6 +51,7 @@ import { E2E_TESTING } from './shared/http-interceptors/e2e-test.interceptor';
       disableConsoleLogging: false,
     }),
     ToastrModule.forRoot({
+      timeOut: 5000,
       preventDuplicates: true,
     }),
     /* local modules */

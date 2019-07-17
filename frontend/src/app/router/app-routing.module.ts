@@ -1,18 +1,19 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { config } from '../config';
 import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
 import { ErrorInformationComponent } from '../components/error-information/error-information.component';
+import { DashboardComponent } from '../components/dashboard/dashboard.component';
+import { MembersListComponent } from '../components/members-list/members-list.component';
 
 const appRoutes: Routes = [
   {
     path: '',
-    redirectTo: `/${config.routes.dashboard.path}`,
+    redirectTo: '/dashboard',
     pathMatch: 'full',
   },
-  config.routes.dashboard,
-  config.routes.membersList,
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'memberslist', component: MembersListComponent },
   { path: 'detail/:id', component: MemberDetailComponent },
   { path: 'errorinformation/:mode', component: ErrorInformationComponent },
   { path: '**', component: ErrorInformationComponent },

@@ -15,7 +15,7 @@ import { MembersService } from '../shared/members-service/members.service';
 import { IMember } from '../data-providers/models/models';
 import { of, Observable } from 'rxjs';
 import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
-import { config } from '../config';
+import { routes } from '../config';
 import { ErrorInformationComponent } from '../components/error-information/error-information.component';
 
 interface IMembersServiceStub {
@@ -147,7 +147,7 @@ describe('AppComponent & RouterTestingModule', () => {
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + config.routes.membersList.path,
+      '/' + routes.membersList.path,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);
@@ -169,7 +169,7 @@ describe('AppComponent & RouterTestingModule', () => {
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + config.routes.membersList.path,
+      '/' + routes.membersList.path,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);
@@ -192,13 +192,13 @@ describe('AppComponent & RouterTestingModule', () => {
     );
     expectElementOf(fixture, DashboardComponent);
     fixture.ngZone!.run(() => {
-      spyLocation.go('/' + config.routes.membersList.path);
+      spyLocation.go('/' + routes.membersList.path);
     });
     fixture.detectChanges();
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + config.routes.membersList.path,
+      '/' + routes.membersList.path,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 
-import { config } from '../../config';
+import { routes } from '../../config';
 
 interface ILink {
   path: string;
@@ -22,9 +22,9 @@ export class AppComponent {
   public header = 'Team Members';
 
   /* routerLink links */
-  private dashboard = config.routes.dashboard;
-  private membersList = config.routes.membersList;
-  private detail = config.routes.detail;
+  private dashboard = routes.dashboard;
+  private membersList = routes.membersList;
+  private detail = routes.detail;
   links: ILink[] = [
     {
       path: '/' + this.dashboard.path,

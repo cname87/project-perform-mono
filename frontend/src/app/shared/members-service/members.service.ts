@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 import { NOT_FOUND } from 'http-status-codes';
+import { ToastrService } from 'ngx-toastr';
 
 import { MembersDataProvider } from '../../data-providers/members.data-provider';
 import {
@@ -11,7 +12,7 @@ import {
   IMemberWithoutId,
 } from '../../data-providers/models/models';
 import { MessageService } from '../message-service/message.service';
-import { IErrReport } from '../../config';
+import { IErrReport, errorSearchTerm, E2E_TESTING } from '../../config';
 
 /**
  * This service provides functions to call all the api functions providing appropriate responses, messaging and errorhandling.
@@ -19,12 +20,17 @@ import { IErrReport } from '../../config';
 @Injectable({ providedIn: 'root' })
 export class MembersService {
   constructor(
+    @Inject(E2E_TESTING) private isTesting: boolean,
     private messageService: MessageService,
     private membersDataProvider: MembersDataProvider,
     private logger: NGXLogger,
+    private toastr: ToastrService,
   ) {
     this.logger.trace(MembersService.name + ': starting members.service');
   }
+
+  /* common toastr message */
+  private toastrMessage = 'A server access error has occurred';
 
   /**
    * Gets members from the server.
@@ -38,6 +44,13 @@ export class MembersService {
    */
   getMembers(term?: string): Observable<IMember[]> {
     this.logger.trace(MembersService.name + ': getMembers called');
+    this.logger.trace(this.isTesting);
+    // console.log(environment);
+
+    /* e2e error test - only if e2e test and match to a specific term */
+    if (this.isTesting && term === errorSearchTerm) {
+      throw new Error('Test application error');
+    }
 
     if (typeof term === 'string' && term.trim() === '') {
       this.logger.trace(
@@ -68,6 +81,7 @@ export class MembersService {
 
         /* inform user and mark as handled */
         this.log('ERROR: Failed to get members from server');
+        this.toastr.error('ERROR!', this.toastrMessage);
         err.isHandled = true;
 
         this.logger.trace(MembersService.name + ': Throwing the error on');
@@ -104,6 +118,7 @@ export class MembersService {
           /* otherwise a general fail */
           this.log('ERROR: Failed to get member from server');
         }
+        this.toastr.error('ERROR!', this.toastrMessage);
         /* mark as handled */
         errReport.isHandled = true;
 
@@ -135,6 +150,7 @@ export class MembersService {
 
         /* inform user and mark as handled */
         this.log('ERROR: Failed to add member to server');
+        this.toastr.error('ERROR!', this.toastrMessage);
         err.isHandled = true;
 
         this.logger.trace(MembersService.name + ': Throwing the error on');
@@ -172,6 +188,7 @@ export class MembersService {
         } else {
           /* otherwise a general fail */
           this.log('ERROR: Failed to delete member from server');
+          this.toastr.error('ERROR!', this.toastrMessage);
         }
         /* mark as handled */
         errReport.isHandled = true;
@@ -209,6 +226,7 @@ export class MembersService {
         } else {
           /* otherwise a general fail */
           this.log('ERROR: Failed to update member on the server');
+          this.toastr.error('ERROR!', this.toastrMessage);
         }
         /* mark as handled */
         errReport.isHandled = true;

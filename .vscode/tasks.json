@@ -3,15 +3,15 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
-    // npm run start frontend - used by Start frontend launch configurations
     {
       "label": "npm start frontend",
       "type": "shell",
       "command": "npm",
       "args": [
         "run",
-        "--prefix", "${workspaceRoot}/frontend",
-        "start",
+        "--prefix",
+        "${workspaceRoot}/frontend",
+        "start"
       ],
       "isBackground": true,
       "presentation": {
@@ -34,7 +34,7 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": {
-            "regexp": "(.*?)" // matches any word to first sapace
+            "regexp": "(.*?)"
           },
           "endsPattern": {
             "regexp": "Compiled | Failed to compile."
@@ -42,21 +42,21 @@
         }
       }
     },
-    // npm run test frontend - used by T frontend launch configuration
     {
       "label": "npm test frontend",
       "type": "shell",
       "command": "npm",
       "args": [
         "run",
-        "--prefix", "${workspaceRoot}/frontend",
-        "test",
+        "--prefix",
+        "${workspaceRoot}/frontend",
+        "test"
       ],
       "isBackground": true,
       "presentation": {
         "reveal": "always",
         "focus": true,
-        "panel": "dedicated",
+        "panel": "dedicated"
       },
       "group": {
         "kind": "build",
@@ -82,17 +82,16 @@
         }
       }
     },
-    // "npm run start backend index.js"
     {
       "label": "npm start backend index.js",
       "type": "shell",
       "command": "npm",
       "args": [
         "run",
-        "--prefix", "${workspaceRoot}/backend",
-        "start",
+        "--prefix",
+        "${workspaceRoot}/backend",
+        "start"
       ],
-      // "isBackground": true,
       "presentation": {
         "reveal": "always",
         "focus": true,
@@ -104,7 +103,6 @@
       },
       "problemMatcher": []
     },
-    // "npm backend server-side watch"
     {
       "label": "npm backend server-side watch",
       "type": "npm",
@@ -118,7 +116,6 @@
         "panel": "dedicated"
       }
     },
-    // "npm backend client-side watch"
     {
       "label": "npm backend client-side watch",
       "type": "npm",
@@ -132,7 +129,6 @@
         "panel": "dedicated"
       }
     },
-    // "npm build backend"
     {
       "label": "npm build backend",
       "type": "npm",
@@ -149,7 +145,6 @@
         "panel": "shared"
       }
     },
-    // "npm build:dev frontend"
     {
       "label": "npm build:dev frontend",
       "type": "shell",
@@ -186,7 +181,60 @@
         }
       }
     },
-    // "Taskkill node.exe"
+    {
+      "label": "npm build:e2e frontend",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "--prefix",
+        "${workspaceRoot}/frontend",
+        "build:e2e"
+      ],
+      "isBackground": true,
+      "presentation": {
+        "focus": true,
+        "panel": "dedicated"
+      },
+      "group": "build",
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": [
+          "relative",
+          "${cwd}"
+        ],
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "(.*?)"
+          },
+          "endsPattern": {
+            "regexp": "Compiled |Failed to compile."
+          }
+        }
+      }
+    },
+    {
+      "label": "npm resetDatabase",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "--prefix",
+        "${workspaceRoot}/frontend",
+        "resetDatabase"
+      ],
+      "isBackground": true,
+      "presentation": {
+        "focus": true,
+        "panel": "dedicated"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
     {
       "label": "Taskkill node.exe",
       "type": "shell",
@@ -201,7 +249,6 @@
       },
       "problemMatcher": []
     },
-    // "Is server up?"
     {
       "label": "Is Server Up?",
       "type": "process",
@@ -224,8 +271,6 @@
       },
       "problemMatcher": []
     },
-    // "Start server
-    /* used as a preLaunchTask in a launch configuration (e.g. ng e2e) to start the server and wait until it is up, or just to pass back if the server is already started  */
     {
       "label": "Start Server",
       "type": "process",
@@ -233,7 +278,6 @@
       "args": [
         "${workspaceFolder}/backend/dist/utils/utils-build/startServer.js"
       ],
-       /* Server running is a background task */
       "isBackground": true,
       "options": {
         "env": {
@@ -248,11 +292,10 @@
         "focus": false,
         "panel": "shared"
       },
-      /* Background task so it needs a problem matcher to know when to pass control on to the launch configuration */
       "problemMatcher": [
         {
           "pattern": [
-            { // dummy problem matcher (as we're not looking for problems)
+            {
               "regexp": ".",
               "file": 1,
               "location": 2,
@@ -262,14 +305,13 @@
           "background": {
             "activeOnStart": true,
             "beginsPattern": {
-              "regexp": "(.*?)" // i.e. starts on anything from startServer - not important - I think it just starts looking for probems from here.
+              "regexp": "(.*?)"
             },
-            "endsPattern": "Connected to", // i.e. passes control on to the  launch configuration when it sees 'Connected to' from startServer.js, i.e. when 'Connected to newly-started server' or 'Connected to previously-started server' is output to console.log from startServer.js
+            "endsPattern": "Connected to"
           }
         }
       ]
     },
-    // "npm delete nyc file"
     {
       "label": "npm delete nyc file",
       "type": "shell",
@@ -287,6 +329,6 @@
       },
       "group": "build",
       "problemMatcher": []
-    }
+    },
   ]
 }

@@ -1,4 +1,4 @@
-import { Injectable, Inject, InjectionToken } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import {
   HttpEvent,
   HttpRequest,
@@ -9,8 +9,7 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 
-import { testUrls } from '../../config';
-export const E2E_TESTING = new InjectionToken<boolean>('e2e_testing');
+import { errorMember, errorTestUrls, E2E_TESTING } from '../../config';
 
 @Injectable({ providedIn: 'root' })
 export class E2eTestInterceptor implements HttpInterceptor {
@@ -33,23 +32,26 @@ export class E2eTestInterceptor implements HttpInterceptor {
       `${E2eTestInterceptor.name} + : isTesting is ${this.isTesting}`,
     );
     /* pass through if not in e2e test mode */
-    if (this.isTesting) {
-    }
-    // if (this.isTesting) {
-    if (true) {
+    if (!this.isTesting) {
       return next.handle(req);
     }
 
     this.logger.trace(
-      E2eTestInterceptor.name +
-        ': NOTE:  Entering error test - you should be in e2e test mode ONLY',
+      `${E2eTestInterceptor.name} + : isTesting is ${this.isTesting}` +
+        '\nEntering error test - you should be in e2e test mode ONLY',
     );
 
     /* specific urls will trigger a specific response */
-    switch (`${req.method}:${req.url}`) {
-      case testUrls.httpErrorResponse: {
+    switch (`${req.method}:${req.urlWithParams}`) {
+      case errorTestUrls.post:
+      case errorTestUrls.put: {
+        /* exit unless we're dealing with the errorMember */
+        if (req.body.name !== errorMember.name) {
+          return next.handle(req);
+        }
+
         this.logger.trace(
-          E2eTestInterceptor.name + ': throwing a simulated server 500 error',
+          E2eTestInterceptor.name + ': throwing a simulated server error',
         );
         const httpError = new HttpErrorResponse({
           error: {
@@ -57,12 +59,12 @@ export class E2eTestInterceptor implements HttpInterceptor {
           },
           status: 998,
           statusText: 'Test 998 error',
-          url: testUrls.httpErrorResponse,
+          url: req.urlWithParams,
         });
         return throwError(httpError);
       }
 
-      case testUrls.httpErrorEvent: {
+      case errorTestUrls.getOne: {
         this.logger.trace(
           E2eTestInterceptor.name +
             ': throwing a simulated client-side or network ErrorEvent error',
@@ -74,12 +76,13 @@ export class E2eTestInterceptor implements HttpInterceptor {
           }),
           status: 999,
           statusText: 'Test 999 error',
-          url: testUrls.httpErrorEvent,
+          url: req.urlWithParams,
         });
         return throwError(httpError);
       }
 
-      case testUrls.unexpectedError: {
+      case errorTestUrls.delete:
+      case errorTestUrls.getAll: {
         this.logger.trace(
           E2eTestInterceptor.name + ': throwing a simulated unexpected error',
         );
