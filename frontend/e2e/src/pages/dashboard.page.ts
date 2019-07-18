@@ -4,6 +4,7 @@ import { getRootElement } from './elements/root.element';
 import { getDashboardElement } from './elements/dashboard.element';
 import { getMemberSearchElement } from './elements/memberSearch.element';
 import { getMessagesElement } from './elements/messages.element';
+import { getToastrElement } from './elements/toastr.element';
 
 /**
  * A get page function exists for each page:
@@ -29,6 +30,7 @@ export function getDashboardPage() {
   const dashboardElement = getDashboardElement();
   const memberSearchElement = getMemberSearchElement();
   const messagesElement = getMessagesElement();
+  const toastrElement = getToastrElement();
 
   return {
     navigateToPage,
@@ -36,5 +38,6 @@ export function getDashboardPage() {
     dashboardElement,
     memberSearchElement,
     messagesElement,
+    toastrElement,
   }
 }

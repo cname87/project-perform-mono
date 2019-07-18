@@ -31,6 +31,10 @@
     "prefer-inline-decorator": true,
     "use-lifecycle-interface": true,
 
+    // extra rules added
+    "no-console": true,
+    "no-magic-numbers": true,
+
     // extra rules added from npm codelyzer page
     "contextual-lifecycle": true,
     "no-attribute-decorator": true,
@@ -39,7 +43,7 @@
     "no-lifecycle-call": true,
     "no-output-native": true,
     "no-pipe-impure": true,
-    // "no-unused-css": true, // took-out as css is not yet clean/mine
+    "no-unused-css": true, // took-out as css is not yet clean/mine
     "prefer-output-readonly": true,
     "template-banana-in-box": true,
     "template-conditional-complexity": [true, 4],

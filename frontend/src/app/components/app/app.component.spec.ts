@@ -3,22 +3,26 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import { MessagesComponent } from '../messages/messages.component';
 import { RouterLinkDirectiveStub, click } from '../../shared/test-helpers';
 import { MaterialModule } from '../../modules/material/material.module';
+import { AppModule } from '../../app.module';
+import { APP_BASE_HREF } from '@angular/common';
 
 describe('AppComponent', () => {
   /* setup function run by each 'it' test suite */
   async function mainSetup() {
     await TestBed.configureTestingModule({
-      declarations: [AppComponent, MessagesComponent, RouterLinkDirectiveStub],
+      declarations: [],
       imports: [
+        AppModule,
         RouterTestingModule.withRoutes([
           { path: 'memberslist', component: AppComponent }, // dummy path needed to avoid routing error warning
         ]),
         MaterialModule,
       ],
-      providers: [],
+      providers: [
+        { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
+      ],
     }).compileComponents();
   }
 
@@ -61,8 +65,9 @@ describe('AppComponent', () => {
     /* create the component instance */
     const component = fixture.componentInstance;
 
-    /* ngOnInit */
-    fixture.detectChanges();
+    /* ngOnInit and any view, binding etc */
+    await fixture.detectChanges();
+    await fixture.detectChanges();
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
@@ -99,15 +104,15 @@ describe('AppComponent', () => {
     const { component, page } = await setup();
     expect(page.routerLinks.length).toBe(3, 'should have 3 routerLinks');
     expect(page.routerLinks[0].linkParams).toBe(
-      `/${component.dashboard.path}`,
+      `/${component['dashboard'].path}`,
       'dashboard route',
     );
     expect(page.routerLinks[1].linkParams).toBe(
-      `/${component.membersList.path}`,
+      `/${component['membersList'].path}`,
       'members route',
     );
     expect(page.routerLinks[2].linkParams).toBe(
-      `/${component.detail.path}`,
+      `/${component['detail'].path}`,
       'detail route (disabled',
     );
   });
@@ -124,11 +129,11 @@ describe('AppComponent', () => {
     fixture.ngZone!.run(() => {
       click(dashboardDe);
     });
-    fixture.detectChanges();
+    await fixture.detectChanges();
 
     /* it attempts to route => dummy path configured above */
     expect(dashboardLink.navigatedTo).toBe(
-      `/${component.dashboard.path}`,
+      `/${component['dashboard'].path}`,
       'dashboard route passed to routerLink',
     );
 
@@ -148,11 +153,11 @@ describe('AppComponent', () => {
     fixture.ngZone!.run(() => {
       click(membersLinkDe);
     });
-    fixture.detectChanges();
+    await fixture.detectChanges();
 
     /* it attempts to route => dummy path configured above */
     expect(membersLink.navigatedTo).toBe(
-      `/${component.membersList.path}`,
+      `/${component['membersList'].path}`,
       'members route passed to routerLink',
     );
 
@@ -172,11 +177,11 @@ describe('AppComponent', () => {
     fixture.ngZone!.run(() => {
       click(detailDe);
     });
-    fixture.detectChanges();
+    await fixture.detectChanges();
 
     /* routerLink gets the route but it does not attempt to route (as disabled ) => no dummy path configured above */
     expect(detailLink.navigatedTo).toEqual(
-      `/${component.detail.path}`,
+      `/${component['detail'].path}`,
       'detail route passed to routerLInk',
     );
 

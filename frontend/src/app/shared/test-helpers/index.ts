@@ -3,15 +3,15 @@ import { ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 export * from './async-observable-helpers';
-export * from './activated-route-snapshot-stub';
+export * from './activated-route-stub';
 export * from './router-link-directive-stub';
 
-// Short utilities //
+// Short test utilities //
 
 /**
  * Simulate a left mouse button element click.
  */
-export function click(el: DebugElement | HTMLElement) {
+export function click(el: DebugElement | HTMLElement): void {
   if (el instanceof HTMLElement) {
     el.click();
   } else {
@@ -30,7 +30,7 @@ export function sendInput(
   inputElement: HTMLInputElement,
   text: string,
   isAppend = false,
-) {
+): Promise<any> {
   fixture.detectChanges();
   inputElement.value = isAppend ? inputElement.value + text : text;
   inputElement.dispatchEvent(new Event('input'));
@@ -38,15 +38,9 @@ export function sendInput(
   return fixture.whenStable();
 }
 
-export function findId<T>(fixture: ComponentFixture<any>, id: string): T {
-  const element = fixture.debugElement.query(By.css('#' + id));
-  return element.nativeElement;
-}
-
-export function findTag<T>(fixture: ComponentFixture<any>, tag: string): T {
-  const element = fixture.debugElement.query(By.css(tag));
-  return element.nativeElement;
-}
+/**
+ * Find by CSS utilities for .spec files.
+ */
 
 /**
  * Use to find a html element that may or may not be present.
@@ -57,7 +51,7 @@ export function findTag<T>(fixture: ComponentFixture<any>, tag: string): T {
 export function findCssOrNot<T>(
   fixture: ComponentFixture<any>,
   css: string,
-): T {
+): T | null {
   const element = fixture.debugElement.query(By.css(css));
   return element ? element.nativeElement : null;
 }
@@ -68,26 +62,28 @@ export function findCssOrNot<T>(
  * @param css A valid css selector.
  * @returns an array of HTMLElements or null if element not found.
  */
-export function findAllCssOrNot(
+export function findAllCssOrNot<T>(
   fixture: ComponentFixture<any>,
   css: string,
-): DebugElement[] | null {
+): T[] | null {
   const elements = fixture.debugElement.queryAll(By.css(css));
-  return elements ? elements : null;
+  if (elements.length === 0) {
+    return (null as unknown) as T[];
+  }
+  const htmlElements: T[] = [];
+  for (const element of elements) {
+    const htmlElement = element.nativeElement as T;
+    htmlElements.push(htmlElement);
+  }
+  return htmlElements;
 }
 
-export function findAllTag(
-  fixture: ComponentFixture<any>,
-  tag: string,
-): DebugElement[] {
-  const DebugElements = fixture.debugElement.queryAll(By.css(tag));
-  return DebugElements;
+export function findId<T>(fixture: ComponentFixture<any>, id: string): T {
+  const element = fixture.debugElement.query(By.css('#' + id));
+  return element.nativeElement;
 }
 
-export function findElements(
-  fixture: ComponentFixture<any>,
-  el: string,
-): DebugElement[] {
-  const DebugElements = fixture.debugElement.queryAll(By.css(el));
-  return DebugElements;
+export function findTag<T>(fixture: ComponentFixture<any>, tag: string): T {
+  const element = fixture.debugElement.query(By.css(tag));
+  return element.nativeElement;
 }

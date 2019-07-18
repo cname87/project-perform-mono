@@ -5,9 +5,11 @@ const { SpecReporter } = require('jasmine-spec-reporter');
 const request = require('request-promise-native');
 const fs = require('fs');
 const path = require('path');
-const certFile = path.resolve(__dirname, './certs/nodeKeyAndCert.pem')
-const keyFile = path.resolve(__dirname, './certs/nodeKeyAndCert.pem')
-const caFile = path.resolve(__dirname, './certs/rootCA.crt')
+const certFile = path.resolve(__dirname, '..//certs/nodeKeyAndCert.pem')
+const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem')
+const caFile = path.resolve(__dirname, '../certs/rootCA.crt')
+
+
 
 /* server request helper function */
 async function askServer(url, method, body = {}) {
@@ -41,6 +43,10 @@ exports.config = {
         "--disable-popup-blocking",
       ]
     },
+    /* enable browser logs for protractor-browser-logs */
+    loggingPrefs: {
+      browser: 'ALL' // "OFF", "SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST", "ALL".
+    }
   },
   baseUrl: 'https://localhost:1337/',
   SELENIUM_PROMISE_MANAGER: false,
@@ -50,6 +56,7 @@ exports.config = {
     defaultTimeoutInterval: 30000,
     print: function() {},
   },
+
   onPrepare: async () => {
 
     require('ts-node').register({

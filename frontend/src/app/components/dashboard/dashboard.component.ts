@@ -1,36 +1,64 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ErrorHandler } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
+import { map, catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
-import { MembersService } from '../../shared/services/members.service';
-import { IMember } from '../../api/api-members.service';
+import { MembersService } from '../../shared/members-service/members.service';
+import { IMember } from '../../data-providers/members.data-provider';
 
+/**
+ * This component displays a dashboard showing key information on a number of members.
+ */
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-  members: IMember[] = [];
-  propertyToDisplay = 'name';
-  firstMemberOnDisplay = 1;
-  lastMemberOnDisplay = 4;
+  /* array of members from server */
+  members$: Observable<IMember[]> = of([]);
+  private firstMemberOnDisplay = 1;
+  private lastMemberOnDisplay = 4;
 
-  constructor(private membersService: MembersService) {}
-
-  ngOnInit() {
-    this.getMembers();
+  constructor(
+    private membersService: MembersService,
+    private logger: NGXLogger,
+    private errorHandler: ErrorHandler,
+  ) {
+    this.logger.trace(
+      DashboardComponent.name + ': Starting DashboardComponent',
+    );
   }
 
-  getMembers() {
-    this.membersService.getMembers().subscribe((members) => {
-      this.members = members.slice(
-        this.firstMemberOnDisplay - 1,
-        this.lastMemberOnDisplay,
-      );
-    });
+  ngOnInit(): void {
+    this.members$ = this.getMembers();
   }
 
-  showProperty(member: IMember) {
-    return member[this.propertyToDisplay];
+  /**
+   * Gets the members from the server.
+   */
+  getMembers(): Observable<IMember[]> {
+    this.logger.trace(DashboardComponent.name + ': Calling getMembers');
+
+    let errorHandlerCalled = false;
+
+    return this.membersService.getMembers().pipe(
+      map((members) => {
+        return members.slice(
+          this.firstMemberOnDisplay - 1,
+          this.lastMemberOnDisplay,
+        );
+      }),
+      catchError((error: any) => {
+        /* only call the error handler once per ngOnInit even though the returned observable might be multicast to multiple html elements */
+        if (!errorHandlerCalled) {
+          errorHandlerCalled = true;
+          this.errorHandler.handleError(error);
+        }
+        /* return dummy value */
+        return of([]);
+      }),
+    );
   }
 
   trackByFn(_index: number, member: IMember) {

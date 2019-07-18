@@ -8,17 +8,26 @@ import {
 import { APP_BASE_HREF } from '@angular/common';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { ErrorHandler } from '@angular/core';
 
 import { AppModule } from '../../app.module';
 import { MemberSearchComponent } from './member-search.component';
-import { MembersService } from '../../shared/services/members.service';
+import { MembersService } from '../../shared/members-service/members.service';
 import { members } from '../../shared/mocks/mock-members';
-import { IMember } from '../../api/model/models';
-import { sendInput } from '../../shared/test-helpers/index';
+import { IMember } from '../../data-providers/models/models';
+import {
+  sendInput,
+  asyncError,
+  findAllCssOrNot,
+  // asyncData,
+} from '../../shared/test-helpers/index';
 
+/* spy interfaces */
 interface IMembersServiceSpy {
   getMembers: jasmine.Spy;
+}
+interface IErrorHandlerSpy {
+  handleError: jasmine.Spy;
 }
 
 describe('memberSearchComponent', () => {
@@ -27,6 +36,9 @@ describe('memberSearchComponent', () => {
     /* create spy objects */
     const memberServiceSpy = jasmine.createSpyObj('memberService', [
       'getMembers',
+    ]);
+    const errorHandlerSpy = jasmine.createSpyObj('errorHandler', [
+      'handleError',
     ]);
 
     /* set up Testbed */
@@ -38,6 +50,7 @@ describe('memberSearchComponent', () => {
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: MembersService, useValue: memberServiceSpy },
+        { provide: ErrorHandler, useValue: errorHandlerSpy },
       ],
     }).compileComponents();
   }
@@ -60,7 +73,7 @@ describe('memberSearchComponent', () => {
       return this.fixture.debugElement.queryAll(By.css('mat-hint'));
     }
     get anchors() {
-      return this.findAllTag('a');
+      return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'a');
     }
 
     constructor(readonly fixture: ComponentFixture<MemberSearchComponent>) {}
@@ -69,23 +82,33 @@ describe('memberSearchComponent', () => {
       const element = this.fixture.debugElement.query(By.css(tag));
       return element.nativeElement;
     }
-    private findAllTag(tag: string): DebugElement[] {
-      const DebugElements = this.fixture.debugElement.queryAll(By.css(tag));
-      return DebugElements;
-    }
   }
 
-  function createSpies(memberServiceSpy: IMembersServiceSpy) {
+  function createSpies(
+    memberServiceSpy: IMembersServiceSpy,
+    errorHandlerSpy: IErrorHandlerSpy,
+    isError = false,
+  ) {
     /* return the mock members array unless '' is the search term */
     const getMembersSpy = memberServiceSpy.getMembers.and.callFake(
       (search: string) => {
-        return search === '' ? of(undefined) : of(members);
+        return isError
+          ? asyncError(new Error('Test Error'))
+          : search === ''
+          ? of(undefined)
+          : of(members);
       },
     );
-    return { getMembersSpy };
+    const handleErrorSpy = errorHandlerSpy.handleError.and.stub();
+    return { getMembersSpy, handleErrorSpy };
   }
 
-  async function createComponent() {
+  function expected() {
+    return {
+      debounceDelay: 300,
+    };
+  }
+  async function createComponent(isError = false) {
     /* create the fixture */
     const fixture = TestBed.createComponent(MemberSearchComponent);
 
@@ -94,8 +117,15 @@ describe('memberSearchComponent', () => {
     const membersServiceSpy = fixture.debugElement.injector.get<
       IMembersServiceSpy
     >(MembersService as any);
+    const errorHandlerSpy = fixture.debugElement.injector.get<IErrorHandlerSpy>(
+      ErrorHandler as any,
+    );
 
-    const { getMembersSpy } = createSpies(membersServiceSpy);
+    const { getMembersSpy, handleErrorSpy } = createSpies(
+      membersServiceSpy,
+      errorHandlerSpy,
+      isError,
+    );
 
     /* create the component instance */
     const component = fixture.componentInstance;
@@ -106,18 +136,23 @@ describe('memberSearchComponent', () => {
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
 
+    /* get he expected magic values */
+    const expectedValues = expected();
+
     return {
       fixture,
       component,
       page,
       getMembersSpy,
+      handleErrorSpy,
+      ...expectedValues,
     };
   }
 
   /* setup function run by each sub test function */
-  async function setup() {
+  async function setup(isError = false) {
     await mainSetup();
-    return createComponent();
+    return createComponent(isError);
   }
 
   it('should be created', async () => {
@@ -126,24 +161,32 @@ describe('memberSearchComponent', () => {
   });
 
   it('should display the title', async(async () => {
-    const { component, page } = await setup();
+    const { component, page, debounceDelay } = await setup();
     expect(page.header.innerText).toBe(component.header, 'header');
+    /* check debounce delay against local variable */
+    expect(component['debounce']).toBe(debounceDelay, 'check delay');
   }));
 
   it('should take input and show search results', fakeAsync(async () => {
-    const { fixture, page, getMembersSpy } = await setup();
+    const { fixture, page, getMembersSpy, debounceDelay } = await setup();
     sendInput(fixture, page.searchInput, 'x');
     fixture.detectChanges();
-    tick(350);
+    tick(debounceDelay);
     fixture.detectChanges();
     expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
-    expect(page.anchors.length).toEqual(members.length, 'members found');
+    expect(page.anchors!.length).toEqual(members.length, 'members found');
     /* hint will show as members found */
     expect(page.hint).not.toBeNull;
   }));
 
   it('should not search when no delay', fakeAsync(async () => {
-    const { component, fixture, page, getMembersSpy } = await setup();
+    const {
+      component,
+      fixture,
+      page,
+      getMembersSpy,
+      debounceDelay,
+    } = await setup();
     component.search('x');
     fixture.detectChanges();
     tick(0);
@@ -154,57 +197,96 @@ describe('memberSearchComponent', () => {
     /* no hint shown */
     expect(page.hintDebugElement).toBeNull;
     /* clear timer */
-    tick(350);
+    tick(debounceDelay);
   }));
 
   it('should show not search with no change', fakeAsync(async () => {
-    const { component, fixture, page, getMembersSpy } = await setup();
+    const {
+      component,
+      fixture,
+      page,
+      getMembersSpy,
+      debounceDelay,
+    } = await setup();
     component.search('x');
     fixture.detectChanges();
-    tick(350);
+    tick(debounceDelay);
     fixture.detectChanges();
-    expect(page.anchors.length).toEqual(members.length);
+    expect(page.anchors!.length).toEqual(members.length);
     expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
 
     /* second search */
     component.search('x');
     fixture.detectChanges();
-    tick(1000);
+    tick(debounceDelay);
     fixture.detectChanges();
     /* no change in getMemberSpy call count */
     expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
   }));
 
   it('should display 1st member', fakeAsync(async () => {
-    const { component, fixture, page } = await setup();
+    const { component, fixture, page, debounceDelay } = await setup();
     component.search('x');
     fixture.detectChanges();
-    tick(1000);
+    tick(debounceDelay);
     fixture.detectChanges();
 
     /* first listed will be the display property of the first member */
-    expect(page.anchors[0].nativeElement.innerText).toEqual(
+    expect(page.anchors![0].innerText).toEqual(
       members[0][component.propertyToDisplay],
       'member property displayed',
     );
   }));
 
   it('should clear input when button clicked', fakeAsync(async () => {
-    const { fixture, page, getMembersSpy } = await setup();
+    const { fixture, page, getMembersSpy, debounceDelay } = await setup();
     sendInput(fixture, page.searchInput, 'x');
     fixture.detectChanges();
-    tick(400);
+    tick(debounceDelay);
     fixture.detectChanges();
-    expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
-    expect(page.anchors.length).toEqual(members.length, 'members found');
+    let numSearches = 0;
+    expect(getMembersSpy.calls.count()).toBe(++numSearches, 'only one search');
+    expect(page.anchors!.length).toEqual(members.length, 'members found');
     /* click the input clear icon */
     page.clearBtn.click();
     fixture.detectChanges();
-    tick(350);
+    tick(debounceDelay);
     fixture.detectChanges();
-    expect(getMembersSpy.calls.count()).toBe(1, 'did not search again');
-    expect(page.anchors.length).toEqual(0, 'no members found');
+    expect(getMembersSpy.calls.count()).toBe(++numSearches, 'searches again');
+    expect(getMembersSpy.calls.allArgs()[1]).toEqual(
+      [''],
+      'called with empty string',
+    );
+    expect(page.anchors).toBeNull('no members found');
     expect(page.searchInput.value).toBe('', 'search box cleared');
+  }));
+
+  it('should handle a getMembers error', fakeAsync(async () => {
+    const {
+      fixture,
+      component,
+      page,
+      getMembersSpy,
+      handleErrorSpy,
+      debounceDelay,
+    } = await setup(true);
+    component.search('x');
+    fixture.detectChanges();
+    tick(debounceDelay);
+    fixture.detectChanges();
+    expect(getMembersSpy).toHaveBeenCalledTimes(1);
+    expect(handleErrorSpy).toHaveBeenCalledTimes(1);
+    /* test that handleError called with the thrown error */
+    expect(handleErrorSpy.calls.argsFor(0)[0].message).toBe('Test Error');
+    /* check no members */
+    expect(page.anchors).toBeNull();
+
+    /* subscribe to the searchTerms$ subject again */
+    const numReturned = await component.members$.toPromise();
+    /* this time test that an empty array returned */
+    expect(numReturned).toEqual([]);
+    /* check handleError still only called once */
+    expect(handleErrorSpy).toHaveBeenCalledTimes(1);
   }));
 
   it('should test trackBy function returns member.id', async () => {

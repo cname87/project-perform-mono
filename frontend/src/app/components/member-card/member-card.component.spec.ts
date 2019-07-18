@@ -37,7 +37,7 @@ describe('memberCardComponent', () => {
   }
 
   /**
-   * Create the MemberDetailComponent, initialize it, set test variables.
+   * Create the component, initialize it, set test variables.
    */
   async function createComponent() {
     /* create the fixture */

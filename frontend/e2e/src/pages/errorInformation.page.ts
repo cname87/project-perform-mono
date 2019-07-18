@@ -1,10 +1,11 @@
 import { browser } from 'protractor';
 
 import { getRootElement } from './elements/root.element';
-import { getPageNotFoundElement } from './elements/pageNotFound.element';
+import { getErrorInformationElement } from './elements/errorInformation.element';
 import { getMessagesElement } from './elements/messages.element';
+import { getToastrElement } from './elements/toastr.element';
 
-export function getPageNotFoundPage() {
+export function getErrorInformationPage() {
 
   /* the pageNotFound component appears in the routerLink just like the other links */
 
@@ -14,13 +15,15 @@ export function getPageNotFoundPage() {
   }
 
   const rootElement = getRootElement();
-  const pageNotFoundElement = getPageNotFoundElement();
+  const errorInformationElement = getErrorInformationElement();
   const messagesElement = getMessagesElement();
+  const toastrElement = getToastrElement();
 
   return {
     navigateToPage,
     rootElement,
-    pageNotFoundElement,
+    errorInformationElement,
     messagesElement,
+    toastrElement,
   }
 }

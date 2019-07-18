@@ -1,91 +1,114 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Component, OnInit, ErrorHandler } from '@angular/core';
+import { Observable, Subject, of } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
   switchMap,
-  takeUntil,
+  publishReplay,
+  refCount,
+  catchError,
 } from 'rxjs/operators';
+import { NGXLogger } from 'ngx-logger';
 
-import { MembersService } from '../../shared/services/members.service';
-import { IMember } from '../../api/api-members.service';
-import { config } from '../../config';
-import { members } from '../../shared/mocks/mock-members';
+import { MembersService } from '../../shared/members-service/members.service';
+import { IMember } from '../../data-providers/members.data-provider';
+import { routes } from '../../config';
 
+/**
+ * This component supplies an input box that is used to find members on the server.  As the user enters text in the input box the component lists the members whose name starts with the entered text.  An interval is awaited after each keystroke before it requests a search from the server.
+ */
 @Component({
   selector: 'app-member-search',
   templateUrl: './member-search.component.html',
   styleUrls: ['./member-search.component.scss'],
 })
-export class MemberSearchComponent implements OnInit, OnDestroy {
+export class MemberSearchComponent implements OnInit {
   /* main title */
   header = 'Member Search';
-  /* component routing elements */
-  detail = config.routes.detail;
-  /* detail to display */
-  propertyToDisplay = 'name';
-  /* members returned from search term (observable) */
-  members$: Observable<IMember[]> | undefined;
-  /* members returned from search term */
-  members: IMember[] | undefined;
-  /* subject observable in send search term to get members */
+  /* initialises search hint */
+  isStart = true;
+  /* observable of array of members returned from search */
+  members$: Observable<IMember[]> = of([]);
+  /* subject observable to initiate search */
   private searchTerms$ = new Subject<string>();
-  /* unsubscribe signal */
-  private unsubscribeSignal$ = new Subject<void>();
+  /* search debounce time in ms */
+  private debounce = 300;
+  /* base route to get member detail */
+  detail = routes.detail;
+  /* member property to display in the list of found members */
+  propertyToDisplay = 'name';
+  /* controls that errorHandler only called once */
+  private errorHandlerCalled = false;
 
-  constructor(private membersService: MembersService) {}
+  constructor(
+    private membersService: MembersService,
+    private logger: NGXLogger,
+    private errorHandler: ErrorHandler,
+  ) {
+    this.logger.trace(
+      MemberSearchComponent.name + ': Starting MemberSearchComponent',
+    );
+  }
 
-  ngOnInit() {
-    /* get an observable of the members returned by the search term following debounce */
+  ngOnInit(): void {
+    /**
+     * Creates an observable of the members returned by the search term, subscribes and stores the found members.
+     */
     this.members$ = this.searchTerms$.pipe(
-      /* wait 300ms after each keystroke before considering the term */
-      debounceTime(300),
+      /* wait a set interval after each keystroke before considering the term */
+      debounceTime(this.debounce),
 
       /* ignore new term if same as previous term */
       distinctUntilChanged(),
 
       /* get the memberService observable each time the term changes */
-      switchMap((term: string) => {
-        return this.membersService.getMembers(term);
-      }),
+      switchMap(
+        (term: string): Observable<IMember[]> => {
+          return this.membersService.getMembers(term);
+        },
+      ),
+      /* using publish as share will resubscribe for each html call in case of unexpected error causing observable to complete (and I don't need to resubscribe on this page) */
+      publishReplay(1),
+      refCount(),
 
-      /* unsubscribe on ngDestroy */
-      takeUntil(this.unsubscribeSignal$.asObservable()),
-    );
-
-    /* get the actual members returned */
-    this.members$
-      .pipe(
-        /* unsubscribe on ngDestroy */
-        takeUntil(this.unsubscribeSignal$.asObservable()),
-      )
-      .subscribe((foundMembers) => {
-        if (!members) {
+      /* note that an error will close the subject i.e. search will no longer work (but will go to error information page anyway) */
+      catchError((error: any) => {
+        /* only call the error handler once per ngOnInit even though the returned observable is multicast to multiple html elements */
+        if (!this.errorHandlerCalled) {
+          this.errorHandlerCalled = true;
+          this.errorHandler.handleError(error);
         }
-        this.members = foundMembers;
-      });
+        /* return empty array of members to all html elements */
+        return of([]);
+      }),
+    );
   }
 
-  ngOnDestroy() {
-    this.unsubscribeSignal$.next();
-    this.unsubscribeSignal$.unsubscribe();
-  }
-
-  /* push a search term into the observable stream */
-  search(term: string) {
+  /**
+   * Pushes a search term into the searchTerms$ observable.
+   */
+  search(term: string): void {
+    this.logger.trace(MemberSearchComponent.name + ': Calling search(term)');
     this.searchTerms$.next(term);
   }
 
-  clear() {
-    this.members = undefined;
+  /**
+   * Clears the input box and the list of displayed members.
+   */
+  clear(): void {
+    this.logger.trace(MemberSearchComponent.name + ': Calling clear()');
+    /* getMembers('') returns an empty array without querying the backend */
+    this.searchTerms$.next('');
   }
 
-  /* return member property to display */
-  showProperty(member: IMember) {
+  /**
+   * The member property to display for the listed found members is returned by this function.
+   */
+  showProperty(member: IMember): IMember {
     return member[this.propertyToDisplay];
   }
 
-  trackByFn(_index: number, member: IMember) {
+  trackByFn(_index: number, member: IMember): number | null {
     return member ? member.id : null;
   }
 }

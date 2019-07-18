@@ -2,7 +2,6 @@
   "openapi" : "3.0.1",
   "info" : {
     "title" : "Project Perform API V1",
-    "version" : "1.0.0",
     "description" : "V1.x.x cover the API for one team of members.",
     "contact" : {
       "name" : "Sean Young",
@@ -11,7 +10,8 @@
     "license" : {
       "name" : "Apache 2.0",
       "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
-    }
+    },
+    "version" : "1.0.1"
   },
   "servers" : [ {
     "url" : "https://localhost:1337/api-v1",
@@ -21,9 +21,8 @@
     "/isTestDatabase" : {
       "get" : {
         "summary" : "Returns whether the test database is in use.",
-        "operationId" : "getIsTestDatabase",
-        "x-swagger-router-controller" : "members",
         "description" : "Returns whether the test database is in use.\nIf the test database is in use then it is safe to run the api tests.\n",
+        "operationId" : "getIsTestDatabase",
         "responses" : {
           "200" : {
             "description" : "Test mode returned.",
@@ -45,23 +44,25 @@
               }
             }
           }
-        }
+        },
+        "x-swagger-router-controller" : "members"
       }
     },
     "/members" : {
       "get" : {
         "summary" : "Returns all the members, or as determined by a query string.",
+        "description" : "Returns all the members, or as determined by a search string.\n",
         "operationId" : "getMembers",
-        "x-swagger-router-controller" : "members",
-        "description" : "Returns all the members\n",
         "parameters" : [ {
-          "in" : "query",
           "name" : "name",
+          "in" : "query",
           "description" : "An optional name search string to limit the returned list.\nAll members with the name property starting with 'name' will be returned. \n",
           "required" : false,
+          "style" : "form",
+          "explode" : true,
           "schema" : {
-            "type" : "string",
-            "maxLength" : 35
+            "maxLength" : 35,
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -88,16 +89,6 @@
               }
             }
           },
-          "404" : {
-            "description" : "The supplied match string does not match any member.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Error"
-                }
-              }
-            }
-          },
           "503" : {
             "description" : "The database service is not available now.",
             "content" : {
@@ -118,84 +109,24 @@
               }
             }
           }
-        }
-      },
-      "post" : {
-        "summary" : "Adds a member.",
-        "operationId" : "addMember",
-        "x-swagger-router-controller" : "members",
-        "description" : "Adds a supplied member.\nA member object must be supplied in the body.\nAn error (409) will be returned if a member with the same id as the id in the supplied member object already exists. \n",
-        "requestBody" : {
-          "description" : "Member detail (without id field).",
-          "x-name" : "member",
-          "required" : true,
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/MemberWithoutId"
-              }
-            }
-          }
         },
-        "responses" : {
-          "201" : {
-            "description" : "Member created",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Member"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "The request is not a valid request.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "503" : {
-            "description" : "The database service is not available now.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "default" : {
-            "description" : "Unexpected error",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
+        "x-swagger-router-controller" : "members"
       },
       "put" : {
         "summary" : "Updates a member (based on the id property of the member).",
         "description" : "Updates the data on a member.\n",
         "operationId" : "updateMember",
-        "x-swagger-router-controller" : "members",
         "requestBody" : {
           "description" : "Updates a member.\nA member object is supplied which must have an id property.\nThe member with that id is updated.\n",
-          "x-name" : "member",
-          "required" : true,
           "content" : {
             "application/json" : {
               "schema" : {
                 "$ref" : "#/components/schemas/Member"
               }
             }
-          }
+          },
+          "required" : true,
+          "x-name" : "member"
         },
         "responses" : {
           "200" : {
@@ -248,13 +179,73 @@
               }
             }
           }
-        }
+        },
+        "x-swagger-router-controller" : "members"
+      },
+      "post" : {
+        "summary" : "Adds a member.",
+        "description" : "Adds a supplied member.\nA member object must be supplied in the body.\nAn error (409) will be returned if a member with the same id as the id in the supplied member object already exists. \n",
+        "operationId" : "addMember",
+        "requestBody" : {
+          "description" : "Mmber detail (without id field).",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MemberWithoutId"
+              }
+            }
+          },
+          "required" : true,
+          "x-name" : "member"
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Member created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "The request is not a valid request.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503" : {
+            "description" : "The database service is not available now.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-swagger-router-controller" : "members"
       },
       "delete" : {
         "summary" : "Deletes all members.",
-        "operationId" : "deleteMembers",
-        "x-swagger-router-controller" : "members",
         "description" : "Deletes all members.\n",
+        "operationId" : "deleteMembers",
         "responses" : {
           "200" : {
             "description" : "Members deleted",
@@ -296,7 +287,8 @@
               }
             }
           }
-        }
+        },
+        "x-swagger-router-controller" : "members"
       }
     },
     "/members/{id}" : {
@@ -304,17 +296,18 @@
         "summary" : "Returns a specific member.",
         "description" : "Get a specific member.\n",
         "operationId" : "getMember",
-        "x-swagger-router-controller" : "members",
         "parameters" : [ {
-          "in" : "path",
           "name" : "id",
+          "in" : "path",
           "description" : "The value of the id property of the member.",
           "required" : true,
+          "style" : "simple",
+          "explode" : false,
           "schema" : {
-            "type" : "integer",
-            "format" : "int32",
+            "maximum" : 999,
             "minimum" : 1,
-            "maximum" : 999
+            "type" : "integer",
+            "format" : "int32"
           }
         } ],
         "responses" : {
@@ -339,7 +332,7 @@
             }
           },
           "404" : {
-            "description" : "A member with the supplied member ID was not found",
+            "description" : "A member with the supplied member ID was not found.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -368,23 +361,25 @@
               }
             }
           }
-        }
+        },
+        "x-swagger-router-controller" : "members"
       },
       "delete" : {
         "summary" : "Deletes a member.",
         "description" : "Deletes a member.\n",
         "operationId" : "deleteMember",
-        "x-swagger-router-controller" : "members",
         "parameters" : [ {
-          "in" : "path",
           "name" : "id",
+          "in" : "path",
           "description" : "The value of the id property of the member.",
           "required" : true,
+          "style" : "simple",
+          "explode" : false,
           "schema" : {
-            "type" : "integer",
-            "format" : "int32",
+            "maximum" : 999,
             "minimum" : 1,
-            "maximum" : 999
+            "type" : "integer",
+            "format" : "int32"
           }
         } ],
         "responses" : {
@@ -409,7 +404,7 @@
             }
           },
           "404" : {
-            "description" : "A member with that ID does not exist",
+            "description" : "A member with the supplied member ID was not found.",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -438,47 +433,47 @@
               }
             }
           }
-        }
+        },
+        "x-swagger-router-controller" : "members"
       }
     }
   },
   "components" : {
     "schemas" : {
       "Member" : {
-        "description" : "Member information",
         "required" : [ "id", "name" ],
         "type" : "object",
         "properties" : {
           "id" : {
+            "maximum" : 999,
+            "minimum" : 1,
             "type" : "integer",
             "format" : "int32",
-            "minimum" : 1,
-            "maximum" : 999,
             "example" : 5
           },
           "name" : {
+            "maxLength" : 35,
             "type" : "string",
             "format" : "string",
-            "maxLength" : 35,
             "example" : "John Athlete"
           }
-        }
+        },
+        "description" : "Member information"
       },
       "MemberWithoutId" : {
-        "description" : "Member information without the id field",
         "required" : [ "name" ],
         "type" : "object",
         "properties" : {
           "name" : {
+            "maxLength" : 35,
             "type" : "string",
             "format" : "string",
-            "maxLength" : 35,
             "example" : "John Athlete"
           }
-        }
+        },
+        "description" : "Member information without the id field"
       },
       "Error" : {
-        "description" : "Error report",
         "required" : [ "code", "message" ],
         "type" : "object",
         "properties" : {
@@ -492,30 +487,31 @@
             "format" : "string",
             "example" : "Not found"
           }
-        }
+        },
+        "description" : "Error report"
       },
       "Count" : {
-        "description" : "Count of documents.",
-        "type" : "object",
         "required" : [ "count" ],
+        "type" : "object",
         "properties" : {
           "count" : {
             "type" : "integer",
             "format" : "int32",
             "example" : 5
           }
-        }
+        },
+        "description" : "Count of documents."
       },
       "IsTestDatabase" : {
-        "description" : "boolean 'true' => test database is in use.",
-        "type" : "object",
         "required" : [ "isTestDatabase" ],
+        "type" : "object",
         "properties" : {
           "isTestDatabase" : {
             "type" : "boolean",
             "example" : false
           }
-        }
+        },
+        "description" : "boolean 'true' => test database is in use."
       }
     }
   }

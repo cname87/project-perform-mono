@@ -199,6 +199,41 @@ describe('api requests', () => {
     /* the server sends { count: n } */
     chai.expect(readBody.count, 'Number deleted').to.eql(2);
   });
+
+  it('should read empty when matchstring matches nothing', async () => {
+    /* create a member so database definitely not empty */
+    let url = 'https://localhost:1337/api-v1/members';
+    const data = { name: 'test9' };
+    let response = await sendRequest(url, 'POST', data);
+
+    url = 'https://localhost:1337/api-v1/members?name=xxx';
+    response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(true);
+    chai.expect(response.status).to.eql(200);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+
+    /* the server sends [] */
+    chai.expect(readBody.length, 'Empty array').to.eql(0);
+  });
+
+  it('should read empty when database empty', async () => {
+    /* delete all */
+    let url = 'https://localhost:1337/api-v1/members';
+    let response = await sendRequest(url, 'DELETE');
+
+    url = 'https://localhost:1337/api-v1/members';
+    response = await sendRequest(url, 'GET');
+    chai.expect(response.ok).to.eql(true);
+    chai.expect(response.status).to.eql(200);
+
+    const readBody = await response.json();
+    console.log('Page body : ', readBody);
+
+    /* the server sends [] */
+    chai.expect(readBody.length, 'Empty array').to.eql(0);
+  });
 });
 
 describe('failed api requests', () => {
@@ -259,45 +294,6 @@ describe('failed api requests', () => {
     chai
       .expect(readBody.message, 'member not found')
       .eql('The supplied member ID does not match a stored member');
-  });
-
-  it('should fail to read all - matchstring matches nothing', async () => {
-    /* create a member so database definitely not empty */
-    let url = 'https://localhost:1337/api-v1/members';
-    const data = { name: 'test9' };
-    let response = await sendRequest(url, 'POST', data);
-
-    url = 'https://localhost:1337/api-v1/members?name=xxx';
-    response = await sendRequest(url, 'GET');
-    chai.expect(response.ok).to.eql(false);
-    chai.expect(response.status).to.eql(404);
-
-    const readBody = await response.json();
-    console.log('Page body : ', readBody);
-    chai
-      .expect(readBody.message, 'no member found')
-      .eql(
-        'No members found: The supplied match string does not match any stored members, or no matchstring supplied and no members are stored',
-      );
-  });
-
-  it('should fail to read all - empty ', async () => {
-    /* delete all */
-    let url = 'https://localhost:1337/api-v1/members';
-    let response = await sendRequest(url, 'DELETE');
-
-    url = 'https://localhost:1337/api-v1/members';
-    response = await sendRequest(url, 'GET');
-    chai.expect(response.ok).to.eql(false);
-    chai.expect(response.status).to.eql(404);
-
-    const readBody = await response.json();
-    console.log('Page body : ', readBody);
-    chai
-      .expect(readBody.message, 'no member found')
-      .eql(
-        'No members found: The supplied match string does not match any stored members, or no matchstring supplied and no members are stored',
-      );
   });
 });
 
@@ -618,7 +614,7 @@ describe('fall back to the angular index.html', () => {
 
     const readTitle = testWindow.document.title;
     console.log('Page title: ', readTitle);
-    chai.expect(readTitle, 'Page title').to.eql('Team Members');
+    chai.expect(readTitle, 'Page title').to.eql('Project Perform');
   });
 });
 

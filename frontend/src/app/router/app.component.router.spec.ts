@@ -11,12 +11,12 @@ import { AppModule } from '../app.module';
 import { AppComponent } from '../components/app/app.component';
 import { DashboardComponent } from '../components/dashboard/dashboard.component';
 import { MembersListComponent } from '../components/members-list/members-list.component';
-import { MembersService } from '../shared/services/members.service';
-import { IMember } from '../api/model/models';
+import { MembersService } from '../shared/members-service/members.service';
+import { IMember } from '../data-providers/models/models';
 import { of, Observable } from 'rxjs';
-import { PageNotFoundComponent } from '../components/page-not-found/page-not-found.component';
 import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
-import { config } from '../config';
+import { routes } from '../config';
+import { ErrorInformationComponent } from '../components/error-information/error-information.component';
 
 interface IMembersServiceStub {
   getMembers: () => Observable<IMember[]>;
@@ -147,7 +147,7 @@ describe('AppComponent & RouterTestingModule', () => {
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + config.routes.membersList.path,
+      '/' + routes.membersList.path,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);
@@ -169,7 +169,7 @@ describe('AppComponent & RouterTestingModule', () => {
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + config.routes.membersList.path,
+      '/' + routes.membersList.path,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);
@@ -192,13 +192,13 @@ describe('AppComponent & RouterTestingModule', () => {
     );
     expectElementOf(fixture, DashboardComponent);
     fixture.ngZone!.run(() => {
-      spyLocation.go('/' + config.routes.membersList.path);
+      spyLocation.go('/' + routes.membersList.path);
     });
     fixture.detectChanges();
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + config.routes.membersList.path,
+      '/' + routes.membersList.path,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);
@@ -222,7 +222,7 @@ describe('AppComponent & RouterTestingModule', () => {
     expectElementOf(fixture, MemberDetailComponent);
   });
 
-  it('should navigate to "Page Not Found"', async () => {
+  it('should navigate to error information page for page not found', async () => {
     const { fixture, spyLocation } = await setup();
     fixture.detectChanges();
     await fixture.whenStable();
@@ -237,6 +237,6 @@ describe('AppComponent & RouterTestingModule', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     expectPathToBe(spyLocation, '/dummyUrl', 'after clicking members link');
-    expectElementOf(fixture, PageNotFoundComponent);
+    expectElementOf(fixture, ErrorInformationComponent);
   });
 });

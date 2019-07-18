@@ -17,6 +17,8 @@
       {{ header }}
     </mat-label>
 
+    <!-- the clear/reset icon button -->
+
     <button
       mat-button
       matSuffix
@@ -28,24 +30,25 @@
       <mat-icon>close</mat-icon>
     </button>
 
+    <!-- ensure no overlap between the mat-hint conditionals -->
 
     <!-- show if no search yet or new search -->
     <mat-hint
-      *ngIf="!members"
+      *ngIf="!searchBox.value"
     >
       Enter a member name search term
     </mat-hint>
 
     <!-- show if no members found -->
     <mat-hint
-      *ngIf="members && members.length === 0"
+      *ngIf="searchBox.value && (members$ | async)?.length === 0"
     >
       No member found
     </mat-hint>
 
     <!-- show if members found -->
     <mat-hint
-      *ngIf="members && members.length > 0"
+      *ngIf="searchBox.value && (members$ | async)?.length > 0"
     >
       Click on a name below to see the member detail
     </mat-hint>
@@ -55,7 +58,7 @@
 
 <mat-nav-list>
   <a
-    *ngFor="let member of members; trackBy: trackByFn"
+    *ngFor="let member of (members$ | async); trackBy: trackByFn"
     mat-list-item
     routerLink="/{{detail.path}}/{{member.id}}"
   >

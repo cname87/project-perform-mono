@@ -12,7 +12,6 @@
     "outDir": "./dist/out-tsc",
     "rootDir": ".",
 
-    /* compiles to this JS version - higher for better debug support, lower for wider browser support */
     "target": "es5",
 
     /* for browser-side scripts - extra types which you know browser will support */
@@ -20,9 +19,6 @@
       "es2018",
       "dom"
     ],
-
-    /* module loader format (independent of target) - es2015 for angular */
-    "module": "es2015",
 
     /* workaround for core.js - see https://github.com/angular/angular-cli/issues/13954 */
     "paths": {
