@@ -43,6 +43,10 @@ exports.config = {
         "--disable-popup-blocking",
       ]
     },
+    /* enable browser logs for protractor-browser-logs */
+    loggingPrefs: {
+      browser: 'ALL' // "OFF", "SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST", "ALL".
+    }
   },
   baseUrl: 'https://localhost:1337/',
   SELENIUM_PROMISE_MANAGER: false,

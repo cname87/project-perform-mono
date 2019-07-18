@@ -78,6 +78,8 @@ describe('Error Handling', () => {
   });
 
   beforeEach(function () {
+    /* clear browser log before test */
+    browser.manage().logs().get('browser');
     logs = browserLogs(browser);
     logs.ignore(logs.DEBUG);
     logs.ignore(logs.INFO);
@@ -94,7 +96,7 @@ describe('Error Handling', () => {
     it(`GET /members?name='error' causes an unexpected error`, async () => {
       /* the dashboard page should be displayed */
       let dashboardPage = getDashboardPage();
-      /* enter 'text' in search box */
+      /* enter dummy text in search box */
       await dashboardPage.memberSearchElement.searchBox.sendKeys('error');
       await browser.sleep(1000);
       /* check message logged on screen */
@@ -252,7 +254,7 @@ describe('Error Handling', () => {
 
     beforeAll(loadRootPage);
 
-    it(`Unexpected application error`, async () => {
+    it('Unexpected application error', async () => {
       /* the dashboard page should be displayed */
       let dashboardPage = getDashboardPage();
       /* enter dummy name in search box - triggers application error*/
@@ -302,7 +304,7 @@ describe('Error Handling', () => {
       logs.expect(/Test application error/, logs.ERROR);
     });
 
-  });
 
+  });
 
 });
