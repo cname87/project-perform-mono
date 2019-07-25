@@ -17,10 +17,6 @@
       "url": "http://localhost:4200/", // proxy to 1337 for api calls
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {
-        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
-        "webpack:///./*": "${workspaceFolder}/frontend/*",
-        "webpack:///*": "frontend/*",
-        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
     },
     // Test frontend - use for frontend unit test debug

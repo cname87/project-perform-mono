@@ -1,0 +1,15 @@
+@import 'src/styles/main-theme.scss';
+
+/* keep a margin between nav bar and the routed components */
+nav {
+  margin-bottom: $default-gap;
+}
+
+/* style a tab that is active via browser (and not via a click) */
+a.item-active {
+  /* tab text stays solid black even when you click on the browser link */
+  opacity: 1.0;
+  /* override the disabled color so the disabled detail tab can appear selected */
+  color: rgba(0, 0, 0, 1.00);
+}
+

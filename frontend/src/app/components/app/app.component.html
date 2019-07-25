@@ -1,24 +1,8 @@
-<h1 class="mat-display-1">{{ header }}</h1>
+<app-login></app-login>
 
-<nav
+<mat-divider></mat-divider>
 
-  mat-tab-nav-bar
-  color="primary"
-  dynamicHeight="true"
->
-  <a
-    [ngClass]="{'item-active' : rla.isActive}"
-    mat-tab-link
-    *ngFor="let link of links trackBy: trackByFn"
-    [routerLink]="link.path"
-    routerLinkActive #rla="routerLinkActive"
-    [active]="rla.isActive"
-    [disabled]="link.disabled"
-  >
-    {{ link.display }}
-  </a>
-
-</nav>
+<app-nav></app-nav>
 
 <router-outlet></router-outlet>
 

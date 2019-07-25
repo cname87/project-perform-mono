@@ -122,7 +122,7 @@ export class ErrorHandlerService implements ErrorHandler {
       this.zone.run(() => {
         this.log('ERROR: An unknown error occurred');
         /* navigate to error information page and then show toastr message */
-        this.router.navigateByUrl('/errorinformation/error').then(() => {
+        this.router.navigateByUrl('/information/error').then(() => {
           this.logger.trace(
             ErrorHandlerService.name + ': Showing toastr message',
           );

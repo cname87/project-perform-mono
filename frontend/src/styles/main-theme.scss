@@ -4,7 +4,7 @@
 /* create a custom theme - can match a prebuilt theme*/
 $primary: mat-palette($mat-deep-purple, 200, 100, 300);
 $accent: mat-palette($mat-amber, 100, 50, 300);
-$warn: mat-palette($mat-red);
+$warn: mat-palette($mat-red, 200, 100, 300);
 $theme: mat-light-theme(
   $primary,
   $accent,
