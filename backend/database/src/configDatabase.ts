@@ -60,9 +60,13 @@ export function getMongoUri(): string {
   const user = encodeURIComponent(process.env.DB_USER as string);
   const password = encodeURIComponent(process.env.DB_PASSWORD as string);
   const host = process.env.DB_HOST as string;
-  const db = process.env.TEST_MODE
-    ? (process.env.DB_DATABASE_TEST as string)
-    : (process.env.DB_DATABASE as string);
+  /* the mongoDB database is either a test database or a production database */
+  const db =
+    process.env.DB_MODE === 'production'
+      ? (process.env.DB_DATABASE as string)
+      : (process.env.DB_DATABASE_TEST as string);
+
+  debug(modulename + ` : database ${db} in use`);
   const ssl = 'true';
   const authSource = 'admin';
   const authMechanism = 'DEFAULT';

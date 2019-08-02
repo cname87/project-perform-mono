@@ -12,7 +12,7 @@
  * The following parameters should be set in config.ts:
  * config.IS_NO_DB_OK = false; i.e. a database is required.
  *
- * The database used up by the server is checked below to ensure it is 'test' (as driven by the process.env variable 'TEST_MODE')  If it isn't the test run will abort.
+ * The database used up by the server is checked below to ensure it is 'test' (as driven by the process.env variable 'DB_MODE')  If it isn't the test run will abort.
  *
  */
 
@@ -155,8 +155,8 @@ describe('server API', () => {
 
       const browserEventsCallback = (arg: { message: string }) => {
         /* try needed as errors thrown within this function
-         * will be seen as a server error and not fail the
-         * mocha test - a reject causes a test case fail. */
+         will be seen as a server error and not fail the
+         mocha test - a reject causes a test case fail. */
         try {
           switch (arg.message) {
             case 'API tests start':

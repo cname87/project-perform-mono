@@ -90,7 +90,7 @@
         "${workspaceFolder}/frontend/node_modules/**/*.js",
       ],
     },
-    // server index.js
+    // run server index.js
     {
       "type": "node",
       "request": "launch",
@@ -99,7 +99,7 @@
       "cwd": "${workspaceFolder}/backend",
       "env": {
         /* set before all tests so test database used */
-        "TEST_MODE": "false",
+        "DB_MODE": "production",
       },
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -134,7 +134,7 @@
       "cwd": "${workspaceFolder}/backend",
       "env": {
         /* set before all tests so test database used */
-        "TEST_MODE": "false",
+        "DB_MODE": "production",
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
@@ -151,7 +151,7 @@
       ],
       "smartStep": false,
     },
-    // monitor.js
+    // run monitor.js
     {
       "type": "node",
       "request": "launch",
@@ -174,7 +174,7 @@
       ],
       "smartStep": false,
     },
-    // database index.js
+    // run database index.js
     {
       "type": "node",
       "request": "launch",
@@ -248,17 +248,17 @@
         /* include testSetup.js to load .env */
         "${workspaceFolder}/backend/dist/test/testSetup.js",
         /* comment out files to select tests */
-        "${workspaceFolder}/backend/dist/database/test/*.test.js",
-        "${workspaceFolder}/backend/dist/models/test/*.test.js",
-        "${workspaceFolder}/backend/dist/utils/test/*.test.js",
+        // "${workspaceFolder}/backend/dist/database/test/*.test.js",
+        // "${workspaceFolder}/backend/dist/models/test/*.test.js",
+        // "${workspaceFolder}/backend/dist/utils/test/*.test.js",
         "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
-        "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
-        "${workspaceFolder}/backend/server/test/*.js",
-        "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
+        // "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
+        // "${workspaceFolder}/backend/server/test/*.js",
+        // "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
       ],
       "env": {
         /* set before all tests so test database used */
-        "TEST_MODE": "true",
+        "DB_MODE": "test",
         /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "true",
       },
@@ -301,7 +301,7 @@
       ],
       "env": {
         /* set before all tests so test database used */
-        "TEST_MODE": "true",
+        "DB_MODE": "test",
         /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "true",
       },
@@ -338,7 +338,7 @@
       ],
       "env": {
         /* set before all tests so test database used */
-        "TEST_MODE": "true",
+        "DB_MODE": "test",
         /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "false",
       },
@@ -396,7 +396,6 @@
       "request": "launch",
       "name": "Launch the currently opened .js file",
       "program": "${file}",
-      "env": {},
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -405,8 +404,29 @@
         "${workspaceFolder}/backend/node_modules/**/*",
         "${workspaceFolder}/backend/node_modules/**/*.js",
       ],
-      "autoAttachChildProcesses": true,
     },
+    // current .ts file
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch the currently opened .ts file",
+      "cwd": "${workspaceFolder}/backend",
+      "outputCapture": "std",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "runtimeArgs": [
+          "-r",
+          "ts-node/register"
+      ],
+      "args": [
+          "${file}",
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "tsconfig.json",
+      },
+    },
+
+
   ],
   "compounds": [
     /* Run backend server and browse to root */

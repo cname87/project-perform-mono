@@ -21,7 +21,7 @@ const appRoot = appRootObject.toString();
 
 /* import all required modules */
 
-/* server class abd functions */
+/* server class and functions */
 import { Server } from './server/serverOps';
 import { startServer } from './server/startserver';
 import { runServer } from './server/runServer';
@@ -41,6 +41,7 @@ import { Database, runDatabaseApp } from '../../database/src/index';
 import { createModelTests } from '../../models/src/tests';
 import { createModelMembers } from '../../models/src/members';
 /* controllers */
+import { apiController } from './controllers/api';
 import { failController } from './controllers/fail';
 /* handlers for /members api */
 import { membersApi } from './handlers/api/membersApi';
@@ -70,6 +71,7 @@ export const config = {
   runDatabaseApp,
   createModelTests,
   createModelMembers,
+  apiController,
   failController,
   membersApi,
   membersHandlers,
@@ -253,9 +255,12 @@ export interface IExpressApp extends Application {
   appLocals: IAppLocals;
 }
 
-/* extension of REQUEST to support appLocals in app */
+/* extension of REQUEST to support Express app and the Auth0 auth parameter returned by express-jwt */
 export interface IRequestApp extends Request {
   app: IExpressApp;
+  auth?: {
+    sub: string;
+  };
 }
 
 /* defines a team member */

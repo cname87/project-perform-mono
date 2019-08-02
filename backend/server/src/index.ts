@@ -58,9 +58,9 @@ const { miscHandlers, membersApi } = config;
 /* errorHandler middleware */
 const { errorHandlers } = config;
 /* route controllers */
-const { failController } = config;
+const { apiController, failController } = config;
 /* database models */
-const { createModelMembers, createModelTests } = config;
+const { createModelTests } = config;
 /* Create the single instances of the general logger & dumpError utilities, and the server logger middleware.  These are passed via the appLocals object. Also, other modules can create new instances later without any parameters and they will receive the same instance. */
 const Logger = config.Logger;
 const logger = new Logger() as winston.Logger;
@@ -77,6 +77,7 @@ appLocals.config = config;
 /* generate the controllers object */
 const controllers: IControllers = {};
 controllers.fail = failController;
+controllers.api = apiController;
 appLocals.controllers = controllers;
 /* appLocals.database filled during server startup */
 /* appLocals.dbConnection filled during server startup */
@@ -151,6 +152,7 @@ async function runApp() {
     debug(modulename + ': calling the database');
 
     /* create a database connection */
+    /* the database will be either a test or production database depending on an env parameter */
     const database = await runDatabaseApp();
     appLocals.database = database;
 
@@ -158,16 +160,16 @@ async function runApp() {
     const dbConnection = database.dbConnection;
     appLocals.dbConnection = dbConnection;
 
-    /* set database ready state variable */
+    /* read whether database is indeed connected or not */
     isDbReady = appLocals.dbConnection.readyState;
 
     if (isDbReady === DBReadyState.Connected) {
       debug(modulename + ': database set up complete');
 
-      /* create database models */
+      /* create the database models (i.e. the mongoDB collection connections) */
       appLocals.models = {} as any;
       appLocals.models.tests = createModelTests(database);
-      appLocals.models.members = createModelMembers(database);
+      /* appLocals.models.members is created when an api function is called */
     } else {
       logger.error(modulename + ': database failed to connect');
     }
@@ -177,7 +179,7 @@ async function runApp() {
     dumpError(err);
   }
 
-  /* call the http server if db connected or not needed otherwise exit */
+  /* call the http server if db connected or not needed, otherwise exit */
   if (isDbReady === DBReadyState.Connected || config.IS_NO_DB_OK) {
     debug(modulename + ': calling the http server');
 

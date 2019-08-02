@@ -39,7 +39,7 @@ export class AuthService {
     if (!this.auth0Client) {
       /* if createAuth0Client has not being called, call it */
       if (!this.auth0ClientPromise) {
-        this.logger.trace(`${AuthService.name}: Calling Auth0`);
+        this.logger.trace(`${AuthService.name}: Creating the Auth0 client`);
         this.auth0ClientPromise = createAuth0Client(auth0Config);
       }
 

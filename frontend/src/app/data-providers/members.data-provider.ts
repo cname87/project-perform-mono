@@ -71,12 +71,12 @@ export class MembersDataProvider {
     }
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
-
     /* set Content-Type header - what content is being sent */
     headers = headers.set('Content-Type', 'application/json');
+    /* set Authorization header - JWT token */
+    headers = headers.set('Authorization', `Bearer ${this.token}`);
 
     this.logger.trace(
       MembersDataProvider.name +
@@ -169,7 +169,6 @@ export class MembersDataProvider {
     }
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
     /* set Authorization header - JWT token */
@@ -222,12 +221,12 @@ export class MembersDataProvider {
     }
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
-
     /* set Content-Type header - what content is being sent */
     headers = headers.set('Content-Type', 'application/json');
+    /* set Authorization header - JWT token */
+    headers = headers.set('Authorization', `Bearer ${this.token}`);
 
     this.logger.trace(
       MembersDataProvider.name +
@@ -269,9 +268,10 @@ export class MembersDataProvider {
     }
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
+    /* set Authorization header - JWT token */
+    headers = headers.set('Authorization', `Bearer ${this.token}`);
 
     this.logger.trace(
       MembersDataProvider.name +
@@ -311,10 +311,10 @@ export class MembersDataProvider {
     this.logger.trace(MembersDataProvider.name + ': deleteMembers called');
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
-
+    /* set Authorization header - JWT token */
+    headers = headers.set('Authorization', `Bearer ${this.token}`);
     this.logger.trace(
       MembersDataProvider.name +
         `: Sending DELETE request to: ${this.basePath}/${this.membersPath}`,
