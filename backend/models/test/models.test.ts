@@ -21,7 +21,7 @@ import { Document, Model } from 'mongoose';
 
 import { runDatabaseApp } from '../../database/src/index';
 import { Database } from '../src/configModels';
-import { createModelTests } from '../src/tests';
+import { createModelTests } from './tests';
 
 /*
  * tests
@@ -38,10 +38,8 @@ describe('Database models operations', () => {
   let docContent2: ITestModel;
   let modelTests: Model<Document>;
 
-  before('Create database connection & tests model', async () => {
-    debug(
-      `Running ${modulename} after - Create database connection & tests model`,
-    );
+  before('Create database connection', async () => {
+    debug(`Running ${modulename} before - Create database connection`);
 
     database = await runDatabaseApp();
 
@@ -64,9 +62,8 @@ describe('Database models operations', () => {
   it('creates the tests model', async () => {
     debug(`Running ${modulename} it - creates the test model`);
 
-    debug('create tests model');
+    debug(modulename + ': create tests model');
     modelTests = createModelTests(database);
-    debug('run tests');
     expect(modelTests.collection.name, 'Should return the model').to.eql(
       'tests',
     );
@@ -75,7 +72,7 @@ describe('Database models operations', () => {
   it('deletes docs', async () => {
     debug(`Running ${modulename} it - deletes docs`);
 
-    debug('delete tests docs');
+    debug(modulename + ': delete tests docs');
     await modelTests.deleteMany({
       _id: {
         $exists: true,
@@ -83,20 +80,18 @@ describe('Database models operations', () => {
     });
     const count = await modelTests.countDocuments();
 
-    debug('run tests');
     expect(count, 'All docs have been deleted').to.eql(0);
   });
 
   it('creates and saves docs', async () => {
     debug(`Running ${modulename} it - creates and saves docs`);
 
-    debug('create docs');
+    debug(modulename + ': create and save docs');
     const testDoc1 = new modelTests(docContent1);
     const returnedDoc1 = await testDoc1.save();
     const testDoc2 = new modelTests(docContent2);
     const returnedDoc2 = await testDoc2.save();
 
-    debug('run tests');
     expect(
       returnedDoc1.get('id'),
       'returned doc to equal doc that was saved',
@@ -110,20 +105,18 @@ describe('Database models operations', () => {
   it('finds docs', async () => {
     debug(`Running ${modulename} it - finds docs`);
 
-    debug('find docs');
+    debug(modulename + ': find docs');
     const foundDocs = await modelTests.find();
 
-    debug('run tests');
     expect(foundDocs.length, 'to equal').to.eql(2);
   });
 
   it('finds a doc', async () => {
     debug(`Running ${modulename} it - finds a doc`);
 
-    debug('find a doc');
+    debug(modulename + ': find a doc');
     const foundDoc = await modelTests.findOne({ id: 21 });
 
-    debug('run tests');
     foundDoc
       ? expect(foundDoc.get('name'), 'to equal').to.eql('test22')
       : expect.fail(true, false, 'Should have failed earlier');
@@ -132,7 +125,7 @@ describe('Database models operations', () => {
   it('updates a doc', async () => {
     debug(`Running ${modulename} it - updates a doc`);
 
-    debug('update a doc');
+    debug(modulename + ': update a doc');
     let foundDoc = await modelTests.findOne({ id: 11 });
     await modelTests.updateMany(
       {
@@ -146,7 +139,6 @@ describe('Database models operations', () => {
     );
     foundDoc = await modelTests.findOne({ id: 11 });
 
-    debug('run tests');
     foundDoc
       ? expect(foundDoc.get('name'), 'to equal').to.eql('updatedTest12')
       : expect.fail(true, false, 'Should have failed earlier');
@@ -155,10 +147,9 @@ describe('Database models operations', () => {
   it('fails to access a database that is down', async () => {
     debug(`Running ${modulename} it - fails to access a database that is down`);
 
-    debug('close database');
+    debug(modulename + ': close database');
     await database.closeConnection(database.dbConnection);
 
-    debug('run tests');
     try {
       await modelTests.find();
       expect.fail(true, false, 'Should have failed earlier');
