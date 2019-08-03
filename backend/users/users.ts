@@ -30,5 +30,5 @@ class Users {
   constructor(private _users: User[]) {}
 }
 
-/* export the findUser function */
+/* export the users findUser function */
 export const getUser = new Users(users).getUser;

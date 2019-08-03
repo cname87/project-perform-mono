@@ -33,6 +33,10 @@ export class User {
 }
 
 /* creates all users */
+const userTest = new User(
+  process.env.userTestId as string,
+  process.env.userTestEmail as string,
+);
 const user1 = new User(
   process.env.user1Id as string,
   process.env.user1Email as string,
@@ -42,4 +46,4 @@ const user2 = new User(
   process.env.user2Email as string,
 );
 
-export const users = [user1, user2];
+export const users = [userTest, user1, user2];

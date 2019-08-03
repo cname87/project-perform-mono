@@ -248,13 +248,13 @@
         /* include testSetup.js to load .env */
         "${workspaceFolder}/backend/dist/test/testSetup.js",
         /* comment out files to select tests */
-        // "${workspaceFolder}/backend/dist/database/test/*.test.js",
-        // "${workspaceFolder}/backend/dist/models/test/*.test.js",
-        // "${workspaceFolder}/backend/dist/utils/test/*.test.js",
+        "${workspaceFolder}/backend/dist/database/test/*.test.js",
+        "${workspaceFolder}/backend/dist/models/test/*.test.js",
+        "${workspaceFolder}/backend/dist/utils/test/*.test.js",
         "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
-        // "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
-        // "${workspaceFolder}/backend/server/test/*.js",
-        // "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
+        "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
+        "${workspaceFolder}/backend/server/test/*.js",
+        "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
       ],
       "env": {
         /* set before all tests so test database used */

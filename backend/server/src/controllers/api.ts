@@ -11,14 +11,11 @@ debug(`Starting ${modulename}`);
 /* external dependencies */
 import { Router, Request, NextFunction, Response } from 'express';
 import OpenAPIBackend from 'openapi-backend';
-import ms from 'ms';
-import jwt = require('express-jwt');
 import util = require('util');
 
 import { IRequestApp, IAppLocals } from '../configServer';
 import { IErr } from '../../../utils/src/configUtils';
 import { getUser } from '../../../users/users';
-import jwksRsa = require('jwks-rsa');
 
 const router = Router();
 
@@ -169,7 +166,7 @@ const initOpenApi = (appLocals: IAppLocals) => {
       ) => {
         debug(modulename + ': api handler running notFound');
 
-        /* let angular or errorhandler deal with not founds */
+        /* let angular or error handler deal with not founds */
         nextFunction();
       },
     },
@@ -178,37 +175,6 @@ const initOpenApi = (appLocals: IAppLocals) => {
 };
 
 /* middleware functions below */
-
-/**
- * Verifies the jwt token.
- * Sets req.auth to the token payload.
- * Note: req.auth.sub will be set to the Auth0 user id.
- */
-const checkJwt = (req: Request, res: Response, next: NextFunction) => {
-  debug(modulename + ': running checkJwt');
-
-  /* retrieves the rsa signing key */
-  const secret = jwksRsa.expressJwtSecret({
-    cache: true,
-    cacheMaxEntries: 5,
-    cacheMaxAge: ms('10h'),
-    /* prevent attackers from sending many random */
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: `https://${process.env.AUTH0_CONFIG_DOMAIN}/.well-known/jwks.json`,
-  });
-
-  const checkToken = jwt({
-    secret,
-    audience: process.env.AUTH0_CONFIG_AUDIENCE,
-    issuer: `https://${process.env.AUTH0_CONFIG_DOMAIN}/`,
-    algorithm: ['RS256'],
-    requestProperty: 'auth',
-  });
-
-  /* run the created middleware */
-  checkToken(req, res, next);
-};
 
 /**
  * Gets the user (or throws an error) and creates the connection to the user collection on the server database.
@@ -220,7 +186,7 @@ const createDbModel = (_req: Request, _res: Response, next: NextFunction) => {
   const req = _req as IRequestApp;
   const appLocals = req.app.appLocals;
 
-  /* get the user based on the authentication token */
+  /* get the user based on the authentication token (which is used as the user id) */
   if (req.auth) {
     const user = getUser(req.auth.sub);
     if (!user) {
@@ -229,7 +195,7 @@ const createDbModel = (_req: Request, _res: Response, next: NextFunction) => {
       /* test if the connection to the user members database collection has been created and, if not, create it */
       if (
         !(
-          appLocals.models.members &&
+          appLocals.models.members.modelName &&
           appLocals.models.members.modelName.substring(0, user.email.length) ===
             `${user.email}`
         )
@@ -270,7 +236,7 @@ const handleErrors = (
 const callApiHandler = (_req: Request, res: Response, next: NextFunction) => {
   debug(modulename + ': running callApiHandler');
 
-  /* retype _req to match actual incoming request */
+  /* retype _req to match actual incoming request that has req.app */
   const req = _req as IRequestApp;
 
   /* initialise OpenApi if not already done */
@@ -294,8 +260,13 @@ const callApiHandler = (_req: Request, res: Response, next: NextFunction) => {
 };
 
 router.use(
-  /* verify the jwt token and set req.auth */
-  checkJwt,
+  '/',
+  (_req: Request, res: Response, next: NextFunction) => {
+    /* retype _req to match actual incoming request that has req.app */
+    const req = _req as IRequestApp;
+    /* verify the jwt token and set req.auth */
+    req.app.appLocals.authenticateHandler(req, res, next);
+  },
   /* create connection to database model / collection */
   createDbModel,
   /* handle authentication and user errors */

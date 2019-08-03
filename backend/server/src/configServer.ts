@@ -32,13 +32,14 @@ import { Logger } from '../../utils/src/logger';
 /* a utility to dump errors to the logger */
 import { DumpError } from '../../utils/src/dumpError';
 /* access to debug logger for mocha - must be imported this way */
-import * as ERROR_HANDLERS from './handlers/errorhandler';
+import * as ERROR_HANDLERS from './handlers/errorHandler';
 /* error handler middleware functions */
 const errorHandlers = ERROR_HANDLERS.errorHandlers;
+/* authentication handler */
+import { authenticateHandler } from './handlers/authenticateHandler';
 /* database class and creation function */
 import { Database, runDatabaseApp } from '../../database/src/index';
 /* models */
-import { createModelTests } from '../../models/src/tests';
 import { createModelMembers } from '../../models/src/members';
 /* controllers */
 import { apiController } from './controllers/api';
@@ -68,8 +69,8 @@ export const config = {
   DumpError,
   ERROR_HANDLERS,
   errorHandlers,
+  authenticateHandler,
   runDatabaseApp,
-  createModelTests,
   createModelMembers,
   apiController,
   failController,
@@ -212,7 +213,7 @@ export interface IControllers {
 }
 
 /* extend Model to include autoinc resetCounter() */
-interface IModelExtended extends Model<Document, {}> {
+export interface IModelExtended extends Model<Document, {}> {
   resetCount: () => void;
   nextCount: () => number;
 }
@@ -229,19 +230,20 @@ export interface IAppLocals {
   dbConnection: Connection;
   /* error logger */
   dumpError: (err: any) => void;
+  /* handlers */
+  miscHandlers: typeof miscHandlers;
+  authenticateHandler: typeof authenticateHandler;
   /* error handler middleware */
   errorHandler: typeof errorHandlers;
   /* event emitter used for test */
   event: EventEmitter;
   /* logger service */
   logger: winston.Logger;
-  /* handles object*/
-  miscHandlers: typeof miscHandlers;
+
   membersApi: typeof membersApi;
   memberhandlers: typeof membersHandlers;
   /* database models object */
   models: {
-    tests: Model<Document, {}>;
     members: IModelExtended;
   };
   /* morgan server logger */

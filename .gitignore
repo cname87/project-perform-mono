@@ -126,21 +126,19 @@ typings/
 
 ### End of https://www.gitignore.io/api/node ###
 
-# ignore all files and directories in all public/ directories
-public/**
-# ignore all '/types'mdirectories
-types/**
-# ignore all compiled 'dist' directories
-dist/**
+# ignore all dist' directories
+**/dist/
+# ignore all '/types' directories
+**/types/
 
-### security-relevany ignores ###
-# NB: Always ignore config files with credentials i.e. certs directory and .env file.
+### security-relevant ignores ###
 
 # ignore all credential certs directories
-certs/**
+**/certs/
 # ignore all .env files
 .env
 
+### End of security-relevant ignores ###
 
 # If files are not being ignored then they may have been previously added
 # try git rm --cached <filename>, or git rm -r --cached <dirname> to get git
