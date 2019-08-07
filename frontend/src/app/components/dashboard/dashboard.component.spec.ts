@@ -100,7 +100,7 @@ describe('DashboardComponent', () => {
     );
 
     /* create the spies */
-    /* isError is passed to create a getMembers that returns an error */
+    /* isError is passed to create a getMembersSpy that returns an error */
     const { getMembersSpy, handleErrorSpy } = createSpies(
       membersServiceSpy,
       errorHandlerSpy,

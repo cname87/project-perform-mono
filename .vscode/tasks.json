@@ -3,6 +3,8 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
+    /* npm start frontend */
+    /* runs 'npm run start' which starts the server and runs ngServe */
     {
       "label": "npm start frontend",
       "type": "shell",
@@ -42,6 +44,8 @@
         }
       }
     },
+    /* npm test frontend */
+    /* runs 'npm run test' which runs ngTest */
     {
       "label": "npm test frontend",
       "type": "shell",
@@ -77,6 +81,7 @@
             "regexp": "(.*?)"
           },
           "endsPattern": {
+            /* it knows ngTest is complete when it sees 'TOTAL ...' in the terminal */
             "regexp": "TOTAL:"
           }
         }

@@ -1,4 +1,4 @@
-import { DebugElement } from '@angular/core';
+import { DebugElement, Type } from '@angular/core';
 import { ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -57,7 +57,7 @@ export function findCssOrNot<T>(
 }
 
 /**
- * Use to find all html element that may or may not be present.
+ * Use to find all html elements that may or may not be present.
  * @param fixture component fixture.
  * @param css A valid css selector.
  * @returns an array of HTMLElements or null if element not found.
@@ -86,4 +86,18 @@ export function findId<T>(fixture: ComponentFixture<any>, id: string): T {
 export function findTag<T>(fixture: ComponentFixture<any>, tag: string): T {
   const element = fixture.debugElement.query(By.css(tag));
   return element.nativeElement;
+}
+/* gets all the routerLink directive instances */
+export function findRouterLinks<T>(
+  fixture: ComponentFixture<any>,
+  directive: Type<T>,
+) {
+  /* get the debugElements with an attached RouterLinkStubDirective */
+  const routerLinksDes = fixture.debugElement.queryAll(
+    By.directive(directive),
+  );
+  /* each debugElement exposes a dependency injector with the specific instance of the directive attached to that element */
+  return routerLinksDes.map((de) =>
+    de.injector.get<T>(directive as Type<T>),
+  );
 }

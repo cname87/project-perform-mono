@@ -20,7 +20,6 @@ const appRoutes: Routes = [
     /* callback from auth0 authentication  - it redirects */
     path: 'callback',
     component: CallbackComponent,
-    // canActivate: [AuthGuard],
   },
   {
     /* shows the dashboard */

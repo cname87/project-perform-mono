@@ -94,7 +94,8 @@ export class GetMembersCache {
       /* get the index of the member to update */
       const index = cachedBody.findIndex((m) => m.id === updatedMember.id);
       /* exit if updated member if not found */
-      if (index === -1) {
+      const notFound = -1;
+      if (index === notFound) {
         this.clearCache();
         return;
       }
@@ -136,7 +137,8 @@ export class GetMembersCache {
       /* test that the member to delete exists */
       const index = cachedBody.findIndex((m) => m.id === deletedMemberId);
       /* set cache to undefined if deleted member is not found */
-      if (index === -1) {
+      const notFound = -1;
+      if (index === notFound) {
         this.clearCache();
         return;
       }

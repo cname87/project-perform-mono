@@ -55,9 +55,7 @@ describe('MembersListComponent', () => {
     }).compileComponents();
   }
 
-  /**
-   * Gets key DOM elements.
-   */
+  /* get key DOM elements */
   class Page {
     get linksArray() {
       return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'a');
@@ -126,9 +124,8 @@ describe('MembersListComponent', () => {
     };
   }
 
-  /**
-   * Create the component, initialize it & set test variables.
-   */
+  /* create the component, and get test variables */
+  /* isError is passed to create a getMembersSpy that returns an error */
   async function createComponent(isError = false) {
     /* create the fixture */
     const fixture = TestBed.createComponent(MembersListComponent);
@@ -148,6 +145,7 @@ describe('MembersListComponent', () => {
     /* create the component instance */
     const component = fixture.componentInstance;
 
+    /* get the spies */
     const {
       getMembersSpy,
       addMemberSpy,
@@ -179,19 +177,19 @@ describe('MembersListComponent', () => {
   /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
   async function preSetup(isError = false) {
     await mainSetup();
-    const methods = await createComponent(isError);
-    return methods;
+    const testVars = await createComponent(isError);
+    return testVars;
   }
 
   /* setup function run by each it test function that runs tests after the component and view are fully established */
   async function setup(isError = false) {
-    const methods = await preSetup(isError);
+    const testVars = await preSetup(isError);
     /* initiate ngOnInit and view changes etc */
-    methods.fixture.detectChanges();
-    await methods.fixture.whenStable();
-    methods.fixture.detectChanges();
-    await methods.fixture.whenStable();
-    return methods;
+    testVars.fixture.detectChanges();
+    await testVars.fixture.whenStable();
+    testVars.fixture.detectChanges();
+    await testVars.fixture.whenStable();
+    return testVars;
   }
 
   describe('after ngOnInit', async () => {
