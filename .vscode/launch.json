@@ -22,7 +22,7 @@
     // Test frontend - use for frontend unit test debug
     {
       /*
-      Runs 'npm run test, i.e. ng test, first and then runs Chrome and connects to the karma runner.
+      Runs 'npm run test, i.e. ng test, first which compiles the front end and opens chrome and connects to the Karma runner, and THEN starts Chrome and connects to the Karma runner.  Debug should work on the second session.
       Run 'npm run test' manually first if problems with preLaunch task.
       Close all open Chrome instances if Chrome won't start.
        */
@@ -38,27 +38,20 @@
         "--new-window",
         "--disable-popup-blocking", // necessary for window.open() to work
       ],
-      "userDataDir": true,
+      "userDataDir":true,
       "url": "http://localhost:9876/debug.html",
-      // tell vscode where to find scripts on the server
       "webRoot": "${workspaceFolder}/frontend/dist/",
       "pathMapping": {
         "/": "${workspaceFolder}/frontend/dist/",
-        "/testServer": "${workspaceFolder}/backend/server/test/client",
       },
       "sourceMapPathOverrides": {
-        "_karma_webpack_/webpack:*": "${workspaceFolder}/frontend/*",
-        "webpack:///webpack/*": "${workspaceFolder}/frontend/node_modules/webpack/*",
-        "webpack:///(webpack)/*": "${workspaceFolder}/frontend/node_modules/webpack/*",
-        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
+        "/./*": "${workspaceFolder}/frontend/*",
         "webpack:///./*": "${workspaceFolder}/frontend/*",
-        "webpack:///*": "frontend/*",
-        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
+      "sourceMaps": true,
       "smartStep": true,
       "disableNetworkCache": true,
       "showAsyncStacks": true,
-      "sourceMaps": true,
       "skipFiles": [
         "<node_internals>/**/*.js",
         "${workspaceFolder}/frontend/node_modules/**/*",

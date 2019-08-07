@@ -1,5 +1,0 @@
-[0412/214547.181:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
-[0414/004834.480:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
-[0414/201605.625:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
-[0414/205856.591:ERROR:file_io.cc(89)] ReadExactly: expected 36, observed 0
-[0415/155712.866:ERROR:file_io.cc(134)] WriteFile: The pipe is being closed. (0xE8)
