@@ -3,7 +3,7 @@ import { NGXLogger } from 'ngx-logger';
 import Auth0Client from '@auth0/auth0-spa-js/dist/typings/Auth0Client';
 
 import { AuthService } from '../../shared/auth.service/auth.service';
-import { auth0Config } from '../../config';
+import { auth0Config, routes } from '../../config';
 
 /**
  * This component reads the isAuthenticated status and shows login and logout buttons as appropriate.
@@ -53,7 +53,7 @@ export class LoginComponent implements OnInit {
       /* appState is returned in authorization response */
       /* see CallbackComponent for how target is used to redirect */
       appState: {
-        target: '/dashboard',
+        target: routes.loginTarget.path,
       },
     });
   }

@@ -9,7 +9,7 @@ export const auth0Config = {
   audience: 'https://localhost:1337/api-v1/',
 };
 
-/* app component routing elements */
+/* application routing elements */
 const dashboard = {
   path: 'dashboard',
   displayName: 'MEMBERS DASHBOARD',
@@ -22,10 +22,22 @@ const detail = {
   path: 'detail',
   displayName: 'MEMBER DETAIL',
 };
+const profile = {
+  path: 'profile',
+};
+const loginPage = {
+  path: '/information/login',
+};
+const loginTarget = {
+  path: '/dashboard',
+};
 export const routes = {
   dashboard,
   membersList,
   detail,
+  profile,
+  loginPage,
+  loginTarget,
 };
 
 /* import to access variable that informs if E2e build in use */

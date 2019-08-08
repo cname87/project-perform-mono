@@ -3,14 +3,15 @@ import { AuthService } from '../../shared/auth.service/auth.service';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 
+import { routes } from '../../config';
+
 /**
  * Following authentication, auth0 calls a configured url which routes to this component, i.e. the application is reloaded (and the authService reports isAuthenticated is true when it gets the auth0Client as authentication has occurred).  This component then calls the route configured in the login component call to loginWithRedirect().
  */
 
 @Component({
   selector: 'app-callback',
-  templateUrl: './callback.component.html',
-  styleUrls: ['./callback.component.scss'],
+  template: '',
 })
 export class CallbackComponent implements OnInit {
   constructor(
@@ -25,13 +26,14 @@ export class CallbackComponent implements OnInit {
 
   async ngOnInit() {
     this.logger.trace(`${CallbackComponent.name}: Calling getAuth0Client()`);
-    const client = await this.authService.getAuth0Client();
 
+    const client = await this.authService.getAuth0Client();
     /* catch errors such as the user manually entering /callback */
     try {
       /* handle success and error responses from Auth0 */
       const result = await client.handleRedirectCallback();
       /* result has the property appState which was set when calling login in the loginComponent */
+      /* if appState was not set then route to the base route */
       const targetRoute =
         result.appState && result.appState.target ? result.appState.target : '';
 
@@ -49,7 +51,7 @@ export class CallbackComponent implements OnInit {
         `${CallbackComponent.name}: Error handling redirect callback`,
       );
       /* redirects to login page */
-      this.router.navigate(['/information/login']);
+      this.router.navigate([routes.loginTarget.path]);
     }
   }
 }

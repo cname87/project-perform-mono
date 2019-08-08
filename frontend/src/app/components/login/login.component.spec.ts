@@ -10,7 +10,7 @@ import {
   findRouterLinks,
   RouterLinkDirectiveStub,
 } from '../../shared/test-helpers';
-import { auth0Config } from '../../config';
+import { auth0Config, routes } from '../../config';
 
 /* spy interfaces */
 interface IAuthServiceSpy {
@@ -19,7 +19,7 @@ interface IAuthServiceSpy {
   profile: jasmine.Spy;
 }
 
-fdescribe('LoginComponent', () => {
+describe('LoginComponent', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
     /* stub authService getAuth0Client method - define spy strategy below */
@@ -35,24 +35,20 @@ fdescribe('LoginComponent', () => {
 
     /* set up Testbed */
     await TestBed.configureTestingModule({
-      imports: [
-        AppModule,
-      ],
+      imports: [AppModule],
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: AuthService, useValue: authServiceSpy },
       ],
     })
-    /* declare RouterLinkDirective in AppModule override (rather than declaring it in AppModule - declaring locally whilst importing AppModule appears not to work) */
-    .overrideModule(AppModule, {
-      add: {
-        declarations: [
-          RouterLinkDirectiveStub,
-        ],
-      },
-    })
-    .compileComponents();
+      /* declare RouterLinkDirective in AppModule override (rather than declaring it in AppModule - declaring locally whilst importing AppModule appears, or importing a module containing RouterLinkdirective, not to work) */
+      .overrideModule(AppModule, {
+        add: {
+          declarations: [RouterLinkDirectiveStub],
+        },
+      })
+      .compileComponents();
   }
 
   /* get key DOM elements */
@@ -75,7 +71,10 @@ fdescribe('LoginComponent', () => {
 
     /* gets all the routerLink directive instances */
     get routerLinks() {
-      return findRouterLinks<RouterLinkDirectiveStub>(this.fixture, RouterLinkDirectiveStub);
+      return findRouterLinks<RouterLinkDirectiveStub>(
+        this.fixture,
+        RouterLinkDirectiveStub,
+      );
     }
 
     constructor(readonly fixture: ComponentFixture<LoginComponent>) {}
@@ -121,7 +120,7 @@ fdescribe('LoginComponent', () => {
       loginResponse: [
         {
           appState: {
-            target: '/dashboard',
+            target: routes.loginTarget.path,
           },
         },
       ],
@@ -131,7 +130,7 @@ fdescribe('LoginComponent', () => {
           returnTo: window.location.origin,
         },
       ],
-      path: ['profile'],
+      path: [routes.profile.path],
     };
   }
 
@@ -191,17 +190,18 @@ fdescribe('LoginComponent', () => {
     /* component property auth0Client should have a loginDirect property supplied by the authService spy */
     it(' should have getAuth0Client called', async () => {
       const { component } = await setup();
-      expect(component['auth0Client'].loginWithRedirect)
-        .toBeTruthy('getAuth0Client called');
+      expect(component['auth0Client'].loginWithRedirect).toBeTruthy(
+        'getAuth0Client called',
+      );
     });
 
-    /* component property isAuthenticated should be set uo true */
+    /* component property isAuthenticated should be set to true */
     it('should have isAuthenticated set', async () => {
       const { component } = await setup();
       expect(component.isAuthenticated).toBeTruthy('isAuthenticated set');
     });
 
-    /* component property isAuthenticated should be set uo true */
+    /* component property isAuthenticated should be set to true */
     it('should have profile set', async () => {
       const { component } = await setup();
       expect(component.profile).toBeTruthy('profile set');

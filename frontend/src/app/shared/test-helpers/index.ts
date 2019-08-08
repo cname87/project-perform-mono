@@ -93,11 +93,7 @@ export function findRouterLinks<T>(
   directive: Type<T>,
 ) {
   /* get the debugElements with an attached RouterLinkStubDirective */
-  const routerLinksDes = fixture.debugElement.queryAll(
-    By.directive(directive),
-  );
+  const routerLinksDes = fixture.debugElement.queryAll(By.directive(directive));
   /* each debugElement exposes a dependency injector with the specific instance of the directive attached to that element */
-  return routerLinksDes.map((de) =>
-    de.injector.get<T>(directive as Type<T>),
-  );
+  return routerLinksDes.map((de) => de.injector.get<T>(directive as Type<T>));
 }
