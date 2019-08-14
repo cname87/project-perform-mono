@@ -25,8 +25,9 @@ describe('AppComponent', () => {
       /* filter to top-level tags only */
       const htmlTags = htmlElements!
         .filter(
-          /* it APPEARS that parent.element.id will be root1 for the top-level elements i.e. the karma page uses a div with id="root1" to hold the component page */
-          (element) => element.parentElement!.id === 'root1',
+          /* it APPEARS that parentElement.id will be 'root0' or 'root1' for the top-level element i.e. the karma page uses a div with id="root0" or "root1" to hold the component page */
+          (element) =>
+            element.parentElement!.id.slice(0, 'root'.length) === 'root',
         )
         /* return the element tag name */
         .map((element) => element.tagName);

@@ -13,12 +13,14 @@ import {
   asyncData,
   click,
   asyncError,
+  RouterLinkDirectiveStub,
 } from '../../shared/test-helpers';
 import {
   IMember,
   IMemberWithoutId,
 } from '../../data-providers/members.data-provider';
 import { members } from '../../shared/mocks/mock-members';
+import { AppRoutingModule } from '../../router/app.routing.module';
 
 /* spy interfaces */
 interface IMembersServiceSpy {
@@ -52,7 +54,24 @@ describe('MembersListComponent', () => {
         { provide: MembersService, useValue: membersServiceSpy },
         { provide: ErrorHandler, useValue: errorHandlerSpy },
       ],
-    }).compileComponents();
+    })
+      .overrideModule(AppModule, {
+        remove: {
+          /* removing router module and replacing it below to avoid spurious errors in authGuard etc */
+          imports: [AppRoutingModule],
+        },
+        add: {
+          /* declare RouterLinkDirective in AppModule override (rather than declaring it in AppModule). Declaring locally whilst importing AppModule appears not to work) */
+          declarations: [RouterLinkDirectiveStub],
+          /* adding RouterTestingModule and sending all paths to a dummy component */
+          imports: [
+            RouterTestingModule.withRoutes([
+              { path: '**', component: MembersListComponent },
+            ]),
+          ],
+        },
+      })
+      .compileComponents();
   }
 
   /* get key DOM elements */
@@ -397,7 +416,7 @@ describe('MembersListComponent', () => {
       });
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
-      await fixture.detectChanges();
+      await fixture.whenStable();
       const id = expected.membersArray[expected.memberIndex].id;
       expect(spyLocation.path()).toEqual(
         `/detail/${id}`,

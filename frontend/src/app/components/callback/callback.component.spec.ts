@@ -89,7 +89,7 @@ describe('CallbackComponent', () => {
       };
     });
     /* spy on router.navigate function */
-    /* throw error if called with specific routeeter */
+    /* throw error if called with specific route */
     const navigateRouterSpy = routerSpy.navigate.and.callFake(
       (route: string) => {
         if (route[0] === 'triggerError') {
@@ -207,15 +207,11 @@ describe('CallbackComponent', () => {
       expect(navigateRouterSpy).toHaveBeenCalledWith([
         expectedFromSpy.targetRoute,
       ]);
-      expect(navigateRouterSpy).toHaveBeenCalledWith([
-        expected.loginRoute,
-      ]);
+      expect(navigateRouterSpy).toHaveBeenCalledWith([expected.loginRoute]);
     });
 
     it('should route to base url if no target supplied)', async () => {
-      const { navigateRouterSpy, expected } = await setup(
-        false,
-      );
+      const { navigateRouterSpy, expected } = await setup(false);
       expect(navigateRouterSpy).toHaveBeenCalledWith([
         expected.emptyTargetRoute,
       ]);

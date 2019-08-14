@@ -188,9 +188,12 @@ describe('InformationComponent', () => {
 
     it('should show the header in uppercase', async () => {
       const { component, fixture, page } = await setup();
+      /* await component ngOnInit and data binding */
+      fixture.detectChanges();
+      await fixture.whenStable();
       /* set up a dummy header */
       component.header = 'test';
-      /* await component ngOnInit and data binding */
+      /* await data binding */
       fixture.detectChanges();
       await fixture.whenStable();
       /* default constructor member shown */

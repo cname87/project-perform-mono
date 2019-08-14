@@ -9,6 +9,7 @@ import {
 import { NGXLogger } from 'ngx-logger';
 
 import { AuthService } from '../../shared/auth.service/auth.service';
+import { routes } from '../../config';
 
 /**
  * This guard prevents certain paths being routed when isAuthenticated is false.  If not allowed, the Auth0 service is called.  Once the user authenticates it routes to the requested path.
@@ -30,9 +31,8 @@ export class AuthGuard implements CanActivate {
     _next: ActivatedRouteSnapshot,
     _state: RouterStateSnapshot,
   ): Promise<boolean | UrlTree> {
-    this.logger.trace(`${AuthGuard.name}: Calling canActivate()`);
+    this.logger.trace(`${AuthGuard.name}: Running canActivate()`);
 
-    this.logger.trace(`${AuthGuard.name}: Calling getAuth0Client()`);
     const client = await this.authService.getAuth0Client();
     /* need to call client as this may be the first call */
     const isAuthenticated = await client.isAuthenticated();
@@ -40,7 +40,7 @@ export class AuthGuard implements CanActivate {
     if (isAuthenticated) {
       return true;
     } else {
-      this.router.navigate(['/information/login']);
+      this.router.navigate([routes.loginPage.path]);
       return false;
     }
   }

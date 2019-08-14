@@ -6,8 +6,13 @@ import { AuthService } from '../../shared/auth.service/auth.service';
 import { auth0Config, routes } from '../../config';
 
 /**
- * This component reads the isAuthenticated status and shows login and logout buttons as appropriate.
- * On clicking login the authentication service is called (which redirects).
+ * Operation:
+ * ngOnInit calls authService.getAuth0Client().
+ * authService.getAuth0Client() gets a singleton Auth0Client instance and checks if the user is authenticated and broadcasts the authenticated status via a subscribable subject, isAuthenticated. It also gets and broadcasts the jwt token.
+ * The auth0 server also sets a cookie in the client which is sent with future requests to the auth0 server.   Thus if a browser if closed and reopened and the client sends the appropriate cookie it will receive and broadcast isAuthenticated = true without the user having to enter a password.
+ * The isAuthentication status sets the views E.g. this component reads the isAuthenticated status and shows login and logout buttons as appropriate.
+ * If the login prompt is clicked then the LoginComponent calls loginWithRedirect which triggers a call to the CallbackComponent, which opens a configured page.
+ * See https://auth0.com/docs/flows/concepts/implicit for the authorization flow.
  * On clicking logout the authentication service is informed and the application is reloaded.
  */
 @Component({

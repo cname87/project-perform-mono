@@ -1,5 +1,6 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppModule } from '../../app.module';
 import { LoginComponent } from './login.component';
@@ -11,6 +12,7 @@ import {
   RouterLinkDirectiveStub,
 } from '../../shared/test-helpers';
 import { auth0Config, routes } from '../../config';
+import { AppRoutingModule } from '../../router/app.routing.module';
 
 /* spy interfaces */
 interface IAuthServiceSpy {
@@ -42,10 +44,20 @@ describe('LoginComponent', () => {
         { provide: AuthService, useValue: authServiceSpy },
       ],
     })
-      /* declare RouterLinkDirective in AppModule override (rather than declaring it in AppModule - declaring locally whilst importing AppModule appears, or importing a module containing RouterLinkdirective, not to work) */
       .overrideModule(AppModule, {
+        remove: {
+          /* removing router module and replacing it below to avoid spurious errors in authGuard etc */
+          imports: [AppRoutingModule],
+        },
         add: {
+          /* declare RouterLinkDirective in AppModule override (rather than declaring it in AppModule). Declaring locally whilst importing AppModule appears not to work) */
           declarations: [RouterLinkDirectiveStub],
+          /* adding RouterTestingModule and sending all paths to a dummy component */
+          imports: [
+            RouterTestingModule.withRoutes([
+              { path: '**', component: LoginComponent },
+            ]),
+          ],
         },
       })
       .compileComponents();
