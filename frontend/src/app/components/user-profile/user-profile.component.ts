@@ -1,5 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
+import { NGXLogger } from 'ngx-logger';
+import { Observable } from 'rxjs';
+
 import { AuthService } from '../../shared/auth.service/auth.service';
+
+interface IProfile {
+  name: string;
+  email: string;
+}
 
 @Component({
   selector: 'app-profile',
@@ -7,12 +16,22 @@ import { AuthService } from '../../shared/auth.service/auth.service';
   styleUrls: ['./user-profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
-  profile: any;
-  token: any;
+  constructor(
+    private authService: AuthService,
+    private location: Location,
+    private logger: NGXLogger,
+  ) {
+    this.logger.trace(ProfileComponent.name + ': Starting ProfileComponent');
+  }
 
-  constructor(private authService: AuthService) {}
+  profile$: Observable<IProfile> = null as any;
 
   ngOnInit() {
-    this.authService.profile.subscribe((profile) => (this.profile = profile));
+    /* get the profile via the authService */
+    this.profile$ = this.authService.profile;
+  }
+
+  goBack() {
+    this.location.back();
   }
 }

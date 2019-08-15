@@ -1,3 +1,53 @@
-<pre *ngIf="profile">
-    <code>{{profile | json}}</code>
-</pre>
+<mat-card
+  *ngIf="(profile$ | async).email"
+  class="profile-card"
+>
+
+  <mat-card-header>
+    <mat-card-title>MY ACCOUNT</mat-card-title>
+    <mat-card-subtitle>Details</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-list>
+
+      <mat-list-item>
+        <span
+          mat-line
+          id="profileName"
+          #profileName
+          attr.data-displayed="{{(profile$ | async)?.name}}"
+
+        >
+          NAME:  {{ (profile$ | async)?.name }}
+        </span>
+      </mat-list-item>
+
+      <mat-list-item>
+        <span
+          mat-line
+          id="profileEmail"
+          #profileEmail
+          attr.data-displayed="{{(profile$ | async)?.email}}"
+
+        >
+          EMAIL:  {{ (profile$ | async)?.email }}
+        </span>
+      </mat-list-item>
+
+    </mat-list>
+
+
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button
+      mat-button
+      id="goBackBtn"
+      (click)="goBack()"
+    >
+      BACK
+    </button>
+  </mat-card-actions>
+
+</mat-card>
