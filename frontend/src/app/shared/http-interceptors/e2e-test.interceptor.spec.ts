@@ -118,7 +118,9 @@ describe('E2eTestInterceptor', () => {
       expect(nextHandleSpy).toHaveBeenCalledWith(req);
       expect(returned).toEqual(req);
       /* test logger not called after if statement */
-      expect(traceLoggerSpy).toHaveBeenCalledTimes(loggerCallsStart + expectedCalls);
+      expect(traceLoggerSpy).toHaveBeenCalledTimes(
+        loggerCallsStart + expectedCalls,
+      );
     });
 
     it('returns if E2E_TESTING is true and post or put but errorMember.name does not match', async () => {

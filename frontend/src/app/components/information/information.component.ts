@@ -46,18 +46,18 @@ export class InformationComponent implements OnInit {
       this.header = 'Unexpected Error!';
       this.hint = 'Click on a tab link above';
       this.isGoBackVisible = true;
-    } else if (this.mode === 'login') {
-      /* set up log in only if a mode query parameter of 'login' is passed in */
+    } else
+    /* set up log in only if a mode query parameter of 'login' is passed in */
+    if (this.mode === 'login') {
       let isAuthenticated = false;
       this.authService.isAuthenticated.subscribe((value) => {
         isAuthenticated = value;
+        this.header = isAuthenticated ? 'Log Out' : 'Log In';
+        this.hint = isAuthenticated
+          ? 'Click on the log out button above (or click on a tab link above to return)'
+          : 'Click on the Log In button above';
+        this.isGoBackVisible = false;
       });
-
-      this.header = isAuthenticated ? 'Log Out' : 'Log In';
-      this.hint = isAuthenticated
-        ? 'Click on the log out button above (or click on a tab link above to return)'
-        : 'Click on the Log In button above';
-      this.isGoBackVisible = false;
 
       /* else set up the page not found */
     } else {

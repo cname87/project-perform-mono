@@ -11,11 +11,16 @@ import {
   ActivatedRouteStub,
   click,
 } from '../../shared/test-helpers';
+import { AuthService } from '../../shared/auth.service/auth.service';
+import { BehaviorSubject } from 'rxjs';
 
 interface ILocationSpy {
   back: jasmine.Spy;
 }
 
+interface IAuthServiceSpy {
+  isAuthenticated: jasmine.Spy;
+}
 describe('InformationComponent', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
@@ -23,6 +28,12 @@ describe('InformationComponent', () => {
     const activatedRouteStub = new ActivatedRouteStub('notfound');
     /* stub Location service */
     const locationSpy = jasmine.createSpyObj('location', ['back']);
+    /* stub authService isAuthenticated property - define spy strategy below */
+    let authServiceSpy = jasmine.createSpyObj('authService', ['dummy']);
+    authServiceSpy = {
+      ...authServiceSpy,
+      isAuthenticated: {},
+    };
 
     /* set up Testbed */
     await TestBed.configureTestingModule({
@@ -35,6 +46,7 @@ describe('InformationComponent', () => {
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: ActivatedRoute, useValue: activatedRouteStub },
         { provide: Location, useValue: locationSpy },
+        { provide: AuthService, useValue: authServiceSpy },
       ],
     }).compileComponents();
   }
@@ -54,16 +66,28 @@ describe('InformationComponent', () => {
     constructor(readonly fixture: ComponentFixture<InformationComponent>) {}
   }
 
-  function createSpies(locationSpy: ILocationSpy) {
+  function createSpies(
+    locationSpy: ILocationSpy,
+    authServiceSpy: IAuthServiceSpy,
+    isAuthenticated = true,
+  ) {
     const backSpy = locationSpy.back.and.stub();
 
-    return { backSpy };
+    authServiceSpy.isAuthenticated = new BehaviorSubject<any>(
+      isAuthenticated,
+    ) as any;
+    const isAuthenticatedSpy = authServiceSpy.isAuthenticated;
+
+    return {
+      backSpy,
+      isAuthenticatedSpy,
+   };
   }
 
   /**
    * Create the InformationComponent, initialize it, set test variables.
    */
-  async function createComponent() {
+  async function createComponent(isAuthenticated = true) {
     /* create the fixture */
     const fixture = TestBed.createComponent(InformationComponent);
 
@@ -75,12 +99,13 @@ describe('InformationComponent', () => {
     const activatedRouteStub = fixture.debugElement.injector.get<
       ActivatedRouteStub
     >(ActivatedRoute as any);
+    const authServiceSpy = fixture.debugElement.injector.get<IAuthServiceSpy>(AuthService as any);
 
     /* create the component instance */
     const component = fixture.componentInstance;
     /* do not run fixture.detectChanges (i.e. ngOnIt here) as included below */
 
-    const { backSpy } = createSpies(locationSpy);
+    const { backSpy } = createSpies(locationSpy, authServiceSpy, isAuthenticated);
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
@@ -94,12 +119,13 @@ describe('InformationComponent', () => {
     };
   }
 
+  /* setup function run by each sub test function */
+  async function setup(isAuthenticated = true) {
+    await mainSetup();
+    return createComponent(isAuthenticated);
+  }
+
   describe('component', async () => {
-    /* setup function run by each sub test function */
-    async function setup() {
-      await mainSetup();
-      return createComponent();
-    }
 
     it('should be created', async () => {
       const { component } = await setup();
@@ -152,13 +178,8 @@ describe('InformationComponent', () => {
   });
 
   describe('page', async () => {
-    /* setup function run by each sub test function */
-    async function setup() {
-      await mainSetup();
-      return createComponent();
-    }
 
-    it('should show the add mode values on start up', async () => {
+    it('should show the not found values by default', async () => {
       const { fixture, page, activatedRouteStub } = await setup();
       /* set up route that the component will get */
       const routeMode = '';
@@ -172,7 +193,7 @@ describe('InformationComponent', () => {
       expect(page.hint.innerText).toBe('Click on a tab link above');
     });
 
-    it('should show the edit mode values on start up', async () => {
+    it('should show the error values if error mode is set', async () => {
       const { fixture, page, activatedRouteStub } = await setup();
       /* set up route that the component will get */
       const routeMode = 'error';
@@ -184,6 +205,34 @@ describe('InformationComponent', () => {
       /* default constructor member shown */
       expect(page.header.innerText).toBe('UNEXPECTED ERROR!');
       expect(page.hint.innerText).toBe('Click on a tab link above');
+    });
+
+    it('should show the login values if login mode is set and app is not authenticated ', async () => {
+      const { fixture, page, activatedRouteStub } = await setup(false);
+      /* set up route that the component will get */
+      const routeMode = 'login';
+      activatedRouteStub.setParameter(routeMode);
+      /* page fields will be null before ngOnInit */
+      /* await component ngOnInit and data binding */
+      fixture.detectChanges();
+      await fixture.whenStable();
+      /* default constructor member shown */
+      expect(page.header.innerText).toBe('LOG IN');
+      expect(page.hint.innerText).toBe('Click on the Log In button above');
+    });
+
+    it('should show the logout values if login mode is set and app is authenticated ', async () => {
+      const { fixture, page, activatedRouteStub } = await setup();
+      /* set up route that the component will get */
+      const routeMode = 'login';
+      activatedRouteStub.setParameter(routeMode);
+      /* page fields will be null before ngOnInit */
+      /* await component ngOnInit and data binding */
+      fixture.detectChanges();
+      await fixture.whenStable();
+      /* default constructor member shown */
+      expect(page.header.innerText).toBe('LOG OUT');
+      expect(page.hint.innerText).toBe('Click on the log out button above (or click on a tab link above to return)');
     });
 
     it('should show the header in uppercase', async () => {
