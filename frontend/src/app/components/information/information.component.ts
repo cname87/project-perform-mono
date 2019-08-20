@@ -46,9 +46,8 @@ export class InformationComponent implements OnInit {
       this.header = 'Unexpected Error!';
       this.hint = 'Click on a tab link above';
       this.isGoBackVisible = true;
-    } else
-    /* set up log in only if a mode query parameter of 'login' is passed in */
-    if (this.mode === 'login') {
+    } else if (this.mode === 'login') {
+      /* set up log in only if a mode query parameter of 'login' is passed in */
       let isAuthenticated = false;
       this.authService.isAuthenticated.subscribe((value) => {
         isAuthenticated = value;

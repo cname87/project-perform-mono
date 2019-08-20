@@ -28,11 +28,9 @@ async function askServer(url, method, body = {}) {
 exports.config = {
   allScriptsTimeout: 11000,
   specs: [
-    './src/**/*.e2e-spec.ts',
+    './src/**/auth.e2e-spec.ts',
   ],
   directConnect: true,
-  chromeDriver:
-    '../node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.46.exe',
   capabilities: {
     browserName: 'chrome',
     'chromeOptions': {
@@ -70,7 +68,7 @@ exports.config = {
 
     /* check test database in use */
     let response
-      = await askServer('https://localhost:1337/isTestDatabase', 'GET');
+      = await askServer('https://localhost:1337/testServer/isTestDatabase', 'GET');
     if(!response.isTestDatabase){
       throw new Error('Test database not in use');
     }

@@ -1,10 +1,10 @@
 import { browser } from 'protractor';
 
-import { getRootElement } from './elements/root.element';
+import { getRootElements } from './elements/root.elements';
 import { getMembersListElement } from './elements/membersList.element';
 import { getMemberInputElement } from './elements/memberInput.element';
-import { getMessagesElement } from './elements/messages.element';
-import { getToastrElement } from './elements/toastr.element';
+import { getMessagesElements } from './elements/messages.elements';
+import { getToastrElements } from './elements/toastr.elements';
 
 export function getMembersListPage() {
 
@@ -13,18 +13,18 @@ export function getMembersListPage() {
     await browser.get('/members');
   }
 
-  const rootElement = getRootElement();
-  const memberListElement = getMembersListElement();
-  const memberInputElement = getMemberInputElement();
-  const messagesElement = getMessagesElement();
-  const toastrElement = getToastrElement();
+  const rootElements = getRootElements();
+  const memberListElements = getMembersListElement();
+  const memberInputElements = getMemberInputElement();
+  const messagesElements = getMessagesElements();
+  const toastrElements = getToastrElements();
 
   return {
     navigateToPage,
-    rootElement,
-    memberListElement,
-    memberInputElement,
-    messagesElement,
-    toastrElement,
+    rootElements,
+    memberListElements,
+    memberInputElements,
+    messagesElements,
+    toastrElements,
   }
 }

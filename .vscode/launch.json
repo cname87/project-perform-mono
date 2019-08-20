@@ -62,7 +62,7 @@
     {
       /*
       Runs npm run e2e.
-      baseUrl is configured in protractor.conf to be loclahost:1337
+      baseUrl is configured in protractor.conf to be localhost:1337
       backend server needs to be started first => started in script.
        */
       "name": "Test e2e frontend",

@@ -9,7 +9,7 @@ const caFile = path.resolve(__dirname, '../../certs/rootCA.crt');
 import { getDashboardPage } from './pages/dashboard.page';
 import { getMemberDetailPage } from './pages/memberDetail.page';
 import { getMembersListPage } from './pages/membersList.page';
-import { getErrorInformationPage } from './pages/errorInformation.page';
+import { getErrorInformationPage } from './pages/error-information.page';
 
 describe('Project Perform', () => {
   const enum Save {
@@ -33,7 +33,7 @@ describe('Project Perform', () => {
    */
   const isTestDatabase = async () => {
     await browser.waitForAngularEnabled(false);
-    await browser.get('/isTestDatabase');
+    await browser.get('/testServer/isTestDatabase');
     /* the page content is only { isTestDatabase: <true | false> } */
     const response = await element(by.css('body')).getText();
     await browser.waitForAngularEnabled(true);

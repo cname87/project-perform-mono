@@ -1,16 +1,26 @@
+/**
+ * This utility resets the test database.  It deletes all members nad loads 10 mock members including one with a configured name that will cause an error when test mode is enabled.
+ * Note: The server must be running before this is run.
+ * Note that a test is carried out to ensure that the test database is in use and not a production database.  The utility will exit without action if the test database is not in use.
+ * Note: global.window is set to a dummy value to avoid an error when config.ts is imported.
+ */
+
 import request from 'request-promise-native';
 import fs from 'fs';
 import path from 'path';
+
+/* need to set a dummy client-side window global as it is referenced in auth0 configuration in config.ts */
+global['window'] = {
+  location: {
+    origin: 'dummy',
+  },
+};
+/* import the member that is configured to trigger an error */
 import { errorMember } from '../src/app/config';
 
 const certFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem');
 const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem');
 const caFile = path.resolve(__dirname, '../certs/rootCA.crt');
-
-/**
- * Resets the test database by deleting all members and loading new mock members.
- * The server must be running before this is run.
- */
 
 /* set up mock members here - loaded below */
 const mockMembers = [
@@ -50,7 +60,7 @@ export const resetDatabase = async () => {
 
   /* the response is { isTestDatabase: <true | false> } */
   const response = await askServer(
-    'https://localhost:1337/isTestDatabase',
+    'https://localhost:1337/testServer/isTestDatabase',
     'GET',
   );
   /* exit if we're not working with the test database */

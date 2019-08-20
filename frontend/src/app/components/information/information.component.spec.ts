@@ -81,7 +81,7 @@ describe('InformationComponent', () => {
     return {
       backSpy,
       isAuthenticatedSpy,
-   };
+    };
   }
 
   /**
@@ -99,13 +99,19 @@ describe('InformationComponent', () => {
     const activatedRouteStub = fixture.debugElement.injector.get<
       ActivatedRouteStub
     >(ActivatedRoute as any);
-    const authServiceSpy = fixture.debugElement.injector.get<IAuthServiceSpy>(AuthService as any);
+    const authServiceSpy = fixture.debugElement.injector.get<IAuthServiceSpy>(
+      AuthService as any,
+    );
 
     /* create the component instance */
     const component = fixture.componentInstance;
     /* do not run fixture.detectChanges (i.e. ngOnIt here) as included below */
 
-    const { backSpy } = createSpies(locationSpy, authServiceSpy, isAuthenticated);
+    const { backSpy } = createSpies(
+      locationSpy,
+      authServiceSpy,
+      isAuthenticated,
+    );
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
@@ -126,7 +132,6 @@ describe('InformationComponent', () => {
   }
 
   describe('component', async () => {
-
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy();
@@ -178,7 +183,6 @@ describe('InformationComponent', () => {
   });
 
   describe('page', async () => {
-
     it('should show the not found values by default', async () => {
       const { fixture, page, activatedRouteStub } = await setup();
       /* set up route that the component will get */
@@ -232,7 +236,9 @@ describe('InformationComponent', () => {
       await fixture.whenStable();
       /* default constructor member shown */
       expect(page.header.innerText).toBe('LOG OUT');
-      expect(page.hint.innerText).toBe('Click on the log out button above (or click on a tab link above to return)');
+      expect(page.hint.innerText).toBe(
+        'Click on the log out button above (or click on a tab link above to return)',
+      );
     });
 
     it('should show the header in uppercase', async () => {

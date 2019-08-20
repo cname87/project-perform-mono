@@ -1,9 +1,9 @@
 import { browser } from 'protractor';
 
-import { getRootElement } from './elements/root.element';
+import { getRootElements } from './elements/root.elements';
 import { getMemberDetailElement } from './elements/memberDetail.element';
 import { getMemberInputElement } from './elements/memberInput.element';
-import { getMessagesElement } from './elements/messages.element';
+import { getMessagesElements } from './elements/messages.elements';
 
 export function getMemberDetailPage() {
 
@@ -12,10 +12,10 @@ export function getMemberDetailPage() {
     await browser.get(`/members/:${id}`);
   }
 
-  const rootElement = getRootElement();
+  const rootElement = getRootElements();
   const memberDetailElement = getMemberDetailElement();
   const memberInputElement = getMemberInputElement();
-  const messagesElement = getMessagesElement();
+  const messagesElement = getMessagesElements();
 
   return {
     navigateToPage,

@@ -1,7 +1,11 @@
+/**
+ * This module tests cache functionality.
+ */
+
 import { browser, by } from 'protractor';
 import browserLogs from 'protractor-browser-logs';
 
-import { resetDatabase} from '../../utils/reset-database';
+import { resetDatabase} from '../../utils/reset-testDatabase';
 import { getDashboardPage } from './pages/dashboard.page';
 
 
@@ -61,7 +65,7 @@ describe('The Cache', () => {
     await loadRootPage();
     /* the dashboard page should be displayed */
     const dashboardPage = getDashboardPage();
-    expect(await dashboardPage.dashboardElement.tag.isPresent()).toBeTruthy();
+    expect(await dashboardPage.dashboardElements.tag.isPresent()).toBeTruthy();
   });
 
   it('then reads `get all members` from the cache', async () => {
@@ -74,7 +78,7 @@ describe('The Cache', () => {
     /* the dashboard page should be displayed */
     const dashboardPage = getDashboardPage();
     /* click on members list link and pass in number of members expected */
-    await dashboardPage.rootElement.membersLink.click();
+    await dashboardPage.rootElements.membersLink.click();
     // await getMembersList(expected.numMembers);
   });
 
