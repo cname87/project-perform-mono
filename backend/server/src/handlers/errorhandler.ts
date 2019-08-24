@@ -52,15 +52,17 @@ function assignCode(
 ) {
   debug(modulename + ': assignCode called');
 
-  if (typeof err === 'object') {
-    /* set the response status code to the error statusCode field, if one was added on error creation, or if one was added above. */
-    res.statusCode = err.statusCode ? err.statusCode : res.statusCode;
-    /* if empty, set the response code to internal server error, 500. */
-    res.statusCode = res.statusCode ? res.statusCode : 500;
-    /* if 20x, set the response code to internal server error, 500. */
-    res.statusCode =
-      res.statusCode < 200 || res.statusCode > 299 ? res.statusCode : 500;
+  if (typeof err !== 'object') {
+    err = new Error(String(err));
   }
+
+  /* set the response status code to the error statusCode field, if one was added on error creation, or if one was added above. */
+  res.statusCode = err.statusCode ? err.statusCode : res.statusCode;
+  /* if empty, set the response code to internal server error, 500. */
+  res.statusCode = res.statusCode ? res.statusCode : 500;
+  /* if 20x, set the response code to internal server error, 500. */
+  res.statusCode =
+    res.statusCode < 200 || res.statusCode > 299 ? res.statusCode : 500;
 
   next(err);
 }

@@ -109,6 +109,7 @@ describe('server API', () => {
         const req = _req as IRequestApp;
         req.auth = {
           sub: process.env.userTestId as string,
+          permissions: ['all:testDB'],
         };
         next();
       });

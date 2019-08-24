@@ -6,10 +6,10 @@
 import { browser, by, ExpectedConditions, element } from 'protractor';
 import browserLogs from 'protractor-browser-logs';
 
-import { getLoginPage } from './pages/login.page';
-import { getDashboardPage } from './pages/dashboard.page';
-import { resetDatabase} from '../../utils/reset-testDatabase';
-import { getUserProfilePage } from './pages/user-profile.page';
+import { getLoginPage } from '../pages/login.page';
+import { getDashboardPage } from '../pages/dashboard.page';
+import { resetDatabase} from '../../../utils/reset-testDatabase';
+import { getUserProfilePage } from '../pages/user-profile.page';
 
 describe('Authentication:', () => {
 
@@ -28,7 +28,7 @@ describe('Authentication:', () => {
     await browser.wait(testPromise(css), 5000);
   };
 
-  const loadRootPage = async (css: string) => {
+  const loadRootPage = async (css = 'app-root') => {
     await browser.get('/');
     await awaitPage(css);
   };
@@ -66,7 +66,6 @@ describe('Authentication:', () => {
     logs.ignore(logs.INFO);
     /* ignore favicon errors from auth0 site */
     logs.ignore(/favicon/);
-
   });
 
   afterEach(async () => {
@@ -74,6 +73,39 @@ describe('Authentication:', () => {
     /* will fail the test on logs.ERROR or higher */
     return logs.verify();
   });
+
+  const login = async () => {
+
+    const { profileEmail, profilePassword } = createExpected();
+
+    /* the login page is still shown */
+    const loginPage = getLoginPage();
+
+
+    /* disable wait for angular (as auth0 has redirected and therefore the page is not seen as an angular page?) */
+    await browser.waitForAngularEnabled(false);
+
+    await loginPage.rootElements.loginBtn.click();
+
+    /* log-in on the non-angular auth0 page using the selenium webdriver */
+    const nameInput = await browser.driver.findElement(by.name('username'));
+    await nameInput.sendKeys(profileEmail);
+    const passwordInput = await browser.driver.findElement(by.name('password'));
+    await passwordInput.sendKeys(profilePassword);
+    const continueButton = await browser.driver.findElement(by.css('.ulp-button'));
+    await continueButton.click();
+
+    /* await until the dashboard logout button is present */
+    await awaitPage('#logoutBtn');
+
+    /* the dashboard page is now shown - following auth0 redirection */
+    const dashboardPage = getDashboardPage();
+    expect(await dashboardPage.rootElements.logoutBtn.isDisplayed())
+      .toBeTruthy();
+
+    /* Note: You can only re-enable this after all tests - otherwise tests time out.  Tests appear to work in the next it test with it enabled. */
+    await browser.waitForAngularEnabled(true);
+  };
 
   describe('If not authenticated shows a login page', () => {
 
@@ -144,34 +176,7 @@ describe('Authentication:', () => {
     });
 
     it(`by clicking on the login button`, async () => {
-      const { profileEmail, profilePassword } = createExpected();
-
-      /* the login page is still shown */
-      const loginPage = getLoginPage();
-
-      await loginPage.rootElements.loginBtn.click();
-
-      /* log-in on the non-angular auth0 page using the selenium webdriver */
-      const nameInput = await browser.driver.findElement(by.name('username'));
-      await nameInput.sendKeys(profileEmail);
-      const passwordInput = browser.driver.findElement(by.name('password'));
-      await passwordInput.sendKeys(profilePassword);
-      const continueButton = browser.driver.findElement(by.css('.ulp-button'));
-      await continueButton.click();
-
-      /* disable wait for angular (as auth0 has redirected and therefore the page is not seen as an angular page?) */
-      await browser.waitForAngularEnabled(false);
-
-      /* await until the dashboard logout button is present */
-      await awaitPage('#logoutBtn');
-
-      /* the dashboard page is now shown - following auth0 redirection */
-      const dashboardPage = getDashboardPage();
-      expect(await dashboardPage.rootElements.logoutBtn.isDisplayed())
-        .toBeTruthy();
-
-      /* Note: You can only re-enable this after all tests - otherwise tests time out.  Tests appear to work in the next it test with it enabled. */
-      await browser.waitForAngularEnabled(true);
+     await login();
     });
 
     it(`and the profile button will be visible`, async () => {

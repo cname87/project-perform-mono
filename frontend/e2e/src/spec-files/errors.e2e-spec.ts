@@ -1,12 +1,12 @@
 import { browser, by, ExpectedConditions } from 'protractor';
 import browserLogs from 'protractor-browser-logs';
 
-import { resetDatabase} from '../../utils/reset-testDatabase';
-import { getDashboardPage } from './pages/dashboard.page';
-import { getMemberDetailPage } from './pages/memberDetail.page';
-import { getMembersListPage } from './pages/membersList.page';
-import { getErrorInformationPage } from './pages/error-information.page';
-import { errorMember } from '../../src/app/config';
+import { resetDatabase} from '../../../utils/reset-testDatabase';
+import { getDashboardPage } from '../pages/dashboard.page';
+import { getMemberDetailPage } from '../pages/memberDetail.page';
+import { getMembersListPage } from '../pages/membersList.page';
+import { getErrorInformationPage } from '../pages/error-information.page';
+import { errorMember } from '../../../src/app/config';
 
 describe('Error Handling', () => {
 

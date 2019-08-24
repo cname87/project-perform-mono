@@ -46,6 +46,7 @@ import {
   IServerIndex,
 } from './configServer';
 import { authenticateHandler } from './handlers/authenticateHandler';
+import { authorizeHandler } from './handlers/authorizeHandler';
 
 /*
  * Define aliases for config parameters.
@@ -85,6 +86,7 @@ appLocals.dumpError = dumpError;
 appLocals.errorHandler = errorHandlers;
 appLocals.miscHandlers = miscHandlers;
 appLocals.authenticateHandler = authenticateHandler;
+appLocals.authorizeHandler = authorizeHandler;
 /* event emitter to signal server up etc */
 /* create before db setup call as async nature of db setup means index exports before db up and index.event definition needed by mocha so it can await server up event */
 const event: EventEmitter = new EventEmitter();

@@ -16,6 +16,7 @@ import util = require('util');
 import { IRequestApp, IAppLocals } from '../configServer';
 import { IErr } from '../../../utils/src/configUtils';
 import { getUser } from '../../../users/users';
+import { User } from '../../../users/configUsers';
 
 const router = Router();
 
@@ -177,57 +178,64 @@ const initOpenApi = (appLocals: IAppLocals) => {
 /* middleware functions below */
 
 /**
+ * This tests if the connection to the user members database collection has been created and, if not, creates it.
+ * @params req - the incoming API request.
+ * @params user - the user identified in the request.
+ */
+
+const createDbConnection = (req: IRequestApp, user: User) => {
+  debug(modulename + ': running create DbConnection');
+
+  const appLocals = req.app.appLocals;
+  if (
+    !(
+      appLocals.models.members.modelName &&
+      appLocals.models.members.modelName.substring(
+        0,
+        user._dbCollection.length,
+      ) === `${user._dbCollection}`
+    )
+  ) {
+    appLocals.models.members = appLocals.config.createModelMembers(
+      appLocals.database,
+      `${user._dbCollection}_Member`,
+      `${user._dbCollection}_members`,
+    );
+  }
+};
+
+/**
  * Gets the user (or throws an error) and creates the connection to the user collection on the server database.
  */
-const createDbModel = (_req: Request, _res: Response, next: NextFunction) => {
+const createDbModel = (_req: Request, res: Response, next: NextFunction) => {
   debug(modulename + ': running find user and create model middleware');
 
   /* retype _req to match actual incoming request */
   const req = _req as IRequestApp;
-  const appLocals = req.app.appLocals;
 
-  /* get the user based on the authentication token (which is used as the user id) */
+  let user: User | null = null;
+
   if (req.auth) {
-    const user = getUser(req.auth.sub);
-    if (!user) {
-      next('NoUserError');
-    } else {
-      /* test if the connection to the user members database collection has been created and, if not, create it */
-      if (
-        !(
-          appLocals.models.members.modelName &&
-          appLocals.models.members.modelName.substring(0, user.email.length) ===
-            `${user.email}`
-        )
-      ) {
-        appLocals.models.members = appLocals.config.createModelMembers(
-          appLocals.database,
-          `${user.email}_Member`,
-          `${user.email}_members`,
-        );
-      }
-    }
+    user = getUser(req.auth.sub);
   } else {
-    next('UnknownError');
-  }
-  next();
-};
-
-const handleErrors = (
-  err: Error,
-  _req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  debug(modulename + ': running handleErrors');
-
-  if (err.name === 'NoUserError') {
+    const error = new Error();
+    error.name = 'NoAuthentication';
+    error.message = 'Unknown authentication error - no req.auth created';
     res.statusCode = 401;
-    err.message = 'No user matching authentication token was found';
-    next(err);
-  } else {
-    next(err);
+    next(error);
   }
+
+  if (user) {
+    createDbConnection(req, user!);
+  } else {
+    const error = new Error();
+    error.name = 'NoUser';
+    error.message = 'No user matching authentication token was found';
+    res.statusCode = 401;
+    next(error);
+  }
+
+  next();
 };
 
 /**
@@ -259,6 +267,30 @@ const callApiHandler = (_req: Request, res: Response, next: NextFunction) => {
   );
 };
 
+export const checkError = (
+  error: any,
+  req: any,
+  _res: Response,
+  next: NextFunction,
+) => {
+  req.app.appLocals.logger.error(modulename + ': Authorization fail');
+  error.statusCode = 403;
+  error.dumped = false;
+  next(error);
+};
+
+const authorize = Router();
+authorize.use(
+  (_req: Request, res: Response, next: NextFunction) => {
+    /* retype _req to match actual incoming request that has req.app */
+    const req = _req as IRequestApp;
+    /* verify that the user is authorized for the configured database */
+    req.app.appLocals.authorizeHandler(req, res, next);
+  },
+  /* catch authorization errors */
+  checkError,
+);
+
 router.use(
   '/',
   (_req: Request, res: Response, next: NextFunction) => {
@@ -267,10 +299,9 @@ router.use(
     /* verify the jwt token and set req.auth */
     req.app.appLocals.authenticateHandler(req, res, next);
   },
-  /* create connection to database model / collection */
+  authorize,
+  /* create connection to the user database model / collection */
   createDbModel,
-  /* handle authentication and user errors */
-  handleErrors,
   /* call a handler based on the path and the api spec */
   callApiHandler,
 );

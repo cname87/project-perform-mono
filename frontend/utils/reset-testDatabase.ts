@@ -83,6 +83,8 @@ export const resetDatabase = async () => {
   await askServer('https://localhost:1337/members', 'POST', mockMembers[7]);
   await askServer('https://localhost:1337/members', 'POST', mockMembers[8]);
   await askServer('https://localhost:1337/members', 'POST', mockMembers[9]);
+
+  console.log('Completed reset and load test database');
 };
 
 /* read first argument - 'run' to run the the utility */

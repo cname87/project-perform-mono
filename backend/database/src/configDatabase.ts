@@ -23,6 +23,7 @@ const appRoot = appRootObject.toString();
 import { ConnectionOptions } from 'mongoose';
 import path = require('path');
 import { format } from 'util';
+import fs from 'fs';
 
 /**
  * The filepaths configuration object.
@@ -55,17 +56,21 @@ export type Database = Database;
  * This method returns the uri parameter in Mongoose.createConnection(uri options) that connects to a MongoDB database server.
  */
 export function getMongoUri(): string {
-  /* mongoDB server connection url and connect options */
-  const scheme = 'mongodb+srv';
+  // /* mongoDB server connection url and connect options */
+  const scheme = process.env.DB_IS_LOCAL === 'true' ? 'mongodb' : 'mongodb+srv';
+
+  /* both local and server databases use the same admin username and password */
   const user = encodeURIComponent(process.env.DB_USER as string);
   const password = encodeURIComponent(process.env.DB_PASSWORD as string);
-  const host = process.env.DB_HOST as string;
+  const host =
+    process.env.DB_IS_LOCAL === 'true'
+      ? 'localhost' // port defaults to 27017
+      : (process.env.DB_HOST as string);
   /* the mongoDB database is either a test database or a production database */
   const db =
     process.env.DB_MODE === 'production'
       ? (process.env.DB_DATABASE as string)
       : (process.env.DB_DATABASE_TEST as string);
-
   debug(modulename + ` : database ${db} in use`);
   const ssl = 'true';
   const authSource = 'admin';
@@ -88,7 +93,25 @@ export function getMongoUri(): string {
  * This method returns the options parameter in Mongoose.createConnection(uri options) that connects to a MongoDB database server.
  */
 export function getConnectionOptions(): ConnectionOptions {
+  /* read the certificate authority */
+  const ROOT_CA = path.join(appRoot, 'database', 'certs', 'rootCA.crt');
+  const ca = [fs.readFileSync(ROOT_CA)];
+  /* read the private key and public cert (both stored in the same file) */
+  const HTTPS_KEY = path.join(
+    appRoot,
+    'database',
+    'certs',
+    'mongoKeyAndCert.pem',
+  );
+  const key = fs.readFileSync(HTTPS_KEY);
+  const cert = key;
+  const sslValidate = process.env.DB_IS_LOCAL === 'true' ? true : false;
+
   return {
+    sslCA: ca,
+    sslCert: cert,
+    sslKey: key,
+    sslValidate,
     /* if not connected, return errors immediately */
     bufferMaxEntries: 0,
     /* prevent mongoose deprecation warnings */

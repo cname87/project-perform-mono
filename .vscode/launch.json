@@ -13,6 +13,7 @@
       "name": "Start frontend",
       "type": "chrome",
       "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
       "preLaunchTask": "npm start frontend",
       "url": "http://localhost:4200/", // proxy to 1337 for api calls
       "webRoot": "${workspaceFolder}",
@@ -38,6 +39,7 @@
         "--new-window",
         "--disable-popup-blocking", // necessary for window.open() to work
       ],
+      "cwd": "${workspaceFolder}/frontend",
       "userDataDir":true,
       "url": "http://localhost:9876/debug.html",
       "webRoot": "${workspaceFolder}/frontend/dist/",
@@ -73,6 +75,7 @@
       "args": [
         "${workspaceFolder}/frontend/e2e/protractor.conf.js",
       ],
+      "cwd": "${workspaceFolder}/frontend",
       "preLaunchTask": "Start Server",
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -91,8 +94,8 @@
       "program": "${workspaceFolder}/backend/index.ts",
       "cwd": "${workspaceFolder}/backend",
       "env": {
-        /* set before all tests so test database used */
-        "DB_MODE": "production",
+        /* set before all tests to choose test or production database */
+        // "DB_MODE": "production",
       },
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -112,8 +115,9 @@
     // npm run server index.js
     {
       /* Runs an npm script to start index.js.
-      * Note that CTRL+C does not exit without manual intervention.
-      * Click on the VSCode 'stop' icon to exit without manual intervention */
+      Note that CTRL+C does not exit without manual intervention.
+      Click on the VSCode 'stop' icon to exit without manual intervention
+      */
       "type": "node",
       "request": "launch",
       "name": "Launch npm backend index.js",
@@ -126,7 +130,7 @@
       "port": 9229,
       "cwd": "${workspaceFolder}/backend",
       "env": {
-        /* set before all tests so test database used */
+        /* set before all tests to choose test or production database */
         "DB_MODE": "production",
       },
       "outputCapture": "std",

@@ -9,8 +9,6 @@ const certFile = path.resolve(__dirname, '..//certs/nodeKeyAndCert.pem')
 const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem')
 const caFile = path.resolve(__dirname, '../certs/rootCA.crt')
 
-
-
 /* server request helper function */
 async function askServer(url, method, body = {}) {
   let options = {
@@ -27,8 +25,10 @@ async function askServer(url, method, body = {}) {
 
 exports.config = {
   allScriptsTimeout: 11000,
+  /* spec patterns are relative to the current working directory when protractor is called */
   specs: [
     './src/**/auth.e2e-spec.ts',
+    './src/**/cache.e2e-spec.ts',
   ],
   directConnect: true,
   capabilities: {

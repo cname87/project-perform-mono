@@ -37,6 +37,8 @@ import * as ERROR_HANDLERS from './handlers/errorHandler';
 const errorHandlers = ERROR_HANDLERS.errorHandlers;
 /* authentication handler */
 import { authenticateHandler } from './handlers/authenticateHandler';
+/* authorization handler */
+import { authorizeHandler } from './handlers/authorizeHandler';
 /* database class and creation function */
 import { Database, runDatabaseApp } from '../../database/src/index';
 /* models */
@@ -233,6 +235,7 @@ export interface IAppLocals {
   /* handlers */
   miscHandlers: typeof miscHandlers;
   authenticateHandler: typeof authenticateHandler;
+  authorizeHandler: typeof authorizeHandler;
   /* error handler middleware */
   errorHandler: typeof errorHandlers;
   /* event emitter used for test */
@@ -262,6 +265,7 @@ export interface IRequestApp extends Request {
   app: IExpressApp;
   auth?: {
     sub: string;
+    permissions: string[];
   };
 }
 
