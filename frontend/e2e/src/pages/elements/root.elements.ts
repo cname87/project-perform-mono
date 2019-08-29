@@ -1,6 +1,7 @@
 import { getLoginElements } from './login.elements';
 import { getNavElements } from './nav.elements';
 import { getMessagesElements } from './messages.elements';
+import { getToastrElements } from './toastr.elements';
 
 export function getRootElements() {
 
@@ -21,6 +22,12 @@ export function getRootElements() {
     messages,
   } = getMessagesElements();
 
+  const {
+    toastr,
+    toastrTitle,
+    toastrMessage,
+  } = getToastrElements();
+
   return {
     bannerHeader,
     loginBtn,
@@ -32,5 +39,8 @@ export function getRootElements() {
     messages,
     messagesHeader,
     messagesClearBtn,
+    toastr,
+    toastrTitle,
+    toastrMessage,
   }
 }

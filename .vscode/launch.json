@@ -75,7 +75,7 @@
       "args": [
         "${workspaceFolder}/frontend/e2e/protractor.conf.js",
       ],
-      "cwd": "${workspaceFolder}/frontend",
+      "cwd": "${workspaceFolder}/frontend/e2e",
       "preLaunchTask": "Start Server",
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -131,7 +131,7 @@
       "cwd": "${workspaceFolder}/backend",
       "env": {
         /* set before all tests to choose test or production database */
-        "DB_MODE": "production",
+        // "DB_MODE": "production",
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit

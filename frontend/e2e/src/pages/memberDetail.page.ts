@@ -12,14 +12,14 @@ export function getMemberDetailPage() {
     await browser.get(`/members/:${id}`);
   }
 
-  const rootElement = getRootElements();
+  const rootElements = getRootElements();
   const memberDetailElement = getMemberDetailElement();
   const memberInputElement = getMemberInputElement();
   const messagesElement = getMessagesElements();
 
   return {
     navigateToPage,
-    rootElement,
+    rootElements,
     memberDetailElement,
     memberInputElement,
     messagesElement,

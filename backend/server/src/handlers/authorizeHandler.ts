@@ -19,7 +19,7 @@ export const authorizeHandler = (
 ) => {
   debug(modulename + ': running authorizeHandler');
 
-  /* the user will need 'all:testDB' permission if the test database is in use, otherwise 'all:perfromDB' is required */
+  // /* the user will need 'all:testDB' permission if the test database is in use, otherwise 'all:perfromDB' is required */
   const requiredPermission =
     process.env.DB_MODE === 'test' ? 'all:testDB' : 'all:performDB';
 

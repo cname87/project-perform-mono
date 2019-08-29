@@ -1,31 +1,48 @@
-import { browser, by, ExpectedConditions } from 'protractor';
-import browserLogs from 'protractor-browser-logs';
+/**
+ * This module tests error handling functionality.
+ */
 
-import { resetDatabase} from '../../../utils/reset-testDatabase';
+import { browser, ExpectedConditions } from 'protractor';
+
+// import { resetDatabase} from '../../../utils/reset-testDatabase';
 import { getDashboardPage } from '../pages/dashboard.page';
 import { getMemberDetailPage } from '../pages/memberDetail.page';
 import { getMembersListPage } from '../pages/membersList.page';
 import { getErrorInformationPage } from '../pages/error-information.page';
+import { getHelpers } from '../e2e-helpers';
+/* need to set a dummy client-side window global as it is referenced in auth0 configuration in config.ts */
+global['window'] = {
+  location: {
+    origin: 'dummy',
+  },
+};
 import { errorMember } from '../../../src/app/config';
 
-describe('Error Handling', () => {
+fdescribe('Error Handling', () => {
 
-  /* holds browser logs utility */
-  let logs: browserLogs.BrowserLogs;
-  /* set timeout here - loaded in beforeAll below */
-  const timeout = 120000;
+  const {
+    // awaitPage,
+    loadRootPage,
+    login,
+    originalTimeout,
+    setTimeout,
+    resetTimeout,
+    // resetDatabase,
+    setupLogsMonitor,
+    checkLogs,
+  } = getHelpers();
 
-  /* loads start page */
-  const loadRootPage = async () => {
+  beforeAll(async () => {
+    /* test that test database is in use and reset it */
+    // await resetDatabase();
+    setTimeout();
+    await loadRootPage('#loginBtn');
+    await login();
+  });
 
-    /* load the root page */
-    await browser.get('/');
-    browser.ignoreSynchronization = true;
-    await browser.wait(() => {
-      return browser.isElementPresent(by.css('app-root'));
-    }, 5000);
-    browser.ignoreSynchronization = false;
-  };
+  afterAll(() => {
+    resetTimeout(originalTimeout);
+  });
 
   /* run before each 'it' function to supply local variables e.g. expected values for tests */
   const testSetup = () => {
@@ -47,53 +64,32 @@ describe('Error Handling', () => {
     /* the dashboard page should be displayed */
     const dashboardPage = getDashboardPage();
     /* click on members nav link */
-    await dashboardPage.rootElement.membersLink.click();
+    await dashboardPage.rootElements.membersLink.click();
     /* the members list page should be displayed */
     const membersListPage = getMembersListPage();
-    expect(await membersListPage.memberListElement.tag.isPresent()).toBeTruthy(
+    expect(await membersListPage.memberListElements.tag.isPresent()).toBeTruthy(
       'shows member list',
     );
 
     /* confirm count of members displayed */
     expect(
-      await membersListPage.memberListElement.allMemberIds.count(),
+      await membersListPage.memberListElements.allMemberIds.count(),
     ).toEqual(numberExpected, 'number of members');
   }
 
-  /* check test database and set timeout */
-  let originalTimeout: number;
-  beforeAll(async () => {
-    /* test that test database is in use and reset it */
-    await resetDatabase();
-    /* set timeout to allow for debug */
-    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout;
-
-  });
-
-  /* clear database and reset timeout value to the original value */
-  afterAll(async () => {
-    /* reset timeout */
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
-  });
-
-  beforeEach(function () {
-    /* clear browser log before test */
-    browser.manage().logs().get('browser');
-    logs = browserLogs(browser);
-    logs.ignore(logs.DEBUG);
-    logs.ignore(logs.INFO);
-  });
-
-  afterEach(() => {
-    return logs.verify();
-  });
-
   describe('handles server request errors:', () => {
 
-    beforeAll(loadRootPage);
+    beforeAll(async() => {
+      loadRootPage('#search-box');
+      await browser.sleep(1000);
+    });
 
-    it(`GET /members?name='error' causes an unexpected error`, async () => {
+    fit(`GET /members?name='error' causes an unexpected error`, async () => {
+
+      const logs = await setupLogsMonitor();
+      /* test an error is logged */
+      logs.expect(/Test unexpected error/, logs.ERROR);
+
       /* the dashboard page should be displayed */
       let dashboardPage = getDashboardPage();
       /* enter dummy text in search box */
@@ -101,31 +97,35 @@ describe('Error Handling', () => {
       await browser.sleep(1000);
       /* check message logged on screen */
       dashboardPage = getDashboardPage();
-      const count = await dashboardPage.messagesElement.messages.count();
-      const message = await dashboardPage.messagesElement.messages
+      const count = await dashboardPage.rootElements.messages.count();
+      const message = await dashboardPage.rootElements.messages
         .get(count - 1)
         .getText();
       expect(message).toEqual('MembersService: ERROR: Failed to get members from server');
       /* check toastr is displayed */
       expect(
-        await dashboardPage.toastrElement.toastr
+        await dashboardPage.rootElements.toastr
           .isDisplayed(),
       ).toBe(true);
       expect(
-        await dashboardPage.toastrElement.toastrTitle
+        await dashboardPage.rootElements.toastrTitle
           .getText(),
       ).toBe('A server access error has occurred');
       expect(
-        await dashboardPage.toastrElement.toastrMessage
+        await dashboardPage.rootElements.toastrMessage
           .getText(),
       ).toBe('ERROR!');
-      /* test an error is logged */
-      logs.expect(/Test unexpected error/, logs.ERROR);
+
+      await checkLogs(logs);
     });
 
     it('DELETE /members/10 causes an unexpected error', async () => {
       /* get expected values object */
       const { expected } = testSetup();
+      const logs = await setupLogsMonitor();
+      /* test an error is logged */
+      logs.expect(/Test unexpected error/, logs.ERROR);
+
       /* click on members list link and pass in number of members expected */
       await getMembersList(expected.numMembers);
       /* the members list page should be displayed */
@@ -133,50 +133,55 @@ describe('Error Handling', () => {
       /* get the link of the member 9 without error */
       const {
         deleteButton,
-      } = await membersListPage.memberListElement.selectMemberById(
+      } = await membersListPage.memberListElements.selectMemberById(
         errorMember.id,
       );
       /* generates DELETE members/10 => error */
       await deleteButton.click();
       /* check message logged on screen */
       membersListPage = getMembersListPage();
-      const count = await membersListPage.messagesElement.messages.count();
-      const message = await membersListPage.messagesElement.messages
+      const count = await membersListPage.rootElements.messages.count();
+      const message = await membersListPage.rootElements.messages
         .get(count - 1)
         .getText();
       expect(message).toEqual('MembersService: ERROR: Failed to delete member from server');
       /* check toastr is displayed */
       expect(
-        await membersListPage.toastrElement.toastr
+        await membersListPage.rootElements.toastr
           .isDisplayed(),
       ).toBe(true);
       expect(
-        await membersListPage.toastrElement.toastrTitle
+        await membersListPage.rootElements.toastrTitle
           .getText(),
       ).toBe('A server access error has occurred');
       expect(
-        await membersListPage.toastrElement.toastrMessage
+        await membersListPage.rootElements.toastrMessage
           .getText(),
             ).toBe('ERROR!');
-      /* test an error is logged */
-      logs.expect(/Test unexpected error/, logs.ERROR);
+
+      await checkLogs(logs);
     });
 
     it(`POST /members causes a server-side  error`, async () => {
+
+      const logs = await setupLogsMonitor();
+      /* test that an error is logged */
+      logs.expect(/Http client-side/, logs.ERROR);
+
       /* the member detail page is still displayed */
       let membersListPage = getMembersListPage();
       /* get the list of members */
       /* enter new name in input box */
-      await membersListPage.memberInputElement.inputBox.sendKeys(
+      await membersListPage.memberInputElements.inputBox.sendKeys(
         errorMember.name,
       );
       /* click on add which saves member and stays on members view */
-      await membersListPage.memberInputElement.actionBtn.click();
+      await membersListPage.memberInputElements.actionBtn.click();
       membersListPage = getMembersListPage();
       /* check message logged on screen */
       membersListPage = getMembersListPage();
-      const count = await membersListPage.messagesElement.messages.count();
-      const message = await membersListPage.messagesElement.messages
+      const count = await membersListPage.rootElements.messages.count();
+      const message = await membersListPage.rootElements.messages
         .get(count - 1)
         .getText();
       expect(message).toEqual('MembersService: ERROR: Failed to add member to server');
@@ -187,6 +192,11 @@ describe('Error Handling', () => {
     it('GET /members/10 causes a HttpClient error', async () => {
       /* get expected values object */
       const { expected } = testSetup();
+
+      const logs = await setupLogsMonitor();
+      /* test that an error is logged */
+      logs.expect(/Http client-side/, logs.ERROR);
+
       /* click on members list link and pass in number of members expected */
       await getMembersList(expected.numMembers);
       /* the members list page should be displayed */
@@ -194,33 +204,37 @@ describe('Error Handling', () => {
       /* get the link of the member 9 without error */
       const {
         memberName,
-      } = await membersListPage.memberListElement.selectMemberById(
+      } = await membersListPage.memberListElements.selectMemberById(
         errorMember.id,
       );
       /* click on the member which takes us to the member detail view */
       await memberName.click();
       /* check message logged on screen */
       membersListPage = getMembersListPage();
-      const count = await membersListPage.messagesElement.messages.count();
-      const message = await membersListPage.messagesElement.messages
+      const count = await membersListPage.rootElements.messages.count();
+      const message = await membersListPage.rootElements.messages
         .get(count - 1)
         .getText();
       expect(message).toEqual('MembersService: ERROR: Failed to get member from server');
-      /* test that an error is logged */
-      logs.expect(/Http client-side/, logs.ERROR);
+
     });
 
     it('PUT /members causes a server-side error', async () => {
       /* get expected values object */
       const { expected } = testSetup();
       /* click on members list link and pass in number of members expected */
+
+      const logs = await setupLogsMonitor();
+      /* test that an error is logged */
+      logs.expect(/Test server-side error/, logs.ERROR);
+
       await getMembersList(expected.numMembers);
       /* the members list page should be displayed */
       const membersPage = getMembersListPage();
       /* get the link of the member 9 without error */
       const {
         memberName,
-      } = await membersPage.memberListElement.selectMemberById(
+      } = await membersPage.memberListElements.selectMemberById(
         9,
       );
       /* click on the member which takes us to the member detail view */
@@ -239,22 +253,28 @@ describe('Error Handling', () => {
       await memberDetailPage.memberInputElement.actionBtn.click();
       /* check message logged on screen */
       memberDetailPage = getMemberDetailPage();
-      const count = await memberDetailPage.messagesElement.messages.count();
-      const message = await memberDetailPage.messagesElement.messages
+      const count = await memberDetailPage.rootElements.messages.count();
+      const message = await memberDetailPage.rootElements.messages
         .get(count - 1)
         .getText();
       expect(message).toEqual('MembersService: ERROR: Failed to update member on the server');
-      /* test that an error is logged */
-      logs.expect(/Test server-side error/, logs.ERROR);
+
     });
 
   });
 
   describe('handles application exceptions:', () => {
 
-    beforeAll(loadRootPage);
+    beforeAll(async() => {
+      loadRootPage('#logoutBtn');
+    });
 
     it('Unexpected application error', async () => {
+
+      const logs = await setupLogsMonitor();
+      /* test an error was logged */
+      logs.expect(/Test application error/, logs.ERROR);
+
       /* the dashboard page should be displayed */
       let dashboardPage = getDashboardPage();
       /* enter dummy name in search box - triggers application error*/
@@ -262,21 +282,17 @@ describe('Error Handling', () => {
       await browser.sleep(1000);
       /* the error information page is displayed */
       const pageErrorInformationPage = getErrorInformationPage();
-      /* shows the error information page */
-      expect(
-        await pageErrorInformationPage.errorInformationElement.tag.isPresent(),
-      ).toBeTruthy('shows error information');
       /* shows the header and hint text */
       expect(
-        await pageErrorInformationPage.errorInformationElement.header.getText(),
+        await pageErrorInformationPage.errorInformationElements.header.getText(),
       ).toEqual('UNEXPECTED ERROR!');
       expect(
-        await pageErrorInformationPage.errorInformationElement.hint.getText(),
+        await pageErrorInformationPage.errorInformationElements.hint.getText(),
       ).toEqual('Click on a tab link above');
       /* check message logged on screen */
       const count
-        = await pageErrorInformationPage.messagesElement.messages.count();
-      const message = await pageErrorInformationPage.messagesElement.messages
+        = await pageErrorInformationPage.rootElements.messages.count();
+      const message = await pageErrorInformationPage.rootElements.messages
         .get(count - 1)
         .getText();
       expect(message).toEqual('ErrorHandlerService: ERROR: An unknown error occurred');
@@ -290,7 +306,7 @@ describe('Error Handling', () => {
           .getText(),
       ).toBe('An unknown error has occurred');
       expect(
-        await pageErrorInformationPage.toastrElement.toastrMessage
+        await pageErrorInformationPage.rootElements.toastrMessage
           .getText(),
       ).toBe('ERROR!');
       /* check toastr disappears after timeout */
@@ -300,8 +316,7 @@ describe('Error Handling', () => {
         await pageErrorInformationPage.toastrElement.toastr
           .isDisplayed(),
       ).toBe(false);
-      /* test an appropriate  error was logged */
-      logs.expect(/Test application error/, logs.ERROR);
+
     });
 
 

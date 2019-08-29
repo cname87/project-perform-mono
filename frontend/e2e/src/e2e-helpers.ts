@@ -27,17 +27,8 @@ export const getHelpers = () => {
     await awaitPage(css);
   };
 
-  const createExpected = () => {
-    return {
-      profileName: 'seany',
-      profileEmail: 'sean.young@openet.com',
-      profilePassword: 'perforM#1',
-    };
-  };
-
   const login = async () => {
 
-    // const { profileEmail, profilePassword } = createExpected();
     /* import test authentication parameters into process.env */
     dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
@@ -60,21 +51,24 @@ export const getHelpers = () => {
     /* Note: Because waitForAngular is disabled you need to wait until page is shown and all requests have been closed, or otherwise you will see errors such as caching not working. So check for the slowest elements and allow a manual delay. */
     await awaitPage('#logoutBtn');
     await awaitPage('app-messages #clearBtn');
-    await browser.sleep(1000);
+    await browser.sleep(2000);
 
     /* the dashboard page is now shown - following auth0 redirection */
     const dashboardPage = getDashboardPage();
     expect(await dashboardPage.rootElements.logoutBtn.isDisplayed())
       .toBeTruthy();
+    expect(await dashboardPage.dashboardElements.topMembers
+      .isDisplayed()).toBeTruthy();
 
     /* Note: It appears you can only re-enable this after all tests - otherwise tests time out. I don't know why I can't re-enable for the Angular pages. */
     await browser.waitForAngularEnabled(true);
+
   };
 
   const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
   /* set long timeout to allow for debug */
-  const setTimeout = (timeout = 1200000) => {
+  const setTimeout = (timeout = 120000) => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout;
   }
 
@@ -82,15 +76,15 @@ export const getHelpers = () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = original;
   }
 
-  let logs = {} as browserLogs.BrowserLogs;
-
-  const setupLogsMonitor = async () => {
+  const setupLogsMonitor = async (ignoreLogs = true) => {
     /* you must clear the browser logs before each test */
     await browser.manage().logs().get('browser');
     const logs = browserLogs(browser);
-    // /* ignore debug and info log messages */
-    // logs.ignore(logs.DEBUG);
-    // logs.ignore(logs.INFO);
+    /* ignore debug and info log messages */
+    if (ignoreLogs) {
+      logs.ignore(logs.DEBUG);
+      logs.ignore(logs.INFO);
+    }
     /* ignore favicon errors e.g. from auth0 site */
     logs.ignore(/favicon/);
     return logs;
@@ -101,6 +95,7 @@ export const getHelpers = () => {
     await browser.wait(async () => {
       try {
         await logs.verify();
+        await browser.driver.sleep(100);
         return true;
       } catch (e) {
         return false
@@ -111,13 +106,11 @@ export const getHelpers = () => {
   return {
     awaitPage,
     loadRootPage,
-    createExpected,
     login,
     originalTimeout,
     setTimeout,
     resetTimeout,
     resetDatabase,
-    logs,
     setupLogsMonitor,
     checkLogs,
   }

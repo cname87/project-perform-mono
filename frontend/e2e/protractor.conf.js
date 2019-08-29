@@ -1,34 +1,16 @@
 // Protractor configuration file, see link for more information
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
-const { SpecReporter } = require('jasmine-spec-reporter');
-const request = require('request-promise-native');
-const fs = require('fs');
-const path = require('path');
-const certFile = path.resolve(__dirname, '..//certs/nodeKeyAndCert.pem')
-const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem')
-const caFile = path.resolve(__dirname, '../certs/rootCA.crt')
-
-/* server request helper function */
-async function askServer(url, method, body = {}) {
-  let options = {
-    url,
-    method,
-    cert: fs.readFileSync(certFile),
-    key: fs.readFileSync(keyFile),
-    ca: fs.readFileSync(caFile),
-    json: true,
-    body,
-  }
-  return await request(options);
-}
+// const jasmineReporters = require('jasmine-reporters');
 
 exports.config = {
   allScriptsTimeout: 11000,
   /* spec patterns are relative to the current working directory when protractor is called */
   specs: [
-    './src/**/auth.e2e-spec.ts',
-    './src/**/cache.e2e-spec.ts',
+    './src/**/test.e2e-spec.ts',
+    // './src/**/auth.e2e-spec.ts',
+    // './src/**/cache.e2e-spec.ts',
+    // './src/**/errors.e2e-spec.ts',
   ],
   directConnect: true,
   capabilities: {
@@ -47,36 +29,54 @@ exports.config = {
     }
   },
   baseUrl: 'https://localhost:1337/',
+  allScriptsTimeout: 10000,
+  getPageTimeout: 10000,
+  untrackOutstandingTimeouts: true,
+  logLevel: 'DEBUG',
+
   SELENIUM_PROMISE_MANAGER: false,
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,
-    defaultTimeoutInterval: 30000,
+    defaultTimeoutInterval: 10000,
     print: function() {},
   },
 
+  beforeLaunch: function() {
+    require('ts-node').register({
+      project: require('path').join(__dirname, './tsconfig.e2e.json')
+    });
+  },
+
+  /* test environment setup - reset database and log in */
   onPrepare: async () => {
 
-    require('ts-node').register({
-      project: require('path').join(__dirname, './tsconfig.e2e.json'),
-    });
-
-    /* set up jasmine reporter */
-    jasmine
-      .getEnv()
-      .addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
-
-    /* check test database in use */
-    let response
-      = await askServer('https://localhost:1337/testServer/isTestDatabase', 'GET');
-    if(!response.isTestDatabase){
-      throw new Error('Test database not in use');
-    }
-    /* delete all 'test' database members */
-    await askServer('https://localhost:1337/members', 'DELETE');
-
-    return;
+    await require('./onPrepare').run();
 
   },
+
+  // onComplete: function() {
+  /* HTMLReport called once tests are finished */
+  //   var browserName, browserVersion;
+  //   var capsPromise = browser.getCapabilities();
+
+  //   capsPromise.then(function (caps) {
+  //      browserName = caps.get('browserName');
+  //      browserVersion = caps.get('version');
+
+  //      var HTMLReport = require('protractor-html-reporter');
+
+  //     testConfig = {
+  //           reportTitle: 'Shield End To End Testing Report',
+  //           outputPath: './',
+  //           screenshotPath: './',
+  //           testBrowser: browserName,
+  //           browserVersion: browserVersion,
+  //           modifiedSuiteName: false,
+  //           screenshotsOnlyOnFailure: true
+  //       };
+  //       new HTMLReport().from('xmlresults.xml', testConfig);
+  //   });
+  // }
 
 };

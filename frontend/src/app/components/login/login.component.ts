@@ -54,6 +54,7 @@ export class LoginComponent implements OnInit {
    */
   async login() {
     this.logger.trace(LoginComponent.name + ': Logging in...');
+
     await this.auth0Client.loginWithRedirect({
       /* appState is returned in authorization response */
       /* see CallbackComponent for how target is used to redirect */

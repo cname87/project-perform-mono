@@ -3,114 +3,62 @@
  * It also tests the profile page.
  */
 
-import { browser, by, ExpectedConditions, element } from 'protractor';
+// import { browser, by, ExpectedConditions, element } from 'protractor';
 import browserLogs from 'protractor-browser-logs';
 
 import { getLoginPage } from '../pages/login.page';
 import { getDashboardPage } from '../pages/dashboard.page';
-import { resetDatabase} from '../../../utils/reset-testDatabase';
+// import { resetDatabase} from '../../../utils/reset-testDatabase';
 import { getUserProfilePage } from '../pages/user-profile.page';
+import { getHelpers } from '../e2e-helpers';
 
 describe('Authentication:', () => {
 
-  /* holds browser logs utility */
-  let logs: browserLogs.BrowserLogs;
-  /* set timeout here - loaded in beforeAll below */
-  const timeout = 120000;
-  let originalTimeout: number;
+  const {
+    awaitPage,
+    loadRootPage,
+    // createExpected,
+    login,
+    originalTimeout,
+    setTimeout,
+    resetTimeout,
+    // resetDatabase,
+    setupLogsMonitor,
+    checkLogs,
+  } = getHelpers();
 
-  /* awaits for an element with the css selector to be visible on the page */
-  const awaitPage = async (css = 'app-root') => {
-    const testPromise = (css = 'app-root') => {
-      const EC = ExpectedConditions;
-      return EC.visibilityOf(element(by.css(css)));
-    }
-    await browser.wait(testPromise(css), 5000);
-  };
+  beforeAll(async () => {
+    /* test that test database is in use and reset it */
+    // await resetDatabase();
+    setTimeout();
+  });
 
-  const loadRootPage = async (css = 'app-root') => {
-    await browser.get('/');
-    await awaitPage(css);
-  };
+  afterAll(() => {
+    resetTimeout(originalTimeout);
+  });
 
   const createExpected = () => {
     return {
       bannerHeader: 'Team Members',
       informationHeader: 'LOG IN',
       informationHint: 'Click on the Log In button above',
-      profileName: 'seany',
-      profileEmail: 'sean.young@openet.com',
-      profilePassword: 'perforM#1',
     };
-  };
-
-  beforeAll(async () => {
-    /* test that test database is in use and reset it, loading mock members */
-    await resetDatabase();
-    /* set timeout to allow for debug */
-    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout;
-
-  });
-
-  afterAll(async () => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
-  });
-
-  beforeEach(async () => {
-    /* clear browser logs before test */
-    browser.manage().logs().get('browser');
-    logs = browserLogs(browser);
-    /* ignore debug and info log messages */
-    logs.ignore(logs.DEBUG);
-    logs.ignore(logs.INFO);
-    /* ignore favicon errors from auth0 site */
-    logs.ignore(/favicon/);
-  });
-
-  afterEach(async () => {
-    await browser.waitForAngularEnabled(false);
-    /* will fail the test on logs.ERROR or higher */
-    return logs.verify();
-  });
-
-  const login = async () => {
-
-    const { profileEmail, profilePassword } = createExpected();
-
-    /* the login page is still shown */
-    const loginPage = getLoginPage();
-
-
-    /* disable wait for angular (as auth0 has redirected and therefore the page is not seen as an angular page?) */
-    await browser.waitForAngularEnabled(false);
-
-    await loginPage.rootElements.loginBtn.click();
-
-    /* log-in on the non-angular auth0 page using the selenium webdriver */
-    const nameInput = await browser.driver.findElement(by.name('username'));
-    await nameInput.sendKeys(profileEmail);
-    const passwordInput = await browser.driver.findElement(by.name('password'));
-    await passwordInput.sendKeys(profilePassword);
-    const continueButton = await browser.driver.findElement(by.css('.ulp-button'));
-    await continueButton.click();
-
-    /* await until the dashboard logout button is present */
-    await awaitPage('#logoutBtn');
-
-    /* the dashboard page is now shown - following auth0 redirection */
-    const dashboardPage = getDashboardPage();
-    expect(await dashboardPage.rootElements.logoutBtn.isDisplayed())
-      .toBeTruthy();
-
-    /* Note: You can only re-enable this after all tests - otherwise tests time out.  Tests appear to work in the next it test with it enabled. */
-    await browser.waitForAngularEnabled(true);
   };
 
   describe('If not authenticated shows a login page', () => {
 
+    let logs = {} as browserLogs.BrowserLogs;
+
     beforeAll(async () => {
       await loadRootPage('#loginBtn');
+    });
+
+    beforeEach(async () => {
+      logs = await setupLogsMonitor();
+    });
+
+    afterEach(async () => {
+      await checkLogs(logs);
     });
 
     it(`with a banner containing a login button only`, async () => {
@@ -195,7 +143,6 @@ describe('Authentication:', () => {
     });
 
     it(`by clicking on the profile button`, async () => {
-      const { profileName, profileEmail } = createExpected();
 
       /* dashboard page is initially displayed */
       const dashboardPage = getDashboardPage();
@@ -210,9 +157,9 @@ describe('Authentication:', () => {
       expect(await profilePage.userProfileElements.profileName.isDisplayed())
         .toBeTruthy();
       expect(await profilePage.userProfileElements.profileName.getText())
-        .toEqual('NAME: ' + profileName );
+        .toEqual('NAME: ' + process.env.TEST_NAME );
       expect(await profilePage.userProfileElements.profileEmail.getText())
-        .toEqual('EMAIL: ' + profileEmail );
+        .toEqual('EMAIL: ' + process.env.TEST_EMAIL );
     });
 
     it(`and then click go back to return`, async () => {

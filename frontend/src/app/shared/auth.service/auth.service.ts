@@ -38,13 +38,13 @@ export class AuthService {
 
     /* if instance exists then skip and just return it */
     if (!this.auth0Client) {
-      /* if createAuth0Client has not being called, call it */
+      /* if createAuth0Client has not been called, call it */
       if (!this.auth0ClientPromise) {
         this.logger.trace(`${AuthService.name}: Creating the Auth0 client`);
         this.auth0ClientPromise = createAuth0Client(auth0Config);
       }
 
-      /* await resolution of the promise */
+      // /* await resolution of the promise */
       this.auth0Client = await this.auth0ClientPromise;
 
       /* provide the current value of isAuthenticated */
