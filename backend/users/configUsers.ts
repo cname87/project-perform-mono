@@ -35,10 +35,6 @@ export class User {
 }
 
 /* creates all users */
-const userTest = new User(
-  process.env.userTestId as string,
-  process.env.userTestDb as string,
-);
 const user1 = new User(
   process.env.user1Id as string,
   process.env.user1Db as string,
@@ -47,5 +43,13 @@ const user2 = new User(
   process.env.user2Id as string,
   process.env.user2Db as string,
 );
+const userTest = new User(
+  process.env.userTestId as string,
+  process.env.userTestDb as string,
+);
+const server = new User(
+  process.env.userServerId as string,
+  process.env.userServerDb as string,
+);
 
-export const users = [userTest, user1, user2];
+export const users = [user1, user2, userTest, server];

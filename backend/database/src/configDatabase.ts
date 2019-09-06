@@ -56,7 +56,10 @@ export type Database = Database;
  * This method returns the uri parameter in Mongoose.createConnection(uri options) that connects to a MongoDB database server.
  */
 export function getMongoUri(): string {
-  // /* mongoDB server connection url and connect options */
+  const server = process.env.DB_IS_LOCAL === 'true' ? 'local' : 'remote';
+  debug(modulename + ` : ${server} database server in use`);
+
+  /* local or remte mongoDB server */
   const scheme = process.env.DB_IS_LOCAL === 'true' ? 'mongodb' : 'mongodb+srv';
 
   /* both local and server databases use the same admin username and password */

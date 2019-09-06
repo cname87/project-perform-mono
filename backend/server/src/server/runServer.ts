@@ -91,7 +91,7 @@ async function runServer(
     app.use((req, _res, next) => {
       debug('\n' + modulename + ': *** Request received ***\n');
       debug(modulename + ': req.url: ' + req.url);
-      debug(modulename + ': re.baseUrl: ' + req.baseUrl);
+      debug(modulename + ': req.baseUrl: ' + req.baseUrl);
       debug(modulename + ': req.originalUrl: ' + req.originalUrl);
       debug(modulename + ': req.method: ' + req.method);
       debug(

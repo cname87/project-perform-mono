@@ -151,14 +151,10 @@ describe('ProfileComponent', () => {
     return testVars;
   }
 
-  describe('before ngOnInit', async () => {
+  describe('before initialization', async () => {
     it('should be created', async () => {
       const { component } = await preSetup();
       expect(component).toBeTruthy('component created');
-    });
-    it('should have dummyprofile', async () => {
-      const { component } = await preSetup();
-      expect(component.profile$).toBeNull('profile$ not initialised');
     });
     it('should not display', async () => {
       const { page } = await preSetup();
@@ -170,12 +166,6 @@ describe('ProfileComponent', () => {
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component created');
-    });
-    it('should have profile set', async () => {
-      const { component } = await setup();
-      component.profile$.subscribe((profile) => {
-        expect(profile.email).toEqual('testProfile.email');
-      });
     });
   });
 

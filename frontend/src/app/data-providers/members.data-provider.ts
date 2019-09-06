@@ -19,7 +19,6 @@ import { CustomHttpUrlEncodingCodec } from './encoder';
 import { ICount, IMember, IMemberWithoutId } from './models/models';
 import { catchError, tap } from 'rxjs/operators';
 export { ICount, IMember, IMemberWithoutId };
-import { AuthService } from '../shared/auth.service/auth.service';
 
 /**
  * This service handles all communication with the server. It implements all the function to create, get, update and delete members on the server.
@@ -34,24 +33,10 @@ export class MembersDataProvider {
   private defaultHeaders = membersConfiguration.defaultHeaders;
   private withCredentials = membersConfiguration.withCredentials;
 
-  constructor(
-    private httpClient: HttpClient,
-    private logger: NGXLogger,
-    private authService: AuthService,
-  ) {
+  constructor(private httpClient: HttpClient, private logger: NGXLogger) {
     this.logger.trace(
       MembersDataProvider.name + ': Starting MembersDataProvider',
     );
-    /* get the JWT token */
-    this.getToken();
-  }
-  /* holds the JWT token */
-  private token: any;
-
-  private getToken() {
-    this.authService.token.subscribe((value) => {
-      this.token = value;
-    });
   }
 
   /**
@@ -75,8 +60,6 @@ export class MembersDataProvider {
     headers = headers.set('Accept', 'application/json');
     /* set Content-Type header - what content is being sent */
     headers = headers.set('Content-Type', 'application/json');
-    /* set Authorization header - JWT token */
-    headers = headers.set('Authorization', `Bearer ${this.token}`);
 
     this.logger.trace(
       MembersDataProvider.name +
@@ -125,8 +108,6 @@ export class MembersDataProvider {
 
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
-    /* set Authorization header - JWT token */
-    headers = headers.set('Authorization', `Bearer ${this.token}`);
 
     this.logger.trace(
       MembersDataProvider.name +
@@ -171,8 +152,6 @@ export class MembersDataProvider {
     let headers = this.defaultHeaders;
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
-    /* set Authorization header - JWT token */
-    headers = headers.set('Authorization', `Bearer ${this.token}`);
 
     this.logger.trace(
       MembersDataProvider.name +
@@ -225,8 +204,6 @@ export class MembersDataProvider {
     headers = headers.set('Accept', 'application/json');
     /* set Content-Type header - what content is being sent */
     headers = headers.set('Content-Type', 'application/json');
-    /* set Authorization header - JWT token */
-    headers = headers.set('Authorization', `Bearer ${this.token}`);
 
     this.logger.trace(
       MembersDataProvider.name +
@@ -270,8 +247,6 @@ export class MembersDataProvider {
     let headers = this.defaultHeaders;
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
-    /* set Authorization header - JWT token */
-    headers = headers.set('Authorization', `Bearer ${this.token}`);
 
     this.logger.trace(
       MembersDataProvider.name +
@@ -313,8 +288,7 @@ export class MembersDataProvider {
     let headers = this.defaultHeaders;
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
-    /* set Authorization header - JWT token */
-    headers = headers.set('Authorization', `Bearer ${this.token}`);
+
     this.logger.trace(
       MembersDataProvider.name +
         `: Sending DELETE request to: ${this.basePath}/${this.membersPath}`,

@@ -1,34 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Location } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
-import { Observable } from 'rxjs';
 
 import { AuthService } from '../../shared/auth.service/auth.service';
 
-interface IProfile {
-  name: string;
-  email: string;
-}
+/**
+ * This module gets the user profile from the authentication server.
+ */
 
 @Component({
   selector: 'app-profile',
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.scss'],
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent {
   constructor(
-    private authService: AuthService,
+    public auth: AuthService,
     private location: Location,
     private logger: NGXLogger,
   ) {
     this.logger.trace(ProfileComponent.name + ': Starting ProfileComponent');
-  }
-
-  profile$: Observable<IProfile> = null as any;
-
-  ngOnInit() {
-    /* get the profile via the authService */
-    this.profile$ = this.authService.profile;
   }
 
   goBack() {

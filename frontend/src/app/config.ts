@@ -85,3 +85,8 @@ export const errorSearchTerm = 'errorSearchTerm';
 
 /* cache timeout in ms */
 export const maxAge = 300000;
+
+export interface IUserProfile {
+  name: string;
+  email: string;
+}

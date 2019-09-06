@@ -64,6 +64,14 @@ function assignCode(
   res.statusCode =
     res.statusCode < 200 || res.statusCode > 299 ? res.statusCode : 500;
 
+  /* set mandatory header for 401 */
+  if (res.statusCode === 401) {
+    res.setHeader(
+      'WWW-Authenticate',
+      'OAuth realm="Access to team members API", charset="UTF-8"',
+    );
+  }
+
   next(err);
 }
 

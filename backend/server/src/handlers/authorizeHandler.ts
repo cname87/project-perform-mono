@@ -19,14 +19,18 @@ export const authorizeHandler = (
 ) => {
   debug(modulename + ': running authorizeHandler');
 
-  // /* the user will need 'all:testDB' permission if the test database is in use, otherwise 'all:perfromDB' is required */
+  // /* the user will need 'all:testDB' permission if the test database is in use, otherwise 'all:performDB' is required */
   const requiredPermission =
     process.env.DB_MODE === 'test' ? 'all:testDB' : 'all:performDB';
+
+  /* server requests use a grant type of client-credentials and the permissions are contained in auth.scope */
+  const permissionsProperty =
+    req.auth!['gty'] === 'client-credentials' ? 'scope' : 'permissions';
 
   /* this will call next(err) on error => catch with an error handler next */
   const checkPermissions = expressJwtPermissions({
     requestProperty: 'auth',
-    permissionsProperty: 'permissions',
+    permissionsProperty,
   }).check(requiredPermission);
 
   checkPermissions(req, res, next);

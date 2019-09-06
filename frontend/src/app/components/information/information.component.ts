@@ -29,7 +29,7 @@ export class InformationComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private location: Location,
-    private authService: AuthService,
+    private auth: AuthService,
     private logger: NGXLogger,
   ) {
     this.logger.trace(
@@ -40,23 +40,21 @@ export class InformationComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     /* get the component mode from the query parameter */
     this.mode = this.route.snapshot.paramMap.get('mode') as string;
+
     /* set up error only if a mode query parameter of 'error' is passed in */
     if (this.mode === 'error') {
       /* main information */
       this.header = 'Unexpected Error!';
       this.hint = 'Click on a tab link above';
       this.isGoBackVisible = true;
-    } else if (this.mode === 'login') {
+
       /* set up log in only if a mode query parameter of 'login' is passed in */
-      let isAuthenticated = false;
-      this.authService.isAuthenticated.subscribe((value) => {
-        isAuthenticated = value;
-        this.header = isAuthenticated ? 'Log Out' : 'Log In';
-        this.hint = isAuthenticated
-          ? 'Click on the log out button above (or click on a tab link above to return)'
-          : 'Click on the Log In button above';
-        this.isGoBackVisible = false;
-      });
+    } else if (this.mode === 'login') {
+      this.header = this.auth.loggedIn ? 'Log Out' : 'Log In';
+      this.hint = this.auth.loggedIn
+        ? 'Click on the log out button above (or click on a link above)'
+        : 'Click on the Log In button above';
+      this.isGoBackVisible = false;
 
       /* else set up the page not found */
     } else {

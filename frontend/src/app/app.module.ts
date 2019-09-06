@@ -1,5 +1,5 @@
 /* angular */
-import { NgModule, ErrorHandler } from '@angular/core';
+import { NgModule, ErrorHandler, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -35,7 +35,12 @@ import { CallbackComponent } from './components/callback/callback.component';
 import { ProfileComponent } from './components/user-profile/user-profile.component';
 import { LoginComponent } from './components/login/login.component';
 import { NavComponent } from './components/nav/nav.component';
+import { AuthService } from './shared/auth.service/auth.service';
+import { AppLoadService } from './shared/app-load.service/app-load.service';
 
+export function init_app(appLoadService: AppLoadService) {
+  return () => appLoadService.initApp();
+}
 @NgModule({
   imports: [
     /* angular modules */
@@ -76,6 +81,7 @@ import { NavComponent } from './components/nav/nav.component';
   ],
   bootstrap: [AppComponent],
   providers: [
+    AuthService,
     {
       provide: ErrorHandler,
       useClass: ErrorHandlerService,
@@ -84,6 +90,12 @@ import { NavComponent } from './components/nav/nav.component';
     RequestCacheService,
     httpInterceptorProviders,
     { provide: E2E_TESTING, useValue: environment.e2eTesting },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: init_app,
+      deps: [AppLoadService],
+      multi: true,
+    },
   ],
 })
 export class AppModule {}

@@ -22,6 +22,7 @@ class Configuration {
   username?: string;
   password?: string;
   accessToken?: string | (() => string);
+  /* indicates whether or not cross-site Access-Control requests should be made using credentials - not currently set*/
   withCredentials?: boolean;
 
   constructor(configurationParameters: IConfigurationParameters) {

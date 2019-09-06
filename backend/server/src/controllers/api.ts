@@ -274,10 +274,23 @@ export const checkError = (
   next: NextFunction,
 ) => {
   req.app.appLocals.logger.error(modulename + ': Authorization fail');
-  error.statusCode = 403;
+  /* apply code 401 meaning there was a problem with credentials */
+  error.statusCode = 401;
   error.dumped = false;
   next(error);
 };
+
+const authenticate = Router();
+authenticate.use(
+  (_req: Request, res: Response, next: NextFunction) => {
+    /* retype _req to match actual incoming request that has req.app */
+    const req = _req as IRequestApp;
+    /* verify that the user is authorized for the configured database */
+    req.app.appLocals.authenticateHandler(req, res, next);
+  },
+  /* catch authentication errors */
+  checkError,
+);
 
 const authorize = Router();
 authorize.use(
@@ -293,12 +306,7 @@ authorize.use(
 
 router.use(
   '/',
-  (_req: Request, res: Response, next: NextFunction) => {
-    /* retype _req to match actual incoming request that has req.app */
-    const req = _req as IRequestApp;
-    /* verify the jwt token and set req.auth */
-    req.app.appLocals.authenticateHandler(req, res, next);
-  },
+  authenticate,
   authorize,
   /* create connection to the user database model / collection */
   createDbModel,

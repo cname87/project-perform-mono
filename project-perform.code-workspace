@@ -11,6 +11,7 @@
     "files.autoSaveDelay": 60000,
 
     "editor.renderWhitespace": "all",
+    "editor.cursorSurroundingLines": 8,
 
     "javascript.referencesCodeLens.enabled": true,
     "javascript.updateImportsOnFileMove.enabled": "always",

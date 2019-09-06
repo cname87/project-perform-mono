@@ -1,5 +1,5 @@
 <mat-card
-  *ngIf="(profile$ | async).email"
+  *ngIf="(auth.userProfile$ | async)?.email"
   class="profile-card"
 >
 
@@ -16,10 +16,10 @@
           mat-line
           id="profileName"
           #profileName
-          attr.data-displayed="{{(profile$ | async)?.name}}"
+          attr.data-displayed="{{(auth.userProfile$ | async)?.name}}"
 
         >
-          NAME:  {{ (profile$ | async)?.name }}
+          NAME:  {{(auth.userProfile$ | async)?.name}}
         </span>
       </mat-list-item>
 
@@ -28,10 +28,10 @@
           mat-line
           id="profileEmail"
           #profileEmail
-          attr.data-displayed="{{(profile$ | async)?.email}}"
+          attr.data-displayed="{{(auth.userProfile$ | async)?.email}}"
 
         >
-          EMAIL:  {{ (profile$ | async)?.email }}
+          EMAIL:  {{(auth.userProfile$ | async)?.email}}
         </span>
       </mat-list-item>
 

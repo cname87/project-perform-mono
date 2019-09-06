@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 
 import { AuthService } from '../../shared/auth.service/auth.service';
@@ -19,10 +19,7 @@ interface ILink {
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
 })
-export class NavComponent implements OnInit {
-  /* is user authenticated */
-  public isAuthenticated = false;
-
+export class NavComponent {
   /* routerLink links */
   private dashboard = routes.dashboard;
   private membersList = routes.membersList;
@@ -43,15 +40,8 @@ export class NavComponent implements OnInit {
     },
   ];
 
-  constructor(private logger: NGXLogger, private authService: AuthService) {
+  constructor(private logger: NGXLogger, public auth: AuthService) {
     this.logger.trace(`${NavComponent.name}: Starting ${NavComponent.name}`);
-  }
-
-  async ngOnInit() {
-    /* Watch for changes to the isAuthenticated state */
-    this.authService.isAuthenticated.subscribe((value) => {
-      this.isAuthenticated = value;
-    });
   }
 
   trackByFn(_index: number, link: ILink): string | null {

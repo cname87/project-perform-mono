@@ -11,28 +11,27 @@ import {
   findRouterLinks,
   RouterLinkDirectiveStub,
 } from '../../shared/test-helpers';
-import { auth0Config, routes } from '../../config';
+import { routes } from '../../config';
 import { AppRoutingModule } from '../../router/app.routing.module';
 
 /* spy interfaces */
 interface IAuthServiceSpy {
-  getAuth0Client: jasmine.Spy;
-  isAuthenticated: jasmine.Spy;
-  profile: jasmine.Spy;
+  login: jasmine.Spy;
+  loggedIn: boolean;
 }
 
 describe('LoginComponent', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
-    /* stub authService getAuth0Client method - define spy strategy below */
+    /* stub authService login() and logout() method - define spy strategy below */
     let authServiceSpy = jasmine.createSpyObj('authService', [
-      'getAuth0Client',
+      'login',
+      'logout',
     ]);
-    /* stub authService properties isAuthenticated and profile - define values below */
+    /* stub authService property loggedIn - define values below */
     authServiceSpy = {
       ...authServiceSpy,
-      isAuthenticated: {},
-      profile: {},
+      loggedIn: {},
     };
 
     /* set up Testbed */
@@ -92,56 +91,22 @@ describe('LoginComponent', () => {
     constructor(readonly fixture: ComponentFixture<LoginComponent>) {}
   }
 
-  function createSpies(
-    authServiceSpy: IAuthServiceSpy,
-    component: LoginComponent,
-  ) {
-    /* stub getAuth0Client() returning loginDirect & logout */
-    const getAuth0ClientSpy = authServiceSpy.getAuth0Client.and.callFake(() => {
-      return {
-        /* set component profile to allow you test that loginWithRedirect was called */
-        loginWithRedirect: (...args: any[]) => {
-          component.profile = args;
-        },
-        /* set component profile to allow you test that logout was called */
-        logout: (...args: any[]) => {
-          component.profile = args;
-        },
-      };
-    });
-    /* stub isAuthenticated property to stub isAuthenticated.subscribe() */
-    authServiceSpy.isAuthenticated = ({
-      subscribe: () => {
-        component.isAuthenticated = true;
-      },
-    } as any) as jasmine.Spy<InferableFunction>;
-    /* stub profile property to stub profile.subscribe() */
-    authServiceSpy.profile = ({
-      subscribe: () => {
-        component.profile = true;
-      },
-    } as any) as jasmine.Spy<InferableFunction>;
+  function createSpies(authServiceSpy: IAuthServiceSpy) {
+    /* stub login() and logout() */
+    const loginSpy = authServiceSpy.login.and.stub();
+    const logoutSpy = authServiceSpy.login.and.stub();
+
+    /* stub loggedIn property defaulting to true */
+    authServiceSpy.loggedIn = true;
     return {
-      getAuth0ClientSpy,
+      loginSpy,
+      logoutSpy,
     };
   }
 
   function createExpected() {
     return {
       header: 'Team Members',
-      loginResponse: [
-        {
-          appState: {
-            target: routes.loginTarget.path,
-          },
-        },
-      ],
-      logoutResponse: [
-        {
-          client_id: auth0Config.client_id,
-          returnTo: window.location.origin,
-        },
-      ],
       path: [routes.profile.path],
     };
   }
@@ -155,13 +120,11 @@ describe('LoginComponent', () => {
     const injector = fixture.debugElement.injector;
     const authServiceSpy = injector.get<IAuthServiceSpy>(AuthService as any);
 
+    const { loginSpy, logoutSpy } = createSpies(authServiceSpy);
     const expected = createExpected();
 
     /* create the component instance */
     const component = fixture.componentInstance;
-
-    /* get the spies */
-    const { getAuth0ClientSpy } = createSpies(authServiceSpy, component);
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
@@ -170,7 +133,9 @@ describe('LoginComponent', () => {
       fixture,
       component,
       page,
-      getAuth0ClientSpy,
+      authServiceSpy,
+      loginSpy,
+      logoutSpy,
       expected,
     };
   }
@@ -198,26 +163,6 @@ describe('LoginComponent', () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component created');
     });
-
-    /* component property auth0Client should have a loginDirect property supplied by the authService spy */
-    it(' should have getAuth0Client called', async () => {
-      const { component } = await setup();
-      expect(component['auth0Client'].loginWithRedirect).toBeTruthy(
-        'getAuth0Client called',
-      );
-    });
-
-    /* component property isAuthenticated should be set to true */
-    it('should have isAuthenticated set', async () => {
-      const { component } = await setup();
-      expect(component.isAuthenticated).toBeTruthy('isAuthenticated set');
-    });
-
-    /* component property isAuthenticated should be set to true */
-    it('should have profile set', async () => {
-      const { component } = await setup();
-      expect(component.profile).toBeTruthy('profile set');
-    });
   });
 
   describe('page', async () => {
@@ -236,9 +181,8 @@ describe('LoginComponent', () => {
     });
 
     it('should only show login button when not authenticated', async () => {
-      const { fixture, component, page, expected } = await setup();
-      /* set isAuthenticated false (as stubbed authService sets it true) */
-      component.isAuthenticated = false;
+      const { fixture, page, authServiceSpy, expected } = await setup();
+      authServiceSpy.loggedIn = false;
       /* await page update */
       fixture.detectChanges();
       fixture.whenStable();
@@ -251,23 +195,22 @@ describe('LoginComponent', () => {
 
   describe('user actions', async () => {
     it('should allow login', async () => {
-      const { fixture, component, page, expected } = await setup();
-      /* set isAuthenticated false (as stubbed authService sets it true) */
-      component.isAuthenticated = false;
+      const { fixture, page, authServiceSpy, loginSpy } = await setup();
+      authServiceSpy.loggedIn = false;
       /* await page update */
       fixture.detectChanges();
       fixture.whenStable();
       const button = page.loginButton;
       click(button!);
-      expect(component.profile).toEqual(expected.loginResponse, 'logged in');
+      expect(loginSpy).toHaveBeenCalled();
     });
 
     it('should allow logout', async () => {
-      const { component, page, expected } = await setup();
+      const { page, logoutSpy } = await setup();
       /* isAuthenticated is true as stubbed authService sets it true) */
       const button = page.logoutButton;
       click(button!);
-      expect(component.profile).toEqual(expected.logoutResponse, 'logged out');
+      expect(logoutSpy).toHaveBeenCalled();
     });
 
     it('should allow profile to be displayed', async () => {

@@ -150,11 +150,6 @@ describe('NavComponent', () => {
       expect(component).toBeTruthy('component created');
     });
 
-    it('isAuthenticated should be true', async () => {
-      const { component } = await setup();
-      expect(component.isAuthenticated).toBeTruthy('isAuthenticated set');
-    });
-
     it('can get RouterLinks from template', async () => {
       const { page, expected } = await setup();
       expect(page.routerLinks.length).toBe(
