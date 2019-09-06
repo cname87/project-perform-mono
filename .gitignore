@@ -5,11 +5,13 @@
 coverage/
 # ignore all all 'logs/' directories
 logs/
+# ignore all all '.log' files
+**/debug.log
 # ignore all node_module dependencies
 node_modules/
 # ignore all files and directories in all public/ directories
 public/
-# ignore all '/types'mdirectories 
+# ignore all '/types'mdirectories
 types/
 # ignore all compiled 'dist' directories
 dist/

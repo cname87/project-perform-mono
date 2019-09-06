@@ -110,5 +110,7 @@
     "typescript.surveys.enabled": false,
     "vsicons.projectDetection.autoReload": true,
 
+
+    "files.exclude": {}
 	}
 }
