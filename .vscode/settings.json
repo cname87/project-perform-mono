@@ -50,8 +50,11 @@
     "devkit",
     "devtool",
     "dotenv",
+<<<<<<< HEAD
     "eofline",
     "esbenp",
+=======
+>>>>>>> parent of 1a366e5... Minor config changes
     "esnext",
     "etag",
     "fdescribe",
@@ -77,7 +80,10 @@
     "pings",
     "prettier",
     "printf",
+<<<<<<< HEAD
     "processsed",
+=======
+>>>>>>> parent of 1a366e5... Minor config changes
     "promisify",
     "proxyquired",
     "redumped",
@@ -99,7 +105,10 @@
     "unsubscribe",
     "untrack",
     "uuidv",
+<<<<<<< HEAD
     "vscode",
+=======
+>>>>>>> parent of 1a366e5... Minor config changes
     "wtfnode",
     "xdescribe",
     "xframe",

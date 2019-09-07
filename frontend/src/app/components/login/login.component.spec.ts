@@ -17,7 +17,7 @@ import { AppRoutingModule } from '../../router/app.routing.module';
 /* spy interfaces */
 interface IAuthServiceSpy {
   login: jasmine.Spy;
-  loggedIn: boolean;
+  isLoggedIn: boolean;
 }
 
 describe('LoginComponent', () => {
@@ -28,10 +28,10 @@ describe('LoginComponent', () => {
       'login',
       'logout',
     ]);
-    /* stub authService property loggedIn - define values below */
+    /* stub authService property isLoggedIn - define values below */
     authServiceSpy = {
       ...authServiceSpy,
-      loggedIn: {},
+      isLoggedIn: {},
     };
 
     /* set up Testbed */
@@ -96,8 +96,8 @@ describe('LoginComponent', () => {
     const loginSpy = authServiceSpy.login.and.stub();
     const logoutSpy = authServiceSpy.login.and.stub();
 
-    /* stub loggedIn property defaulting to true */
-    authServiceSpy.loggedIn = true;
+    /* stub isLoggedIn property defaulting to true */
+    authServiceSpy.isLoggedIn = true;
     return {
       loginSpy,
       logoutSpy,
@@ -182,7 +182,7 @@ describe('LoginComponent', () => {
 
     it('should only show login button when not authenticated', async () => {
       const { fixture, page, authServiceSpy, expected } = await setup();
-      authServiceSpy.loggedIn = false;
+      authServiceSpy.isLoggedIn = false;
       /* await page update */
       fixture.detectChanges();
       fixture.whenStable();
@@ -196,7 +196,7 @@ describe('LoginComponent', () => {
   describe('user actions', async () => {
     it('should allow login', async () => {
       const { fixture, page, authServiceSpy, loginSpy } = await setup();
-      authServiceSpy.loggedIn = false;
+      authServiceSpy.isLoggedIn = false;
       /* await page update */
       fixture.detectChanges();
       fixture.whenStable();

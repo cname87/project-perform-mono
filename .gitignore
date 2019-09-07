@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 
 ### Windows ###
 # Created by https://www.gitignore.io/api/windows
@@ -133,6 +134,22 @@ typings/
 
 ### security-relevant ignores ###
 
+=======
+# ignore istanbul report directories
+.nyc_output/
+# ignore istanbul coverage directories
+coverage/
+# ignore all all 'logs/' directories
+logs/
+# ignore all node_module dependencies
+node_modules/
+# ignore all files and directories in all public/ directories
+public/
+# ignore all '/types'mdirectories 
+types/
+# ignore all compiled 'dist' directories
+dist/
+>>>>>>> parent of 1a366e5... Minor config changes
 # ignore all credential certs directories
 **/certs/
 # ignore all .env files

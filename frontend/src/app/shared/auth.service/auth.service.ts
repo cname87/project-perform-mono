@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
-import createAuth0Client from '@auth0/auth0-spa-js';
+import { Injectable, InjectionToken, Inject } from '@angular/core';
+import originalCreateAuth0Client from '@auth0/auth0-spa-js';
 import Auth0Client from '@auth0/auth0-spa-js/dist/typings/Auth0Client';
 
 import {
   from,
-  of,
   Observable,
   BehaviorSubject,
-  combineLatest,
   throwError,
+  combineLatest,
+  of,
 } from 'rxjs';
 import { tap, catchError, concatMap, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -33,27 +33,42 @@ import { auth0Config, IUserProfile } from '../../config';
  * 4. The isLogged status sets the views E.g. the logout button shows when isLogged is true.
  * 5. On clicking logout the authentication service is informed and the application is reloaded.
  */
+
+/* inject auth0-spa-js create auth0 client instance function via DI for ease of testing */
+type TCreateAuth0Client = (options: Auth0ClientOptions) => Promise<Auth0Client>;
+export const CREATE_AUTH0_CLIENT = new InjectionToken<TCreateAuth0Client>(
+  'createAuth0Client',
+  {
+    providedIn: 'root',
+    factory: () => originalCreateAuth0Client,
+  },
+);
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private router: Router, private logger: NGXLogger) {
+  constructor(
+    private router: Router,
+    private logger: NGXLogger,
+    @Inject(CREATE_AUTH0_CLIENT) private createAuth0Client: TCreateAuth0Client,
+  ) {
     this.logger.trace(`${AuthService.name}: Starting ${AuthService.name}`);
   }
 
   /* holds either the profile of the user logged in or false (or null) */
-  loggedIn: any = null;
+  isLoggedIn: boolean | null = null;
 
   /* create a singleton observable of the Auth0 client instance */
-  private auth0Client$ = from(createAuth0Client(auth0Config)).pipe(
+  private auth0Client$ = from(this.createAuth0Client(auth0Config)).pipe(
     shareReplay(1),
     catchError((err) => throwError(err)),
   );
 
   /* called by AuthGuard to check live status */
-  isAuthenticated$ = this.auth0Client$.pipe(
+  public isAuthenticated$ = this.auth0Client$.pipe(
     concatMap((client: Auth0Client) => from(client.isAuthenticated())),
-    tap((res) => (this.loggedIn = res)),
+    tap((res) => (this.isLoggedIn = res)),
   );
 
   private handleRedirectCallback$ = this.auth0Client$.pipe(
@@ -61,8 +76,9 @@ export class AuthService {
   );
 
   private userProfileSubject$ = new BehaviorSubject<IUserProfile | null>(null);
-  userProfile$ = this.userProfileSubject$.asObservable();
+  public userProfile$ = this.userProfileSubject$.asObservable();
 
+  /* called to set the userProfile$ observable */
   private getUser$(options?: any): Observable<IUserProfile> {
     return this.auth0Client$.pipe(
       concatMap((client: Auth0Client) => from(client.getUser(options))),
@@ -70,22 +86,20 @@ export class AuthService {
     );
   }
 
+  /* called on app initialization - must set userProfile$ and isLoggedIn */
   localAuthSetup() {
-    /* set up local authentication streams */
     const checkAuth$ = this.isAuthenticated$.pipe(
+      /* concatmap ensures getUser observable is subscribed if authenticated */
       concatMap((loggedIn: boolean) => {
         if (loggedIn) {
-          /* if authenticated, get user and set in user profile observable */
+          /* if authenticated, get user and set userProfile$ */
           return this.getUser$();
         }
-        /* if not authenticated, return stream that emits 'false' */
         return of(loggedIn);
       }),
     );
     checkAuth$.subscribe((response: { [key: string]: any } | boolean) => {
-      /* if authenticated, response will be user object */
-      /* if not authenticated, response will be 'false' */
-      this.loggedIn = !!response;
+      this.isLoggedIn = !!response;
     });
   }
 
@@ -100,27 +114,22 @@ export class AuthService {
 
   handleAuthCallback() {
     /* called when app reloads after user logs in with Auth0 */
-    let targetRoute: string; // Path to redirect to after login processsed
+    let targetRoute: string;
     const authComplete$ = this.handleRedirectCallback$.pipe(
       // Have client, now call method to handle auth callback redirect
       tap((cbRes) => {
-        /* result has the property appState which was set when calling login in the loginComponent */
-        /* if appState was not set then route to the base route */
+        /* set target redirect route from callback results */
         targetRoute =
           cbRes.appState && cbRes.appState.target ? cbRes.appState.target : '/';
       }),
+      /* concatmap ensures getUser and isAuthenticated$ observables are subscribed */
       concatMap(() => {
-        // Redirect callback complete; get user and login status
+        /* set userProfile$ and isLoggedIn status */
         return combineLatest([this.getUser$(), this.isAuthenticated$]);
       }),
     );
-
-    /* subscribe to the authentication completion observable*/
-    /* the response will be an array of user and login status */
     authComplete$.subscribe(([_user, _loggedIn]) => {
-      this.logger.trace(
-        `${AuthService.name}: Redirecting following authentication...`,
-      );
+      /* redirect to target route */
       this.router.navigate([targetRoute]);
     });
   }
