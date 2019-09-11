@@ -5,12 +5,12 @@
 >
   <a
     mat-tab-link
-    [ngClass]="{'item-active' : auth.isLoggedIn && rla.isActive}"
+    [ngClass]="{'item-active' : isLoggedIn && rla.isActive}"
     *ngFor="let link of links trackBy: trackByFn"
     [routerLink]="link.path"
     routerLinkActive #rla="routerLinkActive"
-    [active]="auth.isLoggedIn && rla.isActive"
-    [disabled]="!auth.isLoggedIn || link.disabled"
+    [active]="isLoggedIn && rla.isActive"
+    [disabled]="!isLoggedIn || link.disabled"
   >
     {{ link.display }}
   </a>

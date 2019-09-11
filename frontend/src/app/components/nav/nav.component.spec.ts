@@ -16,21 +16,25 @@ import { AppRoutingModule } from '../../router/app.routing.module';
 
 /* spy interfaces */
 interface IAuthServiceSpy {
-  isAuthenticated: jasmine.Spy;
+  isLoggedIn: boolean;
 }
+let authService: any = {};
 
 describe('NavComponent', () => {
-  /* setup function run by each sub test suite*/
-  async function mainSetup() {
+  /* create the base mocks that will replace services */
+  function createBaseMocks(isAuthenticated = true) {
     /* stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
-    /* stub authService - define spy strategy below */
-    let authServiceSpy = jasmine.createSpyObj('authService', ['dummy']);
-    /* stub authService property isAuthenticated - define values below */
-    authServiceSpy = {
-      ...authServiceSpy,
-      isAuthenticated: {},
+    const authServiceSpy = {
+      isLoggedIn: isAuthenticated,
     };
+    return {
+      loggerSpy,
+      authServiceSpy,
+    };
+  }
+  async function mainSetup(isAuthenticated = true) {
+    const { loggerSpy, authServiceSpy } = createBaseMocks(isAuthenticated);
 
     /* set up Testbed */
     await TestBed.configureTestingModule({
@@ -38,6 +42,7 @@ describe('NavComponent', () => {
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
+        /*  stub AuthService with the MockAuthService helper */
         { provide: AuthService, useValue: authServiceSpy },
         { provide: NGXLogger, useValue: loggerSpy },
       ],
@@ -82,20 +87,6 @@ describe('NavComponent', () => {
     constructor(readonly fixture: ComponentFixture<NavComponent>) {}
   }
 
-  function createSpies(
-    authServiceSpy: IAuthServiceSpy,
-    component: NavComponent,
-  ) {
-    /* stub isAuthenticated property to stub isAuthenticated.subscribe() */
-    authServiceSpy.isAuthenticated = ({
-      subscribe: (fn: (value: boolean) => void) => {
-        fn(true);
-        return component;
-      },
-    } as any) as jasmine.Spy<InferableFunction>;
-    return {};
-  }
-
   function createExpected() {
     return {
       numLinks: 3,
@@ -109,15 +100,12 @@ describe('NavComponent', () => {
 
     /* get the injected instances */
     const injector = fixture.debugElement.injector;
-    const authServiceSpy = injector.get<IAuthServiceSpy>(AuthService as any);
+    authService = injector.get<IAuthServiceSpy>(AuthService as any);
 
     const expected = createExpected();
 
     /* create the component instance */
     const component = fixture.componentInstance;
-
-    /* get the spies */
-    const {} = createSpies(authServiceSpy, component);
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
@@ -126,20 +114,21 @@ describe('NavComponent', () => {
       fixture,
       component,
       page,
+      authService,
       expected,
     };
   }
 
   /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
-  async function preSetup() {
-    await mainSetup();
+  async function preSetup(isAuthenticated = true) {
+    await mainSetup(isAuthenticated);
     const testVars = await createComponent();
     return testVars;
   }
 
   /* setup function run by each it test function that runs tests after the component and view are fully established */
-  async function setup() {
-    const testVars = await preSetup();
+  async function setup(isAuthenticated = true) {
+    const testVars = await preSetup(isAuthenticated);
     /* initiate ngOnInit and view changes etc */
     testVars.fixture.detectChanges();
     await testVars.fixture.whenStable();
@@ -189,7 +178,8 @@ describe('NavComponent', () => {
       fixture.ngZone!.run(() => {
         click(dashboardDe);
       });
-      await fixture.detectChanges();
+      fixture.detectChanges();
+      await fixture.whenStable();
 
       /* it attempts to route => dummy path configured above */
       expect(dashboardLink.navigatedTo).toBe(
@@ -201,20 +191,49 @@ describe('NavComponent', () => {
       expect(page.routerLinks[1].navigatedTo).toBe(null);
     });
 
+    it('when not authenticated can click Dashboard link but not route', async () => {
+      /* set to not authenticated */
+      const { component, fixture, page } = await setup(false);
+      const dashboardDe = page.anchorDebugElements[0];
+      const dashboardLink = page.routerLinks[0];
+
+      /* disabled attribute should be true */
+      expect(dashboardDe.attributes['ng-reflect-disabled']).toBe('true');
+      expect(dashboardLink.navigatedTo).toBeNull('should not have navigated yet');
+
+      /* note: clicking on a disabled html element throws an error => using the debug element */
+      /* ngZone needed to avoid an error */
+      fixture.ngZone!.run(() => {
+        click(dashboardDe);
+      });
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      /* routerLink gets the route but it does not attempt to route (as disabled) => no dummy path configured above */
+      expect(dashboardLink.navigatedTo).toEqual(
+        `/${component['dashboard'].path}`,
+        'dashboard route passed to routerLink',
+      );
+
+      /* test memberslist not routed */
+      expect(page.routerLinks[1].navigatedTo).toBe(null);
+    });
+
     it('can click Members link in template', async () => {
       const { component, fixture, page } = await setup();
       const membersLinkDe = page.anchorDebugElements[1];
       const membersLink = page.routerLinks[1];
 
       /* link is not disabled */
-      expect(await membersLinkDe.attributes['ng-reflect-disabled']).toBeNull;
+      expect(membersLinkDe.attributes['ng-reflect-disabled']).toBeNull;
       expect(membersLink.navigatedTo).toBeNull('should not have navigated yet');
 
       /* ngZone needed to avoid an error */
       fixture.ngZone!.run(() => {
         click(membersLinkDe);
       });
-      await fixture.detectChanges();
+      fixture.detectChanges();
+      await fixture.whenStable();
 
       /* it attempts to route => dummy path configured above */
       expect(membersLink.navigatedTo).toBe(
@@ -232,7 +251,7 @@ describe('NavComponent', () => {
       const detailLink = page.routerLinks[2];
 
       /* disabled attribute should be true */
-      expect(await detailDe.attributes['ng-reflect-disabled']).toBe('true');
+      expect(detailDe.attributes['ng-reflect-disabled']).toBe('true');
       expect(detailLink.navigatedTo).toBeNull('should not have navigated yet');
 
       /* note: clicking on a disabled html element throws an error => using the debug element */
@@ -240,7 +259,7 @@ describe('NavComponent', () => {
       fixture.ngZone!.run(() => {
         click(detailDe);
       });
-      await fixture.detectChanges();
+      fixture.detectChanges();
       await fixture.whenStable();
 
       /* routerLink gets the route but it does not attempt to route (as disabled) => no dummy path configured above */

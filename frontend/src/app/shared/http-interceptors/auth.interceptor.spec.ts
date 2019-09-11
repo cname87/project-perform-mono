@@ -52,13 +52,12 @@ describe('AuthInterceptor', () => {
    * Get the service, initialize it, set test variables.
    */
   async function getService() {
-
     const authInterceptor: AuthInterceptor = TestBed.get(
       AuthInterceptor as Type<AuthInterceptor>,
     );
-    const authService: AuthService = TestBed.get(
-      AuthService as Type<AuthService>,
-    );
+    const authService: AuthService = TestBed.get(AuthService as Type<
+      AuthService
+    >);
 
     return {
       authInterceptor,
@@ -100,9 +99,7 @@ describe('AuthInterceptor', () => {
       };
       const req = new HttpRequest('GET', 'www.test.com');
       try {
-        await authInterceptor
-        .intercept(req, nextSpy)
-        .toPromise();
+        await authInterceptor.intercept(req, nextSpy).toPromise();
       } catch (err) {
         expect(err).toEqual('testError');
       }

@@ -23,7 +23,7 @@
     // Test frontend - use for frontend unit test debug
     {
       /*
-      Runs 'npm run test, i.e. ng test, first which compiles the front end and opens chrome and connects to the Karma runner, and THEN starts Chrome and connects to the Karma runner.  Debug should work on the second session.
+      Runs 'npm run test, i.e. ng test, first which compiles the front end and opens chrome and connects to the Karma runner, and THEN starts Chrome again and connects to the Karma runner.  Debug should work on the second session.
       Run 'npm run test' manually first if problems with preLaunch task.
       Close all open Chrome instances if Chrome won't start.
        */

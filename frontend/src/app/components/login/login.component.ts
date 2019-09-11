@@ -16,9 +16,19 @@ import { AuthService } from '../../shared/auth.service/auth.service';
 export class LoginComponent {
   header = 'Team Members';
 
-  constructor(private logger: NGXLogger, public auth: AuthService) {
+  constructor(private logger: NGXLogger, private auth: AuthService) {
     this.logger.trace(
       `${LoginComponent.name}: Starting ${LoginComponent.name}`,
     );
+  }
+
+  get isLoggedIn() {
+    return this.auth.isLoggedIn;
+  }
+  get login() {
+    return this.auth.login;
+  }
+  get logout() {
+    return this.auth.logout;
   }
 }

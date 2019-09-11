@@ -40,8 +40,12 @@ export class NavComponent {
     },
   ];
 
-  constructor(private logger: NGXLogger, public auth: AuthService) {
+  constructor(private logger: NGXLogger, private auth: AuthService) {
     this.logger.trace(`${NavComponent.name}: Starting ${NavComponent.name}`);
+  }
+
+  get isLoggedIn() {
+    return this.auth.isLoggedIn;
   }
 
   trackByFn(_index: number, link: ILink): string | null {
