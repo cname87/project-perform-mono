@@ -1,23 +1,20 @@
 import { APP_BASE_HREF, Location } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { ProfileComponent } from './user-profile.component';
 import { AuthService } from '../../shared/auth.service/auth.service';
+import { MockAuthService } from '../../shared/mocks/mock-auth.service';
+
 import {
   findCssOrNot,
   ActivatedRoute,
   ActivatedRouteStub,
   click,
 } from '../../shared/test-helpers';
-
-/* spy interfaces */
-interface IAuthServiceSpy {
-  getAuth0Client: jasmine.Spy;
-  isAuthenticated: jasmine.Spy;
-  profile: jasmine.Spy;
-}
 
 interface ILocationSpy {
   back: jasmine.Spy;
@@ -26,28 +23,33 @@ interface ILocationSpy {
 describe('ProfileComponent', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
-    /* stub authService profile property - define spy strategy below */
-    let authServiceSpy = jasmine.createSpyObj('authService', ['dummy']);
-    authServiceSpy = {
-      ...authServiceSpy,
-      profile: {},
-    };
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
+
     /* stub Location service */
     const locationSpy = jasmine.createSpyObj('location', ['back']);
     /* stub ActivatedRoute with a configurable path parameter */
     const activatedRouteStub = new ActivatedRouteStub(0);
 
+    /* note that AuthService is replaced by a mock */
+
     /* set up Testbed */
     await TestBed.configureTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, RouterTestingModule],
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
-        { provide: AuthService, useValue: authServiceSpy },
         { provide: Location, useValue: locationSpy },
         { provide: ActivatedRoute, useValue: activatedRouteStub },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
+
+    TestBed.overrideComponent(ProfileComponent, {
+      set: {
+        providers: [{ provide: AuthService, useClass: MockAuthService }],
+      },
+    });
   }
 
   /* get key DOM elements */
@@ -68,20 +70,15 @@ describe('ProfileComponent', () => {
     constructor(readonly fixture: ComponentFixture<ProfileComponent>) {}
   }
 
-  function createSpies(
-    authServiceSpy: IAuthServiceSpy,
-    locationSpy: ILocationSpy,
-  ) {
-    /* stub profile property to stub profile.subscribe() */
-    authServiceSpy.profile = new BehaviorSubject<any>({
+  function createSpies(authService: AuthService, locationSpy: ILocationSpy) {
+    /* mock authService userProfile$ property */
+    authService.userProfile$ = new BehaviorSubject<any>({
       email: 'testProfile.email',
       name: 'testProfile.name',
     }) as any;
-    const profileSpy = authServiceSpy.profile;
 
     const backSpy = locationSpy.back.and.stub();
     return {
-      profileSpy,
       backSpy,
     };
   }
@@ -97,14 +94,20 @@ describe('ProfileComponent', () => {
     const fixture = TestBed.createComponent(ProfileComponent);
 
     /* get the injected instances */
-    const injector = fixture.debugElement.injector;
-    const authServiceSpy = injector.get<IAuthServiceSpy>(AuthService as any);
+    // const injector = fixture.debugElement.injector;
+    // const authService = injector.get<AuthService>(AuthService as any);
     const locationSpy = fixture.debugElement.injector.get<ILocationSpy>(
       Location as any,
     );
     const activatedRouteStub = fixture.debugElement.injector.get<
       ActivatedRouteStub
     >(ActivatedRoute as any);
+
+    const authService = fixture.debugElement.injector.get<AuthService>(
+      AuthService as any,
+    );
+    // const testBed = getTestBed();
+    // const authService = testBed.get(AuthService);
 
     /* get the expected values */
     const expected = createExpected();
@@ -113,7 +116,7 @@ describe('ProfileComponent', () => {
     const component = fixture.componentInstance;
 
     /* get the spies */
-    const { profileSpy, backSpy } = createSpies(authServiceSpy, locationSpy);
+    const { backSpy } = createSpies(authService, locationSpy);
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
@@ -122,7 +125,6 @@ describe('ProfileComponent', () => {
       fixture,
       component,
       page,
-      profileSpy,
       backSpy,
       activatedRouteStub,
       expected,

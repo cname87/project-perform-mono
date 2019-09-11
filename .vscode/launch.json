@@ -47,7 +47,7 @@
         "/": "${workspaceFolder}/frontend/dist/",
       },
       "sourceMapPathOverrides": {
-        "/./*": "${workspaceFolder}/frontend/*",
+        "./*": "${workspaceFolder}/frontend/*",
         "webpack:///./*": "${workspaceFolder}/frontend/*",
       },
       "sourceMaps": true,

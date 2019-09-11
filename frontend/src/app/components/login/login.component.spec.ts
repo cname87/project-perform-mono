@@ -1,6 +1,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { LoginComponent } from './login.component';
@@ -17,12 +18,16 @@ import { AppRoutingModule } from '../../router/app.routing.module';
 /* spy interfaces */
 interface IAuthServiceSpy {
   login: jasmine.Spy;
+  logout: jasmine.Spy;
   isLoggedIn: boolean;
 }
 
 describe('LoginComponent', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
+
     /* stub authService login() and logout() method - define spy strategy below */
     let authServiceSpy = jasmine.createSpyObj('authService', [
       'login',
@@ -31,7 +36,7 @@ describe('LoginComponent', () => {
     /* stub authService property isLoggedIn - define values below */
     authServiceSpy = {
       ...authServiceSpy,
-      isLoggedIn: {},
+      isLoggedIn: true,
     };
 
     /* set up Testbed */
@@ -41,6 +46,7 @@ describe('LoginComponent', () => {
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: AuthService, useValue: authServiceSpy },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     })
       .overrideModule(AppModule, {
@@ -94,7 +100,7 @@ describe('LoginComponent', () => {
   function createSpies(authServiceSpy: IAuthServiceSpy) {
     /* stub login() and logout() */
     const loginSpy = authServiceSpy.login.and.stub();
-    const logoutSpy = authServiceSpy.login.and.stub();
+    const logoutSpy = authServiceSpy.logout.and.stub();
 
     /* stub isLoggedIn property defaulting to true */
     authServiceSpy.isLoggedIn = true;
@@ -173,7 +179,7 @@ describe('LoginComponent', () => {
 
     it('should show all but login button when authenticated', async () => {
       const { page, expected } = await setup();
-      /* isAuthenticated is true as stubbed authService sets it true) */
+      /* isLoggedIn is true as stubbed authService sets it true) */
       expect(page.header!.innerText).toBe(expected.header, 'header');
       expect(page.logoutButton).toBeTruthy('logout button');
       expect(page.profileButton).toBeTruthy('profile button');
@@ -207,7 +213,7 @@ describe('LoginComponent', () => {
 
     it('should allow logout', async () => {
       const { page, logoutSpy } = await setup();
-      /* isAuthenticated is true as stubbed authService sets it true) */
+      /* isLoggedIn is true as stubbed authService sets it true) */
       const button = page.logoutButton;
       click(button!);
       expect(logoutSpy).toHaveBeenCalled();
@@ -215,7 +221,7 @@ describe('LoginComponent', () => {
 
     it('should allow profile to be displayed', async () => {
       const { page, expected } = await setup();
-      /* isAuthenticated is true as stubbed authService sets it true) */
+      /* isLoggedIn is true as stubbed authService sets it true) */
 
       /* get the routerLink directive instance */
       const routerLink = page.routerLinks[0];

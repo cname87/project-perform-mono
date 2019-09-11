@@ -1,5 +1,6 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { MessagesComponent } from './messages.component';
@@ -21,6 +22,8 @@ interface IMessageServiceStub {
 describe('messagesComponent', () => {
   /* setup function run by each 'it' test suite */
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create stub instances with spies for injection */
     const messageServiceStub: IMessageServiceStub = {
       messages: [],
@@ -45,6 +48,7 @@ describe('messagesComponent', () => {
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' },
         { provide: MessageService, useValue: messageServiceStub },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
   }

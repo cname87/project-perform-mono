@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { APP_BASE_HREF } from '@angular/common';
+import { NGXLogger } from 'ngx-logger';
 
 import {
   MembersDataProvider,
@@ -12,7 +13,6 @@ import { asyncData, asyncError } from '../shared/test-helpers';
 import { membersConfiguration } from './configuration';
 import { ICount } from './models/count';
 import { AppModule } from '../app.module';
-import { AuthService } from '../shared/auth.service/auth.service';
 
 interface IHttpClientStub {
   post: jasmine.Spy;
@@ -23,6 +23,8 @@ interface IHttpClientStub {
 
 describe('MembersDataProvider', () => {
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create stub instances with spies for injection */
     const mockMemberWithoutId = { name: 'testName' };
     const httpClientStub: IHttpClientStub = {
@@ -66,17 +68,6 @@ describe('MembersDataProvider', () => {
         },
       ),
     };
-    /* create authService spy - need to stub a dummy method */
-    let authServiceSpy = jasmine.createSpyObj('authService', ['dummy']);
-    /* stub authService property token - define value below */
-    authServiceSpy = {
-      ...authServiceSpy,
-      token: {
-        subscribe: (fn: (value: string) => void) => {
-          fn('testToken');
-        },
-      },
-    };
 
     await TestBed.configureTestingModule({
       imports: [AppModule],
@@ -84,7 +75,7 @@ describe('MembersDataProvider', () => {
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: HttpClient, useValue: httpClientStub },
-        { provide: AuthService, useValue: authServiceSpy },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
 
@@ -124,13 +115,7 @@ describe('MembersDataProvider', () => {
       'Http method called with configured url',
     );
 
-    /* last parameter is options object */
-    expect(argsArray[argsArray.length - 1].withCredentials).toEqual(
-      membersConfiguration.withCredentials,
-      'Http method called with configured withCredentials option',
-    );
-
-    /* test options.headers */
+    /* create expected headers to test against */
     let headers = membersConfiguration.defaultHeaders;
     headers = headers.set('Accept', 'application/json');
     /* only methods 'post' and 'put' set Content-Type */
@@ -139,12 +124,6 @@ describe('MembersDataProvider', () => {
       headers = headers.set('Content-Type', 'application/json');
       contentType = 'application/json';
     }
-    /* set Authorization header - JWT token */
-    headers = headers.set('Authorization', 'Bearer testToken');
-    expect(argsArray[argsArray.length - 1].headers).toEqual(
-      headers,
-      'Http method called with configured headers',
-    );
     expect(argsArray[argsArray.length - 1].headers.get('Accept')).toBe(
       'application/json',
       'Http method called with configured header Accept option',
@@ -152,10 +131,6 @@ describe('MembersDataProvider', () => {
     expect(argsArray[argsArray.length - 1].headers.get('Content-Type')).toBe(
       contentType,
       'Http method called with configured header Content-Type option',
-    );
-    expect(argsArray[argsArray.length - 1].headers.get('Authorization')).toBe(
-      'Bearer testToken',
-      'Http method called with configured header Authorization option',
     );
   }
 
@@ -239,7 +214,7 @@ describe('MembersDataProvider', () => {
       });
 
       /* test common error paths */
-      // testErrors('addMember', 'post');
+      testErrors('addMember', 'post');
     };
   }
 

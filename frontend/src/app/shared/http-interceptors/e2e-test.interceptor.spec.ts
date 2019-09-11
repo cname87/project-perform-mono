@@ -5,6 +5,7 @@ import { NGXLogger } from 'ngx-logger';
 import { AppModule } from '../../app.module';
 import { E2eTestInterceptor } from './e2e-test.interceptor';
 import { errorMember, errorTestUrls, E2E_TESTING } from '../../config';
+import { Type } from '@angular/core';
 
 interface INgxLoggerSpy {
   trace: jasmine.Spy;
@@ -63,7 +64,9 @@ describe('E2eTestInterceptor', () => {
    */
   async function getService() {
     /* create the service */
-    const e2eTestInterceptor = TestBed.get(E2eTestInterceptor);
+    const e2eTestInterceptor: E2eTestInterceptor = TestBed.get(
+      E2eTestInterceptor as Type<E2eTestInterceptor>,
+    );
 
     /* get the injected instances */
     const ngxLoggerSpy = TestBed.get(NGXLogger) as INgxLoggerSpy;
@@ -96,7 +99,8 @@ describe('E2eTestInterceptor', () => {
   describe('has a intercept function that', async () => {
     it('traces that it has been called', async () => {
       const { e2eTestInterceptor, traceLoggerSpy, nextSpy } = await setup();
-      e2eTestInterceptor.intercept({}, nextSpy);
+      const req: any = {};
+      e2eTestInterceptor.intercept(req, nextSpy);
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'E2eTestInterceptor: intercept called',
       );
@@ -109,7 +113,7 @@ describe('E2eTestInterceptor', () => {
         nextSpy,
         nextHandleSpy,
       } = await setup(false);
-      const req = {
+      const req: any = {
         dummy: 'dummy',
       };
       const loggerCallsStart = traceLoggerSpy.calls.count();
@@ -130,7 +134,7 @@ describe('E2eTestInterceptor', () => {
         nextSpy,
         nextHandleSpy,
       } = await setup(true);
-      const req = {
+      const req: any = {
         method: 'POST',
         urlWithParams: errorTestUrls.post.slice('POST:'.length),
         body: {
@@ -156,7 +160,7 @@ describe('E2eTestInterceptor', () => {
         nextHandleSpy,
         error998,
       } = await setup(true);
-      const req = {
+      const req: any = {
         method: 'POST',
         urlWithParams: errorTestUrls.post.slice('POST:'.length),
         body: {
@@ -190,7 +194,7 @@ describe('E2eTestInterceptor', () => {
         nextHandleSpy,
         error999,
       } = await setup(true);
-      const req = {
+      const req: any = {
         method: 'GET',
         urlWithParams: errorTestUrls.getOne.slice('GET:'.length),
         body: {
@@ -223,7 +227,7 @@ describe('E2eTestInterceptor', () => {
         nextSpy,
         nextHandleSpy,
       } = await setup(true);
-      const req = {
+      const req: any = {
         method: 'DELETE',
         urlWithParams: errorTestUrls.delete.slice('DELETE:'.length),
         body: {

@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF, Location } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { InformationComponent } from './information.component';
@@ -12,18 +13,19 @@ import {
   click,
 } from '../../shared/test-helpers';
 import { AuthService } from '../../shared/auth.service/auth.service';
-import { BehaviorSubject } from 'rxjs';
 
 interface ILocationSpy {
   back: jasmine.Spy;
 }
 
 interface IAuthServiceSpy {
-  isAuthenticated: jasmine.Spy;
+  isLoggedIn: boolean;
 }
 describe('InformationComponent', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* stub ActivatedRoute with a configurable path parameter */
     const activatedRouteStub = new ActivatedRouteStub('notfound');
     /* stub Location service */
@@ -32,7 +34,7 @@ describe('InformationComponent', () => {
     let authServiceSpy = jasmine.createSpyObj('authService', ['dummy']);
     authServiceSpy = {
       ...authServiceSpy,
-      isAuthenticated: {},
+      isLoggedIn: true,
     };
 
     /* set up Testbed */
@@ -47,6 +49,7 @@ describe('InformationComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteStub },
         { provide: Location, useValue: locationSpy },
         { provide: AuthService, useValue: authServiceSpy },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
   }
@@ -73,10 +76,8 @@ describe('InformationComponent', () => {
   ) {
     const backSpy = locationSpy.back.and.stub();
 
-    authServiceSpy.isAuthenticated = new BehaviorSubject<any>(
-      isAuthenticated,
-    ) as any;
-    const isAuthenticatedSpy = authServiceSpy.isAuthenticated;
+    authServiceSpy.isLoggedIn = isAuthenticated;
+    const isAuthenticatedSpy = authServiceSpy.isLoggedIn;
 
     return {
       backSpy,
@@ -237,7 +238,7 @@ describe('InformationComponent', () => {
       /* default constructor member shown */
       expect(page.header.innerText).toBe('LOG OUT');
       expect(page.hint.innerText).toBe(
-        'Click on the log out button above (or click on a tab link above to return)',
+        'Click on the log out button above (or click on a link above)',
       );
     });
 

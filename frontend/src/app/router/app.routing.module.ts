@@ -11,7 +11,7 @@ import { AuthGuard } from './guards/auth.guard';
 
 const appRoutes: Routes = [
   {
-    /* default path */
+    /* default path if no route supplied */
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full',
@@ -34,7 +34,7 @@ const appRoutes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    /* shows 1 member detail */
+    /* shows a member's detail */
     path: 'detail/:id',
     component: MemberDetailComponent,
     canActivate: [AuthGuard],
@@ -51,7 +51,7 @@ const appRoutes: Routes = [
     component: InformationComponent,
   },
   {
-    /* shows information page defaulting to page not found */
+    /* otherwise shows the information page, defaulting to page not found */
     path: '**',
     component: InformationComponent,
   },

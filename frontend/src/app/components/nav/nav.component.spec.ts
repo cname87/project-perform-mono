@@ -1,6 +1,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { NavComponent } from './nav.component';
@@ -21,6 +22,8 @@ interface IAuthServiceSpy {
 describe('NavComponent', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* stub authService - define spy strategy below */
     let authServiceSpy = jasmine.createSpyObj('authService', ['dummy']);
     /* stub authService property isAuthenticated - define values below */
@@ -36,6 +39,7 @@ describe('NavComponent', () => {
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: AuthService, useValue: authServiceSpy },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     })
       .overrideModule(AppModule, {

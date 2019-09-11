@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { MemberInputComponent } from './member-input.component';
@@ -9,6 +10,8 @@ import { findCssOrNot, sendInput } from '../../shared/test-helpers';
 describe('memberInputComponent', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* set up Testbed */
     await TestBed.configureTestingModule({
       imports: [
@@ -18,6 +21,7 @@ describe('memberInputComponent', () => {
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
   }

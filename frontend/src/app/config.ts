@@ -31,6 +31,9 @@ const loginPage = {
 const loginTarget = {
   path: '/dashboard',
 };
+const callback = {
+  path: '/callback',
+};
 export const routes = {
   dashboard,
   membersList,
@@ -38,6 +41,7 @@ export const routes = {
   profile,
   loginPage,
   loginTarget,
+  callback,
 };
 
 /* import to access variable that informs if E2e build in use */

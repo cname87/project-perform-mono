@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { APP_BASE_HREF } from '@angular/common';
+import { NGXLogger } from 'ngx-logger';
 
 import { MembersService } from './members.service';
 import { MessageService } from '../message-service/message.service';
@@ -32,6 +33,8 @@ interface IMessageServiceStub {
 
 describe('MembersService', () => {
   async function mainSetup(mockMembers = members, isTesting = false) {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create stub instances with spies for injection */
     const membersApiStub: IMembersApiStub = {
       getMembers: jasmine.createSpy('getMembers').and.callFake(
@@ -137,6 +140,7 @@ describe('MembersService', () => {
         { provide: MessageService, useValue: messageServiceStub },
         { provide: MembersDataProvider, useValue: membersApiStub },
         { provide: E2E_TESTING, useValue: isTesting },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
 

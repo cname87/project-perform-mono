@@ -4,7 +4,6 @@ import {
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   Router,
-  UrlTree,
 } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
@@ -29,17 +28,22 @@ export class AuthGuard implements CanActivate {
     this.logger.trace(`${AuthGuard.name}: Starting ${AuthGuard.name}`);
   }
 
+  /**
+   * Checks if the user is authenticated by calling the relevant property of the AuthService and allows (returns Observable(true) if authenticated or routes to the login page and returns Observable(false) otherwise.
+   * @param _next ActivatedRouteSnapshot contains the future route that will be activated  should you pass through the guard check
+   * @param _state RouterStateSnapshot contains the future RouterState of the application should you pass through the guard check
+   */
   canActivate(
-    /* The ActivatedRouteSnapshot contains the future route that will be activated and the RouterStateSnapshot contains the future RouterState of the application, should you pass through the guard check. */
     _next: ActivatedRouteSnapshot,
     _state: RouterStateSnapshot,
-  ): Observable<boolean> | Promise<boolean | UrlTree> | boolean {
+  ): Observable<boolean> {
     this.logger.trace(`${AuthGuard.name}: Running canActivate()`);
     return this.auth.isAuthenticated$.pipe(
       tap((isLoggedIn: boolean) => {
         if (!isLoggedIn) {
-          /* redirect to login page and then back to this page */
-          return this.router.navigate([routes.loginPage.path]);
+          /* redirect to login page */
+          this.router.navigate([routes.loginPage.path]);
+          return false;
         } else {
           return true;
         }

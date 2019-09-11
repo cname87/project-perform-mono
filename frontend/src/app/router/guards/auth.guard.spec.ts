@@ -1,94 +1,62 @@
-import { APP_BASE_HREF, Location } from '@angular/common';
+import { APP_BASE_HREF } from '@angular/common';
 import { TestBed, getTestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { SpyLocation } from '@angular/common/testing';
 import {
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   Router,
 } from '@angular/router';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { AuthGuard } from './auth.guard';
+import { MockAuthService } from '../../shared/mocks/mock-auth.service';
 import { AuthService } from '../../shared/auth.service/auth.service';
 import { routes } from '../../config';
-
-/* spy interfaces */
-interface IAuthServiceSpy {
-  getAuth0Client: jasmine.Spy;
-  isAuthenticated: jasmine.Spy;
-}
+import { Observable, from } from 'rxjs';
 
 describe('AuthGuard', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
-    /* stub authService getAuth0Client method - define spy strategy below */
-    const authServiceSpy = jasmine.createSpyObj('authService', [
-      'getAuth0Client',
-    ]);
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
 
-    /* set up Testbed */
+    /* stub router for ease of test*/
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
+    /* note that AuthService is mocked */
+
     await TestBed.configureTestingModule({
       imports: [AppModule, RouterTestingModule],
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
-        { provide: AuthService, useValue: authServiceSpy },
+        { provide: AuthService, useClass: MockAuthService },
+        { provide: NGXLogger, useValue: loggerSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
   }
 
-  function createSpies(
-    authServiceSpy: IAuthServiceSpy,
-    authenticated: boolean,
-  ) {
-    /* stub getAuth0Client() returning isAuthenticated */
-    const getAuth0ClientSpy = authServiceSpy.getAuth0Client.and.callFake(() => {
-      return {
-        /* set isAuthenticated() */
-        isAuthenticated: () => {
-          return authenticated;
-        },
-      };
-    });
-    return {
-      getAuth0ClientSpy,
-    };
-  }
-
-  function createExpected() {
-    return {};
-  }
-
   /* create the guard, and get test variables */
-  async function createElement(authenticated: boolean) {
+  async function createElement() {
     /* get the injected instances */
     const testBed = getTestBed();
     const guard = testBed.get<AuthGuard>(AuthGuard) as AuthGuard;
-    const authServiceSpy = testBed.get(AuthService) as IAuthServiceSpy;
-    const router = testBed.get(Router) as Router;
-    const spyLocation = testBed.get(Location) as SpyLocation;
-
-    router.initialNavigation();
-
-    const expected = createExpected();
-
-    /* get the spies */
-    const { getAuth0ClientSpy } = createSpies(authServiceSpy, authenticated);
+    const authService = testBed.get(AuthService);
+    const router = testBed.get(Router);
 
     return {
       guard,
-      authServiceSpy,
-      spyLocation,
-      getAuth0ClientSpy,
-      expected,
+      authService,
+      router,
     };
   }
 
   /* setup function run by each it test function */
-  async function setup(authenticated = true) {
+  async function setup() {
     await mainSetup();
-    const testVars = await createElement(authenticated);
+    const testVars = await createElement();
     return testVars;
   }
 
@@ -101,32 +69,35 @@ describe('AuthGuard', () => {
 
   describe('canActivate', async () => {
     it('should return true when authenticated', async () => {
-      const { guard } = await setup(true);
-      expect(
-        await guard.canActivate(
-          {} as ActivatedRouteSnapshot,
-          {} as RouterStateSnapshot,
-        ),
-      ).toEqual(true);
+      const { guard } = await setup();
+      const result$ = guard.canActivate(
+        {} as ActivatedRouteSnapshot,
+        {} as RouterStateSnapshot,
+      ) as Observable<boolean>;
+      expect(await result$.toPromise()).toEqual(true);
     });
     it('should return false when not authenticated', async () => {
-      const { guard } = await setup(false);
-      expect(
-        await guard.canActivate(
-          {} as ActivatedRouteSnapshot,
-          {} as RouterStateSnapshot,
-        ),
-      ).toEqual(false);
+      const { authService, guard } = await setup();
+      /* override authService.isAuthenticated$ */
+      authService.isAuthenticated$ = from(Promise.resolve(false));
+      const result$ = guard.canActivate(
+        {} as ActivatedRouteSnapshot,
+        {} as RouterStateSnapshot,
+      ) as Observable<boolean>;
+      expect(await result$.toPromise()).toEqual(false);
     });
     it('should route to login when not authenticated', async () => {
-      const { guard, spyLocation } = await setup(false);
-      expect(
-        await guard.canActivate(
-          {} as ActivatedRouteSnapshot,
-          {} as RouterStateSnapshot,
-        ),
-      ).toEqual(false);
-      expect(spyLocation.path()).toEqual(routes.loginPage.path, 'login page');
+      const { authService, guard, router } = await setup();
+      /* stub call to router.navigate */
+      const routerNavigateSpy = router.navigate.and.stub();
+      /* override authService.isAuthenticated$ */
+      authService.isAuthenticated$ = from(Promise.resolve(false));
+      const result$ = guard.canActivate(
+        {} as ActivatedRouteSnapshot,
+        {} as RouterStateSnapshot,
+      ) as Observable<boolean>;
+      expect(await result$.toPromise()).toEqual(false);
+      expect(routerNavigateSpy).toHaveBeenCalledWith([routes.loginPage.path]);
     });
   });
 });

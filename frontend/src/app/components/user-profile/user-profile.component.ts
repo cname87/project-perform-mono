@@ -15,11 +15,15 @@ import { AuthService } from '../../shared/auth.service/auth.service';
 })
 export class ProfileComponent {
   constructor(
-    public auth: AuthService,
+    private auth: AuthService,
     private location: Location,
     private logger: NGXLogger,
   ) {
     this.logger.trace(ProfileComponent.name + ': Starting ProfileComponent');
+  }
+
+  get userProfile$() {
+    return this.auth.userProfile$;
   }
 
   goBack() {

@@ -1,22 +1,24 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { TestBed, getTestBed } from '@angular/core/testing';
 import { NGXLogger } from 'ngx-logger';
+import { throwError } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppModule } from '../../app.module';
 import { AuthService, CREATE_AUTH0_CLIENT } from './auth.service';
-import { auth0Config } from '../../config';
-import { Router } from '@angular/router';
-import { throwError } from 'rxjs';
+import { auth0Config, routes } from '../../config';
 
-fdescribe('AuthService', () => {
+describe('AuthService', () => {
   /* set any expected values */
   function createExpected() {
     const loginRedirectDefault = {
-      redirect_uri: `${window.location.origin}/callback`,
+      redirect_uri: `${window.location.origin}${routes.callback.path}`,
       appState: { target: '/' },
     };
     const loginRedirectPath = {
-      redirect_uri: `${window.location.origin}/callback`,
+      redirect_uri: `${window.location.origin}${routes.callback.path}`,
       appState: { target: '/testPath' },
     };
     const logoutParameter = {
@@ -30,7 +32,11 @@ fdescribe('AuthService', () => {
     };
   }
 
-  /* setup function run by each sub test suite*/
+  /**
+   * @param isAlreadyAuthenticated: Sets the user authenticated status
+   * @param redirectPath: appState.target returned from handleRedirectCallback
+   * @param createFail: Causes createAuth0Client to throw an error
+   */
   async function mainSetup(
     isAlreadyAuthenticated = true,
     redirectPath = '',
@@ -58,8 +64,8 @@ fdescribe('AuthService', () => {
       );
     const getUserSpy = jasmine.createSpy('getUserSpy').and.callFake(() =>
       Promise.resolve({
-        Name: 'testName',
-        Email: 'testEmail',
+        name: 'testName',
+        email: 'testEmail',
       }),
     );
     const loginWithRedirectSpy = jasmine
@@ -81,20 +87,20 @@ fdescribe('AuthService', () => {
       getTokenSilentlySpy,
     };
 
-    /* CREATE_AUTH0_CLIENT is a function called upon service creation (which is created once testbed is created => must declare here */
+    /* CREATE_AUTH0_CLIENT is a function called upon service creation (which is created once the testbed is created => must declare here */
     const mockCreateAuth0Client = createFail
       ? () => throwError('testError')
       : () => {
-      const auth0 = {
-        isAuthenticated: isAuthenticatedSpy,
-        handleRedirectCallback: handleRedirectCallbackSpy,
-        getUser: getUserSpy,
-        loginWithRedirect: loginWithRedirectSpy,
-        logout: logoutSpy,
-        getTokenSilently: getTokenSilentlySpy,
-      };
-      return Promise.resolve(auth0);
-    };
+          const auth0 = {
+            isAuthenticated: isAuthenticatedSpy,
+            handleRedirectCallback: handleRedirectCallbackSpy,
+            getUser: getUserSpy,
+            loginWithRedirect: loginWithRedirectSpy,
+            logout: logoutSpy,
+            getTokenSilently: getTokenSilentlySpy,
+          };
+          return Promise.resolve(auth0);
+        };
 
     const createAuth0Spy = jasmine
       .createSpy('createAuth0Spy')
@@ -102,7 +108,7 @@ fdescribe('AuthService', () => {
 
     /* set up Testbed */
     await TestBed.configureTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, RouterTestingModule],
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
@@ -116,9 +122,10 @@ fdescribe('AuthService', () => {
     const testBed = getTestBed();
     const authService = testBed.get(AuthService) as AuthService;
 
+    /* get all expected values */
     const expected = createExpected();
 
-    /* helper function to allow event loop turn */
+    /* helper function to allow an event loop turn */
     const sleep = (ms: number) => {
       return new Promise((resolve) => setTimeout(resolve, ms));
     };
@@ -147,21 +154,30 @@ fdescribe('AuthService', () => {
     expect(authService).toBeTruthy('service created');
   });
 
-  it('should have localAuthSetUp set isLoggedIn to true', async () => {
+  it('localAuthSetUp sets isLoggedIn to true and set userProfile$ to the user profile', async () => {
     const { authService, sleep } = await setup(true);
     authService.localAuthSetup();
     await sleep(0);
     expect(authService.isLoggedIn).toEqual(true);
+    const userProfile = await authService['userProfile$']
+      .pipe(take(1))
+      .toPromise();
+    expect(userProfile!.name).toEqual('testName');
   });
 
-  it('should have localAuthSetUp set isLoggedIn to false', async () => {
+  it('localAuthSetUp sets isLoggedIn to false and not modify userProfile$', async () => {
     const { authService, sleep } = await setup(false);
+    expect(authService.isLoggedIn).toBeNull();
     authService.localAuthSetup();
     await sleep(0);
     expect(authService.isLoggedIn).toEqual(false);
+    const userProfile = await authService['userProfile$']
+      .pipe(take(1))
+      .toPromise();
+    expect(userProfile).toBeNull();
   });
 
-  it('should have localAuthSetUp cause an error', async () => {
+  it('authClient$ can catch a Auth client creation error', async () => {
     const { authService } = await setup(true, '', true);
     try {
       await authService['auth0Client$'].toPromise();
@@ -171,27 +187,7 @@ fdescribe('AuthService', () => {
     }
   });
 
-  it('should have isAuthenticated$ return false', async () => {
-    const { authService, createAuth0Spy, isAuthenticatedSpy } = await setup(
-      false,
-    );
-    const isLoggedIn = await authService.isAuthenticated$.toPromise();
-    expect(isLoggedIn).toEqual(false, 'isLoggedIn false');
-    expect(createAuth0Spy).toHaveBeenCalledWith(auth0Config);
-    expect(isAuthenticatedSpy).toHaveBeenCalled();
-  });
-
-  it('should have isAuthenticated$ return true', async () => {
-    const { authService, createAuth0Spy, isAuthenticatedSpy } = await setup(
-      true,
-    );
-    const isLoggedIn = await authService.isAuthenticated$.toPromise();
-    expect(isLoggedIn).toBeTruthy('isLoggedIn true');
-    expect(createAuth0Spy).toHaveBeenCalledWith(auth0Config);
-    expect(isAuthenticatedSpy).toHaveBeenCalled();
-  });
-
-  it('should have login call loginWithRedirect with default path', async () => {
+  it('login should call loginWithRedirect with the default path', async () => {
     const {
       authService,
       loginWithRedirectSpy,
@@ -203,7 +199,7 @@ fdescribe('AuthService', () => {
     expect(loginWithRedirectSpy).toHaveBeenCalledWith(loginRedirectDefault);
   });
 
-  it('should have login call loginWithRedirect with path', async () => {
+  it('login should call loginWithRedirect with a path parameter', async () => {
     const {
       authService,
       loginWithRedirectSpy,
@@ -215,20 +211,25 @@ fdescribe('AuthService', () => {
     expect(loginWithRedirectSpy).toHaveBeenCalledWith(loginRedirectPath);
   });
 
-  it('should handle auth0 callback', async () => {
+  it('handleRedirectCallback should route to a returned path and set isLoggedIn to true and userProfile$ to the user profile', async () => {
     const {
       authService,
       handleRedirectCallbackSpy,
       routerNavigateSpy,
       sleep,
-    } = await setup(true, '/testPath');
+    } = await setup(true, '/testPath'); // pass path to be retuned
     authService.handleAuthCallback();
     await sleep(0);
     expect(handleRedirectCallbackSpy).toHaveBeenCalledWith();
+    expect(authService.isLoggedIn).toEqual(true);
+    const userProfile = await authService['userProfile$']
+      .pipe(take(1))
+      .toPromise();
+    expect(userProfile!.name).toEqual('testName');
     expect(routerNavigateSpy).toHaveBeenCalledWith(['/testPath']);
   });
 
-  it('should handle auth0 callback with default path', async () => {
+  it('handleRedirectCallback should route to the default path and set isLoggedIn to true and userProfile$ to the user profile', async () => {
     const {
       authService,
       handleRedirectCallbackSpy,
@@ -238,17 +239,21 @@ fdescribe('AuthService', () => {
     authService.handleAuthCallback();
     await sleep(0);
     expect(handleRedirectCallbackSpy).toHaveBeenCalledWith();
+    const userProfile = await authService['userProfile$']
+      .pipe(take(1))
+      .toPromise();
+    expect(userProfile!.name).toEqual('testName');
     expect(routerNavigateSpy).toHaveBeenCalledWith(['/']);
   });
 
-  it('should have logout call logout', async () => {
+  it('logout should call Auth0 client logout with configured parameter', async () => {
     const { authService, logoutSpy, logoutParameter, sleep } = await setup();
     authService.logout();
     await sleep(0);
     expect(logoutSpy).toHaveBeenCalledWith(logoutParameter);
   });
 
-  it('should have getTokenSilently call getTokenSilently', async () => {
+  it('getTokenSilently should call Auth0 client with an options parameter and return the token from the client', async () => {
     const { authService, getTokenSilentlySpy, sleep } = await setup();
     const token = await authService
       .getTokenSilently$('testParameter')

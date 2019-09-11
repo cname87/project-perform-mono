@@ -5,6 +5,7 @@ import { Router, RouterLinkWithHref } from '@angular/router';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SpyLocation } from '@angular/common/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NGXLogger } from 'ngx-logger';
 
 import { click } from '../shared/test-helpers';
 import { AppModule } from '../app.module';
@@ -24,14 +25,17 @@ interface IMembersServiceStub {
   getMembers: () => Observable<IMember[]>;
 }
 interface IAuthServiceSpy {
-  getAuth0Client: jasmine.Spy;
-  isAuthenticated: jasmine.Spy;
-  profile: jasmine.Spy;
+  localAuthSetup: jasmine.Spy;
+  isAuthenticated$: jasmine.Spy;
+  userProfile$: jasmine.Spy;
 }
 
 describe('RoutingModule', () => {
   /* setup function run by each 'it' test suite */
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
+
     /* create stub instances with spies for injection */
     const membersServiceStub: IMembersServiceStub = {
       getMembers: () => {
@@ -41,18 +45,17 @@ describe('RoutingModule', () => {
 
     /* stub authService getAuth0Client method - define spy strategy below */
     let authServiceSpy = jasmine.createSpyObj('authService', [
-      'getAuth0Client',
+      'localAuthSetup',
     ]);
-    /* stub authService properties isAuthenticated - define values below */
+    /* stub authService properties isLoggedIn - define values below */
     authServiceSpy = {
       ...authServiceSpy,
-      isAuthenticated: (fn: (value: boolean) => void) => {
-        fn(true);
+      isAuthenticated$: {
+        subscribe: (fn: (value: boolean) => void) => {
+          fn(true);
+        },
       },
-      subscribe: (fn: (value: boolean) => void) => {
-        fn(true);
-      },
-      profile: {
+      userProfile$: {
         subscribe: (fn: (value: string) => void) => {
           fn('testProfile');
         },
@@ -67,6 +70,7 @@ describe('RoutingModule', () => {
         { provide: APP_BASE_HREF, useValue: '/' },
         { provide: MembersService, useValue: membersServiceStub },
         { provide: AuthService, useValue: authServiceSpy },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
   }
@@ -89,21 +93,14 @@ describe('RoutingModule', () => {
     authServiceSpy: IAuthServiceSpy,
     authenticated: boolean,
   ) {
-    /* stub getAuth0Client() returning isAuthenticated() */
-    const getAuth0ClientSpy = authServiceSpy.getAuth0Client.and.callFake(() => {
-      return {
-        /* set isAuthenticated to return true */
-        isAuthenticated: () => authenticated,
-      };
-    });
-    /* stub isAuthenticated property to stub isAuthenticated.subscribe() */
-    authServiceSpy.isAuthenticated = ({
-      subscribe: (fn: (value: boolean) => void) => {
-        fn(authenticated);
-      },
-    } as any) as jasmine.Spy<InferableFunction>;
+    /* stub localAuthSetupSpy() */
+    const localAuthSetupSpy = authServiceSpy.localAuthSetup.and.stub();
+    /* mock isAuthenticated$ property to simulate an observable */
+    authServiceSpy.isAuthenticated$ = (of(authenticated) as any) as jasmine.Spy<
+      InferableFunction
+    >;
     return {
-      getAuth0ClientSpy,
+      localAuthSetupSpy,
     };
   }
   /* create the component, initialize it & return test variables */
@@ -129,7 +126,7 @@ describe('RoutingModule', () => {
     const component = fixture.componentInstance;
 
     /* get the spies */
-    const { getAuth0ClientSpy } = createSpies(authServiceSpy, authenticated);
+    const { localAuthSetupSpy } = createSpies(authServiceSpy, authenticated);
 
     fixture.detectChanges();
     await fixture.whenStable();
@@ -144,7 +141,7 @@ describe('RoutingModule', () => {
       spyLocation,
       page,
       membersServiceInjected,
-      getAuth0ClientSpy,
+      localAuthSetupSpy,
     };
   }
 

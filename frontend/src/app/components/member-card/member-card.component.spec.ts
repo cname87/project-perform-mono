@@ -1,6 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { By } from '@angular/platform-browser';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { MemberCardComponent } from './member-card.component';
@@ -8,6 +9,8 @@ import { MemberCardComponent } from './member-card.component';
 describe('memberCardComponent', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* set up Testbed */
     await TestBed.configureTestingModule({
       imports: [
@@ -16,6 +19,7 @@ describe('memberCardComponent', () => {
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
   }

@@ -9,6 +9,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { ErrorHandler } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { MemberSearchComponent } from './member-search.component';
@@ -33,6 +34,8 @@ interface IErrorHandlerSpy {
 describe('memberSearchComponent', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create spy objects */
     const memberServiceSpy = jasmine.createSpyObj('memberService', [
       'getMembers',
@@ -51,6 +54,7 @@ describe('memberSearchComponent', () => {
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: MembersService, useValue: memberServiceSpy },
         { provide: ErrorHandler, useValue: errorHandlerSpy },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
   }

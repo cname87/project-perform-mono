@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppComponent } from './app.component';
 import { findAllCssOrNot } from '../../shared/test-helpers';
@@ -8,11 +9,15 @@ import { AppModule } from '../../app.module';
 describe('AppComponent', () => {
   /* setup function run by each 'it' test suite */
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
+
     await TestBed.configureTestingModule({
       declarations: [],
       imports: [AppModule],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
   }
