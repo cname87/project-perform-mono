@@ -8,6 +8,7 @@ export function getNavElements() {
   const detailLink = navElements.get(2);
 
   return {
+    navElements,
     dashboardLink,
     membersLink,
     detailLink,

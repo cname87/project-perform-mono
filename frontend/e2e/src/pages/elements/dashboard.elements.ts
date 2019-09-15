@@ -5,6 +5,7 @@ const memberCardsElements = getMemberCardsElements();
 
 export function getDashboardElements() {
 
+  const tag = element(by.css('app-dashboard'));
   const topMembers = element.all(by.css('app-dashboard a'));
 
   /* select a member from the dashboard top members */
@@ -19,6 +20,7 @@ export function getDashboardElements() {
   }
 
   return {
+    tag,
     topMembers,
     selectMember,
   }

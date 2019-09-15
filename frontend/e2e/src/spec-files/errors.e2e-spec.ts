@@ -276,12 +276,12 @@ describe('Error Handling', () => {
       const memberDetailPage = getMemberDetailPage();
 
       /* test for visibility of members detail element tag */
-      await awaitElementVisible(memberDetailPage.memberDetailElement.tag);
+      await awaitElementVisible(memberDetailPage.memberDetailElements.tag);
 
       /* confirm you have member 9 */
       await browser.wait(async () => {
         return (
-          (await memberDetailPage.memberDetailElement.getMember()).id === 9
+          (await memberDetailPage.memberDetailElements.getMember()).id === 9
         );
       }, 5000);
 
@@ -289,13 +289,13 @@ describe('Error Handling', () => {
       await clearMessages();
 
       /* set the name to the errorMember name in the input field */
-      await memberDetailPage.memberInputElement.inputBox.clear();
-      await memberDetailPage.memberInputElement.inputBox.sendKeys(
+      await memberDetailPage.memberInputElements.inputBox.clear();
+      await memberDetailPage.memberInputElements.inputBox.sendKeys(
         errorMember.name,
       );
 
       /* generate a PUT app-v1/members => an error */
-      await memberDetailPage.memberInputElement.actionBtn.click();
+      await memberDetailPage.memberInputElements.actionBtn.click();
 
       /* wait until new message appears */
       await browser.wait(async () => {

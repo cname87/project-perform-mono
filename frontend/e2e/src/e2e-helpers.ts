@@ -7,12 +7,16 @@ import browserLogs from 'protractor-browser-logs';
 
 import { getRootElements } from './pages/elements/root.elements';
 import { getMembersListPage } from './pages/membersList.page';
+import { getDashboardPage } from './pages/dashboard.page';
+import { getMemberDetailPage } from './pages/memberDetail.page';
 
 /**
  * This module provides a function that returns common helper functions.
  */
 
 export const getHelpers = () => {
+
+  const mockMembers = require('../onPrepare').mockMembers;
 
   const resetDatabase = require('../onPrepare').resetDatabase;
 
@@ -81,9 +85,8 @@ export const getHelpers = () => {
     await browser.executeScript('window.localStorage.clear();');
   }
 
-    /**
-   * Assumes the dashboard page is being displayed.
-   * Clicks on the members link.
+  /**
+   * Clicks on the members link on the nav bar.
    * The members list page is loaded.
    * @param numberExpected: The expected number of members that will be displayed - defaults to 10.
    */
@@ -97,6 +100,7 @@ export const getHelpers = () => {
 
     /* await visibility of an element */
     await awaitElementVisible(membersListPage.memberListElements.tag);
+
     /* wait until full count of members list is displayed */
     await browser.wait(async () => {
       return (
@@ -106,7 +110,64 @@ export const getHelpers = () => {
     });
   }
 
+  /**
+   * Clicks on the dashboard link on the nav bar.
+   * The dashboard page is loaded.
+   * @param numberExpected: The expected number of top members that will be displayed - defaults to 4.
+   */
+  async function getDashboard(numberExpected = 4) {
+
+    /* click on members nav link */
+    await getRootElements().dashboardLink.click();
+
+      /* the dashboard page should be displayed */
+      const dashboardPage = getDashboardPage();
+
+    /* await visibility of an element */
+    await awaitElementVisible(dashboardPage.dashboardElements.tag);
+
+    /* wait until full count of members list is displayed */
+    await browser.wait(async () => {
+      return (
+        await dashboardPage.dashboardElements.topMembers.count()
+          === numberExpected
+      );
+    });
+  }
+
+  /**
+   * Assumes the dashboard page is being displayed.
+   * Selects a member from the top members dashboard based on a passed-in index.
+   * The appropriate member detail page is loaded.
+   * @param index: Index is zero-based and must correspond to a displayed member, i.e. if 2 is passed in then at least three members must be displayed (and the third member is selected).
+   */
+  const dashboardClickMember = async (index: number) => {
+    const dashboardPage = getDashboardPage();
+
+    /* get member link and name */
+    const { name, link } = await dashboardPage.dashboardElements.selectMember(
+      index,
+    );
+
+    /* click on the selected member which brings up the member detail page */
+    await link.click();
+
+    /* the members detail page should be displayed */
+    const memberDetailPage = getMemberDetailPage();
+
+    await awaitElementVisible(memberDetailPage.memberDetailElements.tag);
+
+    /* wait until member detail is displayed */
+    await browser.wait(async () => {
+      return (
+        (await memberDetailPage.memberDetailElements.getMember()).name
+          === name
+      );
+    });
+  }
+
   return {
+    mockMembers,
     resetDatabase,
     awaitElementVisible,
     loadRootPage,
@@ -119,5 +180,7 @@ export const getHelpers = () => {
     clearMessages,
     clearCache,
     getMembersList,
+    getDashboard,
+    dashboardClickMember,
   }
 }

@@ -7,6 +7,7 @@ exports.config = {
   allScriptsTimeout: 11000,
   /* spec patterns are relative to the current working directory when protractor is called */
   specs: [
+    './src/**/app.e2e-spec.ts',
     './src/**/auth.e2e-spec.ts',
     './src/**/cache.e2e-spec.ts',
     './src/**/errors.e2e-spec.ts',

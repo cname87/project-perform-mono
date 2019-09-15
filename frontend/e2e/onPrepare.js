@@ -71,26 +71,26 @@ const testDatabaseInUse = async () => {
   }
 }
 
+/* define mock members */
+const errorMember = {
+  id: 10,
+  name: 'errorName',
+};
+export const mockMembers = [
+  { name: 'test10' },
+  { name: 'test11' },
+  { name: 'test12' },
+  { name: 'test13' },
+  { name: 'test14' },
+  { name: 'test15' },
+  { name: 'test116' },
+  { name: 'test117' },
+  { name: 'test118' },
+  { name: errorMember.name }, // used for error testing
+];
+
 /* delete all 'test' database members */
 const resetDatabase = async () => {
-
-  /* define mock members */
-  const errorMember = {
-    id: 10,
-    name: 'errorName',
-  };
-  const mockMembers = [
-    { name: 'test10' },
-    { name: 'test11' },
-    { name: 'test12' },
-    { name: 'test13' },
-    { name: 'test14' },
-    { name: 'test15' },
-    { name: 'test16' },
-    { name: 'test17' },
-    { name: 'test18' },
-    { name: errorMember.name }, // used for error testing
-  ];
 
   /* request a token */
   const options = {
@@ -213,6 +213,7 @@ export const run = async () => {
 }
 
 /* export login */
+module.exports.mockMembers = mockMembers;
 module.exports.resetDatabase = resetDatabase;
 module.exports.loadRootPage = loadRootPage;
 module.exports.login = login;

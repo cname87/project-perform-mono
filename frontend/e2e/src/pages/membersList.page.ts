@@ -2,7 +2,7 @@ import { browser } from 'protractor';
 
 import { getRootElements } from './elements/root.elements';
 import { getMembersListElement } from './elements/membersList.element';
-import { getMemberInputElement } from './elements/memberInput.element';
+import { getMemberInputElements } from './elements/memberInput.element';
 import { getMessagesElements } from './elements/messages.elements';
 import { getToastrElements } from './elements/toastr.elements';
 
@@ -15,7 +15,7 @@ export function getMembersListPage() {
 
   const rootElements = getRootElements();
   const memberListElements = getMembersListElement();
-  const memberInputElements = getMemberInputElement();
+  const memberInputElements = getMemberInputElements();
   const messagesElements = getMessagesElements();
   const toastrElements = getToastrElements();
 

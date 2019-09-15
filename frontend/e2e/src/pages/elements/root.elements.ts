@@ -12,6 +12,7 @@ export function getRootElements() {
     profileBtn,
   } = getLoginElements();
   const {
+    navElements,
     dashboardLink,
     membersLink,
     detailLink,
@@ -33,6 +34,7 @@ export function getRootElements() {
     loginBtn,
     logoutBtn,
     profileBtn,
+    navElements,
     dashboardLink,
     membersLink,
     detailLink,
