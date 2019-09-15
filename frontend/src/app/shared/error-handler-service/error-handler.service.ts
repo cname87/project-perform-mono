@@ -92,10 +92,11 @@ export class ErrorHandlerService implements ErrorHandler {
    * @param errReport This is either a managed error and will thus meet the IErrReport interface but may also be any unexpected error.
    */
   handleError(errReport: any): void {
-    /* if e2e testing then change logger config to log error notifications */
-    const originalLogLevel = this.logger.getConfigSnapshot().level;
+    /* if e2e testing then change logger config to log trace notifications */
+    let originalLogLevel = NgxLoggerLevel.TRACE;
     if (environment.e2eTesting) {
-      this.logger.updateConfig({ level: NgxLoggerLevel.ERROR });
+      originalLogLevel = this.logger.getConfigSnapshot().level;
+      this.logger.updateConfig({ level: NgxLoggerLevel.TRACE });
     }
 
     this.logger.trace(ErrorHandlerService.name + ': handleError called');
@@ -134,13 +135,17 @@ export class ErrorHandlerService implements ErrorHandler {
             ErrorHandlerService.name + ': Showing toastr message',
           );
           this.toastr.error('ERROR!', 'An unknown error has occurred');
-          /* reset logger level */
-          this.logger.updateConfig({ level: originalLogLevel });
+          /* if e2e testing reset logger level */
+          if (environment.e2eTesting) {
+            this.logger.updateConfig({ level: originalLogLevel });
+          }
         });
       });
     }
 
-    /* reset logger level */
-    this.logger.updateConfig({ level: originalLogLevel });
+    /* if e2e testing reset logger level */
+    if (environment.e2eTesting) {
+      this.logger.updateConfig({ level: originalLogLevel });
+    }
   }
 }
