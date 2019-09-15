@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
+import { environment } from '../../../environments/environment';
 
 import { AuthService } from '../../shared/auth.service/auth.service';
 
@@ -16,8 +17,15 @@ export class AppComponent implements OnInit {
     this.logger.trace(`${AppComponent.name}: Starting ${AppComponent.name}`);
   }
 
+  private _isE2eTesting = false;
+
+  get isE2eTesting() {
+    return this._isE2eTesting;
+  }
+
   ngOnInit() {
     /* check authentication state */
     this.auth.localAuthSetup();
+    this._isE2eTesting = environment.e2eTesting;
   }
 }

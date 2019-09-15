@@ -12,24 +12,29 @@ const certFile = path.resolve(__dirname, '..//certs/nodeKeyAndCert.pem')
 const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem')
 const caFile = path.resolve(__dirname, '../certs/rootCA.crt')
 
-/* helper function - awaits for an element with the css selector to be visible on the page */
-const awaitPage = async (css = 'app-root') => {
-  const testPromise = (css = 'app-root') => {
-    const EC = ExpectedConditions;
-    return EC.visibilityOf(element(by.css(css)));
-  }
-  await browser.wait(testPromise(css), 5000);
+import { getDashboardPage } from './src/pages/dashboard.page';
+import { getRootElements } from './src/pages/elements/root.elements';
+
+/**
+ * This module...
+ * - sets up a jasmine reporter
+ * - tests that the test database is being used (or throws an error if not)
+ * - resets the database by clearing and loading mock members
+ * - loads the root page
+ * - checks that the app has been built with e2e environment so e2eTesting is true as required by the errors spec file
+ * - logins the app vai OAuth0
+ * - sets the jasmine default timeout
+ * - exports various helper functions including an await element visible helper
+ */
+
+
+/* awaits for an element to be visible on the page */
+const awaitElementVisible = async (element) => {
+  return await browser.wait(ExpectedConditions.visibilityOf(element), 5000);
 };
 
-/* checks that all but 1 macro task is open - this macro task is due to the auth0 client setting a timer to expire the token so you have to account for it whenever you are logged in */
-const awaitStabilityWhenLogginIn = async () => {
-  const isStable = () => browser.executeScript(
-    `const ngZone = window.getAllAngularTestabilities()[0]._ngZone;
-     return (ngZone.hasPendingMacrotasks === 1) && (ngZone.hasPendingMicroTasks === 0);`);
-  await browser.wait(isStable(), 5000);
-}
 
-/* helper function - sends a request to the server */
+/* sends a configured request to the server */
 const askServer = async(
   url,
   method,
@@ -61,13 +66,33 @@ const testDatabaseInUse = async () => {
   /* body will contain { isTestDatabase: <boolean> } */
   if(!testDatabaseResponseBody.isTestDatabase){
     throw new Error('Test database not in use');
+  } else {
+    console.log('Test database in use')
   }
 }
 
 /* delete all 'test' database members */
 const resetDatabase = async () => {
 
-    /* request a token */
+  /* define mock members */
+  const errorMember = {
+    id: 10,
+    name: 'errorName',
+  };
+  const mockMembers = [
+    { name: 'test10' },
+    { name: 'test11' },
+    { name: 'test12' },
+    { name: 'test13' },
+    { name: 'test14' },
+    { name: 'test15' },
+    { name: 'test16' },
+    { name: 'test17' },
+    { name: 'test18' },
+    { name: errorMember.name }, // used for error testing
+  ];
+
+  /* request a token */
   const options = {
     method: 'POST',
     url: 'https://projectperform.eu.auth0.com/oauth/token',
@@ -89,18 +114,61 @@ const resetDatabase = async () => {
   if(!Number.isInteger(deleteResponseBody.count)) {
     throw new Error('Error resetting test database');
   }
+
+  /* add test database members here */
+  for (const member of mockMembers) {
+    await askServer(
+      'https://localhost:1337/api-v1/members',
+      'POST',
+      member,
+      { Authorization: `Bearer ${token}` },
+    );
+  }
+
+  console.log('Completed database reset and loaded test members');
 }
 
-const clearCache = async () => {
-  await browser.executeScript('window.sessionStorage.clear();');
-  await browser.executeScript('window.localStorage.clear();');
+/**
+ * Loads the root page and awaits either the log in button or the message saying that members have been loaded from the server (or not).
+ * @param isLoggedIn: Says whether we expect the log in page or the logged in dashboard page.
+ */
+const loadRootPage = async (isLoggedIn = true) => {
+  console.log('Loading root page');
+  await browser.get('/');
+  if (!isLoggedIn) {
+    /* just wait for the login button to show */
+    await awaitElementVisible(getRootElements().loginBtn);
+  } else {
+  /* otherwise wait until the message denoting the loading of members appears */
+    await awaitElementVisible(getRootElements().logoutBtn);
+    await browser.wait(async () => {
+      return (
+        await getRootElements().messages.count()
+          === 1
+      );
+    }, 10000);
+  }
+  console.log('Root page loaded');
+};
+
+/* check that the e2e build environment is in use - this is needed for the error testing spec file */
+const checkE2eEnvironment = async () => {
+  /* the app-login element is configured with a custom attribute */
+  const el = browser.findElement(by.css('app-login'));
+  const isE2eTesting = await el.getAttribute('data-environment');
+  if(isE2eTesting === 'true'){
+    console.log(`E2e build environment in use`);
+  } else {
+    throw new Error('E2e build environment not in use');
+  }
 }
 
-/* login */
+/* login - assumes the non-logged in root page is open */
 const login = async() => {
 
-  await browser.get('/');
-  await browser.driver.findElement(by.id('loginBtn')).click();
+  console.log('Beginning login routine');
+
+  await browser.findElement(by.id('loginBtn')).click();
 
   /* disable wait for angular (as auth0 has redirected and therefore the page is not seen as an angular page?) */
   await browser.waitForAngularEnabled(false);
@@ -114,28 +182,39 @@ const login = async() => {
   await continueButton.click();
 
   /* Note: Because waitForAngular is disabled you need to wait until page is shown and all asynchronous operations have been closed, or otherwise you will see intermittent errors such as caching not working. So check for the slowest elements and manually check for stability. */
-  await awaitPage('#logoutBtn');
-  await awaitPage('app-messages #clearBtn');
-  await awaitStabilityWhenLogginIn();
+  await awaitElementVisible(getRootElements().logoutBtn);
+  await awaitElementVisible(getRootElements().messagesClearBtn);
 
-  /* Note: It appears you can only re-enable waitForAngular after all tests - otherwise tests time out. I don't know why I can't re-enable for the Angular pages.
-  => commented out for the moment.
-  NB: This means I have no angular synchronization after login => caution loading pages!
+  /* When logged in you can't re-enable waitForAngular as tests will time out.
+  NB: This means I have no angular synchronization after login
+    => after load pages await visibility of an item, and then
+    => browser.wait() for anything you are going to test.
   */
 
-  //await browser.waitForAngularEnabled(true);
-
-  console.log('Exiting login()');
+  console.log('Completed login routine');
 }
 
+/* set long timeout to allow for debug */
+const setTimeout = (timeout = 120000) => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout;
+}
 export const run = async () => {
-    /* set up a jasmine reporter */
+  /* set up a jasmine reporter */
   jasmine
-  .getEnv()
-  .addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
+    .getEnv()
+    .addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
 
   await testDatabaseInUse();
   await resetDatabase();
-  // await clearCache();
+  await loadRootPage(false);
+  await checkE2eEnvironment();
   await login();
+  setTimeout(120000);
 }
+
+/* export login */
+module.exports.resetDatabase = resetDatabase;
+module.exports.loadRootPage = loadRootPage;
+module.exports.login = login;
+module.exports.setTimeout = setTimeout;
+module.exports.awaitElementVisible = awaitElementVisible;

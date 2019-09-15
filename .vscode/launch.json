@@ -73,6 +73,7 @@
       "program": "${workspaceFolder}/frontend//node_modules/protractor/bin/protractor",
       "protocol": "inspector",
       "args": [
+        /* choose which spec files to run in protractor.conf.js */
         "${workspaceFolder}/frontend/e2e/protractor.conf.js",
       ],
       "cwd": "${workspaceFolder}/frontend/e2e",
@@ -86,7 +87,7 @@
         "${workspaceFolder}/frontend/node_modules/**/*.js",
       ],
     },
-    // run server index.js
+    // run backend server index.js
     {
       "type": "node",
       "request": "launch",

@@ -92,19 +92,19 @@ export class AuthService {
   public userProfile$ = this.userProfileSubject$.asObservable();
 
   /* called to set the userProfile$ observable */
-  private getUser$(options?: any): Observable<IUserProfile> {
+  private getUser$ = (options?: any): Observable<IUserProfile> => {
     return this.auth0Client$.pipe(
       concatMap((client: Auth0Client) => from(client.getUser(options))),
       tap((user) => this.userProfileSubject$.next(user)),
     );
-  }
+  };
 
   /**
    * Sets isLoggedIn to true if user is authenticated, otherwise it sets isLoggedIn to false.
    * Sets userProfile$ to the user profile if user is authenticated, otherwise it does not modify userProfile$.
    * Note: Called on app initialization only.
    */
-  public localAuthSetup() {
+  public localAuthSetup = () => {
     const checkAuth$ = this.isAuthenticated$.pipe(
       concatMap((loggedIn: boolean) => {
         if (loggedIn) {
@@ -118,20 +118,20 @@ export class AuthService {
     checkAuth$.subscribe((response: { [key: string]: any } | boolean) => {
       this.isLoggedIn = !!response;
     });
-  }
+  };
 
   /**
    * Calls the Auth0 client instance loginWithDirect function.  The function is called with an object parameter that sets the redirect uri to the callback component and also an appState property passed to the callback component used to set the target route to which the app is ultimately sent.
    * @param redirectPath: The target redirect path supplied to the Auth loginWithRedirect function.  It defaults to /, i.e. the app is ultimately redirected to the home page.
    */
-  public login(redirectPath: string = '/') {
+  public login = (redirectPath: string = '/') => {
     this.auth0Client$.subscribe((client: Auth0Client) => {
       client.loginWithRedirect({
         redirect_uri: `${window.location.origin}${routes.callback.path}`,
         appState: { target: redirectPath },
       });
     });
-  }
+  };
 
   /**
    * Causes the Auth0 client instance handleRedirectCallback function to be called, sets userProfile$ and isLoggedIn, and navigates to the target route.
@@ -139,7 +139,7 @@ export class AuthService {
    *
    * Note: Called when app reloads after the Auth0 server redirects after the user is authenticated.
    */
-  public handleAuthCallback() {
+  public handleAuthCallback = () => {
     let targetRoute: string;
     const authComplete$ = this.handleRedirectCallback$.pipe(
       tap((cbRes) => {
@@ -155,29 +155,29 @@ export class AuthService {
     authComplete$.subscribe(([_user, _loggedIn]) => {
       this.router.navigate([targetRoute]);
     });
-  }
+  };
   /**
    * Calls the Auth0 client instance logout function.
    * The logout function is called with an object containing the configured Auth0 application client ID and a returnTo property set to the app uri origin.
    */
-  public logout() {
+  public logout = () => {
     this.auth0Client$.subscribe((client: Auth0Client) => {
       client.logout({
         client_id: auth0Config.client_id,
         returnTo: `${window.location.origin}`,
       });
     });
-  }
+  };
 
   /**
    * Calls the Auth0 client instance getTokenSilently function with a supplied options parameter and rteurns the received token as an observable..
    * @param options: Parameter to be supplied to the Auth0 function - see documentation.  Optional and not currently used.
    */
-  public getTokenSilently$(options?: any): Observable<string> {
+  public getTokenSilently$ = (options?: any): Observable<string> => {
     return this.auth0Client$.pipe(
       concatMap((client: Auth0Client) =>
         from(client.getTokenSilently(options)),
       ),
     );
-  }
+  };
 }

@@ -7,10 +7,9 @@ exports.config = {
   allScriptsTimeout: 11000,
   /* spec patterns are relative to the current working directory when protractor is called */
   specs: [
-    './src/**/test.e2e-spec.ts',
-    // './src/**/auth.e2e-spec.ts',
-    // './src/**/cache.e2e-spec.ts',
-    // './src/**/errors.e2e-spec.ts',
+    './src/**/auth.e2e-spec.ts',
+    './src/**/cache.e2e-spec.ts',
+    './src/**/errors.e2e-spec.ts',
   ],
   directConnect: true,
   capabilities: {
@@ -55,28 +54,9 @@ exports.config = {
 
   },
 
-  // onComplete: function() {
-  /* HTMLReport called once tests are finished */
-  //   var browserName, browserVersion;
-  //   var capsPromise = browser.getCapabilities();
+  onComplete: function() {
+    console.log('E2e test complete');
 
-  //   capsPromise.then(function (caps) {
-  //      browserName = caps.get('browserName');
-  //      browserVersion = caps.get('version');
-
-  //      var HTMLReport = require('protractor-html-reporter');
-
-  //     testConfig = {
-  //           reportTitle: 'Shield End To End Testing Report',
-  //           outputPath: './',
-  //           screenshotPath: './',
-  //           testBrowser: browserName,
-  //           browserVersion: browserVersion,
-  //           modifiedSuiteName: false,
-  //           screenshotsOnlyOnFailure: true
-  //       };
-  //       new HTMLReport().from('xmlresults.xml', testConfig);
-  //   });
-  // }
+  }
 
 };

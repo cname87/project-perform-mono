@@ -1,5 +1,5 @@
 /**
- * This utility resets the test database.  It deletes all members nad loads 10 mock members including one with a configured name that will cause an error when test mode is enabled.
+ * This utility resets the test database.  It deletes all members and loads 10 mock members including one with a configured name that will cause an error when test mode is enabled.
  * Note: The server must be running before this is run.
  * Note that a test is carried out to ensure that the test database is in use and not a production database.  The utility will exit without action if the test database is not in use.
  * Note: global.window is set to a dummy value to avoid an error when config.ts is imported.
@@ -84,7 +84,7 @@ export const resetDatabase = async () => {
   await askServer('https://localhost:1337/members', 'POST', mockMembers[8]);
   await askServer('https://localhost:1337/members', 'POST', mockMembers[9]);
 
-  console.log('Completed reset and load test database');
+  console.log('Completed database reset and loaded test members');
 };
 
 /* read first argument - 'run' to run the the utility */

@@ -9,11 +9,11 @@
     // "./test/testSetup.ts",
     "./**/types/*.d.ts",
     "./server/types/types.d.ts",
-    "./utils/types.d.ts",
+    "./utils/types.d.ts"
   ],
   "exclude": [
     "./server/test/client", // client-side files compiled separately
-    "node_modules",
+    "node_modules"
   ],
 
   "compilerOptions": {
@@ -30,6 +30,6 @@
     ], // for browser-side scripts - extra types which you know browser will support
 
     /* module option */
-    "module": "commonjs",  // module loader format (independent of target) - commonjs for node
+    "module": "commonjs"  // module loader format (independent of target) - commonjs for node
   }
 }

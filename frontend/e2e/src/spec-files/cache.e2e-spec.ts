@@ -9,23 +9,22 @@ import { getHelpers } from '../e2e-helpers';
 describe('Cache', () => {
 
   const {
-    awaitPage,
     loadRootPage,
-    login,
     originalTimeout,
     setTimeout,
     resetTimeout,
-    // resetDatabase,
+    resetDatabase,
     setupLogsMonitor,
     checkLogs,
+    getMembersList,
   } = getHelpers();
+
+  /* Note: app must start in logged in state */
 
   beforeAll(async () => {
     /* test that test database is in use and reset it */
-    // await resetDatabase();
-    setTimeout();
-    await loadRootPage('#loginBtn');
-    await login();
+    await resetDatabase();
+    setTimeout(120000);
   });
 
   afterAll(() => {
@@ -43,17 +42,17 @@ describe('Cache', () => {
     });
     logs.expect(/CachingInterceptor: reading from server/, logs.INFO);
 
-    /* open new page to generate a read from server */
-    await browser.get('/');
-    await awaitPage('#logoutBtn');
-    await awaitPage('app-messages #clearBtn');
-    await browser.sleep(1000);
+    /* reopen root page to generate a read from server */
+    await loadRootPage();
 
     /* the dashboard page should be displayed */
     const dashboardPage = getDashboardPage();
 
-    expect(await dashboardPage.dashboardElements.topMembers
-      .isDisplayed()).toBeTruthy();
+    await browser.wait(async () => {
+      return (
+        await dashboardPage.dashboardElements.topMembers.isDisplayed()
+      );
+    });
 
     await checkLogs(logs);
   });
@@ -73,12 +72,8 @@ describe('Cache', () => {
     /* the dashboard page should be displayed */
     const dashboardPage = getDashboardPage();
 
-    /* click on members list link to generate log */
-    await dashboardPage.rootElements.membersLink.click();
-
-    await awaitPage('app-members');
-    await awaitPage('app-messages #clearBtn');
-    await browser.sleep(1000);
+    /* click on members list link */
+    await getMembersList();
 
     expect(await dashboardPage.rootElements.bannerHeader
       .isDisplayed()).toBeTruthy();

@@ -199,7 +199,9 @@ describe('NavComponent', () => {
 
       /* disabled attribute should be true */
       expect(dashboardDe.attributes['ng-reflect-disabled']).toBe('true');
-      expect(dashboardLink.navigatedTo).toBeNull('should not have navigated yet');
+      expect(dashboardLink.navigatedTo).toBeNull(
+        'should not have navigated yet',
+      );
 
       /* note: clicking on a disabled html element throws an error => using the debug element */
       /* ngZone needed to avoid an error */

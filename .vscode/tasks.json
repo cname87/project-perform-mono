@@ -87,6 +87,8 @@
         }
       }
     },
+    /* npm start backend index.js */
+    /* runs 'npm run start'in /backend which starts backend server */
     {
       "label": "npm start backend index.js",
       "type": "shell",
@@ -134,6 +136,7 @@
         "panel": "dedicated"
       }
     },
+    /* npm build backend */
     {
       "label": "npm build backend",
       "type": "npm",
@@ -150,6 +153,7 @@
         "panel": "shared"
       }
     },
+    /* npm build:dev frontend */
     {
       "label": "npm build:dev frontend",
       "type": "shell",
@@ -186,6 +190,7 @@
         }
       }
     },
+    /* npm build:e2e frontend */
     {
       "label": "npm build:e2e frontend",
       "type": "shell",
@@ -222,6 +227,7 @@
         }
       }
     },
+    /* npm resetDatabase */
     {
       "label": "npm resetDatabase",
       "type": "shell",
@@ -240,6 +246,7 @@
       "group": "build",
       "problemMatcher": []
     },
+    /* Taskkill node.exe */
     {
       "label": "Taskkill node.exe",
       "type": "shell",
@@ -254,6 +261,7 @@
       },
       "problemMatcher": []
     },
+    /* Is Server Up? */
     {
       "label": "Is Server Up?",
       "type": "process",
@@ -276,6 +284,7 @@
       },
       "problemMatcher": []
     },
+    /* Start Server*/
     {
       "label": "Start Server",
       "type": "process",
@@ -317,6 +326,7 @@
         }
       ]
     },
+    /* npm delete nyc file */
     {
       "label": "npm delete nyc file",
       "type": "shell",
