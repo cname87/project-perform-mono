@@ -2,15 +2,13 @@
  * This module tests authentication functionality i.e. login and logout.
  * It also tests the profile page.
  */
-
-import browserLogs from 'protractor-browser-logs';
+import { browser } from 'protractor';
 
 import { getLoginPage } from '../pages/login.page';
 import { getDashboardPage } from '../pages/dashboard.page';
 import { getUserProfilePage } from '../pages/user-profile.page';
 import { getHelpers } from '../e2e-helpers';
 import { getRootElements } from '../pages/elements/root.elements';
-import { browser } from 'protractor';
 
 describe('Authentication:', () => {
 
@@ -21,8 +19,6 @@ describe('Authentication:', () => {
     setTimeout,
     resetTimeout,
     resetDatabase,
-    setupLogsMonitor,
-    checkLogs,
   } = getHelpers();
 
   const createExpected = () => {
@@ -79,19 +75,9 @@ describe('Authentication:', () => {
 
   describe('If not authenticated shows a login page', () => {
 
-    let logs = {} as browserLogs.BrowserLogs;
-
     /* the app must be logged out at this stage */
     beforeAll(async () => {
       await awaitElementVisible(getRootElements().loginBtn);
-    });
-
-    beforeEach(async () => {
-      logs = await setupLogsMonitor();
-    });
-
-    afterEach(async () => {
-      await checkLogs(logs);
     });
 
     it(`with a banner containing a login button only`, async () => {

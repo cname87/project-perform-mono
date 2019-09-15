@@ -1,11 +1,13 @@
 import { NgxLoggerLevel } from 'ngx-logger';
 
 export const environment = {
+  /* default to production */
   production: true,
+  /* used to inform error testing interceptor */
   e2eTesting: true,
-  /* console logging level */
-  logLevel: NgxLoggerLevel.TRACE,
-  /* server logging level */
+  /* console logging level OFF - same as production setting */
+  logLevel: NgxLoggerLevel.OFF,
+  /* server logging level same as production*/
   serverLogLevel: NgxLoggerLevel.ERROR,
   /* server logs go to this url */
   apiUrl: 'http://localhost:1337/',

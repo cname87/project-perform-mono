@@ -7,11 +7,12 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import Rollbar from 'rollbar';
-import { NGXLogger } from 'ngx-logger';
+import { NGXLogger, NgxLoggerLevel } from 'ngx-logger';
 import { ToastrService } from 'ngx-toastr';
 
 import { MessageService } from '../message-service/message.service';
 import { errorTypes } from '../../config';
+import { environment } from '../../../environments/environment';
 
 /* set up the rollbar service */
 const rollbarConfig = {
@@ -91,6 +92,12 @@ export class ErrorHandlerService implements ErrorHandler {
    * @param errReport This is either a managed error and will thus meet the IErrReport interface but may also be any unexpected error.
    */
   handleError(errReport: any): void {
+    /* if e2e testing then change logger config to log error notifications */
+    const originalLogLevel = this.logger.getConfigSnapshot().level;
+    if (environment.e2eTesting) {
+      this.logger.updateConfig({ level: NgxLoggerLevel.ERROR });
+    }
+
     this.logger.trace(ErrorHandlerService.name + ': handleError called');
 
     switch (errReport.allocatedType) {
@@ -127,8 +134,13 @@ export class ErrorHandlerService implements ErrorHandler {
             ErrorHandlerService.name + ': Showing toastr message',
           );
           this.toastr.error('ERROR!', 'An unknown error has occurred');
+          /* reset logger level */
+          this.logger.updateConfig({ level: originalLogLevel });
         });
       });
     }
+
+    /* reset logger level */
+    this.logger.updateConfig({ level: originalLogLevel });
   }
 }
