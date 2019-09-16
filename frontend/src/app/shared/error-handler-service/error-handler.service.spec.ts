@@ -281,7 +281,7 @@ describe('ErrorHandlerService', () => {
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: Reporting: ERROR: An unknown error occurred',
       );
-      expect(navigateByUrlSpy).toHaveBeenCalledWith('/errorinformation/error');
+      expect(navigateByUrlSpy).toHaveBeenCalledWith('/information/error');
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: Showing toastr message',
       );
@@ -315,7 +315,7 @@ describe('ErrorHandlerService', () => {
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: Reporting: ERROR: An unknown error occurred',
       );
-      expect(navigateByUrlSpy).toHaveBeenCalledWith('/errorinformation/error');
+      expect(navigateByUrlSpy).toHaveBeenCalledWith('/information/error');
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: Showing toastr message',
       );

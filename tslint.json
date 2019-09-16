@@ -79,7 +79,10 @@
     ],
     "no-misused-new": true,
     "no-non-null-assertion": false, // allow use of ! to assert non-null
-    "no-object-literal-type-assertion": [true, { "allow-arguments": true }],
+    "no-object-literal-type-assertion": [
+      true,
+      { "allow-arguments": true }
+    ], // spurious error warning
     "no-redundant-jsdoc": true,
     "no-shadowed-variable": true,
     "no-string-literal": false,
@@ -109,7 +112,8 @@
     "radix": true,
     "semicolon": [
       true,
-      "always"
+      "always",
+      "ignore-bound-class-methods"
     ],
     "triple-equals": [
       true,

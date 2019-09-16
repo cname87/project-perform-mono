@@ -12,7 +12,7 @@
  * The following parameters should be set in config.ts:
  * config.IS_NO_DB_OK = false; i.e. a database is required.
  *
- * The database used up by the server is checked below to ensure it is 'test' (as driven by the process.env variable 'TEST_MODE')  If it isn't the test run will abort.
+ * The database used up by the server is checked below to ensure it is 'test' (as driven by the process.env variable 'DB_MODE')  If it isn't the test run will abort.
  *
  */
 
@@ -24,7 +24,7 @@ debug(`Starting ${modulename}`);
 /* set up mocha, sinon & chai */
 import chai = require('chai');
 import 'mocha';
-import sinon = require('sinon');
+import sinon from 'sinon';
 import sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 const expect = chai.expect;
@@ -41,7 +41,9 @@ import puppeteer from 'puppeteer-core';
 import winston = require('winston');
 
 /* internal dependencies */
-import { IServerIndex } from '../../src/configServer';
+import { IServerIndex, IRequestApp } from '../../src/configServer';
+
+/* variables */
 const indexPath = '../../src/index';
 const dbTestName = 'test';
 /* path to chrome executable */
@@ -73,7 +75,7 @@ describe('server API', () => {
     return new Promise(async (resolve, reject) => {
       /* use proxyquire in case index.js already required */
       const { index: serverIndex } = proxyquire(indexPath, {});
-      /* Note: You need index.ts to define 'event' before the db setup call as the async db set up (which cannot easily be awaited) means the next line is executed before the db is up ND 'index.event' needs to be defined by then */
+      /* Note: You need index.ts to define 'event' before the db setup call as the async db set up (which cannot easily be awaited) means the next line is executed before the db is up and 'index.event' needs to be defined by then */
       serverIndex.event.once(indexRunApp, (arg: { message: string }) => {
         if (arg.message === 'Server running 0') {
           debug(modulename + ': server running message caught: ' + arg.message);
@@ -100,6 +102,17 @@ describe('server API', () => {
     spyLoggerError = sinon.spy(index.appLocals.logger, 'error');
     spyDumpError = sinon.spy(index.appLocals, 'dumpError');
     eventEmitter = index.appLocals.event;
+    /* stub the authenticate handler and set req.auth,sub to the name of the test database collection */
+    sinon
+      .stub(index.appLocals, 'authenticateHandler')
+      .callsFake((_req, _res, next) => {
+        const req = _req as IRequestApp;
+        req.auth = {
+          sub: process.env.userTestId as string,
+          permissions: ['all:testDB'],
+        };
+        next();
+      });
   };
 
   /* awaits that index.ts has shut and fired the completion event */
@@ -155,19 +168,18 @@ describe('server API', () => {
 
       const browserEventsCallback = (arg: { message: string }) => {
         /* try needed as errors thrown within this function
-         * will be seen as a server error and not fail the
-         * mocha test - a reject causes a test case fail. */
+         will be seen as a server error and not fail the
+         mocha test - a reject causes a test case fail. */
         try {
           switch (arg.message) {
             case 'API tests start':
-              index.appLocals.models.members.resetCount();
-              break;
             case 'Failed API tests start':
             case 'Invalid API requests tests start':
             case 'Angular fall back test start':
             case 'File retrieval test start':
               break;
             case 'Bad database tests start':
+              /* this mocks membersHandlers mongoose queries */
               /* only way to stub mongoose queries is to mock entire chain */
               //
               /* mock addMember */

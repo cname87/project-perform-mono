@@ -51,7 +51,7 @@ async function sendMessage(number: number, message: string) {
 /* tests that the datbase is use */
 before('Test that the test database is in use', async () => {
   console.log('Testing that test datbase is in use');
-  const url = 'https://localhost:1337/api-v1/isTestDatabase';
+  const url = 'https://localhost:1337/testServer/isTestDatabase';
   const response = await sendRequest(url, 'GET');
   chai.expect(response.ok).to.eql(true);
 

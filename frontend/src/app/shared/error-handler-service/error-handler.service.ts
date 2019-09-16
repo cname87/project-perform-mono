@@ -7,11 +7,12 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import Rollbar from 'rollbar';
-import { NGXLogger } from 'ngx-logger';
+import { NGXLogger, NgxLoggerLevel } from 'ngx-logger';
 import { ToastrService } from 'ngx-toastr';
 
 import { MessageService } from '../message-service/message.service';
 import { errorTypes } from '../../config';
+import { environment } from '../../../environments/environment';
 
 /* set up the rollbar service */
 const rollbarConfig = {
@@ -91,6 +92,13 @@ export class ErrorHandlerService implements ErrorHandler {
    * @param errReport This is either a managed error and will thus meet the IErrReport interface but may also be any unexpected error.
    */
   handleError(errReport: any): void {
+    /* if e2e testing then change logger config to log trace notifications */
+    let originalLogLevel = NgxLoggerLevel.TRACE;
+    if (environment.e2eTesting) {
+      originalLogLevel = this.logger.getConfigSnapshot().level;
+      this.logger.updateConfig({ level: NgxLoggerLevel.TRACE });
+    }
+
     this.logger.trace(ErrorHandlerService.name + ': handleError called');
 
     switch (errReport.allocatedType) {
@@ -122,13 +130,22 @@ export class ErrorHandlerService implements ErrorHandler {
       this.zone.run(() => {
         this.log('ERROR: An unknown error occurred');
         /* navigate to error information page and then show toastr message */
-        this.router.navigateByUrl('/errorinformation/error').then(() => {
+        this.router.navigateByUrl('/information/error').then(() => {
           this.logger.trace(
             ErrorHandlerService.name + ': Showing toastr message',
           );
           this.toastr.error('ERROR!', 'An unknown error has occurred');
+          /* if e2e testing reset logger level */
+          if (environment.e2eTesting) {
+            this.logger.updateConfig({ level: originalLogLevel });
+          }
         });
       });
+    }
+
+    /* if e2e testing reset logger level */
+    if (environment.e2eTesting) {
+      this.logger.updateConfig({ level: originalLogLevel });
     }
   }
 }

@@ -38,12 +38,15 @@ import {
   IControllers,
   IErr,
   IExpressApp,
+  IModelExtended,
   processExtended,
   Server,
   typeSigInt,
   typeUncaught,
   IServerIndex,
 } from './configServer';
+import { authenticateHandler } from './handlers/authenticateHandler';
+import { authorizeHandler } from './handlers/authorizeHandler';
 
 /*
  * Define aliases for config parameters.
@@ -58,9 +61,7 @@ const { miscHandlers, membersApi } = config;
 /* errorHandler middleware */
 const { errorHandlers } = config;
 /* route controllers */
-const { failController } = config;
-/* database models */
-const { createModelMembers, createModelTests } = config;
+const { apiController, failController } = config;
 /* Create the single instances of the general logger & dumpError utilities, and the server logger middleware.  These are passed via the appLocals object. Also, other modules can create new instances later without any parameters and they will receive the same instance. */
 const Logger = config.Logger;
 const logger = new Logger() as winston.Logger;
@@ -77,19 +78,25 @@ appLocals.config = config;
 /* generate the controllers object */
 const controllers: IControllers = {};
 controllers.fail = failController;
+controllers.api = apiController;
 appLocals.controllers = controllers;
-/* appLocals.database filled during server startup */
-/* appLocals.dbConnection filled during server startup */
+/* appLocals.database is filled during server startup */
+/* appLocals.dbConnection is filled during server startup */
 appLocals.dumpError = dumpError;
 appLocals.errorHandler = errorHandlers;
+appLocals.miscHandlers = miscHandlers;
+appLocals.authenticateHandler = authenticateHandler;
+appLocals.authorizeHandler = authorizeHandler;
 /* event emitter to signal server up etc */
 /* create before db setup call as async nature of db setup means index exports before db up and index.event definition needed by mocha so it can await server up event */
 const event: EventEmitter = new EventEmitter();
 appLocals.event = event;
-appLocals.miscHandlers = miscHandlers;
 appLocals.membersApi = membersApi;
 appLocals.logger = logger;
-/* appLocals.models filled during server startup */
+/* appLocals.models.members is filled during api call */
+appLocals.models = {
+  members: ({} as any) as IModelExtended,
+};
 appLocals.serverLogger = serverLogger;
 
 /* the express app used throughout */
@@ -151,6 +158,7 @@ async function runApp() {
     debug(modulename + ': calling the database');
 
     /* create a database connection */
+    /* the database will be either a test or production database depending on an env parameter */
     const database = await runDatabaseApp();
     appLocals.database = database;
 
@@ -158,16 +166,11 @@ async function runApp() {
     const dbConnection = database.dbConnection;
     appLocals.dbConnection = dbConnection;
 
-    /* set database ready state variable */
+    /* read whether database is indeed connected or not */
     isDbReady = appLocals.dbConnection.readyState;
 
     if (isDbReady === DBReadyState.Connected) {
       debug(modulename + ': database set up complete');
-
-      /* create database models */
-      appLocals.models = {} as any;
-      appLocals.models.tests = createModelTests(database);
-      appLocals.models.members = createModelMembers(database);
     } else {
       logger.error(modulename + ': database failed to connect');
     }
@@ -177,7 +180,7 @@ async function runApp() {
     dumpError(err);
   }
 
-  /* call the http server if db connected or not needed otherwise exit */
+  /* call the http server if db connected or not needed, otherwise exit */
   if (isDbReady === DBReadyState.Connected || config.IS_NO_DB_OK) {
     debug(modulename + ': calling the http server');
 

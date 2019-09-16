@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF, Location } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ErrorHandler } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { MemberDetailComponent } from './member-detail.component';
@@ -31,6 +32,8 @@ interface IErrorHandlerSpy {
 describe('MemberDetailComponent', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create spies on memberService methods */
     const membersServiceSpy = jasmine.createSpyObj('membersService', [
       'getMember',
@@ -57,6 +60,7 @@ describe('MemberDetailComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteStub },
         { provide: Location, useValue: locationSpy },
         { provide: ErrorHandler, useValue: errorHandlerSpy },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
   }

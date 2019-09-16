@@ -2,8 +2,8 @@
 /* the .env file must be in process.cwd() */
 import dotenv = require('dotenv');
 dotenv.config();
-/* set TEST_MODE to true to load the test database */
-process.env.TEST_MODE = 'true';
+/* set DB_MODE to 'test' to load the test database */
+process.env.DB_MODE = 'test';
 
 /* file header */
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));

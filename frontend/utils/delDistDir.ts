@@ -1,9 +1,9 @@
 /**
- * * Utility to delete a dist directory *
+ * Utility to delete a dist directory *
  *
- * * Usage:
+ * Usage:
  *
- * Used in package.com.
+ * Called in package.com.
  *
  * The dist directory to be deleted is passed in as a parameter.
  * package.com script: "npm run delDistDir.ts <pathToDistDir>".

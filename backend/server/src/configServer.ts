@@ -21,7 +21,7 @@ const appRoot = appRootObject.toString();
 
 /* import all required modules */
 
-/* server class abd functions */
+/* server class and functions */
 import { Server } from './server/serverOps';
 import { startServer } from './server/startserver';
 import { runServer } from './server/runServer';
@@ -32,15 +32,19 @@ import { Logger } from '../../utils/src/logger';
 /* a utility to dump errors to the logger */
 import { DumpError } from '../../utils/src/dumpError';
 /* access to debug logger for mocha - must be imported this way */
-import * as ERROR_HANDLERS from './handlers/errorhandler';
+import * as ERROR_HANDLERS from './handlers/errorHandler';
 /* error handler middleware functions */
 const errorHandlers = ERROR_HANDLERS.errorHandlers;
+/* authentication handler */
+import { authenticateHandler } from './handlers/authenticateHandler';
+/* authorization handler */
+import { authorizeHandler } from './handlers/authorizeHandler';
 /* database class and creation function */
 import { Database, runDatabaseApp } from '../../database/src/index';
 /* models */
-import { createModelTests } from '../../models/src/tests';
 import { createModelMembers } from '../../models/src/members';
 /* controllers */
+import { apiController } from './controllers/api';
 import { failController } from './controllers/fail';
 /* handlers for /members api */
 import { membersApi } from './handlers/api/membersApi';
@@ -67,9 +71,10 @@ export const config = {
   DumpError,
   ERROR_HANDLERS,
   errorHandlers,
+  authenticateHandler,
   runDatabaseApp,
-  createModelTests,
   createModelMembers,
+  apiController,
   failController,
   membersApi,
   membersHandlers,
@@ -210,7 +215,7 @@ export interface IControllers {
 }
 
 /* extend Model to include autoinc resetCounter() */
-interface IModelExtended extends Model<Document, {}> {
+export interface IModelExtended extends Model<Document, {}> {
   resetCount: () => void;
   nextCount: () => number;
 }
@@ -227,19 +232,21 @@ export interface IAppLocals {
   dbConnection: Connection;
   /* error logger */
   dumpError: (err: any) => void;
+  /* handlers */
+  miscHandlers: typeof miscHandlers;
+  authenticateHandler: typeof authenticateHandler;
+  authorizeHandler: typeof authorizeHandler;
   /* error handler middleware */
   errorHandler: typeof errorHandlers;
   /* event emitter used for test */
   event: EventEmitter;
   /* logger service */
   logger: winston.Logger;
-  /* handles object*/
-  miscHandlers: typeof miscHandlers;
+
   membersApi: typeof membersApi;
   memberhandlers: typeof membersHandlers;
   /* database models object */
   models: {
-    tests: Model<Document, {}>;
     members: IModelExtended;
   };
   /* morgan server logger */
@@ -253,9 +260,13 @@ export interface IExpressApp extends Application {
   appLocals: IAppLocals;
 }
 
-/* extension of REQUEST to support appLocals in app */
+/* extension of REQUEST to support Express app and the Auth0 auth parameter returned by express-jwt */
 export interface IRequestApp extends Request {
   app: IExpressApp;
+  auth?: {
+    sub: string;
+    permissions: string[];
+  };
 }
 
 /* defines a team member */

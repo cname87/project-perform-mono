@@ -56,10 +56,8 @@ export class MembersDataProvider {
     }
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
-
     /* set Content-Type header - what content is being sent */
     headers = headers.set('Content-Type', 'application/json');
 
@@ -152,7 +150,6 @@ export class MembersDataProvider {
     }
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
 
@@ -203,10 +200,8 @@ export class MembersDataProvider {
     }
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
-
     /* set Content-Type header - what content is being sent */
     headers = headers.set('Content-Type', 'application/json');
 
@@ -250,7 +245,6 @@ export class MembersDataProvider {
     }
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
 
@@ -292,7 +286,6 @@ export class MembersDataProvider {
     this.logger.trace(MembersDataProvider.name + ': deleteMembers called');
 
     let headers = this.defaultHeaders;
-
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
 

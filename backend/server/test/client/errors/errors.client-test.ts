@@ -428,7 +428,7 @@ describe('server crash', () => {
   });
 
   after('Close window', async () => {
-    await sleep(1500); // delay as errorhandler delays before calling process.exit
+    await sleep(1500); // delay as error handler delays before calling process.exit
 
     await new Promise(async (resolve) => {
       setTimeout(() => {

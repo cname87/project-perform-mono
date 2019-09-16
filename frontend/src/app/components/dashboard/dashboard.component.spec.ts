@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { ErrorHandler } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 
 import { DashboardComponent } from './dashboard.component';
 /* members contains an array of 10 dummy members */
@@ -25,6 +26,9 @@ interface IErrorHandlerSpy {
 describe('DashboardComponent', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
+
     /* create spy objects */
     const memberServiceSpy = jasmine.createSpyObj('memberService', [
       'getMembers',
@@ -43,6 +47,7 @@ describe('DashboardComponent', () => {
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: MembersService, useValue: memberServiceSpy },
         { provide: ErrorHandler, useValue: errorHandlerSpy },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
   }
@@ -100,7 +105,7 @@ describe('DashboardComponent', () => {
     );
 
     /* create the spies */
-    /* isError is passed to create a getMembers that returns an error */
+    /* isError is passed to create a getMembersSpy that returns an error */
     const { getMembersSpy, handleErrorSpy } = createSpies(
       membersServiceSpy,
       errorHandlerSpy,

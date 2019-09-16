@@ -3,6 +3,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SpyLocation } from '@angular/common/testing';
 import { ErrorHandler } from '@angular/core';
+import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
 import { MembersListComponent } from './members-list.component';
@@ -13,12 +14,14 @@ import {
   asyncData,
   click,
   asyncError,
+  RouterLinkDirectiveStub,
 } from '../../shared/test-helpers';
 import {
   IMember,
   IMemberWithoutId,
 } from '../../data-providers/members.data-provider';
 import { members } from '../../shared/mocks/mock-members';
+import { AppRoutingModule } from '../../router/app.routing.module';
 
 /* spy interfaces */
 interface IMembersServiceSpy {
@@ -33,6 +36,8 @@ interface IErrorHandlerSpy {
 describe('MembersListComponent', () => {
   /* setup function run by each sub test suite*/
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create spies on memberService methods */
     const membersServiceSpy = jasmine.createSpyObj('membersService', [
       'getMembers',
@@ -51,13 +56,29 @@ describe('MembersListComponent', () => {
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: MembersService, useValue: membersServiceSpy },
         { provide: ErrorHandler, useValue: errorHandlerSpy },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
-    }).compileComponents();
+    })
+      .overrideModule(AppModule, {
+        remove: {
+          /* removing router module and replacing it below to avoid spurious errors in authGuard etc */
+          imports: [AppRoutingModule],
+        },
+        add: {
+          /* declare RouterLinkDirective in AppModule override (rather than declaring it in AppModule). Declaring locally whilst importing AppModule appears not to work) */
+          declarations: [RouterLinkDirectiveStub],
+          /* adding RouterTestingModule and sending all paths to a dummy component */
+          imports: [
+            RouterTestingModule.withRoutes([
+              { path: '**', component: MembersListComponent },
+            ]),
+          ],
+        },
+      })
+      .compileComponents();
   }
 
-  /**
-   * Gets key DOM elements.
-   */
+  /* get key DOM elements */
   class Page {
     get linksArray() {
       return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'a');
@@ -126,9 +147,8 @@ describe('MembersListComponent', () => {
     };
   }
 
-  /**
-   * Create the component, initialize it & set test variables.
-   */
+  /* create the component, and get test variables */
+  /* isError is passed to create a getMembersSpy that returns an error */
   async function createComponent(isError = false) {
     /* create the fixture */
     const fixture = TestBed.createComponent(MembersListComponent);
@@ -148,6 +168,7 @@ describe('MembersListComponent', () => {
     /* create the component instance */
     const component = fixture.componentInstance;
 
+    /* get the spies */
     const {
       getMembersSpy,
       addMemberSpy,
@@ -179,19 +200,19 @@ describe('MembersListComponent', () => {
   /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
   async function preSetup(isError = false) {
     await mainSetup();
-    const methods = await createComponent(isError);
-    return methods;
+    const testVars = await createComponent(isError);
+    return testVars;
   }
 
   /* setup function run by each it test function that runs tests after the component and view are fully established */
   async function setup(isError = false) {
-    const methods = await preSetup(isError);
+    const testVars = await preSetup(isError);
     /* initiate ngOnInit and view changes etc */
-    methods.fixture.detectChanges();
-    await methods.fixture.whenStable();
-    methods.fixture.detectChanges();
-    await methods.fixture.whenStable();
-    return methods;
+    testVars.fixture.detectChanges();
+    await testVars.fixture.whenStable();
+    testVars.fixture.detectChanges();
+    await testVars.fixture.whenStable();
+    return testVars;
   }
 
   describe('after ngOnInit', async () => {
@@ -399,7 +420,7 @@ describe('MembersListComponent', () => {
       });
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
-      await fixture.detectChanges();
+      await fixture.whenStable();
       const id = expected.membersArray[expected.memberIndex].id;
       expect(spyLocation.path()).toEqual(
         `/detail/${id}`,

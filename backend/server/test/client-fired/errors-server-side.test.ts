@@ -192,7 +192,7 @@ describe('Server', () => {
               // second error message informs on header already sent
               expect(
                 spyErrorHandlerDebug.calledWith(
-                  '\\errorhandler.js: not sending a client ' +
+                  '\\errorHandler.js: not sending a client ' +
                     'response as headers already sent',
                 ),
               ).to.be.true;
@@ -231,7 +231,7 @@ describe('Server', () => {
               reject(new Error('should not reach this point'));
           }
         } catch (err) {
-          /* a test above failed => exit test */
+          debug(modulename + ': test fail => exit test');
           reject(err);
         }
 

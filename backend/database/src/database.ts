@@ -150,8 +150,9 @@ async function closeConnection(
 }
 
 /**
- * Creates a Mongoose model based on a calling database
- * and supplied schema and collection.
+ * Creates a Mongoose model (which is an object that allows access to a named mongoDB collection).
+ * The model (or collection connection) will be on the parent database instance
+ * with the supplied collection name, (and using the supplied schema).
  * @params
  * - this: Accesses logger and dumpError.
  * - ModelName: The name to give the created model.
@@ -176,7 +177,10 @@ function createModel(
   });
 
   try {
-    const DbModel = this.dbConnection.model(ModelName, DbSchema);
+    /* compile the model if it doesn't already exist */
+    const DbModel =
+      this.dbConnection.models[ModelName] ||
+      this.dbConnection.model(ModelName, DbSchema);
     debug(modulename + `: mongoose model \'${DbModel.modelName}\' created`);
     return DbModel;
   } catch (err) {

@@ -20,14 +20,13 @@ import compression = require('compression');
 import cookieParser = require('cookie-parser');
 import express = require('express');
 import { Request, NextFunction, Response } from 'express';
-import { OpenAPIBackend } from 'openapi-backend';
 import path = require('path');
 import urlParser = require('url');
 import util = require('util');
 import uuidv1 = require('uuid/v1');
 
 /* internal dependencies */
-import { IErr, IExpressApp, IRequestApp } from '../configServer';
+import { IExpressApp, IControllers } from '../configServer';
 
 /**
  * Sets up express middleware and responds to incoming requests.
@@ -40,7 +39,7 @@ import { IErr, IExpressApp, IRequestApp } from '../configServer';
 async function runServer(
   app: IExpressApp,
   config: any,
-  controllers: any,
+  controllers: IControllers,
   errorHandlers: any,
   handles: any,
   serverLogger: any,
@@ -92,7 +91,7 @@ async function runServer(
     app.use((req, _res, next) => {
       debug('\n' + modulename + ': *** Request received ***\n');
       debug(modulename + ': req.url: ' + req.url);
-      debug(modulename + ': re.baseUrl: ' + req.baseUrl);
+      debug(modulename + ': req.baseUrl: ' + req.baseUrl);
       debug(modulename + ': req.originalUrl: ' + req.originalUrl);
       debug(modulename + ': req.method: ' + req.method);
       debug(
@@ -126,9 +125,20 @@ async function runServer(
       express.static(config.NODE_MODULES_PATH, staticTestOptions),
     );
 
+    /* respond to request whether test database is in use */
+    app.use('/testServer/isTestDatabase', (_req, res, _next) => {
+      debug(modulename + ': calling isTestDatabase');
+      const result = {
+        isTestDatabase:
+          app.appLocals.database.dbConnection.db.databaseName ===
+          process.env.DB_DATABASE_TEST,
+      };
+      res.status(200).json(result);
+    });
+
     /* use fail controller to test errorhandling */
     app.use('/testServer/fail', (req, res, next) => {
-      debug(modulename + ': calling .../fail controller');
+      debug(modulename + ': calling the fail controller');
       controllers.fail(req, res, next);
     });
 
@@ -136,138 +146,14 @@ async function runServer(
     app.post('/raiseEvent', handles['raiseEvent']);
   }
 
-  /* route paths as per the api file */
-  const api = new OpenAPIBackend({
-    definition: config.API_FILE,
-    apiRoot: '/api-v1',
-    strict: true,
-    validate: true,
-    withContext: true,
-    ajvOpts: {
-      unknownFormats: ['int32', 'string'],
-      verbose: true,
+  /* handle openapi-backend calls a handler based on the path and the api */
+  app.use(
+    /* use for api paths only */
+    process.env.API_BASE_PATH as string,
+    (req, res, next) => {
+      debug(modulename + ': calling the api controller');
+      controllers.api(req, res, next);
     },
-    handlers: {
-      getIsTestDatabase: (
-        context,
-        req: IRequestApp,
-        res: Response,
-        next: NextFunction,
-      ) => {
-        const result = {
-          isTestDatabase:
-            req.app.appLocals.database.dbConnection.db.databaseName ===
-            process.env.DB_DATABASE_TEST,
-        };
-        req.app.appLocals.miscHandlers.writeJson(
-          context,
-          req,
-          res,
-          next,
-          200,
-          result,
-        );
-      },
-      getMember: (
-        context,
-        req: IRequestApp,
-        res: Response,
-        next: NextFunction,
-      ) => app.appLocals.membersApi.getMember(context, req, res, next),
-      getMembers: (
-        context,
-        req: IRequestApp,
-        res: Response,
-        next: NextFunction,
-      ) => app.appLocals.membersApi.getMembers(context, req, res, next),
-      addMember: (
-        context,
-        req: IRequestApp,
-        res: Response,
-        next: NextFunction,
-      ) => app.appLocals.membersApi.addMember(context, req, res, next),
-      deleteMember: (
-        context,
-        req: IRequestApp,
-        res: Response,
-        next: NextFunction,
-      ) => app.appLocals.membersApi.deleteMember(context, req, res, next),
-      deleteMembers: (
-        context,
-        req: IRequestApp,
-        res: Response,
-        next: NextFunction,
-      ) => app.appLocals.membersApi.deleteMembers(context, req, res, next),
-      updateMember: (
-        context,
-        req: IRequestApp,
-        res: Response,
-        next: NextFunction,
-      ) => app.appLocals.membersApi.updateMember(context, req, res, next),
-      validationFail: (
-        context,
-        _req: Request,
-        _res: Response,
-        next: NextFunction,
-      ) => {
-        debug(modulename + ': running validationFail');
-
-        app.appLocals.logger.error(modulename + ': API validation fail');
-        const err: IErr = {
-          name: 'REQUEST_VALIDATION_FAIL',
-          message: 'API validation fail',
-          statusCode: 400,
-          dumped: false,
-        };
-
-        if (!(context && context.validation && context.validation.errors)) {
-          /* openapi-backend types require this test */
-          /* unexpected error if no context.validation.errors returned */
-          err.message = err.message + ': unexpected failure';
-          err.statusCode = 500;
-          return next(err);
-        }
-
-        /* dump detail and then strip back for the client */
-        err.message =
-          'API validation fail\n' + util.inspect(context.validation.errors);
-        app.appLocals.dumpError(err);
-        err.message = 'API validation fail';
-        next(err);
-      },
-      notFound: async (
-        /* called if path not matched - needed or an exception thrown */
-        _context,
-        _req: Request,
-        _res: Response,
-        next: NextFunction,
-      ) => {
-        debug(modulename + ': api handler running notFound');
-
-        /* let angular or errorhandler deal with not founds */
-        next();
-      },
-    },
-  });
-
-  /* initialize Openapi-backend middleware */
-  api.init();
-
-  /* openapi-backend calls a handler based on the path and the api */
-  app.use((req, res, next) =>
-    api.handleRequest(
-      /* the first parameter is passed to openapi-backend middleware - the others are passed to the called handler function */
-      {
-        method: req.method,
-        path: req.path,
-        body: req.body,
-        query: req.query,
-        headers: req.headers as { [key: string]: string | string[] },
-      },
-      req,
-      res,
-      next,
-    ),
   );
 
   /* serve the angular files */

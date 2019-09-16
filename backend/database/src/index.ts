@@ -27,6 +27,7 @@ import {
 
 /**
  * This function connects to a MongoDB online database.
+ * The database connection returned is either a test or production database depending on an env parameter, as set in the config database file.
  *
  * @returns The function returns a Database instance.
  *

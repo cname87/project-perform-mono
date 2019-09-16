@@ -1,25 +1,6 @@
 /* import theme with styling variables */
 @import 'src/styles/main-theme.scss';
 
-/* style the page header */
-.mat-display-1 {
-  // margin-top: 5rem;
-  text-align: center;
-}
-
-/* keep a margin between nav bar and the routed components */
-nav {
-  margin-bottom: $default-gap;
-}
-
-/* style a tab that is active via browser (and not via a click) */
-a.item-active {
-  /* tab text stays solid black even when you click on the browser link */
-  opacity: 1.0;
-  /* override the disabled color so the disabled detail tab can appear selected */
-  color: rgba(0, 0, 0, 1.00);
-}
-
 /* provide a margin above the divider */
 mat-divider.mat-divider {
   margin-top: $default-gap;

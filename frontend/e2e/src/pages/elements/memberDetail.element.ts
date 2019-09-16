@@ -2,7 +2,7 @@ import { by, element } from 'protractor';
 
 import { IMember } from 'src/app/data-providers/models/member';
 
-export function getMemberDetailElement() {
+export function getMemberDetailElements() {
 
   /* DOM elements */
   const tag = element(by.css('app-member-detail'));

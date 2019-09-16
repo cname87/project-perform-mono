@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { APP_BASE_HREF } from '@angular/common';
+import { NGXLogger } from 'ngx-logger';
 
 import {
   MembersDataProvider,
@@ -11,8 +13,6 @@ import { asyncData, asyncError } from '../shared/test-helpers';
 import { membersConfiguration } from './configuration';
 import { ICount } from './models/count';
 import { AppModule } from '../app.module';
-import { RouterTestingModule } from '@angular/router/testing';
-import { APP_BASE_HREF } from '@angular/common';
 
 interface IHttpClientStub {
   post: jasmine.Spy;
@@ -23,6 +23,8 @@ interface IHttpClientStub {
 
 describe('MembersDataProvider', () => {
   async function mainSetup() {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create stub instances with spies for injection */
     const mockMemberWithoutId = { name: 'testName' };
     const httpClientStub: IHttpClientStub = {
@@ -68,17 +70,17 @@ describe('MembersDataProvider', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [AppModule, RouterTestingModule],
+      imports: [AppModule],
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: HttpClient, useValue: httpClientStub },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
 
     const membersDataProvider = TestBed.get(MembersDataProvider);
     const httpClient: IHttpClientStub = TestBed.get(HttpClient);
-
     return {
       mockMemberWithoutId,
       membersDataProvider,
@@ -113,13 +115,7 @@ describe('MembersDataProvider', () => {
       'Http method called with configured url',
     );
 
-    /* last parameter is options object */
-    expect(argsArray[argsArray.length - 1].withCredentials).toEqual(
-      membersConfiguration.withCredentials,
-      'Http method called with configured withCredentials option',
-    );
-
-    /* test options.headers */
+    /* create expected headers to test against */
     let headers = membersConfiguration.defaultHeaders;
     headers = headers.set('Accept', 'application/json');
     /* only methods 'post' and 'put' set Content-Type */
@@ -128,10 +124,6 @@ describe('MembersDataProvider', () => {
       headers = headers.set('Content-Type', 'application/json');
       contentType = 'application/json';
     }
-    expect(argsArray[argsArray.length - 1].headers).toEqual(
-      headers,
-      'Http method called with configured headers',
-    );
     expect(argsArray[argsArray.length - 1].headers.get('Accept')).toBe(
       'application/json',
       'Http method called with configured header Accept option',
@@ -419,8 +411,10 @@ describe('MembersDataProvider', () => {
   describe('getMembers', testGetMembers('testName', 'testName'));
   /* test custom encoder */
   describe('getMembers', testGetMembers('test+1', 'test%2B1'));
+  // tslint:disable-next-line: no-magic-numbers
   describe('getMember', testGetMember(9));
   describe('updateMember', testUpdateMember({ id: 21, name: 'test21' }));
+  // tslint:disable-next-line: no-magic-numbers
   describe('deleteMember', testDeleteMember(9));
   describe('deleteMembers', testDeleteMembers());
 });

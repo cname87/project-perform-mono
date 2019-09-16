@@ -44,11 +44,12 @@ export class MembersService {
    */
   getMembers(term?: string): Observable<IMember[]> {
     this.logger.trace(MembersService.name + ': getMembers called');
-    this.logger.trace(this.isTesting);
-    // console.log(environment);
 
     /* e2e error test - only if e2e test and match to a specific term */
     if (this.isTesting && term === errorSearchTerm) {
+      this.logger.trace(
+        MembersService.name + ': e2e testing - throwing an error',
+      );
       throw new Error('Test application error');
     }
 

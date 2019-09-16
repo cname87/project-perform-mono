@@ -33,7 +33,12 @@
 
     // extra rules added
     "no-console": true,
-    "no-magic-numbers": true,
+    "no-magic-numbers": [
+      true,
+      {
+        "allowed-numbers": [-1, 0, 1, 2]
+      }
+    ],
 
     // extra rules added from npm codelyzer page
     "contextual-lifecycle": true,

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { APP_BASE_HREF } from '@angular/common';
+import { NGXLogger } from 'ngx-logger';
 
 import { MembersService } from './members.service';
 import { MessageService } from '../message-service/message.service';
@@ -14,7 +15,7 @@ import { asyncData, asyncError } from '../test-helpers';
 import { members } from '../mocks/mock-members';
 import { ICount } from '../../data-providers/models/count';
 import { AppModule } from '../../app.module';
-import { IErrReport } from '../../config';
+import { IErrReport, E2E_TESTING, errorSearchTerm } from '../../config';
 
 interface IMembersApiStub {
   getMembers: jasmine.Spy;
@@ -31,9 +32,10 @@ interface IMessageServiceStub {
 }
 
 describe('MembersService', () => {
-  async function mainSetup(mockMembers = members) {
+  async function mainSetup(mockMembers = members, isTesting = false) {
+    /* stub logger to avoid console logs */
+    const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create stub instances with spies for injection */
-    // const mockMembers = members;
     const membersApiStub: IMembersApiStub = {
       getMembers: jasmine.createSpy('getMembers').and.callFake(
         (str: string): Observable<IMember[]> => {
@@ -137,22 +139,26 @@ describe('MembersService', () => {
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
         { provide: MessageService, useValue: messageServiceStub },
         { provide: MembersDataProvider, useValue: membersApiStub },
+        { provide: E2E_TESTING, useValue: isTesting },
+        { provide: NGXLogger, useValue: loggerSpy },
       ],
     }).compileComponents();
 
     const membersService: MembersService = TestBed.get(MembersService);
     const membersApi: IMembersApiStub = TestBed.get(MembersDataProvider);
     const messageService: IMessageServiceStub = TestBed.get(MessageService);
+    const E2E_TESTING_SPY = TestBed.get(E2E_TESTING) as boolean;
 
     return {
       membersService,
       membersApi,
       messageService,
+      E2E_TESTING_SPY,
     };
   }
 
-  async function setup(mockMembers = members) {
-    return mainSetup(mockMembers);
+  async function setup({ mockMembers = members, isTesting = false } = {}) {
+    return mainSetup(mockMembers, isTesting);
   }
 
   describe('setup', () => {
@@ -166,6 +172,7 @@ describe('MembersService', () => {
   describe('addMember', describeAddMember);
   describe('deleteMember', describeDeleteMember);
   describe('updateMember', describeUpdateMember);
+  describe('testError', describeTestError);
 
   async function describeGetMembers() {
     it('should have getMembers(" ") return [] without accessing the server', async () => {
@@ -197,7 +204,9 @@ describe('MembersService', () => {
 
     it('should have getMembers() handle a returned []', async () => {
       /* call setup so getMembers() returns [] */
-      const { membersService, membersApi, messageService } = await setup([]);
+      const { membersService, membersApi, messageService } = await setup({
+        mockMembers: [],
+      });
       const result = await membersService.getMembers().toPromise();
       expect(membersApi.getMembers.calls.count()).toEqual(
         1,
@@ -594,6 +603,19 @@ describe('MembersService', () => {
           );
         },
       );
+    });
+  }
+  /* tests the test error functionality in getMembers */
+  async function describeTestError() {
+    it('should throw a test error', async () => {
+      const { membersService } = await setup({ isTesting: true });
+
+      try {
+        await membersService.getMembers(errorSearchTerm).toPromise();
+        fail('should not reach this point');
+      } catch (error) {
+        expect(error.message).toEqual('Test application error');
+      }
     });
   }
 });

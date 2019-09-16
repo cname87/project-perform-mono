@@ -1,0 +1,62 @@
+<mat-toolbar
+  fxLayout="row"
+  fxLayoutAlign="start"
+  color="accent"
+>
+
+  <span
+    fxFlex="0 0 auto"
+    fxFlexAlign="center"
+    class="header"
+  >
+    {{ header }}
+  </span>
+
+  <!-- fills between left and right elements -->
+  <span
+    fxFlex="1 1 auto"
+  ></span>
+
+  <button
+    mat-raised-button
+    fxFlex="0 0 auto"
+    fxFlexAlign="center"
+    id="loginBtn"
+    *ngIf="!isLoggedIn"
+    (click)="login()"
+    color="primary"
+    class="button"
+  >
+    Log In
+  </button>
+
+  <button
+    mat-raised-button
+    fxFlex="0 0 auto"
+    fxFlexAlign="center"
+    id="logoutBtn"
+    *ngIf="isLoggedIn"
+    (click)="logout()"
+    color="primary"
+    class="button"
+  >
+    Log Out
+  </button>
+
+  <a
+    mat-raised-button
+    fxFlex="0 0 auto"
+    fxFlexAlign="center"
+    id="profileBtn"
+    *ngIf="isLoggedIn"
+    [routerLink]="['profile']"
+    color="primary"
+    class="button"
+  >
+    My Account
+  </a>
+
+</mat-toolbar>
+
+
+

@@ -1,6 +1,6 @@
 import { by, element, } from 'protractor';
 
-export function getMemberInputElement() {
+export function getMemberInputElements() {
 
   /* DOM elements */
   const tag = element(by.css('app-member-input'));

@@ -6,13 +6,13 @@ export function getMembersListElement() {
 
   /* DOM elements */
   const tag = element(by.css('app-members'));
-  const list = element(by.css('mat-nav-list'));
-  const allListItems = element.all(by.css('mat-list-item'));
-  const allMemberIds = element.all(by.css('#memberId'));
-  const allMemberNames = element.all(by.css('#memberName'));
-  const allDeleteBtns = tag.all(by.css('#deleteBtn'));
+  const list = element(by.css('app-members mat-nav-list'));
+  const allListItems = element.all(by.css('app-members mat-list-item'));
+  const allMemberIds = element.all(by.css('app-members #memberId'));
+  const allMemberNames = element.all(by.css('app-members #memberName'));
+  const allDeleteBtns = element.all(by.css('app-members #deleteBtn'));
 
-  /**
+  /**ng
    * Assumes member list page is displayed.
    * Selects a member from the members list page based on a supplied id.
    * @param id The id of the member to select - must correspond to a displayed member.
@@ -40,17 +40,9 @@ export function getMembersListElement() {
       return { id: +id, name };
     }
 
-    let promisedMembers: IMember[] = await allListItems.map(await fromListItem);
+    let promisedMembers: IMember[] = await allListItems.map(fromListItem);
     return Promise.all(promisedMembers);
   }
-
-  async function debugPrint() {
-    console.log('allListItems: ' + await allListItems.count());
-    console.log('allMemberIds: ' + await allMemberIds.count());
-    console.log('allMemberNames: ' + await allMemberNames.count());
-  }
-
-  debugPrint();
 
   return {
     tag,
@@ -60,6 +52,5 @@ export function getMembersListElement() {
     allDeleteBtns,
     selectMemberById,
     getMembersArray,
-    debugPrint,
   }
 }

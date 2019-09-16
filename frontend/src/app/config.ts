@@ -1,7 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { InjectionToken } from '@angular/core';
 
-/* app component routing elements */
+/* auth0 application configuration */
+export const auth0Config = {
+  domain: 'projectperform.eu.auth0.com',
+  client_id: 'GNnNi0E0Bg5F3jAuFkDhKULWVgv3S21I',
+  redirect_uri: `${window.location.origin}/callback`,
+  audience: 'https://localhost:1337/api-v1/',
+};
+
+/* application routing elements */
 const dashboard = {
   path: 'dashboard',
   displayName: 'MEMBERS DASHBOARD',
@@ -14,10 +22,26 @@ const detail = {
   path: 'detail',
   displayName: 'MEMBER DETAIL',
 };
+const profile = {
+  path: 'profile',
+};
+const loginPage = {
+  path: '/information/login',
+};
+const loginTarget = {
+  path: '/dashboard',
+};
+const callback = {
+  path: '/callback',
+};
 export const routes = {
   dashboard,
   membersList,
   detail,
+  profile,
+  loginPage,
+  loginTarget,
+  callback,
 };
 
 /* import to access variable that informs if E2e build in use */
@@ -65,3 +89,8 @@ export const errorSearchTerm = 'errorSearchTerm';
 
 /* cache timeout in ms */
 export const maxAge = 300000;
+
+export interface IUserProfile {
+  name: string;
+  email: string;
+}

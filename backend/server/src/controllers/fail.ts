@@ -87,5 +87,4 @@ router.get('/', (req, res, next) => {
   }
 });
 
-/* export the router */
 export { router as failController };

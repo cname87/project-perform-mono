@@ -2,11 +2,11 @@ import { Component, OnInit, ErrorHandler } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
+import { catchError, refCount, publishReplay } from 'rxjs/operators';
+import { of, Observable } from 'rxjs';
 
 import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../data-providers/members.data-provider';
-import { first, catchError, refCount, publishReplay } from 'rxjs/operators';
-import { of, Observable } from 'rxjs';
 
 /**
  * This member shows detail on a member whose id is passed in via the url id parameter.
@@ -89,11 +89,8 @@ export class MemberDetailComponent implements OnInit {
     if (!name) {
       return;
     }
-    this.membersService
-      .updateMember({ id: +id, name })
-      .pipe(first())
-      .subscribe(() => {
-        this.goBack();
-      });
+    this.membersService.updateMember({ id: +id, name }).subscribe(() => {
+      this.goBack();
+    });
   }
 }

@@ -13,20 +13,17 @@
       "name": "Start frontend",
       "type": "chrome",
       "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
       "preLaunchTask": "npm start frontend",
       "url": "http://localhost:4200/", // proxy to 1337 for api calls
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {
-        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
-        "webpack:///./*": "${workspaceFolder}/frontend/*",
-        "webpack:///*": "frontend/*",
-        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
     },
     // Test frontend - use for frontend unit test debug
     {
       /*
-      Runs 'npm run test, i.e. ng test, first and then runs Chrome and connects to the karma runner.
+      Runs 'npm run test, i.e. ng test, first which compiles the front end and opens chrome and connects to the Karma runner, and THEN starts Chrome again and connects to the Karma runner.  Debug should work on the second session.
       Run 'npm run test' manually first if problems with preLaunch task.
       Close all open Chrome instances if Chrome won't start.
        */
@@ -42,27 +39,21 @@
         "--new-window",
         "--disable-popup-blocking", // necessary for window.open() to work
       ],
-      "userDataDir": true,
+      "cwd": "${workspaceFolder}/frontend",
+      "userDataDir":true,
       "url": "http://localhost:9876/debug.html",
-      // tell vscode where to find scripts on the server
       "webRoot": "${workspaceFolder}/frontend/dist/",
       "pathMapping": {
         "/": "${workspaceFolder}/frontend/dist/",
-        "/testServer": "${workspaceFolder}/backend/server/test/client",
       },
       "sourceMapPathOverrides": {
-        "_karma_webpack_/webpack:*": "${workspaceFolder}/frontend/*",
-        "webpack:///webpack/*": "${workspaceFolder}/frontend/node_modules/webpack/*",
-        "webpack:///(webpack)/*": "${workspaceFolder}/frontend/node_modules/webpack/*",
-        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
+        "./*": "${workspaceFolder}/frontend/*",
         "webpack:///./*": "${workspaceFolder}/frontend/*",
-        "webpack:///*": "frontend/*",
-        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
+      "sourceMaps": true,
       "smartStep": true,
       "disableNetworkCache": true,
       "showAsyncStacks": true,
-      "sourceMaps": true,
       "skipFiles": [
         "<node_internals>/**/*.js",
         "${workspaceFolder}/frontend/node_modules/**/*",
@@ -73,7 +64,7 @@
     {
       /*
       Runs npm run e2e.
-      baseUrl is configured in protractor.conf to be loclahost:1337
+      baseUrl is configured in protractor.conf to be localhost:1337
       backend server needs to be started first => started in script.
        */
       "name": "Test e2e frontend",
@@ -82,8 +73,10 @@
       "program": "${workspaceFolder}/frontend//node_modules/protractor/bin/protractor",
       "protocol": "inspector",
       "args": [
+        /* choose which spec files to run in protractor.conf.js */
         "${workspaceFolder}/frontend/e2e/protractor.conf.js",
       ],
+      "cwd": "${workspaceFolder}/frontend/e2e",
       "preLaunchTask": "Start Server",
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -94,7 +87,7 @@
         "${workspaceFolder}/frontend/node_modules/**/*.js",
       ],
     },
-    // server index.js
+    // run backend server index.js
     {
       "type": "node",
       "request": "launch",
@@ -102,8 +95,8 @@
       "program": "${workspaceFolder}/backend/index.ts",
       "cwd": "${workspaceFolder}/backend",
       "env": {
-        /* set before all tests so test database used */
-        "TEST_MODE": "false",
+        /* set before all tests to choose test or production database */
+        // "DB_MODE": "production",
       },
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -123,8 +116,9 @@
     // npm run server index.js
     {
       /* Runs an npm script to start index.js.
-      * Note that CTRL+C does not exit without manual intervention.
-      * Click on the VSCode 'stop' icon to exit without manual intervention */
+      Note that CTRL+C does not exit without manual intervention.
+      Click on the VSCode 'stop' icon to exit without manual intervention
+      */
       "type": "node",
       "request": "launch",
       "name": "Launch npm backend index.js",
@@ -137,8 +131,8 @@
       "port": 9229,
       "cwd": "${workspaceFolder}/backend",
       "env": {
-        /* set before all tests so test database used */
-        "TEST_MODE": "false",
+        /* set before all tests to choose test or production database */
+        // "DB_MODE": "production",
       },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
@@ -155,7 +149,7 @@
       ],
       "smartStep": false,
     },
-    // monitor.js
+    // run monitor.js
     {
       "type": "node",
       "request": "launch",
@@ -178,7 +172,7 @@
       ],
       "smartStep": false,
     },
-    // database index.js
+    // run database index.js
     {
       "type": "node",
       "request": "launch",
@@ -228,12 +222,13 @@
         "/testServer": "${workspaceFolder}/backend/dist/server/test/client/",
       },
       "sourceMapPathOverrides": {
-        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
+        "webpack:///./node_modules/*": "${workspaceFolder}/frontend/node_modules/*",
+        // "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
         "webpack:///./*": "${workspaceFolder}/frontend/*",
         "webpack:///*": "frontend/*",
         "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
-      "smartStep": true,
+      "smartStep": false,
       "disableNetworkCache": true,
       "showAsyncStacks": true,
       "sourceMaps": true,
@@ -262,7 +257,7 @@
       ],
       "env": {
         /* set before all tests so test database used */
-        "TEST_MODE": "true",
+        "DB_MODE": "test",
         /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "true",
       },
@@ -305,7 +300,7 @@
       ],
       "env": {
         /* set before all tests so test database used */
-        "TEST_MODE": "true",
+        "DB_MODE": "test",
         /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "true",
       },
@@ -342,7 +337,7 @@
       ],
       "env": {
         /* set before all tests so test database used */
-        "TEST_MODE": "true",
+        "DB_MODE": "test",
         /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome */
         "RUN_CHROME": "false",
       },
@@ -400,7 +395,6 @@
       "request": "launch",
       "name": "Launch the currently opened .js file",
       "program": "${file}",
-      "env": {},
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -409,8 +403,29 @@
         "${workspaceFolder}/backend/node_modules/**/*",
         "${workspaceFolder}/backend/node_modules/**/*.js",
       ],
-      "autoAttachChildProcesses": true,
     },
+    // current .ts file
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch the currently opened .ts file",
+      "cwd": "${workspaceFolder}/backend",
+      "outputCapture": "std",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "runtimeArgs": [
+          "-r",
+          "ts-node/register"
+      ],
+      "args": [
+          "${file}",
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "tsconfig.json",
+      },
+    },
+
+
   ],
   "compounds": [
     /* Run backend server and browse to root */

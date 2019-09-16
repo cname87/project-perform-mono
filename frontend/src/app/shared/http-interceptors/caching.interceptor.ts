@@ -8,9 +8,10 @@ import {
 } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { NGXLogger } from 'ngx-logger';
+import { NGXLogger, NgxLoggerLevel } from 'ngx-logger';
 
-import { RequestCacheService } from '../caching.service.ts/request-cache.service';
+import { RequestCacheService } from '../caching.service/request-cache.service';
+import { environment } from '../../../environments/environment';
 
 /**
  * This service sends the request to the cache service and returns the cache response if one is provided.  If the cache does not return a response it passes on the request and the then sends the request and response to the cache service for its use.
@@ -32,8 +33,20 @@ export class CachingInterceptor implements HttpInterceptor {
     /* check if there is for a cached response */
     const cachedResponse = this.cache.getCache(request);
 
+    /* if e2e testing then change logger config to log trace notifications */
+    let originalLogLevel = NgxLoggerLevel.TRACE;
+    if (environment.e2eTesting) {
+      originalLogLevel = this.logger.getConfigSnapshot().level;
+      this.logger.updateConfig({ level: NgxLoggerLevel.TRACE });
+    }
+
     if (cachedResponse) {
       this.logger.trace(CachingInterceptor.name + ': reading from cache');
+    }
+
+    /* if e2e testing reset logger level */
+    if (environment.e2eTesting) {
+      this.logger.updateConfig({ level: originalLogLevel });
     }
 
     return cachedResponse
@@ -50,7 +63,17 @@ export class CachingInterceptor implements HttpInterceptor {
     next: HttpHandler,
     cache: RequestCacheService,
   ): Observable<HttpEvent<any>> {
+    /* if e2e testing then change logger config to log trace notifications */
+    let originalLogLevel = NgxLoggerLevel.TRACE;
+    if (environment.e2eTesting) {
+      originalLogLevel = this.logger.getConfigSnapshot().level;
+      this.logger.updateConfig({ level: NgxLoggerLevel.TRACE });
+    }
     this.logger.trace(CachingInterceptor.name + ': reading from server');
+    /* if e2e testing reset logger level */
+    if (environment.e2eTesting) {
+      this.logger.updateConfig({ level: originalLogLevel });
+    }
     return next.handle(request).pipe(
       tap((response) => {
         /* check event is http response as there may be other events */

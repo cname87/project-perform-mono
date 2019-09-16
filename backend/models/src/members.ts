@@ -16,10 +16,16 @@ import { Database, IModelExtended } from './configModels';
 
 /**
  * Creates a Members schema and returns a Mongoose model.
+ * @param database - a connection to a mongoDB database.
+ * @param ModelName - the name for the created model.
+ * @param collection - the name of the mongoDB collection.
  * @returns A Mongoose model.
- * @param database connection to a mongoDB database.
  */
-function createModel(database: Database): IModelExtended {
+function createModel(
+  database: Database,
+  ModelName: string,
+  collection: string,
+): IModelExtended {
   debug(modulename + ': running createModel');
 
   /* set up schema, collection, and model name */
@@ -28,12 +34,10 @@ function createModel(database: Database): IModelExtended {
     name: String,
   });
 
-  const collection = 'members';
-  const ModelName = 'Members';
-
   /* auto-increment the id field on document creation */
+  /* note: resetCount() is called when delete all members is called */
   memberSchema.plugin(autoIncrement, {
-    model: 'Members',
+    model: ModelName,
     field: 'id',
     startAt: 1,
   });
