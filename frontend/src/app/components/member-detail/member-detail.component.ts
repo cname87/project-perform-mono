@@ -1,8 +1,7 @@
-import { Component, OnInit, ErrorHandler } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Data } from '@angular/router';
 import { Location } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
-import { catchError, refCount, publishReplay } from 'rxjs/operators';
 import { of, Observable } from 'rxjs';
 
 import { MembersService } from '../../shared/members-service/members.service';
@@ -32,44 +31,16 @@ export class MemberDetailComponent implements OnInit {
     private membersService: MembersService,
     private location: Location,
     private logger: NGXLogger,
-    private errorHandler: ErrorHandler,
   ) {
     this.logger.trace(
       MemberDetailComponent.name + ': Starting MemberDetailComponent',
     );
   }
 
-  ngOnInit(): void {
-    this.member$ = this.getMember();
-  }
-
-  /**
-   * Gets the member from the server based on the id supplied in the route and sets the local observable accordingly.
-   */
-  getMember(): Observable<IMember> {
-    this.logger.trace(MemberDetailComponent.name + ': Calling getMember');
-
-    /* get id of member to be displayed from the route */
-    const id = +(this.route.snapshot.paramMap.get('id') as string);
-
-    let errorHandlerCalled = false;
-
-    /* create a subject to multicast to elements on html page */
-    return this.membersService.getMember(id).pipe(
-      /* using publish as share will resubscribe for each html call in case of unexpected error causing observable to complete (and I don't need to resubscribe on this page) */
-      publishReplay(1),
-      refCount(),
-
-      catchError((error: any) => {
-        /* only call the error handler once per ngOnInit even though the returned observable might be multicast to multiple html elements */
-        if (!errorHandlerCalled) {
-          errorHandlerCalled = true;
-          this.errorHandler.handleError(error);
-        }
-        /* return dummy value to all html elements */
-        return of(this.dummyMember);
-      }),
-    );
+  ngOnInit() {
+    this.route.data.subscribe((data: Data) => {
+      this.member$ = of(data.member);
+    });
   }
 
   goBack(): void {

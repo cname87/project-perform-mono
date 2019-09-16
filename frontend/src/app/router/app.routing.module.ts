@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 
 import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
 import { InformationComponent } from '../components/information/information.component';
@@ -7,7 +8,7 @@ import { DashboardComponent } from '../components/dashboard/dashboard.component'
 import { MembersListComponent } from '../components/members-list/members-list.component';
 import { CallbackComponent } from '../components/callback/callback.component';
 import { ProfileComponent } from '../components/user-profile/user-profile.component';
-import { AuthGuard } from './guards/auth.guard';
+import { MemberDetailResolverService } from '../shared/resolvers/member-detail-resolver.service';
 
 const appRoutes: Routes = [
   {
@@ -38,6 +39,9 @@ const appRoutes: Routes = [
     path: 'detail/:id',
     component: MemberDetailComponent,
     canActivate: [AuthGuard],
+    resolve: {
+      member: MemberDetailResolverService,
+    },
   },
   {
     /* shows the authenticated user profile */

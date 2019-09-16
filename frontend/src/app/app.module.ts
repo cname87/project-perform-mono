@@ -37,6 +37,7 @@ import { LoginComponent } from './components/login/login.component';
 import { NavComponent } from './components/nav/nav.component';
 import { AuthService } from './shared/auth.service/auth.service';
 import { AppLoadService } from './shared/app-load.service/app-load.service';
+import { MemberDetailResolverService } from './shared/resolvers/member-detail-resolver.service';
 
 export function init_app(appLoadService: AppLoadService) {
   return () => appLoadService.initApp();
@@ -96,6 +97,7 @@ export function init_app(appLoadService: AppLoadService) {
       deps: [AppLoadService],
       multi: true,
     },
+    MemberDetailResolverService,
   ],
 })
 export class AppModule {}
