@@ -13,6 +13,7 @@ describe('Project Perform', () => {
     mockMembers,
     loadRootPage,
     awaitElementVisible,
+    awaitElementInvisible,
     originalTimeout,
     setTimeout,
     resetTimeout,
@@ -70,7 +71,6 @@ describe('Project Perform', () => {
     };
   };
 
-
   /**
    * The members detail page must be being displayed when this is called.
    * Edits the member name in the members detail page.
@@ -94,6 +94,7 @@ describe('Project Perform', () => {
     await memberDetailPage.memberInputElements.inputBox.sendKeys(
       suffix,
     );
+
     /* show the member card does not update to match the input text */
     const afterMember = await memberDetailPage.memberDetailElements.getMember();
     expect(originalMember.name).toEqual(afterMember.name);
@@ -104,6 +105,11 @@ describe('Project Perform', () => {
 
       /* saves the new member name and routes back to the last page*/
       await memberDetailPage.memberInputElements.actionBtn.click();
+
+      /* await the appearance of the progress bar as should be loading from the database server */
+      await awaitElementVisible(getRootElements().progressBar);
+      /* await the disappearance of the progress bar */
+      await awaitElementInvisible(getRootElements().progressBar);
 
       await awaitElementVisible(getRootElements().messagesClearBtn);
 
@@ -492,6 +498,11 @@ describe('Project Perform', () => {
       /* click 'delete' which deletes the member & stays on the members view */
       await deleteButton.click();
 
+      /* await the appearance of the progress bar as should be loading from the database server */
+      await awaitElementVisible(getRootElements().progressBar);
+      /* await the disappearance of the progress bar */
+      await awaitElementInvisible(getRootElements().progressBar);
+
       await awaitElementVisible(membersListPage.memberListElements.tag);
 
       /* confirm count of members displayed is down by one */
@@ -609,6 +620,11 @@ describe('Project Perform', () => {
 
       /* enter 'text' in search box */
       await dashboardPage.memberSearchElement.searchBox.sendKeys('test1');
+
+    /* await the appearance of the progress bar as should be loading from the database server */
+    await awaitElementVisible(getRootElements().progressBar);
+    /* await the disappearance of the progress bar */
+    await awaitElementInvisible(getRootElements().progressBar);
 
       await browser.wait(async () => {
         return (

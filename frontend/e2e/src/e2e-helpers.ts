@@ -17,19 +17,13 @@ import { getMemberDetailPage } from './pages/memberDetail.page';
 export const getHelpers = () => {
 
   const mockMembers = require('../onPrepare').mockMembers;
-
   const resetDatabase = require('../onPrepare').resetDatabase;
-
   const awaitElementVisible = require('../onPrepare').awaitElementVisible;
-
+  const awaitElementInvisible = require('../onPrepare').awaitElementInvisible;
   const loadRootPage = require('../onPrepare').loadRootPage;
-
   const login = require('../onPrepare').login;
-
   const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-
   const setTimeout = require('../onPrepare').setTimeout;
-
   const resetTimeout = (original: number) => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = original;
   }
@@ -101,13 +95,11 @@ export const getHelpers = () => {
     /* await visibility of an element */
     await awaitElementVisible(membersListPage.memberListElements.tag);
 
-    /* wait until full count of members list is displayed */
-    await browser.wait(async () => {
-      return (
-        await membersListPage.memberListElements.allMemberIds.count()
-          === numberExpected
-      );
-    });
+    /* test resolver prevents the page loading until data is available by testing for the full count of members list without browser.wait */
+    expect(await membersListPage.memberListElements.allMemberIds.count()).toEqual(numberExpected);
+
+    /* await the disappearance of the progress bar */
+    await awaitElementInvisible(getRootElements().progressBar);
   }
 
   /**
@@ -126,13 +118,9 @@ export const getHelpers = () => {
     /* await visibility of an element */
     await awaitElementVisible(dashboardPage.dashboardElements.tag);
 
-    /* wait until full count of members list is displayed */
-    await browser.wait(async () => {
-      return (
-        await dashboardPage.dashboardElements.topMembers.count()
-          === numberExpected
-      );
-    });
+    /* test resolver prevents the page loading until data is available by testing for the members presence without browser.wait */
+    expect(await dashboardPage.dashboardElements.topMembers.count()).toEqual(numberExpected);
+
   }
 
   /**
@@ -155,21 +143,25 @@ export const getHelpers = () => {
     /* the members detail page should be displayed */
     const memberDetailPage = getMemberDetailPage();
 
+    /* await the appearance of the progress bar as should be loading from the database server */
+    await awaitElementVisible(getRootElements().progressBar);
+
+    /* await until element visible */
     await awaitElementVisible(memberDetailPage.memberDetailElements.tag);
 
-    /* wait until member detail is displayed */
-    await browser.wait(async () => {
-      return (
-        (await memberDetailPage.memberDetailElements.getMember()).name
-          === name
-      );
-    });
+    /* test resolver prevents the page loading until data is available by testing for the member name without browser.wait */
+    expect((await memberDetailPage.memberDetailElements.getMember()).name).toEqual(name);
+
+    /* await the disappearance of the progress bar */
+    await awaitElementInvisible(getRootElements().progressBar);
+
   }
 
   return {
     mockMembers,
     resetDatabase,
     awaitElementVisible,
+    awaitElementInvisible,
     loadRootPage,
     login,
     originalTimeout,

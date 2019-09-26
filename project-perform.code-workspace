@@ -21,8 +21,6 @@
     "workbench.sideBar.location": "right",
     "window.zoomLevel": -1,
 
-    "typescript.experimental.useSeparateSyntaxServer": true,
-
     "cSpell.language": "en-GB",
     "cSpell.allowCompoundWords": true,
     "cSpell.enabledLanguageIds": [
@@ -69,7 +67,6 @@
     "editor.wordWrap": "wordWrapColumn",
     "terminal.integrated.copyOnSelection": true,
     "terminal.integrated.cursorBlinking": true,
-    "workbench.statusBar.feedback.visible": false,
     "breadcrumbs.enabled": true,
     "workbench.editor.highlightModifiedTabs": true,
     "search.showLineNumbers": true,
@@ -79,7 +76,6 @@
     "debug.internalConsoleOptions": "neverOpen",
     "debug.showSubSessionsInToolBar": true,
     "extensions.showRecommendationsOnlyOnDemand": true,
-    "gitlens.settings.mode": "advanced",
     "gitlens.views.repositories.files.layout": "tree",
     "typescript.updateImportsOnFileMove.enabled": "always",
     "terminal.integrated.rendererType": "dom",
@@ -111,7 +107,8 @@
     "typescript.surveys.enabled": false,
     "vsicons.projectDetection.autoReload": true,
 
-
-    "files.exclude": {}
+    "files.exclude": {},
+    "editor.smoothScrolling": false,
+    "editor.mouseWheelScrollSensitivity": 0,
 	}
 }

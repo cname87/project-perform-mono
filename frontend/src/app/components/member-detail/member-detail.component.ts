@@ -3,6 +3,7 @@ import { ActivatedRoute, Data } from '@angular/router';
 import { Location } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
 import { of, Observable } from 'rxjs';
+import { IsLoadingService } from '@service-work/is-loading';
 
 import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../data-providers/members.data-provider';
@@ -16,12 +17,8 @@ import { IMember } from '../../data-providers/members.data-provider';
   styleUrls: ['./member-detail.component.scss'],
 })
 export class MemberDetailComponent implements OnInit {
-  /* member to display initialised with dummy value*/
-  private dummyMember = {
-    id: 0,
-    name: '',
-  };
-  member$: Observable<IMember> = of(this.dummyMember);
+  /* member to display*/
+  member$!: Observable<IMember>;
 
   /* mode for input box */
   inputMode = 'edit';
@@ -31,6 +28,7 @@ export class MemberDetailComponent implements OnInit {
     private membersService: MembersService,
     private location: Location,
     private logger: NGXLogger,
+    private isLoadingService: IsLoadingService,
   ) {
     this.logger.trace(
       MemberDetailComponent.name + ': Starting MemberDetailComponent',
@@ -38,6 +36,7 @@ export class MemberDetailComponent implements OnInit {
   }
 
   ngOnInit() {
+    /* get the data as supplied from the route resolver */
     this.route.data.subscribe((data: Data) => {
       this.member$ = of(data.member);
     });
@@ -50,7 +49,7 @@ export class MemberDetailComponent implements OnInit {
   /**
    * Updates the name property of the member previously retrieved.
    * Called by the input box when the user updates the input string and presses Enter (or clicks on the the Save icon).
-   * Note: members$ completes when page displayed => cannot get from members$ so got from page instead.
+   * Note: member$ completes when page displayed => cannot get from id from member$ so got from page instead.
    * @param name
    * name: The input box string is supplied as the name parameter.
    * id: The displayed member id is supplied as the member id.
@@ -60,8 +59,11 @@ export class MemberDetailComponent implements OnInit {
     if (!name) {
       return;
     }
-    this.membersService.updateMember({ id: +id, name }).subscribe(() => {
-      this.goBack();
-    });
+    /* set an isLoadingService indicator (that loads a progress bar) and clears it when the returned observable emits. */
+    this.isLoadingService.add(
+      this.membersService.updateMember({ id: +id, name }).subscribe(() => {
+        this.goBack();
+      }),
+    );
   }
 }

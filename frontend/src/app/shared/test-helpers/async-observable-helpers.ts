@@ -2,7 +2,7 @@
  * Mock async observables that return asynchronously.
  * The observable either emits once and completes or errors.
  *
- * Must call `tick()` when test with `fakeAsync()`.
+ * Must call `tick()` when testing with `fakeAsync()`.
  *
  * THE FOLLOWING DON'T WORK
  * .of() is a synchronous observable.

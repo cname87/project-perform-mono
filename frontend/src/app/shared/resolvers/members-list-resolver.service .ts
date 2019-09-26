@@ -6,7 +6,7 @@ import {
   ActivatedRouteSnapshot,
 } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { publishReplay, refCount, catchError } from 'rxjs/operators';
+import { catchError, publishReplay, refCount } from 'rxjs/operators';
 
 import { MembersService } from '../members-service/members.service';
 import { IMember } from '../../data-providers/models/models';
@@ -14,48 +14,40 @@ import { IMember } from '../../data-providers/models/models';
 @Injectable({
   providedIn: 'root',
 })
-export class MemberDetailResolverService implements Resolve<IMember> {
+export class MembersListResolverService implements Resolve<IMember[]> {
   constructor(
     private membersService: MembersService,
     private logger: NGXLogger,
     private errorHandler: ErrorHandler,
   ) {
     this.logger.trace(
-      MemberDetailResolverService.name +
-        ': Starting MemberDetailResolverService',
+      MembersListResolverService.name + ': Starting MembersListResolverService',
     );
   }
 
   resolve(
-    route: ActivatedRouteSnapshot,
+    _route: ActivatedRouteSnapshot,
     _state: RouterStateSnapshot,
-  ): Observable<IMember> {
-    this.logger.trace(MemberDetailResolverService.name + ': Calling getMember');
-
-    /* get id of member to be displayed from the route */
-    const id = +route.paramMap.get('id')!;
+  ): Observable<IMember[]> {
+    this.logger.trace(MembersListResolverService.name + ': Calling getMembers');
 
     let errorHandlerCalled = false;
-    const dummyMember = {
-      id: 0,
-      name: '',
-    };
+    const dummyMembers: IMember[] = [];
 
     /* create a subject to multicast to elements on html page */
-    return this.membersService.getMember(id).pipe(
+    return this.membersService.getMembers().pipe(
       publishReplay(1),
       refCount(),
-
       catchError((error: any) => {
         if (!errorHandlerCalled) {
           this.logger.trace(
-            MemberDetailResolverService.name + ': catchError called',
+            MembersListResolverService.name + ': catchError called',
           );
           errorHandlerCalled = true;
           this.errorHandler.handleError(error);
         }
         /* return dummy member */
-        return of(dummyMember);
+        return of(dummyMembers);
       }),
     );
   }

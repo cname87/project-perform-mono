@@ -1,13 +1,15 @@
 import { Component, OnInit, ErrorHandler } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
+import { IsLoadingService } from '@service-work/is-loading';
 
 import { MembersService } from '../../shared/members-service/members.service';
 import {
   IMember,
   IMemberWithoutId,
 } from '../../data-providers/members.data-provider';
-import { publishReplay, refCount, catchError } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import { ActivatedRoute, Data } from '@angular/router';
+import { catchError, publishReplay, refCount } from 'rxjs/operators';
 
 /**
  * This component displays a list of members.
@@ -21,41 +23,47 @@ import { Observable, of } from 'rxjs';
 })
 export class MembersListComponent implements OnInit {
   /* observable of array of members returned from search */
-  members$: Observable<IMember[]> = of([]);
+  members$!: Observable<IMember[]>;
   /* mode for input box */
   inputMode = 'add';
-  /* controls that errorHandler only called once */
-  private errorHandlerCalled = false;
 
   constructor(
+    private route: ActivatedRoute,
     private membersService: MembersService,
     private logger: NGXLogger,
     private errorHandler: ErrorHandler,
+    private isLoadingService: IsLoadingService,
   ) {
     this.logger.trace(
       MembersListComponent.name + ': Starting MembersListComponent',
     );
   }
 
-  ngOnInit(): void {
-    this.members$ = this.getMembers();
+  ngOnInit() {
+    /* get the data as supplied from the route resolver */
+    this.route.data.subscribe((data: Data) => {
+      this.members$ = of(data.members);
+    });
   }
 
-  getMembers(): any {
+  getMembers() {
     this.logger.trace(MembersListComponent.name + ': Calling getMembers');
 
+    let errorHandlerCalled = false;
+    const dummyMembers: IMember[] = [];
+
+    /* create a subject to multicast to elements on html page */
     return this.membersService.getMembers().pipe(
-      /* using publish as share will resubscribe for each html call in case of unexpected error causing observable to complete */
       publishReplay(1),
       refCount(),
       catchError((error: any) => {
-        /* only call the error handler once per ngOnInit even though the returned observable might be multicast to multiple html elements */
-        if (!this.errorHandlerCalled) {
-          this.errorHandlerCalled = true;
+        if (!errorHandlerCalled) {
+          this.logger.trace(MembersListComponent.name + ': catchError called');
+          errorHandlerCalled = true;
           this.errorHandler.handleError(error);
         }
-        /* return empty array of members to all html elements */
-        return of([]);
+        /* return dummy member */
+        return of(dummyMembers);
       }),
     );
   }
@@ -72,21 +80,29 @@ export class MembersListComponent implements OnInit {
     /* add the new member */
     const member: IMemberWithoutId = { name };
 
-    this.membersService.addMember(member).subscribe((_addedMember) => {
-      /* retrieve members list from server */
-      this.members$ = this.getMembers();
-      /* allow errors go to errorHandler */
-      /* httpclient observable => unsubscribe not necessary */
-    });
+    /* set an isLoadingService indicator (that loads a progress bar) and clears it when the returned observable emits. */
+    this.isLoadingService.add(
+      this.membersService.addMember(member).subscribe((_addedMember) => {
+        /* retrieve members list from server */
+        this.members$ = this.getMembers();
+        return this.members$;
+        /* allow errors go to errorHandler */
+        /* httpclient observable => unsubscribe not necessary */
+      }),
+    );
   }
 
   delete(member: IMember): void {
     this.logger.trace(MembersListComponent.name + ': Calling deleteMember');
-    this.membersService.deleteMember(member.id).subscribe((_count) => {
-      this.members$ = this.getMembers();
-      /* allow errors go to errorHandler */
-      /* httpclient observable => unsubscribe not necessary */
-    });
+
+    /* set an isLoadingService indicator (that loads a progress bar) and clears it when the returned observable emits. */
+    this.isLoadingService.add(
+      this.membersService.deleteMember(member.id).subscribe((_count) => {
+        this.members$ = this.getMembers();
+        /* allow errors go to errorHandler */
+        /* httpclient observable => unsubscribe not necessary */
+      }),
+    );
   }
 
   trackByFn(_index: number, member: IMember): number | null {

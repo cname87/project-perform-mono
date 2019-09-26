@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 const material = [
   MatToolbarModule,
@@ -19,6 +20,7 @@ const material = [
   MatSelectModule,
   MatListModule,
   MatCardModule,
+  MatProgressBarModule,
 ];
 
 @NgModule({

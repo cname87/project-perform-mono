@@ -6,7 +6,8 @@ export const environment = {
   /* used to inform error testing interceptor */
   e2eTesting: true,
   /* console logging level OFF - same as production setting */
-  logLevel: NgxLoggerLevel.OFF,
+  /* change to TRACE for debug only */
+  logLevel: NgxLoggerLevel.TRACE,
   /* server logging level same as production*/
   serverLogLevel: NgxLoggerLevel.ERROR,
   /* server logs go to this url */

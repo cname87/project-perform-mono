@@ -141,11 +141,17 @@ export const getMembers = (
   const dumpError = req.app.appLocals.dumpError;
   const modelMembers = req.app.appLocals.models.members;
 
+  /* replace all characters, 'c', in the user entered search string that need to be escaped in a regex pattern with '\c' */
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+  const sanitizedMatchString = escapeRegExp(matchString);
+
   return new Promise((resolve, reject) => {
     modelMembers
       .find()
       .where('name')
-      .regex('name', new RegExp(`^${matchString}.*`, 'i'))
+      .regex('name', new RegExp(`^${sanitizedMatchString}.*`, 'i'))
       .lean(true) // return json object
       .select({ _id: 0, __v: 0 }) // exclude _id and __v fields
       .exec()

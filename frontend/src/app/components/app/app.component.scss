@@ -5,3 +5,9 @@
 mat-divider.mat-divider {
   margin-top: $default-gap;
 }
+
+.progress-bar {
+  position: absolute;
+  top: 8px;
+  z-index: 5000;
+}

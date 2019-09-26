@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 import { NOT_FOUND } from 'http-status-codes';
@@ -60,6 +60,7 @@ export class MembersService {
       );
       return of([]);
     }
+
     return this.membersDataProvider.getMembers(term).pipe(
       tap((members) => {
         if (members.length > 0) {
@@ -76,7 +77,6 @@ export class MembersService {
           }
         }
       }),
-
       catchError((err: IErrReport) => {
         this.logger.trace(MembersService.name + ': catchError called');
 

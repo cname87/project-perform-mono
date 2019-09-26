@@ -49,6 +49,7 @@ describe('Cache', () => {
     /* the dashboard page should be displayed */
     const dashboardPage = getDashboardPage();
 
+    /* the top members should be shown */
     await browser.wait(async () => {
       return (
         await dashboardPage.dashboardElements.topMembers.isDisplayed()
@@ -74,7 +75,7 @@ describe('Cache', () => {
     const dashboardPage = getDashboardPage();
 
     /* click on members list link */
-    await getMembersList();
+    await getMembersList(10);
 
     expect(await dashboardPage.rootElements.bannerHeader
       .isDisplayed()).toBeTruthy();

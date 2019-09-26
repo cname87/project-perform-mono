@@ -121,6 +121,7 @@ export function getConnectionOptions(): ConnectionOptions {
     useNewUrlParser: true,
     useFindAndModify: false,
     useCreateIndex: true,
+    useUnifiedTopology: true,
   };
 }
 

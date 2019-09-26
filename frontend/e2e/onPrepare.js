@@ -27,12 +27,15 @@ import { getRootElements } from './src/pages/elements/root.elements';
  * - exports various helper functions including an await element visible helper
  */
 
-
 /* awaits for an element to be visible on the page */
 const awaitElementVisible = async (element) => {
   return await browser.wait(ExpectedConditions.visibilityOf(element), 5000);
 };
 
+/* awaits for an element to be invisible on the page */
+const awaitElementInvisible = async (element) => {
+  return await browser.wait(ExpectedConditions.invisibilityOf(element), 5000);
+};
 
 /* sends a configured request to the server */
 const askServer = async(
@@ -132,15 +135,29 @@ const resetDatabase = async () => {
  * Loads the root page and awaits either the log in button or the message saying that members have been loaded from the server (or not).
  * @param isLoggedIn: Says whether we expect the log in page or the logged in dashboard page.
  */
-const loadRootPage = async (isLoggedIn = true) => {
+const loadRootPage = async (isLoggedIn = true, numberExpected = 4) => {
   console.log('Loading root page');
   await browser.get('/');
   if (!isLoggedIn) {
     /* just wait for the login button to show */
     await awaitElementVisible(getRootElements().loginBtn);
   } else {
-  /* otherwise wait until the message denoting the loading of members appears */
-    await awaitElementVisible(getRootElements().logoutBtn);
+    /* await the appearance of the progress bar as should be loading from the database server */
+    await awaitElementVisible(getRootElements().progressBar);
+
+    /* the dashboard page is now displayed */
+    const dashboardPage = getDashboardPage();
+
+    /* await the dashboard */
+    await awaitElementVisible(dashboardPage.dashboardElements.tag);
+
+    /* test resolver prevents the page loading until data is available by testing for the members presence without browser.wait */
+    expect(await dashboardPage.dashboardElements.topMembers.count()).toEqual(numberExpected);
+
+    /* await the disappearance of the progress bar */
+    await awaitElementInvisible(getRootElements().progressBar);
+
+    /* await the message denoting the loading of members appears as this is slow to appear */
     await browser.wait(async () => {
       return (
         await getRootElements().messages.count()
@@ -219,3 +236,4 @@ module.exports.loadRootPage = loadRootPage;
 module.exports.login = login;
 module.exports.setTimeout = setTimeout;
 module.exports.awaitElementVisible = awaitElementVisible;
+module.exports.awaitElementInvisible = awaitElementInvisible;

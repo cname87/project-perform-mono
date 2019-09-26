@@ -1,10 +1,10 @@
-import { Component, OnInit, ErrorHandler } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { map, catchError } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
-import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../data-providers/members.data-provider';
+import { ActivatedRoute, Data } from '@angular/router';
 
 /**
  * This component displays a dashboard showing key information on a number of members.
@@ -20,45 +20,24 @@ export class DashboardComponent implements OnInit {
   private firstMemberOnDisplay = 1;
   private lastMemberOnDisplay = 4;
 
-  constructor(
-    private membersService: MembersService,
-    private logger: NGXLogger,
-    private errorHandler: ErrorHandler,
-  ) {
+  constructor(private route: ActivatedRoute, private logger: NGXLogger) {
     this.logger.trace(
       DashboardComponent.name + ': Starting DashboardComponent',
     );
   }
 
-  ngOnInit(): void {
-    this.members$ = this.getMembers();
-  }
-
-  /**
-   * Gets the members from the server.
-   */
-  getMembers(): Observable<IMember[]> {
-    this.logger.trace(DashboardComponent.name + ': Calling getMembers');
-
-    let errorHandlerCalled = false;
-
-    return this.membersService.getMembers().pipe(
-      map((members) => {
-        return members.slice(
-          this.firstMemberOnDisplay - 1,
-          this.lastMemberOnDisplay,
-        );
-      }),
-      catchError((error: any) => {
-        /* only call the error handler once per ngOnInit even though the returned observable might be multicast to multiple html elements */
-        if (!errorHandlerCalled) {
-          errorHandlerCalled = true;
-          this.errorHandler.handleError(error);
-        }
-        /* return dummy value */
-        return of([]);
-      }),
-    );
+  ngOnInit() {
+    /* get the data as supplied from the route resolver */
+    this.route.data.subscribe((data: Data) => {
+      this.members$ = of(data.members).pipe(
+        map((members) => {
+          return members.slice(
+            this.firstMemberOnDisplay - 1,
+            this.lastMemberOnDisplay,
+          );
+        }),
+      );
+    });
   }
 
   trackByFn(_index: number, member: IMember) {

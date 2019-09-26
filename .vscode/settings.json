@@ -36,6 +36,7 @@
     "applocals",
     "apps",
     "arrow",
+    "asychronous",
     "async",
     "auto",
     "bazel",

@@ -1,6 +1,17 @@
-<app-login [attr.data-environment]=isE2eTesting></app-login>
+<app-login
+  [attr.data-environment]=isE2eTesting
+>
+</app-login>
 
 <mat-divider></mat-divider>
+
+<mat-progress-bar
+  *ngIf="isLoading$ | async"
+  class="progress-bar"
+  mode="indeterminate"
+  color="warn"
+>
+</mat-progress-bar>
 
 <app-nav></app-nav>
 

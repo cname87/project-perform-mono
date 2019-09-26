@@ -7,8 +7,10 @@ import {
   publishReplay,
   refCount,
   catchError,
+  tap,
 } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
+import { IsLoadingService } from '@service-work/is-loading';
 
 import { MembersService } from '../../shared/members-service/members.service';
 import { IMember } from '../../data-providers/members.data-provider';
@@ -37,20 +39,22 @@ export class MemberSearchComponent implements OnInit {
   detail = routes.detail;
   /* member property to display in the list of found members */
   propertyToDisplay = 'name';
-  /* controls that errorHandler only called once */
-  private errorHandlerCalled = false;
 
   constructor(
     private membersService: MembersService,
     private logger: NGXLogger,
     private errorHandler: ErrorHandler,
+    private isLoadingService: IsLoadingService,
   ) {
     this.logger.trace(
       MemberSearchComponent.name + ': Starting MemberSearchComponent',
     );
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
+    /* controls that errorHandler only called once */
+    let errorHandlerCalled = false;
+
     /**
      * Creates an observable of the members returned by the search term, subscribes and stores the found members.
      */
@@ -64,21 +68,23 @@ export class MemberSearchComponent implements OnInit {
       /* get the memberService observable each time the term changes */
       switchMap(
         (term: string): Observable<IMember[]> => {
-          return this.membersService.getMembers(term);
+          const getMembers$ = this.membersService.getMembers(term);
+          this.isLoadingService.add();
+          return getMembers$;
         },
       ),
-      /* using publish as share will resubscribe for each html call in case of unexpected error causing observable to complete (and I don't need to resubscribe on this page) */
+      tap(() => {
+        this.isLoadingService.remove();
+      }),
       publishReplay(1),
       refCount(),
-
-      /* note that an error will close the subject i.e. search will no longer work (but will go to error information page anyway) */
       catchError((error: any) => {
-        /* only call the error handler once per ngOnInit even though the returned observable is multicast to multiple html elements */
-        if (!this.errorHandlerCalled) {
-          this.errorHandlerCalled = true;
+        this.isLoadingService.remove();
+        if (!errorHandlerCalled) {
+          this.logger.trace(MemberSearchComponent.name + ': catchError called');
+          errorHandlerCalled = true;
           this.errorHandler.handleError(error);
         }
-        /* return empty array of members to all html elements */
         return of([]);
       }),
     );
@@ -88,7 +94,7 @@ export class MemberSearchComponent implements OnInit {
    * Pushes a search term into the searchTerms$ observable.
    */
   search(term: string): void {
-    this.logger.trace(MemberSearchComponent.name + ': Calling search(term)');
+    this.logger.trace(MemberSearchComponent.name + `: Calling search(${term})`);
     this.searchTerms$.next(term);
   }
 
