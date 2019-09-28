@@ -6,7 +6,8 @@ const { browser, by } = require('protractor');
 const { SpecReporter } = require('jasmine-spec-reporter');
 const request = require('request-promise-native');
 const fs = require('fs');
-const {promisify} = require('util');
+const { promisify } = require('util');
+const { NgxLoggerLevel } = require('ngx-logger');
 
 const certFile = path.resolve(__dirname, '..//certs/nodeKeyAndCert.pem')
 const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem')
@@ -14,6 +15,7 @@ const caFile = path.resolve(__dirname, '../certs/rootCA.crt')
 
 import { getDashboardPage } from './src/pages/dashboard.page';
 import { getRootElements } from './src/pages/elements/root.elements';
+import { NGXLogger } from 'ngx-logger';
 
 /**
  * This module...
@@ -172,13 +174,25 @@ const loadRootPage = async (isLoggedIn = true, numberExpected = 4) => {
 const checkE2eEnvironment = async () => {
   /* the app-login element is configured with a custom attribute */
   const el = browser.findElement(by.css('app-login'));
-  const isE2eTesting = await el.getAttribute('data-environment');
+  const isE2eTesting = await el.getAttribute('data-isE2eTesting');
+  const production = await el.getAttribute('data-production');
+  const logLevel = await el.getAttribute('data-logLevel');
+
   if(isE2eTesting === 'true'){
     console.log(`E2e build environment in use`);
   } else {
     throw new Error('E2e build environment not in use');
   }
+  /* print out other environment properties if not as expected */
+  if(production !== 'true'){
+    console.log(`*** WARN: environment.production should be true`);
+  }
+  if(logLevel !== NgxLoggerLevel.OFF){
+    console.log(`*** WARN: environment.logLevel should be NGXLoggerLevel.OFF`);
+  }
+
 }
+
 
 /* login - assumes the non-logged in root page is open */
 const login = async() => {

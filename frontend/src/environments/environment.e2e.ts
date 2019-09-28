@@ -7,7 +7,7 @@ export const environment = {
   e2eTesting: true,
   /* console logging level OFF - same as production setting */
   /* change to TRACE for debug only */
-  logLevel: NgxLoggerLevel.TRACE,
+  logLevel: NgxLoggerLevel.OFF,
   /* server logging level same as production*/
   serverLogLevel: NgxLoggerLevel.ERROR,
   /* server logs go to this url */

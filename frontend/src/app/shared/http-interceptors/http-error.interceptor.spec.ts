@@ -50,6 +50,13 @@ describe('HttpErrorInterceptor', () => {
       error: 'Error property in test error',
     };
 
+    const serverErrorNoStatus = {
+      allocatedType: 'None',
+      message: 'Server error message',
+      /// no 'status' property
+      error: 'Error property in test error',
+    };
+
     let tryNumber = 0;
 
     const nextFactory = () => {
@@ -70,6 +77,9 @@ describe('HttpErrorInterceptor', () => {
       nextServerError: {
         handle: () => throwError(serverError),
       },
+      nextServerErrorNoStatus: {
+        handle: () => throwError(serverErrorNoStatus),
+      },
       nextClientError: {
         handle: () => throwError(clientError),
       },
@@ -78,6 +88,7 @@ describe('HttpErrorInterceptor', () => {
       },
       noError,
       serverError,
+      serverErrorNoStatus,
       clientError,
       traceCallsExErrors,
     };
@@ -272,6 +283,41 @@ describe('HttpErrorInterceptor', () => {
           );
           /* test error report properties */
           expect(error.allocatedType).toBe('Http client-side');
+
+          expect(traceLoggerSpy).toHaveBeenCalledWith(
+            'HttpErrorInterceptor: Throwing error report on',
+          );
+        },
+      );
+      /* delay to allow for the retries */
+      tick((totalTries - 1) * retryDelay);
+    }));
+
+    it('constructs an error report for an unknown error', fakeAsync(async () => {
+      const {
+        totalTries,
+        retryDelay,
+        httpErrorInterceptor,
+        traceLoggerSpy,
+        requestUrl,
+        nextServerErrorNoStatus,
+      } = await setup();
+      const result = httpErrorInterceptor.intercept(
+        requestUrl,
+        nextServerErrorNoStatus,
+      );
+      result.subscribe(
+        (_ok: any) => {},
+        (error: any) => {
+          /* non-ErrorEvent path*/
+          expect(traceLoggerSpy).not.toHaveBeenCalledWith(
+            'HttpErrorInterceptor: Client-side or network error',
+          );
+          expect(traceLoggerSpy).not.toHaveBeenCalledWith(
+            'Server returned an unsuccessful response code',
+          );
+          /* test error report properties */
+          expect(error.allocatedType).toBe('None');
 
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Throwing error report on',

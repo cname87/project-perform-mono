@@ -14,12 +14,11 @@ import {
   ActivatedRoute,
   ActivatedRouteStub,
   click,
-  asyncError,
 } from '../../shared/test-helpers';
 import { IMember } from '../../data-providers/members.data-provider';
+import { members } from '../../shared/mocks/mock-members';
 
 interface IMembersServiceSpy {
-  getMember: jasmine.Spy;
   updateMember: jasmine.Spy;
 }
 interface ILocationSpy {
@@ -31,16 +30,15 @@ interface IErrorHandlerSpy {
 
 describe('MemberDetailComponent', () => {
   /* setup function run by each sub test suite */
-  async function mainSetup() {
+  async function mainSetup(routeId = 0) {
     /* stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create spies on memberService methods */
     const membersServiceSpy = jasmine.createSpyObj('membersService', [
-      'getMember',
       'updateMember',
     ]);
     /* stub ActivatedRoute with a configurable path parameter */
-    const activatedRouteStub = new ActivatedRouteStub(0);
+    const activatedRouteStub = new ActivatedRouteStub(routeId);
     /* stub Location service */
     const locationSpy = jasmine.createSpyObj('location', ['back']);
     const errorHandlerSpy = jasmine.createSpyObj('errorHandler', [
@@ -99,16 +97,7 @@ describe('MemberDetailComponent', () => {
     memberServiceSpy: IMembersServiceSpy,
     locationSpy: ILocationSpy,
     errorHandlerSpy: IErrorHandlerSpy,
-    isError = false,
   ) {
-    const getMemberSpy = memberServiceSpy.getMember.and.callFake(
-      (id: number) => {
-        /* return a member unless an input flag parameter is set in which case an error is returned. */
-        return isError
-          ? asyncError(new Error('Test Error'))
-          : asyncData({ id, name: expected().memberName + id });
-      },
-    );
     const updateMemberSpy = memberServiceSpy.updateMember.and.callFake(() => {
       /* return as expected */
       return asyncData('');
@@ -118,10 +107,10 @@ describe('MemberDetailComponent', () => {
 
     const handleErrorSpy = errorHandlerSpy.handleError.and.stub();
 
-    return { getMemberSpy, updateMemberSpy, backSpy, handleErrorSpy };
+    return { updateMemberSpy, backSpy, handleErrorSpy };
   }
 
-  async function createComponent(isError = false) {
+  async function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(MemberDetailComponent);
 
@@ -144,12 +133,11 @@ describe('MemberDetailComponent', () => {
     const component = fixture.componentInstance;
     /* do not run fixture.detectChanges (i.e. ngOnIt here) as included below */
 
-    const {
-      getMemberSpy,
-      updateMemberSpy,
-      backSpy,
-      handleErrorSpy,
-    } = createSpies(membersServiceSpy, locationSpy, errorHandlerSpy, isError);
+    const { updateMemberSpy, backSpy, handleErrorSpy } = createSpies(
+      membersServiceSpy,
+      locationSpy,
+      errorHandlerSpy,
+    );
 
     /* create a page to access the DOM elements */
     const page = new Page(fixture);
@@ -158,7 +146,6 @@ describe('MemberDetailComponent', () => {
       fixture,
       component,
       page,
-      getMemberSpy,
       updateMemberSpy,
       backSpy,
       handleErrorSpy,
@@ -170,8 +157,8 @@ describe('MemberDetailComponent', () => {
 
   describe('component', async () => {
     /* setup function run by each sub test function */
-    async function setup() {
-      await mainSetup();
+    async function setup(routeId = 0) {
+      await mainSetup(routeId);
       return createComponent();
     }
 
@@ -180,36 +167,21 @@ describe('MemberDetailComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should have the default member before ngOnInit called', async () => {
-      const { component } = await setup();
-      component.member$.subscribe((member: IMember) => {
-        expect(member).toEqual({ id: 0, name: '' });
-      });
-    });
-
     it('should have the right member after ngOnInit called', async () => {
-      const {
-        component,
-        fixture,
-        memberName,
-        activatedRouteStub,
-      } = await setup();
       /* set up route that the component will get */
-      const routeId = 1;
-      activatedRouteStub.setParameter(routeId);
+      const routeId = 5;
+      const { component, fixture } = await setup(routeId);
       /* initiate ngOnInit */
       fixture.detectChanges();
+      await fixture.whenStable();
       /* note that component.member$ will complete once the page displays and all subscriptions complete => we access before .whenStable() */
       component.member$.subscribe((member: IMember) => {
-        expect(member.name).toBe(memberName + routeId);
+        expect(member.name).toBe(members[routeId].name);
       });
     });
 
     it('should call goBack', async () => {
-      const { component, fixture, backSpy, activatedRouteStub } = await setup();
-      /* set up route that the component will get */
-      const routeId = 1;
-      activatedRouteStub.setParameter(routeId);
+      const { component, fixture, backSpy } = await setup();
       /* initiate ngOnInit */
       fixture.detectChanges();
       await fixture.whenStable();
@@ -241,17 +213,11 @@ describe('MemberDetailComponent', () => {
     });
 
     it('should call save() and call member update function', async () => {
-      const {
-        component,
-        fixture,
-        memberName,
-        updateMemberSpy,
-        backSpy,
-        activatedRouteStub,
-      } = await setup();
       /* set up route that the component will get */
-      const routeId = 2;
-      activatedRouteStub.setParameter(routeId);
+      const routeId = 6;
+      const { component, fixture, updateMemberSpy, backSpy } = await setup(
+        routeId,
+      );
       /* initiate ngOnInit */
       fixture.detectChanges();
       await fixture.whenStable();
@@ -259,14 +225,14 @@ describe('MemberDetailComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       /* manually call save() with the user name */
-      component.save(memberName + routeId, routeId.toString());
+      component.save(members[routeId].name, routeId.toString());
       /* await async data return */
       fixture.detectChanges();
       await fixture.whenStable();
       expect(updateMemberSpy).toHaveBeenCalledTimes(1);
       expect(updateMemberSpy).toHaveBeenCalledWith({
         id: routeId,
-        name: memberName + routeId,
+        name: members[routeId].name,
       });
       expect(backSpy).toHaveBeenCalledTimes(1);
     });
@@ -274,16 +240,15 @@ describe('MemberDetailComponent', () => {
 
   describe('page', async () => {
     /* setup function run by each sub test function */
-    async function setup(isError = false) {
-      await mainSetup();
-      return createComponent(isError);
+    async function setup(routeId = 0) {
+      await mainSetup(routeId);
+      return createComponent();
     }
 
     it('should show the right values on start up', async () => {
-      const { fixture, page, memberName, activatedRouteStub } = await setup();
       /* set up route that the component will get */
-      const routeId = 2;
-      activatedRouteStub.setParameter(routeId);
+      const routeId = 8;
+      const { fixture, page } = await setup(routeId);
       /* page fields will be null before ngOnInit */
       /* await component ngOnInit and data binding */
       fixture.detectChanges();
@@ -292,15 +257,18 @@ describe('MemberDetailComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       /* test header, name and id */
-      expect(page.header.innerText).toBe(
-        memberName.toUpperCase() + routeId,
+      expect(page.header.innerText).toEqual(
+        members[routeId].name.toUpperCase(),
         'header',
       );
       expect(page.nameDisplay.innerText).toEqual(
-        'NAME: ' + memberName + routeId,
+        'NAME: ' + members[routeId].name,
         'name',
       );
-      expect(page.idDisplay.innerText).toEqual('ID: ' + routeId, 'id');
+      expect(page.idDisplay.innerText).toEqual(
+        'ID: ' + members[routeId].id,
+        'id',
+      );
       /* test the mode attribute in the member input element */
       const mode = page.memberInput.attributes.getNamedItem('ng-reflect-mode');
       expect(mode!.value).toBe('edit', 'input box is set to edit mode');
@@ -309,23 +277,21 @@ describe('MemberDetailComponent', () => {
         'ng-reflect-input-text',
       );
       expect(text!.value).toBe(
-        memberName + routeId,
+        members[routeId].name,
         'input box value is set to the supplied name',
       );
     });
 
     it('should call save with the right parameters on input event', async () => {
+      /* set up route that the component will get */
+      const routeId = 3;
       const {
         component,
         fixture,
         page,
         updateMemberSpy,
         backSpy,
-        activatedRouteStub,
-      } = await setup();
-      /* set up route that the component will get */
-      const routeId = 2;
-      activatedRouteStub.setParameter(routeId);
+      } = await setup(routeId);
       /* page fields will be null before ngOnInit */
       /* await component ngOnInit and data binding */
       fixture.detectChanges();
@@ -342,7 +308,10 @@ describe('MemberDetailComponent', () => {
       input.dispatchEvent(inputEvent);
       /* test that save() was called with the event and the id string */
       /* note: the '$event' emitted by the input box inputEnter event is the event passed in and not the input box name */
-      expect(saveSpy).toHaveBeenCalledWith(inputEvent, routeId.toString());
+      expect(saveSpy).toHaveBeenCalledWith(
+        inputEvent,
+        members[routeId].id.toString(),
+      );
       /* await async data return */
       fixture.detectChanges();
       await fixture.whenStable();
@@ -350,17 +319,14 @@ describe('MemberDetailComponent', () => {
       await fixture.whenStable();
       expect(updateMemberSpy).toHaveBeenCalledTimes(1);
       expect(updateMemberSpy).toHaveBeenCalledWith({
-        id: routeId,
+        id: members[routeId].id,
         name: inputEvent, // not memberName
       });
       expect(backSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should call go back on clicking go back button', async () => {
-      const { fixture, page, backSpy, activatedRouteStub } = await setup();
-      /* set up route that the component will get */
-      const routeId = 4;
-      activatedRouteStub.setParameter(routeId);
+      const { fixture, page, backSpy } = await setup();
       fixture.detectChanges();
       await fixture.whenStable();
       fixture.detectChanges();
@@ -368,34 +334,6 @@ describe('MemberDetailComponent', () => {
       /* click the go back button */
       click(page.goBackButton);
       expect(backSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('should handle a getMember error', async () => {
-      /* set getMemberSpy to return an error */
-      const {
-        component,
-        fixture,
-        page,
-        getMemberSpy,
-        handleErrorSpy,
-      } = await setup(true);
-      fixture.detectChanges();
-      await fixture.whenStable();
-      fixture.detectChanges();
-      await fixture.whenStable();
-      expect(getMemberSpy).toHaveBeenCalledTimes(1);
-      const spyCalls = 1;
-      expect(handleErrorSpy).toHaveBeenCalledTimes(spyCalls);
-      /* test that handleError called with the thrown error */
-      expect(handleErrorSpy.calls.argsFor(0)[0].message).toBe('Test Error');
-      /* check dummy member shown */
-      expect(page.idDisplay.innerText).toEqual('ID: 0');
-      /* subscribe to the getMembers observable again */
-      const numReturned = await component.member$.toPromise();
-      /* this time test that an empty array returned */
-      expect(numReturned).toEqual({ id: 0, name: '' });
-      /* check handleError still only called once */
-      expect(handleErrorSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

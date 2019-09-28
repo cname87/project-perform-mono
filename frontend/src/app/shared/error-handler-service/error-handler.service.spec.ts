@@ -12,10 +12,13 @@ import {
 } from './error-handler.service';
 import { MessageService } from '../message-service/message.service';
 import { errorTypes } from '../../config';
+import { environment } from '../../../environments/environment';
 
 interface INgxLoggerSpy {
   trace: jasmine.Spy;
   error: jasmine.Spy;
+  getConfigSnapshot: jasmine.Spy;
+  updateConfig: jasmine.Spy;
 }
 
 interface IMessageServiceSpy {
@@ -37,7 +40,12 @@ describe('ErrorHandlerService', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
     /* create spies to be injected */
-    const ngxLoggerSpy = jasmine.createSpyObj('ngxLogger', ['trace', 'error']);
+    const ngxLoggerSpy = jasmine.createSpyObj('ngxLogger', [
+      'trace',
+      'error',
+      'getConfigSnapshot',
+      'updateConfig',
+    ]);
     const messageServiceSpy = jasmine.createSpyObj('messageService', ['add']);
     const rollbarServiceSpy = jasmine.createSpyObj('rollbarService', ['error']);
     const toastrServiceSpy = jasmine.createSpyObj('toastrService', ['error']);
@@ -51,12 +59,12 @@ describe('ErrorHandlerService', () => {
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
-        ErrorHandlerService,
         { provide: NGXLogger, useValue: ngxLoggerSpy },
         { provide: MessageService, useValue: messageServiceSpy },
         { provide: RollbarService, useValue: rollbarServiceSpy },
         { provide: ToastrService, useValue: toastrServiceSpy },
         { provide: Router, useValue: routerSpy },
+        ErrorHandlerService,
       ],
     }).compileComponents();
   }
@@ -66,7 +74,7 @@ describe('ErrorHandlerService', () => {
    */
   function expected() {
     return {
-      testHttpError: {
+      testHttpServerError: {
         allocatedType: errorTypes.httpServerSide,
         message: 'test message',
         status: 'test status',
@@ -75,13 +83,30 @@ describe('ErrorHandlerService', () => {
         /* set true by the members.service call */
         isHandled: true,
       },
-      testHttpErrorReport: {
+      testHttpServerErrorReport: {
         allocatedType: errorTypes.httpServerSide,
         message: 'test message',
         status: 'test status',
         body: 'test body',
         error: 'test error',
         isHandled: true,
+      },
+      testHttpClientError: {
+        allocatedType: errorTypes.httpClientSide,
+        message: 'test message',
+        status: 'test status',
+        body: 'test body',
+        error: 'test error',
+        /* set true by the members.service call */
+        isHandled: false, // false to exercise all paths
+      },
+      testHttpClientErrorReport: {
+        allocatedType: errorTypes.httpClientSide,
+        message: 'test message',
+        status: 'test status',
+        body: 'test body',
+        error: 'test error',
+        isHandled: false,
       },
       testNonHttpError: {
         /* no type property */
@@ -109,6 +134,14 @@ describe('ErrorHandlerService', () => {
   ) {
     const traceLoggerSpy = ngxLoggerSpy.trace.and.stub();
     const errorLoggerSpy = ngxLoggerSpy.error.and.stub();
+    const getConfigSnapshotSpy = ngxLoggerSpy.getConfigSnapshot.and.callFake(
+      () => {
+        return {
+          level: 0,
+        };
+      },
+    );
+    const updateConfigSpy = ngxLoggerSpy.updateConfig.and.stub();
     const addMessageSpy = messageServiceSpy.add.and.stub();
     const errorRollbarSpy = rollbarServiceSpy.error.and.stub();
     const errorToastrSpy = toastrServiceSpy.error.and.stub();
@@ -122,6 +155,8 @@ describe('ErrorHandlerService', () => {
     return {
       traceLoggerSpy,
       errorLoggerSpy,
+      getConfigSnapshotSpy,
+      updateConfigSpy,
       addMessageSpy,
       errorRollbarSpy,
       errorToastrSpy,
@@ -132,21 +167,25 @@ describe('ErrorHandlerService', () => {
   /**
    * Get the service, initialize it, set test variables.
    */
-  async function getService() {
+  async function getService(e2eTesting = false) {
     /* create the fixture */
     const errorHandlerService = TestBed.get(ErrorHandlerService);
 
     /* get the injected instances */
-    /* angular.io guide suggests you need to get these from injector.get.  It seemed to work when I just used the 'useValues' in configureTestingModule but now implementing as per guide */
     const ngxLoggerSpy = TestBed.get(NGXLogger);
     const messageServiceSpy = TestBed.get(MessageService);
     const rollbarServiceSpy = TestBed.get(RollbarService);
     const toastrServiceSpy = TestBed.get(ToastrService);
     const routerSpy = TestBed.get(Router);
 
+    /* set environment.e2eTesting to false by default */
+    environment.e2eTesting = e2eTesting;
+
     const {
       traceLoggerSpy,
       errorLoggerSpy,
+      getConfigSnapshotSpy,
+      updateConfigSpy,
       addMessageSpy,
       errorRollbarSpy,
       errorToastrSpy,
@@ -166,6 +205,8 @@ describe('ErrorHandlerService', () => {
       errorHandlerService,
       traceLoggerSpy,
       errorLoggerSpy,
+      getConfigSnapshotSpy,
+      updateConfigSpy,
       addMessageSpy,
       errorRollbarSpy,
       errorToastrSpy,
@@ -176,9 +217,9 @@ describe('ErrorHandlerService', () => {
 
   describe('service', async () => {
     /* setup function run by each sub test function */
-    async function setup() {
+    async function setup(e2eTesting = false) {
       await mainSetup();
-      return getService();
+      return getService(e2eTesting);
     }
 
     it('should be created', async () => {
@@ -210,48 +251,80 @@ describe('ErrorHandlerService', () => {
 
   describe('has a handleError function that', async () => {
     /* setup function run by each sub test function */
-    async function setup() {
+    async function setup(e2eTesting = false) {
       await mainSetup();
-      return getService();
+      return getService(e2eTesting);
     }
 
     it('traces that it has been called', async () => {
       const {
         errorHandlerService,
         traceLoggerSpy,
-        testHttpError,
+        testHttpServerError,
       } = await setup();
-      errorHandlerService.handleError(testHttpError);
+      errorHandlerService.handleError(testHttpServerError);
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: handleError called',
       );
     });
 
-    it('logs a http error', async () => {
+    it('logs a http server-side error', async () => {
       const {
         errorHandlerService,
         traceLoggerSpy,
         errorLoggerSpy,
         errorRollbarSpy,
-        testHttpError,
-        testHttpErrorReport,
+        testHttpServerError,
+        testHttpServerErrorReport,
       } = await setup();
-      errorHandlerService.handleError(testHttpError);
+      errorHandlerService.handleError(testHttpServerError);
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: Http error reported',
       );
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: Logging the error',
       );
-      expect(errorLoggerSpy).toHaveBeenCalledWith(testHttpErrorReport);
+      expect(errorLoggerSpy).toHaveBeenCalledWith(testHttpServerErrorReport);
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: Sending error to Rollbar',
       );
-      expect(errorRollbarSpy).toHaveBeenCalledWith(testHttpError);
-      /* isHandled is set true on testHttpError */
+      expect(errorRollbarSpy).toHaveBeenCalledWith(testHttpServerError);
+      /* isHandled is set true on testHttpServerError */
       expect(traceLoggerSpy).not.toHaveBeenCalledWith(
         'ErrorHandlerService: Reporting: ERROR: An unknown error occurred',
       );
+    });
+    it('logs a http client-side error', async () => {
+      /* test with e2eTesting set to true */
+      const {
+        errorHandlerService,
+        traceLoggerSpy,
+        errorLoggerSpy,
+        errorRollbarSpy,
+        getConfigSnapshotSpy,
+        updateConfigSpy,
+        testHttpClientError,
+        testHttpClientErrorReport,
+      } = await setup(true);
+      errorHandlerService.handleError(testHttpClientError);
+      expect(getConfigSnapshotSpy).toHaveBeenCalled();
+      expect(traceLoggerSpy).toHaveBeenCalledWith(
+        'ErrorHandlerService: Http error reported',
+      );
+      expect(traceLoggerSpy).toHaveBeenCalledWith(
+        'ErrorHandlerService: Logging the error',
+      );
+      expect(errorLoggerSpy).toHaveBeenCalledWith(testHttpClientErrorReport);
+      expect(traceLoggerSpy).toHaveBeenCalledWith(
+        'ErrorHandlerService: Sending error to Rollbar',
+      );
+      expect(errorRollbarSpy).toHaveBeenCalledWith(testHttpClientError);
+      /* isHandled is set false on testHttpServerError */
+      expect(traceLoggerSpy).toHaveBeenCalledWith(
+        'ErrorHandlerService: Reporting: ERROR: An unknown error occurred',
+      );
+      const updateConfigCalls = 3;
+      expect(updateConfigSpy).toHaveBeenCalledTimes(updateConfigCalls);
     });
 
     it('logs a non-http error', async () => {

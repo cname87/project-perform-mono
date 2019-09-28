@@ -34,15 +34,25 @@ export class AppComponent implements OnInit {
 
   public isLoading$!: Observable<boolean>;
   private _isE2eTesting = false;
+  private _production = false;
+  private _logLevel = 0;
 
   get isE2eTesting() {
     return this._isE2eTesting;
+  }
+  get production() {
+    return this._production;
+  }
+  get logLevel() {
+    return this._logLevel;
   }
 
   ngOnInit() {
     /* check authentication state */
     this.auth.localAuthSetup();
     this._isE2eTesting = environment.e2eTesting;
+    this._production = environment.production;
+    this._logLevel = environment.logLevel;
     this.isLoading$ = this.isLoadingService.isLoading$();
 
     /* set (and clear) an isLoadingService indicator (that loads a progress bar) for routing events */

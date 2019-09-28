@@ -4,6 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { SpyLocation } from '@angular/common/testing';
 import { ErrorHandler } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
+import { ActivatedRoute } from '@angular/router';
 
 import { AppModule } from '../../app.module';
 import { MembersListComponent } from './members-list.component';
@@ -14,6 +15,7 @@ import {
   asyncData,
   click,
   asyncError,
+  ActivatedRouteStub,
   RouterLinkDirectiveStub,
 } from '../../shared/test-helpers';
 import {
@@ -38,6 +40,8 @@ describe('MembersListComponent', () => {
   async function mainSetup() {
     /* stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
+    /* stub ActivatedRoute with a configurable path parameter */
+    const activatedRouteStub = new ActivatedRouteStub();
     /* create spies on memberService methods */
     const membersServiceSpy = jasmine.createSpyObj('membersService', [
       'getMembers',
@@ -57,6 +61,7 @@ describe('MembersListComponent', () => {
         { provide: MembersService, useValue: membersServiceSpy },
         { provide: ErrorHandler, useValue: errorHandlerSpy },
         { provide: NGXLogger, useValue: loggerSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteStub },
       ],
     })
       .overrideModule(AppModule, {
@@ -162,6 +167,9 @@ describe('MembersListComponent', () => {
     const errorHandlerSpy = fixture.debugElement.injector.get<IErrorHandlerSpy>(
       ErrorHandler as any,
     );
+    const activatedRouteStub = fixture.debugElement.injector.get<
+      ActivatedRouteStub
+    >(ActivatedRoute as any);
 
     const expected = createExpected();
 
@@ -193,6 +201,7 @@ describe('MembersListComponent', () => {
       deleteMemberSpy,
       handleErrorSpy,
       spyLocation,
+      activatedRouteStub,
       expected,
     };
   }
@@ -222,12 +231,13 @@ describe('MembersListComponent', () => {
     });
 
     it('should have the members after ngOnInit called', async () => {
-      const { fixture, page, getMembersSpy, expected } = await setup();
+      const { fixture, component, page, expected } = await setup();
       /* initiate ngOnInit and view changes etc */
       await fixture.detectChanges();
       await fixture.whenStable();
-      /* test */
-      expect(getMembersSpy).toHaveBeenCalledTimes(1);
+      const membersLoaded = await component.members$.toPromise();
+      expect(membersLoaded.length).toEqual(expected.membersArray.length);
+
       /* await asyncData call */
       fixture.detectChanges();
       await fixture.whenStable();
@@ -238,29 +248,23 @@ describe('MembersListComponent', () => {
     });
 
     it('should call getMembers()', async () => {
-      const {
-        component,
-        fixture,
-        page,
-        getMembersSpy,
-        expected,
-      } = await setup();
-      /* getMembersSpy called on ngOnInit */
-      expect(getMembersSpy).toHaveBeenCalledTimes(1);
+      const { component, fixture, getMembersSpy, expected } = await setup();
+      /* getMembersSpy not called on ngOnInit */
+      expect(getMembersSpy).toHaveBeenCalledTimes(0);
       /* increase members.length */
       expected.membersArray.push({ id: 21, name: 'test21' });
       /* manually call getMembers() */
-      component.getMembers();
-      /* getMembersSpy called again after getMembers() */
-      const expectedCalls = 2;
+      const membersReturned = await component.getMembers().toPromise();
+      /* getMembersSpy called */
+      const expectedCalls = 1;
       expect(getMembersSpy).toHaveBeenCalledTimes(expectedCalls);
       /* await asyncData call */
       fixture.detectChanges();
       await fixture.whenStable();
       fixture.detectChanges();
       await fixture.whenStable();
-      expect(page.memberIdArray!.length).toEqual(
-        expected.membersArray.length,
+      expect(membersReturned).toEqual(
+        expected.membersArray,
         'members retrieved',
       );
     });
@@ -327,11 +331,11 @@ describe('MembersListComponent', () => {
     it('should show the right values on start up', async () => {
       const { fixture, page, expected } = await preSetup();
       /* page fields will be null before ngOnInit */
-      /* await component ngOnInit only */
-      fixture.detectChanges();
-      await fixture.whenStable();
       /* default constructor member shown */
       expect(page.linksArray).toBeNull();
+      /* await component ngOnInit - will load members */
+      fixture.detectChanges();
+      await fixture.whenStable();
       /* get the mode attribute in the member input element */
       const mode = page.memberInput!.attributes.getNamedItem('ng-reflect-mode');
       expect(mode!.value).toBe('add', 'input box is set to add mode');
@@ -429,20 +433,18 @@ describe('MembersListComponent', () => {
     });
 
     it('should handle a getMembers error', async () => {
-      const { component, page, getMembersSpy, handleErrorSpy } = await setup(
-        true,
-      );
+      const { component, getMembersSpy, handleErrorSpy } = await setup(true);
+      /* call getMembers() manually */
+      const membersReturned$ = component.getMembers();
+      const membersReturned = await membersReturned$.toPromise();
       expect(getMembersSpy).toHaveBeenCalledTimes(1);
+      expect(membersReturned).toEqual([]);
       expect(handleErrorSpy).toHaveBeenCalledTimes(1);
       /* test that handleError called with the thrown error */
       expect(handleErrorSpy.calls.argsFor(0)[0].message).toBe('Test Error');
-      /* check no members in dashboard */
-      expect(page.memberIdArray).toBeNull();
-      /* subscribe to the getMembers observable again */
-      const numReturned = await component.members$.toPromise();
-      /* this time test that an empty array returned */
-      expect(numReturned).toEqual([]);
-      /* check handleError still only called once */
+      /* call the returned getMembers() subscribable again */
+      await membersReturned$.toPromise();
+      /* handleError still only called once */
       expect(handleErrorSpy).toHaveBeenCalledTimes(1);
     });
   });

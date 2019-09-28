@@ -46,6 +46,7 @@ export class MembersListComponent implements OnInit {
     });
   }
 
+  /* getMembers called after add() and delete() to reload from server */
   getMembers() {
     this.logger.trace(MembersListComponent.name + ': Calling getMembers');
 

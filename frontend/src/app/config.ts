@@ -52,7 +52,7 @@ export interface IErrReport {
   /* the handled error is always stored here */
   error: HttpErrorResponse;
   /* every handled error will have allocatedType set */
-  allocatedType: 'Http client-side' | 'Http server-side' | 'TBC';
+  allocatedType: 'Http client-side' | 'Http server-side' | 'None';
   /*  set true if user is informed etc => errorHandlerService will not send error message etc */
   isHandled?: boolean;
 }

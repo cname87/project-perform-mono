@@ -1,16 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
+import { HttpResponse } from '@angular/common/http';
 
 import { AppModule } from '../../app.module';
 import { CachingInterceptor } from './caching.interceptor';
 import { of } from 'rxjs';
 import { RequestCacheService } from '../caching.service/request-cache.service';
-import { HttpResponse } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 interface INgxLoggerSpy {
   trace: jasmine.Spy;
   error: jasmine.Spy;
+  getConfigSnapshot: jasmine.Spy;
+  updateConfig: jasmine.Spy;
 }
 interface ICacheSpy {
   getCache: jasmine.Spy;
@@ -21,7 +24,12 @@ describe('CachingInterceptor', () => {
   /* setup function run by each sub test suite */
   async function mainSetup() {
     /* create spies to be injected */
-    const ngxLoggerSpy = jasmine.createSpyObj('ngxLogger', ['trace', 'error']);
+    const ngxLoggerSpy = jasmine.createSpyObj('ngxLogger', [
+      'trace',
+      'error',
+      'getConfigSnapshot',
+      'updateConfig',
+    ]);
     const cacheSpy = jasmine.createSpyObj('cache', ['getCache', 'putCache']);
 
     /* set up Testbed */
@@ -63,7 +71,14 @@ describe('CachingInterceptor', () => {
 
   function createSpies(ngxLoggerSpy: INgxLoggerSpy, cacheSpy: ICacheSpy) {
     const traceLoggerSpy = ngxLoggerSpy.trace.and.stub();
-
+    const getConfigSnapshotSpy = ngxLoggerSpy.getConfigSnapshot.and.callFake(
+      () => {
+        return {
+          level: 0,
+        };
+      },
+    );
+    const updateConfigSpy = ngxLoggerSpy.updateConfig.and.stub();
     /* default to get a falsy value, otherwise set the cache value before use */
     let localCache = '';
     function setCache(value: any) {
@@ -77,6 +92,8 @@ describe('CachingInterceptor', () => {
     const putCacheSpy = cacheSpy.putCache.and.stub();
     return {
       traceLoggerSpy,
+      getConfigSnapshotSpy,
+      updateConfigSpy,
       getCacheSpy,
       putCacheSpy,
       setCache,
@@ -86,13 +103,16 @@ describe('CachingInterceptor', () => {
   /**
    * Get the service, initialize it, set test variables.
    */
-  async function getService() {
+  async function getService(e2eTesting = false) {
     /* create the service */
     const cachingInterceptor = TestBed.get(CachingInterceptor);
 
     /* get the injected instances */
     const ngxLoggerSpy = TestBed.get(NGXLogger);
     const cacheSpy = TestBed.get(RequestCacheService);
+
+    /* set environment.e2eTesting to false by default */
+    environment.e2eTesting = e2eTesting;
 
     return {
       cachingInterceptor,
@@ -104,9 +124,9 @@ describe('CachingInterceptor', () => {
 
   describe('interceptor', async () => {
     /* setup function run by each sub test function */
-    async function setup() {
+    async function setup(e2eTesting = false) {
       await mainSetup();
-      return getService();
+      return getService(e2eTesting);
     }
 
     it('should be created', async () => {
@@ -117,9 +137,9 @@ describe('CachingInterceptor', () => {
 
   describe('has a intercept function that', async () => {
     /* setup function run by each sub test function */
-    async function setup() {
+    async function setup(e2eTesting = false) {
       await mainSetup();
-      return getService();
+      return getService(e2eTesting);
     }
 
     it('traces that it has been called', async () => {
@@ -153,13 +173,16 @@ describe('CachingInterceptor', () => {
     });
 
     it('fails to get the cache', async () => {
+      /* test with e2eTesting set to true */
       const {
         cachingInterceptor,
         traceLoggerSpy,
+        getConfigSnapshotSpy,
+        updateConfigSpy,
         dummyRequest,
         nextText,
         readCacheMessage,
-      } = await setup();
+      } = await setup(true);
       /* spy on sendRequest */
       spyOn(cachingInterceptor, 'sendRequest').and.returnValue('testReturn');
       /* call intercept and cache is read but returns falsy by default */
@@ -172,16 +195,19 @@ describe('CachingInterceptor', () => {
         nextText,
         cachingInterceptor.cache,
       );
-      /* sendRequest returns as epected */
+      /* sendRequest returns as expected */
       expect(result).toEqual('testReturn');
+      /* test e2eTesting = true calls logger functions */
+      expect(getConfigSnapshotSpy).toHaveBeenCalled();
+      expect(updateConfigSpy).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('has a sendRequest function that', async () => {
     /* setup function run by each sub test function */
-    async function setup() {
+    async function setup(e2eTesting = false) {
       await mainSetup();
-      return getService();
+      return getService(e2eTesting);
     }
 
     it('fails to load the cache', async () => {
@@ -206,15 +232,18 @@ describe('CachingInterceptor', () => {
     });
 
     it('loads the cache', async () => {
+      /* test with e2eTesting set to true */
       const {
         cachingInterceptor,
         traceLoggerSpy,
+        getConfigSnapshotSpy,
+        updateConfigSpy,
         putCacheSpy,
         nextResponse,
         readServerMessage,
         dummyRequest,
         dummyResponse,
-      } = await setup();
+      } = await setup(true);
       /* call intercept and cache is read but returns falsy by default */
       const result$ = cachingInterceptor.intercept(dummyRequest, nextResponse);
       /* result will hold what sendRequest returns */
@@ -225,6 +254,10 @@ describe('CachingInterceptor', () => {
       expect(putCacheSpy).toHaveBeenCalledWith(dummyRequest, dummyResponse);
       /* check first intercept parameter passed through */
       expect(result).toEqual(dummyResponse);
+      /* test e2eTesting = true calls logger functions */
+      expect(getConfigSnapshotSpy).toHaveBeenCalled();
+      const updateConfigCalls = 4;
+      expect(updateConfigSpy).toHaveBeenCalledTimes(updateConfigCalls);
     });
   });
 });

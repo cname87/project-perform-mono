@@ -84,7 +84,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         /* add an error type to identified errors  */
         const errReport: IErrReport = {
           error: caughtError, // pass on original error
-          allocatedType: 'TBC', // add a http error type
+          allocatedType: 'None', // add a http error type
         };
 
         /* mark as client-side if error is an ErrorEvent */

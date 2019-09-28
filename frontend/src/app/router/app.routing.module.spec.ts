@@ -23,6 +23,7 @@ import { LoginComponent } from '../components/login/login.component';
 
 interface IMembersServiceStub {
   getMembers: () => Observable<IMember[]>;
+  getMember: () => Observable<IMember>;
 }
 interface IAuthServiceSpy {
   localAuthSetup: jasmine.Spy;
@@ -40,6 +41,9 @@ describe('RoutingModule', () => {
     const membersServiceStub: IMembersServiceStub = {
       getMembers: () => {
         return of([{ id: 1, name: 'testName1' }]);
+      },
+      getMember: () => {
+        return of({ id: 2, name: 'testName2' });
       },
     };
 
@@ -261,7 +265,7 @@ describe('RoutingModule', () => {
     expectPathToBe(
       spyLocation,
       '/' + routes.membersList.path,
-      'after clicking members link',
+      'after url change to/members',
     );
     expectElementOf(fixture, MembersListComponent);
   });
@@ -280,7 +284,7 @@ describe('RoutingModule', () => {
     });
     fixture.detectChanges();
     await fixture.whenStable();
-    expectPathToBe(spyLocation, '/detail/2', 'after clicking members link');
+    expectPathToBe(spyLocation, '/detail/2', 'after route change to /detail/2');
     expectElementOf(fixture, MemberDetailComponent);
   });
 
