@@ -1,6 +1,7 @@
 {
+  /* diverts all calls from localhost:4200 */
   "/api-v1": {
-    "target": "https://localhost:1337",
+    "target": "https://localhost:8080",
     "secure": false
   },
   "logLevel": "debug"

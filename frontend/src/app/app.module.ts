@@ -54,9 +54,7 @@ export function init_app(appLoadService: AppLoadService) {
     /* 3rd party modules */
     FlexLayoutModule,
     LoggerModule.forRoot({
-      // serverLoggingUrl: `${environment.apiUrl}api-v1/logs`,
       level: environment.logLevel,
-      serverLogLevel: environment.serverLogLevel,
       disableConsoleLogging: false,
     }),
     ToastrModule.forRoot({

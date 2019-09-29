@@ -15,7 +15,7 @@
       "request": "launch",
       "cwd": "${workspaceFolder}/frontend",
       "preLaunchTask": "npm start frontend",
-      "url": "http://localhost:4200/", // proxy to 1337 for api calls
+      "url": "http://localhost:4200/", // proxy to 8080 for api calls
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {
       },
@@ -64,7 +64,7 @@
     {
       /*
       Runs npm run e2e.
-      baseUrl is configured in protractor.conf to be localhost:1337
+      baseUrl is configured in protractor.conf to be localhost:8080
       backend server needs to be started first => started in script.
        */
       "name": "Test e2e frontend",
@@ -81,6 +81,10 @@
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
+      "sourceMapPathOverrides": {
+        "./*": "${workspaceFolder}/frontend/*",
+        "webpack:///./*": "${workspaceFolder}/frontend/*",
+      },
       "skipFiles": [
         "<node_internals>/**/*.js",
         "${workspaceFolder}/frontend/node_modules/**/*",
@@ -196,11 +200,11 @@
       ],
       "smartStep": false,
     },
-    // https://localhost:1337/
+    // https://localhost:8080/
     {
       // starts Chrome and connect to the home page
       // the server must be started in advance of running this
-      "name": "Open https://localhost:1337/",
+      "name": "Open https://localhost:8080/",
       "type": "chrome",
       "request": "launch",
       "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -215,7 +219,7 @@
         "--disk-cache-size=1"
       ],
       "userDataDir": true,
-      "url": "https://localhost:1337/",
+      "url": "https://localhost:8080/",
       // tell vscode where to find scripts on the server
       "pathMapping": {
         "/": "${workspaceFolder}/frontend/dist/",
@@ -352,11 +356,11 @@
       ],
       "autoAttachChildProcesses": true,
     },
-    // https://localhost:1337/testServer/xxx/loadMocha.html
+    // https://localhost:8080/testServer/xxx/loadMocha.html
     {
       // starts Chrome and loads the a client-side browser test runner.
       // the equivalent server-side client tests (with Run Chrome disabled) must be started in advance of running this
-      "name": "Open https://localhost:1337/testServer/xxx/loadMocha.html",
+      "name": "Open https://localhost:8080/testServer/xxx/loadMocha.html",
       "type": "chrome",
       "request": "launch",
       "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
@@ -369,8 +373,8 @@
       ],
       "userDataDir": true,
       /* comment out to run a specific loadMocha*/
-      "url": "https://localhost:1337/testServer/api/static/loadmocha.html",
-      // "url": "https://localhost:1337/testServer/errors/static/loadmocha.html",
+      "url": "https://localhost:8080/testServer/api/static/loadmocha.html",
+      // "url": "https://localhost:8080/testServer/errors/static/loadmocha.html",
       // tell vscode where to find scripts on the server
       "pathMapping": {
         "/": "${workspaceFolder}/frontend/dist/",
@@ -434,7 +438,7 @@
       "name": "Backend/Frontend",
       "configurations": [
         "Launch backend index.js",
-        "Open https://localhost:1337/",
+        "Open https://localhost:8080/",
       ]
     },
     /* Run backend server and ng serve - debug frontend with watch */
@@ -465,7 +469,7 @@
       /* you must match the tests in both configurations below */
       "configurations": [
         "Run Mocha client-fired backend tests",
-        "Open https://localhost:1337/testServer/xxx/loadMocha.html",
+        "Open https://localhost:8080/testServer/xxx/loadMocha.html",
       ]
     },
   ],

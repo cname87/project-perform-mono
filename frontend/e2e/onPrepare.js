@@ -65,7 +65,7 @@ const askServer = async(
 const testDatabaseInUse = async () => {
   const testDatabaseResponseBody
     = await askServer(
-      'https://localhost:1337/testServer/isTestDatabase',
+      'https://localhost:8080/testServer/isTestDatabase',
       'GET',
     );
   /* body will contain { isTestDatabase: <boolean> } */
@@ -110,7 +110,7 @@ const resetDatabase = async () => {
 
   /* delete all members in the test database */
   const deleteResponseBody  = await askServer(
-    'https://localhost:1337/api-v1/members',
+    'https://localhost:8080/api-v1/members',
     'DELETE',
     {},
     { Authorization: `Bearer ${token}` },
@@ -123,7 +123,7 @@ const resetDatabase = async () => {
   /* add test database members here */
   for (const member of mockMembers) {
     await askServer(
-      'https://localhost:1337/api-v1/members',
+      'https://localhost:8080/api-v1/members',
       'POST',
       member,
       { Authorization: `Bearer ${token}` },
@@ -178,16 +178,20 @@ const checkE2eEnvironment = async () => {
   const production = await el.getAttribute('data-production');
   const logLevel = await el.getAttribute('data-logLevel');
 
-  if(isE2eTesting === 'true'){
+  if(isE2eTesting === 'true') {
     console.log(`E2e build environment in use`);
   } else {
     throw new Error('E2e build environment not in use');
   }
   /* print out other environment properties if not as expected */
-  if(production !== 'true'){
+  if(production === 'true') {
+    console.log(`Production is true`);
+  } else {
     console.log(`*** WARN: environment.production should be true`);
   }
-  if(logLevel !== NgxLoggerLevel.OFF){
+  if(+logLevel === NgxLoggerLevel.OFF) {
+    console.log(`LogLevel is NGXLoggerLevel.OFF`);
+  } else {
     console.log(`*** WARN: environment.logLevel should be NGXLoggerLevel.OFF`);
   }
 

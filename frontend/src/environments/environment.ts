@@ -9,10 +9,13 @@ export const environment = {
   e2eTesting: false,
   /* console logging level */
   logLevel: NgxLoggerLevel.TRACE,
-  /* server logging level */
-  serverLogLevel: NgxLoggerLevel.ERROR,
-  /* server logs go to this url */
-  apiUrl: 'http://localhost:1337/',
+  /* GCP port must be 8080 */
+  PORT: 8080,
+  HOST: 'https://localhost',
+  API_BASE_URL: 'api-v1',
+  get apiUrl() {
+    return `${this.HOST}:${this.PORT}/${this.API_BASE_URL}/`;
+  },
 };
 
 /*

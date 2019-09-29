@@ -8,6 +8,9 @@
 
 let testWindow: Window;
 
+const PORT = 8080;
+const HOST = `https://localhost:${PORT}/`;
+
 async function postData(url = '', data = {}) {
   const myRequest = new Request(url);
   const myInit: RequestInit = {
@@ -47,7 +50,7 @@ function sleep(delay = 100) {
 
 async function closeTest(number: number, message: string) {
   await new Promise(async (resolve) => {
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number,
       message,
@@ -62,7 +65,7 @@ async function closeTest(number: number, message: string) {
 
 /* tells the server that tests are starting */
 before('signal server to start tests', async () => {
-  const url = 'https://localhost:1337/raiseEvent';
+  const url = `${HOST}raiseEvent`;
   const data = {
     number: 1,
     message: 'Start tests',
@@ -74,7 +77,7 @@ before('signal server to start tests', async () => {
 
 /* tells the server that tests are ending */
 after('signal server to end tests', async () => {
-  const url = 'https://localhost:1337/raiseEvent';
+  const url = `${HOST}raiseEvent`;
   const data = {
     number: 2,
     message: 'End tests',
@@ -89,7 +92,7 @@ describe('page not found', () => {
     console.log('Starting page not found tests');
 
     /* signal server that client 404 test starting */
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number: 1,
       message: '404 test start',
@@ -104,7 +107,7 @@ describe('page not found', () => {
 
   it('should have body with code: 404', async () => {
     /* /dummyUrl set to go to 404 i.e. not to Angular front end */
-    const url = 'https://localhost:1337/dummyUrl';
+    const url = `${HOST}dummyUrl`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -117,7 +120,7 @@ describe('page not found', () => {
 
   it('should return 404', async () => {
     /* /dummyUrl set to go to 404 i.e. not to Angular front end */
-    const url = 'https://localhost:1337/dummyUrl';
+    const url = `${HOST}dummyUrl`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -132,7 +135,7 @@ describe('coffee not found - return 418', () => {
     console.log('Starting fail=coffee test');
 
     /* signal server that test starting */
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number: 1,
       message: 'Coffee test start',
@@ -148,7 +151,7 @@ describe('coffee not found - return 418', () => {
   it('should have body with code: 418', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=coffee&timestamp' + dt;
+      `${HOST}testServer/fail?fail=coffee&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -161,7 +164,7 @@ describe('coffee not found - return 418', () => {
   it('should return 418', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=coffee&timestamp' + dt;
+      `${HOST}testServer/fail?fail=coffee&timestamp${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -175,7 +178,7 @@ describe('response sent twice', () => {
     console.log('Starting fail=sent test');
 
     /* signal server that test starting */
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number: 1,
       message: 'Sent test start',
@@ -191,7 +194,7 @@ describe('response sent twice', () => {
   it("should return 'Response sent'", async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=sent&timestamp=' + dt;
+      `${HOST}testServer/fail?fail=sent&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(true);
 
@@ -207,7 +210,7 @@ describe('throw a specific error', () => {
     console.log('Starting fail=trap-503 test');
 
     /* signal server that test starting */
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number: 1,
       message: 'Trap-503 test start',
@@ -223,7 +226,7 @@ describe('throw a specific error', () => {
   it('should have body with code: 503', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=trap-503&timestamp=' + dt;
+      `${HOST}testServer/fail?fail=trap-503&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -236,7 +239,7 @@ describe('throw a specific error', () => {
   it('should return 503', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=trap-503&timestamp=' + dt;
+      `${HOST}testServer/fail?fail=trap-503&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -245,12 +248,12 @@ describe('throw a specific error', () => {
   });
 });
 
-describe('trap a promise rejection ' + 'and throw a specific error', () => {
+describe('trap a promise rejection and throw a specific error', () => {
   before('Open /tests/fail with ?fail=async-handled', async () => {
     console.log('Starting fail=async-handled test');
 
     /* signal server that test starting */
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number: 1,
       message: 'Async-handled test start',
@@ -266,8 +269,7 @@ describe('trap a promise rejection ' + 'and throw a specific error', () => {
   it('should have body code: 501', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=async-handled&timestamp=' +
-      dt;
+      `${HOST}testServer/fail?fail=async-handled&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -280,8 +282,7 @@ describe('trap a promise rejection ' + 'and throw a specific error', () => {
   it('should return 501', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=async-handled&timestamp=' +
-      dt;
+      `${HOST}testServer/fail?fail=async-handled&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -295,7 +296,7 @@ describe('throw an error', () => {
     console.log('Starting fail=error test');
 
     /* signal server that test starting */
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number: 1,
       message: 'Error test start',
@@ -313,7 +314,7 @@ describe('throw an error', () => {
   it('should have body as sent', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=error&timestamp=' + dt;
+      `${HOST}testServer/fail?fil=error&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -326,7 +327,7 @@ describe('throw an error', () => {
   it('should return 500', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=error&timestamp=' + dt;
+      `${HOST}testServer/fail?fail=error&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -340,7 +341,7 @@ describe('unhandled promise rejection', () => {
     console.log('Starting fail=async test');
 
     /* signal server that test starting */
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number: 1,
       message: 'Async test start',
@@ -350,7 +351,7 @@ describe('unhandled promise rejection', () => {
 
     const dt = new Date().toString();
     testWindow = window.open(
-      'https://localhost:1337/testServer/fail?fail=async&timestamp=' + dt,
+      `${HOST}testServer/fail?fail=async&timestamp=${dt}`,
       '_blank',
     ) as Window;
 
@@ -374,7 +375,7 @@ describe('unhandled promise rejection', () => {
         resolve();
       }, 500);
 
-      const url = 'https://localhost:1337/raiseEvent';
+      const url = `${HOST}raiseEvent`;
       const data = {
         number: 2,
         message: 'Async test end',
@@ -402,7 +403,7 @@ describe('server crash', () => {
     console.log('Starting fail=crash test');
 
     /* signal server that test starting */
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number: 1,
       message: 'Crash test start',
@@ -412,7 +413,7 @@ describe('server crash', () => {
 
     const dt = new Date().toString();
     testWindow = window.open(
-      'https://localhost:1337/testServer/fail?fail=crash&timestamp=' + dt,
+      `${HOST}testServer/fail?fail=crash&timestamp=${dt}`,
       '_blank',
     ) as Window;
 
@@ -436,7 +437,7 @@ describe('server crash', () => {
         resolve();
       }, 500);
 
-      const url = 'https://localhost:1337/raiseEvent';
+      const url = `${HOST}raiseEvent`;
       const data = {
         number: 2,
         message: 'Crash test end',
@@ -461,7 +462,7 @@ describe('fail query not recognised', () => {
   before('Open with ?fail=dummy', async () => {
     console.log('Starting fail=dummy test');
 
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number: 1,
       message: 'Return 404 test start',
@@ -477,7 +478,7 @@ describe('fail query not recognised', () => {
   it('should have body with code: 404', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=dummy&timestamp=' + dt;
+      `${HOST}testServer/fail?fail=dummy&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -491,7 +492,7 @@ describe('fail query not recognised', () => {
   it('should return 404', async () => {
     const dt = new Date().toString();
     const url =
-      'https://localhost:1337/testServer/fail?fail=dummy&timestamp=' + dt;
+      `${HOST}testServer/fail?fail=dummy&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 

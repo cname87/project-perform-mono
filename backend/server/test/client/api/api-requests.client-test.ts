@@ -6,6 +6,11 @@
  * This client-side script sends requests that drive testing the application api paths.
  */
 
+const PORT = 8080;
+const HOST = `https://localhost:${PORT}/`;
+const API_PATH = 'api-v1/';
+const API_URL = `${HOST}${API_PATH}`;
+
 async function sendRequest(
   url: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE',
@@ -35,7 +40,7 @@ async function sendRequest(
 
 async function sendMessage(number: number, message: string) {
   await new Promise(async (resolve) => {
-    const url = 'https://localhost:1337/raiseEvent';
+    const url = `${HOST}raiseEvent`;
     const data = {
       number,
       message,
@@ -51,7 +56,7 @@ async function sendMessage(number: number, message: string) {
 /* tests that the datbase is use */
 before('Test that the test database is in use', async () => {
   console.log('Testing that test datbase is in use');
-  const url = 'https://localhost:1337/testServer/isTestDatabase';
+  const url = `${HOST}testServer/isTestDatabase`;
   const response = await sendRequest(url, 'GET');
   chai.expect(response.ok).to.eql(true);
 
@@ -83,7 +88,7 @@ describe('api requests', () => {
   });
 
   it('should delete all members', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(true);
 
@@ -94,7 +99,7 @@ describe('api requests', () => {
   });
 
   it('should create a member', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { name: 'test1' };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
@@ -106,7 +111,7 @@ describe('api requests', () => {
   });
 
   it('should create another member', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { name: duplicateName };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
@@ -118,7 +123,7 @@ describe('api requests', () => {
   });
 
   it('should create a member with duplicate name', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { name: duplicateName };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(true);
@@ -130,7 +135,7 @@ describe('api requests', () => {
   });
 
   it('should get all members', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(true);
 
@@ -142,7 +147,7 @@ describe('api requests', () => {
   });
 
   it('should get queried members', async () => {
-    const url = `https://localhost:1337/api-v1/members?name=${duplicateName}`;
+    const url = `${API_URL}?name=${duplicateName}`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(true);
 
@@ -154,7 +159,7 @@ describe('api requests', () => {
   });
 
   it('should update a member', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { id: 2, name: 'test2_updated' };
     const response = await sendRequest(url, 'PUT', data);
     chai.expect(response.ok).to.eql(true);
@@ -167,7 +172,7 @@ describe('api requests', () => {
   });
 
   it('should get a member', async () => {
-    const url = 'https://localhost:1337/api-v1/members/2';
+    const url = `${API_URL}members/2`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(true);
 
@@ -179,7 +184,7 @@ describe('api requests', () => {
   });
 
   it('should delete a member', async () => {
-    const url = 'https://localhost:1337/api-v1/members/2';
+    const url = `${API_URL}members/2`;
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(true);
 
@@ -190,7 +195,7 @@ describe('api requests', () => {
   });
 
   it('should delete all members', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(true);
 
@@ -202,11 +207,11 @@ describe('api requests', () => {
 
   it('should read empty when matchstring matches nothing', async () => {
     /* create a member so database definitely not empty */
-    let url = 'https://localhost:1337/api-v1/members';
+    let url = `${API_URL}members`;
     const data = { name: 'test9' };
     let response = await sendRequest(url, 'POST', data);
 
-    url = 'https://localhost:1337/api-v1/members?name=xxx';
+    url = `${API_URL}members?name=xxx`;
     response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(true);
     chai.expect(response.status).to.eql(200);
@@ -220,10 +225,10 @@ describe('api requests', () => {
 
   it('should read empty when database empty', async () => {
     /* delete all */
-    let url = 'https://localhost:1337/api-v1/members';
+    let url = `${API_URL}members`;
     let response = await sendRequest(url, 'DELETE');
 
-    url = 'https://localhost:1337/api-v1/members';
+    url = `${API_URL}members`;
     response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(true);
     chai.expect(response.status).to.eql(200);
@@ -248,10 +253,10 @@ describe('failed api requests', () => {
   });
 
   it('should fail to read - not there ', async () => {
-    let url = 'https://localhost:1337/api-v1/members/997';
+    let url = `${API_URL}members/997`;
     let response = await sendRequest(url, 'DELETE');
 
-    url = 'https://localhost:1337/api-v1/members/997';
+    url = `${API_URL}members/997`;
     response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(404);
@@ -264,10 +269,10 @@ describe('failed api requests', () => {
   });
 
   it('should fail to update - not there ', async () => {
-    let url = 'https://localhost:1337/api-v1/members/4';
+    let url = `${API_URL}members/4`;
     let response = await sendRequest(url, 'DELETE');
 
-    url = 'https://localhost:1337/api-v1/members';
+    url = `${API_URL}members`;
     const data = { id: 4, name: 'test4_create_updated' };
     response = await sendRequest(url, 'PUT', data);
     chai.expect(response.ok).to.eql(false);
@@ -281,10 +286,10 @@ describe('failed api requests', () => {
   });
 
   it('should fail to delete - not there ', async () => {
-    let url = 'https://localhost:1337/api-v1/members/997';
+    let url = `${API_URL}members/997`;
     let response = await sendRequest(url, 'DELETE');
 
-    url = 'https://localhost:1337/api-v1/members/997';
+    url = `${API_URL}members/997`;
     response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(404);
@@ -309,7 +314,7 @@ describe('bad database tests', () => {
   });
 
   it('should fail to create - bad database', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { name: 'test8' };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(false);
@@ -323,7 +328,7 @@ describe('bad database tests', () => {
   });
 
   it('should fail to get one - bad database ', async () => {
-    const url = 'https://localhost:1337/api-v1/members/1';
+    const url = `${API_URL}members/1`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(503);
@@ -336,7 +341,7 @@ describe('bad database tests', () => {
   });
 
   it('should fail to get all - bad database ', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(503);
@@ -349,7 +354,7 @@ describe('bad database tests', () => {
   });
 
   it('should fail to update - bad database', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { id: 1, name: 'test1' };
     const response = await sendRequest(url, 'PUT', data);
     chai.expect(response.ok).to.eql(false);
@@ -363,7 +368,7 @@ describe('bad database tests', () => {
   });
 
   it('should fail to delete one - bad database ', async () => {
-    const url = 'https://localhost:1337/api-v1/members/1';
+    const url = `${API_URL}members/1`;
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(503);
@@ -376,7 +381,7 @@ describe('bad database tests', () => {
   });
 
   it('should fail to delete all - bad database ', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(503);
@@ -401,7 +406,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to create - name too long', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { id: 1, name: '0123456789012345678901234567890123456789' };
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(false);
@@ -415,7 +420,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to create - missing property', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = {} as any;
     const response = await sendRequest(url, 'POST', data);
     chai.expect(response.ok).to.eql(false);
@@ -429,7 +434,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to update - id > max', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { id: 1001, name: 'test2_updated' };
     const response = await sendRequest(url, 'PUT', data);
     chai.expect(response.ok).to.eql(false);
@@ -443,7 +448,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to update - id < 0', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { id: -13, name: 'test2_updated' };
     const response = await sendRequest(url, 'PUT', data);
     chai.expect(response.ok).to.eql(false);
@@ -457,7 +462,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to update - name too long', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { id: 1, name: '0123456789012345678901234567890123456789' };
     const response = await sendRequest(url, 'PUT', data);
     chai.expect(response.ok).to.eql(false);
@@ -471,7 +476,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to update - missing property', async () => {
-    const url = 'https://localhost:1337/api-v1/members';
+    const url = `${API_URL}members`;
     const data = { id: 1 } as any;
     const response = await sendRequest(url, 'PUT', data);
     chai.expect(response.ok).to.eql(false);
@@ -485,8 +490,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to get - query too long', async () => {
-    const url =
-      'https://localhost:1337/api-v1/members?name=0123456789012345678901234567890123456789';
+    const url = `${API_URL}members?name=0123456789012345678901234567890123456789`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(400);
@@ -499,7 +503,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to get - id > max', async () => {
-    const url = 'https://localhost:1337/api-v1/members/1001';
+    const url = `${API_URL}members/1001`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(400);
@@ -512,7 +516,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to get - id < 0', async () => {
-    const url = 'https://localhost:1337/api-v1/members/-13';
+    const url = `${API_URL}members/-13`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(400);
@@ -525,7 +529,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to get - id not a number', async () => {
-    const url = 'https://localhost:1337/api-v1/members/x';
+    const url = `${API_URL}members/x`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(false);
     chai.expect(response.status).to.eql(400);
@@ -538,7 +542,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to delete id > max', async () => {
-    const url = 'https://localhost:1337/api-v1/members/1001';
+    const url = `${API_URL}members/1001`;
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(false);
 
@@ -550,7 +554,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to delete id < 0', async () => {
-    const url = 'https://localhost:1337/api-v1/members/-13';
+    const url = `${API_URL}members/-13`;
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(false);
 
@@ -562,7 +566,7 @@ describe('invalid api requests', () => {
   });
 
   it('should fail to delete id not a number', async () => {
-    const url = 'https://localhost:1337/api-v1/members/x';
+    const url = `${API_URL}members/x`;
     const response = await sendRequest(url, 'DELETE');
     chai.expect(response.ok).to.eql(false);
 
@@ -598,7 +602,7 @@ describe('fall back to the angular index.html', () => {
   it('should fall back to angular index.html', async () => {
     const dt = new Date().toString();
     testWindow = window.open(
-      'https://localhost:1337/notfound.html' + '?timestamp=' + dt,
+      `${HOST}notfound.html?timestamp==${dt}`,
       '_blank',
     ) as Window;
 
@@ -642,9 +646,7 @@ describe('page and file retrieval', () => {
   it("should download a page with title 'Test Title'", async () => {
     const dt = new Date().toString();
     testWindow = window.open(
-      'https://localhost:1337/testServer/api/static/pagetest.html' +
-        '?timestamp=' +
-        dt,
+      `${HOST}testServer/api/static/pagetest.html?timestamp=${dt}`,
       '_blank',
     ) as Window;
 
@@ -666,9 +668,7 @@ describe('page and file retrieval', () => {
   it('should download and file receive an x-icon content type', async () => {
     const dt = new Date().toString();
     testWindow = window.open(
-      'https://localhost:1337/testServer/api/static/pagetest.html' +
-        '?timestamp=' +
-        dt,
+      `${HOST}testServer/api/static/pagetest.html?timestamp=${dt}`,
       '_blank',
     ) as Window;
 
@@ -688,9 +688,7 @@ describe('page and file retrieval', () => {
     };
 
     /* download the favicon */
-    const myRequest = new Request(
-      'https://localhost:1337/testServer/api/static/filetest.ico',
-    );
+    const myRequest = new Request(`${HOST}testServer/api/static/filetest.ico`);
 
     response = await fetch(myRequest, myInit);
 

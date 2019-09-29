@@ -11,13 +11,13 @@ import { getMemberDetailPage } from '../pages/memberDetail.page';
 import { getMembersListPage } from '../pages/membersList.page';
 import { getErrorInformationPage } from '../pages/error-information.page';
 import { getHelpers } from '../e2e-helpers';
-/* need to set a dummy client-side window global as it is referenced in auth0 configuration in config.ts (which I import below) */
-global['window'] = {
-  location: {
-    origin: 'dummy',
-  },
+
+/* dummy member for e2e error testing - must match the value in config.ts */
+/* can't easily import config.ts as would need to mock global window variable and also import 'zone...' in environment import causes a problem */
+export const errorMember = {
+  id: 10,
+  name: 'errorName',
 };
-import { errorMember } from '../../../src/app/config';
 
 describe('Error Handling', () => {
 

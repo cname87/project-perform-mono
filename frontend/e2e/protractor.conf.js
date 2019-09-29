@@ -1,8 +1,6 @@
 // Protractor configuration file, see link for more information
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
-// const jasmineReporters = require('jasmine-reporters');
-
 exports.config = {
   allScriptsTimeout: 11000,
   /* spec patterns are relative to the current working directory when protractor is called */
@@ -28,7 +26,7 @@ exports.config = {
       browser: 'ALL' // "OFF", "SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST", "ALL".
     }
   },
-  baseUrl: 'https://localhost:1337/',
+  baseUrl: 'https://localhost:8080/',
   allScriptsTimeout: 10000,
   getPageTimeout: 10000,
   untrackOutstandingTimeouts: true,

@@ -41,7 +41,7 @@ describe('Application tests', function() {
   let spyDumpError;
 
   const options = {
-    url: 'https://localhost:1337/',
+    url: 'https://localhost:8080/',
     key: fs.readFileSync(config.HTTPS_KEY),
     cert: fs.readFileSync(config.HTTPS_CERT),
     ca: fs.readFileSync(config.ROOT_CA),

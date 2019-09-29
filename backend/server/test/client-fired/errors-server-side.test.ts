@@ -48,7 +48,7 @@ const chromeExec =
   'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
 /* url that initiates the client-fired tests */
 const fireTestUrl =
-  'https://localhost:1337/testServer/errors/static/loadMocha.html';
+  'https://localhost:8080/testServer/errors/static/loadMocha.html';
 /* hold browser open for this time (ms) */
 const browserDelay = 5000;
 /* event names */

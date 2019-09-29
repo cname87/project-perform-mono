@@ -32,7 +32,7 @@ const HTTPS_CERT = path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem');
 
 /* server access options */
 const options = {
-  url: 'https://localhost:1337/',
+  url: 'https://localhost:8080/',
   key: fs.readFileSync(HTTPS_KEY),
   cert: fs.readFileSync(HTTPS_CERT),
   ca: fs.readFileSync(ROOT_CA),

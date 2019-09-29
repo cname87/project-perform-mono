@@ -8,10 +8,12 @@ export const environment = {
   /* console logging level OFF - same as production setting */
   /* change to TRACE for debug only */
   logLevel: NgxLoggerLevel.OFF,
-  /* server logging level same as production*/
-  serverLogLevel: NgxLoggerLevel.ERROR,
+  /* GCP port must be 8080 */
+  PORT: 8080,
   /* server logs go to this url */
-  apiUrl: 'http://localhost:1337/',
+  get apiUrl() {
+    return `https://localhost:${this.PORT}/api-v1/`;
+  },
 };
 
 /*
@@ -20,4 +22,5 @@ export const environment = {
  *
  * This import should be commented out in production mode because it will have a negative impact on performance if an error is thrown.
  */
-import 'zone.js/dist/zone-error'; // Included with Angular CLI.
+/* leave commented out by default to simulate production */
+// import 'zone.js/dist/zone-error'; // Included with Angular CLI.

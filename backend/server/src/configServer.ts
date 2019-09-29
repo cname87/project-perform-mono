@@ -111,8 +111,8 @@ export const config = {
   /* HTTP/S server parameters                                            */
   /***********************************************************************/
 
-  // port to be listened on
-  PORT: 1337,
+  // port to be listened on - must be 8080 for GCP
+  PORT: 8080,
   // true for https with http on port 80 being redirected
   HTTPS_ON: true,
   // https credentials

@@ -9,6 +9,8 @@ import request from 'request-promise-native';
 import fs from 'fs';
 import path from 'path';
 
+import { environment } from '../src/environments/environment';
+
 /* need to set a dummy client-side window global as it is referenced in auth0 configuration in config.ts */
 global['window'] = {
   location: {
@@ -60,7 +62,7 @@ export const resetDatabase = async () => {
 
   /* the response is { isTestDatabase: <true | false> } */
   const response = await askServer(
-    'https://localhost:1337/testServer/isTestDatabase',
+    `${environment.apiUrl}testServer/isTestDatabase`,
     'GET',
   );
   /* exit if we're not working with the test database */
@@ -70,19 +72,19 @@ export const resetDatabase = async () => {
   }
 
   /* delete all 'test' database members */
-  await askServer('https://localhost:1337/members', 'DELETE');
+  await askServer(`${environment.apiUrl}members`, 'DELETE');
 
   /* add test database members here */
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[0]);
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[1]);
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[2]);
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[3]);
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[4]);
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[5]);
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[6]);
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[7]);
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[8]);
-  await askServer('https://localhost:1337/members', 'POST', mockMembers[9]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[0]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[1]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[2]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[3]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[4]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[5]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[6]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[7]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[8]);
+  await askServer(`${environment.apiUrl}members`, 'POST', mockMembers[9]);
 
   console.log('Completed database reset and loaded test members');
 };
