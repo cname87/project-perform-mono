@@ -65,7 +65,7 @@ const askServer = async(
 const testDatabaseInUse = async () => {
   const testDatabaseResponseBody
     = await askServer(
-      'https://localhost:8080/testServer/isTestDatabase',
+      `${process.env.HOST}testServer/isTestDatabase`,
       'GET',
     );
   /* body will contain { isTestDatabase: <boolean> } */
@@ -110,7 +110,7 @@ const resetDatabase = async () => {
 
   /* delete all members in the test database */
   const deleteResponseBody  = await askServer(
-    'https://localhost:8080/api-v1/members',
+    `${process.env.HOST}${process.env.API_PATH}members`,
     'DELETE',
     {},
     { Authorization: `Bearer ${token}` },
@@ -123,7 +123,7 @@ const resetDatabase = async () => {
   /* add test database members here */
   for (const member of mockMembers) {
     await askServer(
-      'https://localhost:8080/api-v1/members',
+      `${process.env.HOST}${process.env.API_PATH}members`,
       'POST',
       member,
       { Authorization: `Bearer ${token}` },

@@ -1,5 +1,6 @@
-// Protractor configuration file, see link for more information
-// https://github.com/angular/protractor/blob/master/lib/config.ts
+const dotenv = require('dotenv');
+const path = require('path');
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 exports.config = {
   allScriptsTimeout: 11000,
@@ -26,7 +27,7 @@ exports.config = {
       browser: 'ALL' // "OFF", "SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST", "ALL".
     }
   },
-  baseUrl: 'https://localhost:8080/',
+  baseUrl: `${process.env.HOST}`,
   allScriptsTimeout: 10000,
   getPageTimeout: 10000,
   untrackOutstandingTimeouts: true,

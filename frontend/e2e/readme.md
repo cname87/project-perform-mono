@@ -5,6 +5,7 @@ We define elements for every html component tag.
 ## Root page
 
 The root app-page contains the following components:
+
 - app-login
 - app-nav
 - router-outlet (see below)
@@ -17,7 +18,9 @@ Each routed page loads a separate component in the router-outlet and might alter
 The following are the routed pages and the components they load in place of router-outlet, and any components :
 
 - 'information/login' page containing a login notice:
+  - app-login
 - 'information/notfound' page containing a not found notice:
+  app-information
 - 'information/error' page containing an error notice:
   - app-information
 - 'profile' page containing user information:
@@ -37,14 +40,11 @@ The following are the routed pages and the components they load in place of rout
 
 A page module exists for each page.
 
-A get page function is exported which returns the root and other components that appear on the page, along with any necessary helper functions.
+A get page function is exported which returns the elements in the root and other components that appear on the page (see below), along with any necessary helper functions.
 
-The components need to be on the DOM when an action is called, i.e. only call the get dashboard page function when the dashboard page is being displayed.
 
 ## Elements modules
 
 An elements module exists for each component.
 
 A get elements function is exported which returns all needed elements that appear on the component.
-
-The elements need to be on the DOM when an action is called, i.e. only call the get component function when that component is being displayed.
