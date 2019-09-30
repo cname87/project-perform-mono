@@ -6,6 +6,11 @@
  * It is also imported by all other modules to import types only.
  */
 
+/* import configuration parameters into process.env first */
+/* the .env file must be in process.cwd() */
+import dotenv = require('dotenv');
+dotenv.config();
+
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
@@ -111,11 +116,11 @@ export const config = {
   /* HTTP/S server parameters                                            */
   /***********************************************************************/
 
-  // port to be listened on - must be 8080 for GCP
-  PORT: 8080,
-  // true for https with http on port 80 being redirected
+  /* port to be listened on */
+  PORT: +process.env.PORT!,
+  /* true for https with http on port 80 being redirected */
   HTTPS_ON: true,
-  // https credentials
+  /* https credentials */
   ROOT_CA: path.join(appRoot, 'server', 'certs', 'rootCA.crt'),
   HTTPS_KEY: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
   HTTPS_CERT: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),

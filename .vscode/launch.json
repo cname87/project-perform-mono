@@ -325,10 +325,11 @@
     {
       /* This runs a server-side mocha client test file to test the server-side behaviour during client-side fired tests. */
       /* If Run_Chrome is set true it kicks off the browser tests that fire the client-side tests.  Otherwise you can load testServer/loadmocha.html manually after running this, or if you need debug of the browser-side then use a launch configuration to load the matching loadMocha.html. */
+      /* Note: Make sure you use the correct matching file */
       /* A compound configuration is set up for use when debugging client-side test scripts */
       "type": "node",
       "request": "launch",
-      "name": "Run Mocha client-fired backend tests",
+      "name": "Run server and start Mocha client-fired tests",
       "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
       "args": [
         "--config",
@@ -336,8 +337,8 @@
         /* include testSetup.js to load .env */
         "${workspaceFolder}/backend/dist/test/testSetup.js",
         /* comment out files to select a test */
-        "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
-        // "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
+        // "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
+        "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
       ],
       "env": {
         /* set before all tests so test database used */
@@ -358,8 +359,9 @@
     },
     // https://localhost:8080/testServer/xxx/loadMocha.html
     {
-      // starts Chrome and loads the a client-side browser test runner.
-      // the equivalent server-side client tests (with Run Chrome disabled) must be started in advance of running this
+      /* starts Chrome and loads the a client-side browser test runner */
+      /* the equivalent server-side client tests (with Run Chrome disabled) must be started in advance of running this */
+      /* make sure you use the correct matching file */
       "name": "Open https://localhost:8080/testServer/xxx/loadMocha.html",
       "type": "chrome",
       "request": "launch",
@@ -373,8 +375,8 @@
       ],
       "userDataDir": true,
       /* comment out to run a specific loadMocha*/
-      "url": "https://localhost:8080/testServer/api/static/loadmocha.html",
-      // "url": "https://localhost:8080/testServer/errors/static/loadmocha.html",
+      // "url": "https://localhost:8080/testServer/api/static/loadmocha.html",
+      "url": "https://localhost:8080/testServer/errors/static/loadmocha.html",
       // tell vscode where to find scripts on the server
       "pathMapping": {
         "/": "${workspaceFolder}/frontend/dist/",

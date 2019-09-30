@@ -3,7 +3,7 @@
 /// <reference types='@types/chai' />
 
 /**
- * This module tests the Express error handling middleware functionality.
+ * This client-side script tests the Express error handling middleware functionality.
  */
 
 let testWindow: Window;
@@ -150,8 +150,7 @@ describe('coffee not found - return 418', () => {
 
   it('should have body with code: 418', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=coffee&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=coffee&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -163,8 +162,7 @@ describe('coffee not found - return 418', () => {
 
   it('should return 418', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=coffee&timestamp${dt}`;
+    const url = `${HOST}testServer/fail?fail=coffee&timestamp${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -193,8 +191,7 @@ describe('response sent twice', () => {
 
   it("should return 'Response sent'", async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=sent&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=sent&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(true);
 
@@ -225,8 +222,7 @@ describe('throw a specific error', () => {
 
   it('should have body with code: 503', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=trap-503&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=trap-503&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -238,8 +234,7 @@ describe('throw a specific error', () => {
 
   it('should return 503', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=trap-503&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=trap-503&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -268,8 +263,7 @@ describe('trap a promise rejection and throw a specific error', () => {
 
   it('should have body code: 501', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=async-handled&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=async-handled&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -281,8 +275,7 @@ describe('trap a promise rejection and throw a specific error', () => {
 
   it('should return 501', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=async-handled&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=async-handled&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -313,8 +306,7 @@ describe('throw an error', () => {
 
   it('should have body as sent', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fil=error&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=error&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -326,8 +318,7 @@ describe('throw an error', () => {
 
   it('should return 500', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=error&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=error&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -477,8 +468,7 @@ describe('fail query not recognised', () => {
 
   it('should have body with code: 404', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=dummy&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=dummy&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
@@ -491,8 +481,7 @@ describe('fail query not recognised', () => {
 
   it('should return 404', async () => {
     const dt = new Date().toString();
-    const url =
-      `${HOST}testServer/fail?fail=dummy&timestamp=${dt}`;
+    const url = `${HOST}testServer/fail?fail=dummy&timestamp=${dt}`;
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 

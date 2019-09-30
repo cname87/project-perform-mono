@@ -11,6 +11,11 @@
  * This function is this is imported and the returned promise from the function is actioned as desired.
  */
 
+/* import configuration parameters into process.env first */
+/* the .env file must be in process.cwd() */
+import dotenv = require('dotenv');
+dotenv.config();
+
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
@@ -32,7 +37,7 @@ const HTTPS_CERT = path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem');
 
 /* server access options */
 const options = {
-  url: 'https://localhost:8080/',
+  url: process.env.HOST!,
   key: fs.readFileSync(HTTPS_KEY),
   cert: fs.readFileSync(HTTPS_CERT),
   ca: fs.readFileSync(ROOT_CA),

@@ -1,5 +1,10 @@
 'use strict';
 
+/* import configuration parameters into process.env first */
+/* the .env file must be in process.cwd() */
+const dotenv = require('dotenv');
+dotenv.config();
+
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 const debug = require('debug')('PP_' + modulename);
 debug(`Starting ${modulename}`);
@@ -41,7 +46,7 @@ describe('Application tests', function() {
   let spyDumpError;
 
   const options = {
-    url: 'https://localhost:8080/',
+    url: process.env.HOST,
     key: fs.readFileSync(config.HTTPS_KEY),
     cert: fs.readFileSync(config.HTTPS_CERT),
     ca: fs.readFileSync(config.ROOT_CA),

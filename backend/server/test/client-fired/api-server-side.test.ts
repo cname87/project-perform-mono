@@ -16,6 +16,11 @@
  *
  */
 
+/* import configuration parameters into process.env first */
+/* the .env file must be in process.cwd() */
+import dotenv = require('dotenv');
+dotenv.config();
+
 const modulename = __filename.slice(__filename.lastIndexOf('\\'));
 import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
@@ -50,8 +55,7 @@ const dbTestName = 'test';
 const chromeExec =
   'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
 /* url that initiates the client-fired tests */
-const fireTestUrl =
-  'https://localhost:8080/testServer/api/static/loadMocha.html';
+const fireTestUrl = `${process.env.HOST}/testServer/api/static/loadMocha.html`;
 /* hold browser open for this time (ms) */
 const browserDelay = 5000;
 /* event names */

@@ -147,7 +147,7 @@ describe('api requests', () => {
   });
 
   it('should get queried members', async () => {
-    const url = `${API_URL}?name=${duplicateName}`;
+    const url = `${API_URL}members?name=${duplicateName}`;
     const response = await sendRequest(url, 'GET');
     chai.expect(response.ok).to.eql(true);
 
