@@ -107,8 +107,8 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
         "<node_internals>/**/*.js",
-        "${workspaceFolder}/backend/node_modules/**/*",
-        "${workspaceFolder}/backend/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
@@ -143,8 +143,8 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
         "<node_internals>/**/*.js",
-        "${workspaceFolder}/backend/node_modules/**/*",
-        "${workspaceFolder}/backend/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
@@ -166,8 +166,8 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
         "<node_internals>/**/*.js",
-        "${workspaceFolder}/backend/node_modules/**/*",
-        "${workspaceFolder}/backend/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
@@ -190,8 +190,8 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
         "<node_internals>/**/*.js",
-        "${workspaceFolder}/backend/node_modules/**/*",
-        "${workspaceFolder}/backend/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
@@ -244,7 +244,7 @@
       "type": "node",
       "request": "launch",
       "name": "Run Mocha backend tests",
-      "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
         "--config",
         "${workspaceFolder}/backend/.mocharc.json",
@@ -271,8 +271,8 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
         "<node_internals>/**/*.js",
-        "${workspaceFolder}/backend/node_modules/**/*",
-        "${workspaceFolder}/backend/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
       // "preLaunchTask": "Taskkill node.exe", // kill any previously failed node runs
@@ -282,13 +282,13 @@
       "type": "node",
       "request": "launch",
       "name": "Run Mocha backend tests with Istanbul",
-      "program": "${workspaceFolder}/backend/node_modules/nyc/bin/nyc",
+      "program": "${workspaceFolder}/node_modules/nyc/bin/nyc",
       "args": [
         "--reporter=text",
         "--reporter=html",
         "--report-dir",
         "${workspaceFolder}/backend/coverage/all",
-        "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
+        "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "--config",
         "${workspaceFolder}/backend/.mocharc.json",
         /* include testSetup.js to load .env */
@@ -314,8 +314,8 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
         "<node_internals>/**/*.js",
-        "${workspaceFolder}/backend/node_modules/**/*",
-        "${workspaceFolder}/backend/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
       // "preLaunchTask": "Taskkill node.exe", // kill any failed node runs
@@ -330,7 +330,7 @@
       "type": "node",
       "request": "launch",
       "name": "Run server and start Mocha client-fired tests",
-      "program": "${workspaceFolder}/backend/node_modules/mocha/bin/_mocha",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
         "--config",
         "${workspaceFolder}/backend/.mocharc.json",
@@ -352,8 +352,8 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
         "<node_internals>/**/*.js",
-        "${workspaceFolder}/backend/node_modules/**/*",
-        "${workspaceFolder}/backend/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
     },
@@ -406,8 +406,8 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": [
         "<node_internals>/**/*.js",
-        "${workspaceFolder}/backend/node_modules/**/*",
-        "${workspaceFolder}/backend/node_modules/**/*.js",
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/node_modules/**/*.js",
       ],
     },
     // current .ts file
@@ -470,7 +470,7 @@
       /* you must close Chrome manually afterwards */
       /* you must match the tests in both configurations below */
       "configurations": [
-        "Run Mocha client-fired backend tests",
+        "Run server and start Mocha client-fired tests",
         "Open https://localhost:8080/testServer/xxx/loadMocha.html",
       ]
     },

@@ -98,7 +98,7 @@ export const config = {
   /* ok to start server if database fails to start? */
   IS_NO_DB_OK: true,
   /* directory for logs used by all backend components */
-  LOGS_DIR: path.join(appRoot, 'logs'),
+  LOGS_DIR: path.join(appRoot, 'backend', 'logs'),
   // 'development' or 'production'
   ENV: 'development',
 
@@ -110,7 +110,7 @@ export const config = {
    * This section sets parameters used by the Angular app.
    */
 
-  APP_PATH: path.join(appRoot, '..', 'frontend', 'dist'),
+  APP_PATH: path.join(appRoot, 'frontend', 'dist'),
 
   /***********************************************************************/
   /* HTTP/S server parameters                                            */
@@ -121,9 +121,21 @@ export const config = {
   /* true for https with http on port 80 being redirected */
   HTTPS_ON: true,
   /* https credentials */
-  ROOT_CA: path.join(appRoot, 'server', 'certs', 'rootCA.crt'),
-  HTTPS_KEY: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
-  HTTPS_CERT: path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem'),
+  ROOT_CA: path.join(appRoot, 'backend', 'server', 'certs', 'rootCA.crt'),
+  HTTPS_KEY: path.join(
+    appRoot,
+    'backend',
+    'server',
+    'certs',
+    'nodeKeyAndCert.pem',
+  ),
+  HTTPS_CERT: path.join(
+    appRoot,
+    'backend',
+    'server',
+    'certs',
+    'nodeKeyAndCert.pem',
+  ),
   // cookieparser key
   COOKIE_KEY: 'cookie_key',
   /* number of times a server will attempt to listen on an occupied port
@@ -133,7 +145,14 @@ export const config = {
    * a number between 1 to 10 */
   SVR_LISTEN_TIMEOUT: 3,
   // path to static server for server tests
-  STATIC_TEST_PATH: path.join(appRoot, 'dist', 'server', 'test', 'client'),
+  STATIC_TEST_PATH: path.join(
+    appRoot,
+    'backend',
+    'dist',
+    'server',
+    'test',
+    'client',
+  ),
   NODE_MODULES_PATH: path.join(appRoot, 'node_modules'),
 
   /***********************************************************************/
@@ -170,7 +189,7 @@ export const config = {
    */
 
   // The path to the executable js file
-  EXEC_JS: path.join(appRoot, 'dist', 'server', 'src', 'index'),
+  EXEC_JS: path.join(appRoot, 'backend', 'dist', 'server', 'src', 'index'),
   // maximum number of child starts triggered by forever
   MAX_STARTS: 10,
   // true for forever to restart child when files change
@@ -202,7 +221,7 @@ export const config = {
   /**
    * This section sets all configuration parameters for the API middleware.
    */
-  API_FILE: path.join(appRoot, 'api', 'openapi.json'),
+  API_FILE: path.join(appRoot, 'backend', 'api', 'openapi.json'),
 };
 
 /***********************************************************************/

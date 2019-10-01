@@ -304,7 +304,7 @@ describe('MemberDetailComponent', () => {
       /* get the input element */
       const input = page.memberInput;
       /* dispatch an 'inputEnter' event to the member input element */
-      const inputEvent = new Event('inputEnter');
+      const inputEvent: any = new Event('inputEnter');
       input.dispatchEvent(inputEvent);
       /* test that save() was called with the event and the id string */
       /* note: the '$event' emitted by the input box inputEnter event is the event passed in and not the input box name */

@@ -49,18 +49,21 @@ export const config = {
   /* forever log when run as a daemon */
   MONITOR_FOREVER_LOG: path.join(
     appRoot,
+    'backend',
     process.env.LOGS_DIR as string,
     'monitorForever.log',
   ),
   /* child stdout log */
   MONITOR_OUT_LOG: path.join(
     appRoot,
+    'backend',
     process.env.LOGS_DIR as string,
     'monitorOut.log',
   ),
   /* child stderr log */
   MONITOR_ERR_LOG: path.join(
     appRoot,
+    'backend',
     process.env.LOGS_DIR as string,
     'monitorErr.log',
   ),

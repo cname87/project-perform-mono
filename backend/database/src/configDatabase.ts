@@ -59,7 +59,7 @@ export function getMongoUri(): string {
   const server = process.env.DB_IS_LOCAL === 'true' ? 'local' : 'remote';
   debug(modulename + ` : ${server} database server in use`);
 
-  /* local or remte mongoDB server */
+  /* local or remote mongoDB server */
   const scheme = process.env.DB_IS_LOCAL === 'true' ? 'mongodb' : 'mongodb+srv';
 
   /* both local and server databases use the same admin username and password */
@@ -97,11 +97,18 @@ export function getMongoUri(): string {
  */
 export function getConnectionOptions(): ConnectionOptions {
   /* read the certificate authority */
-  const ROOT_CA = path.join(appRoot, 'database', 'certs', 'rootCA.crt');
+  const ROOT_CA = path.join(
+    appRoot,
+    'backend',
+    'database',
+    'certs',
+    'rootCA.crt',
+  );
   const ca = [fs.readFileSync(ROOT_CA)];
   /* read the private key and public cert (both stored in the same file) */
   const HTTPS_KEY = path.join(
     appRoot,
+    'backend',
     'database',
     'certs',
     'mongoKeyAndCert.pem',
@@ -126,7 +133,14 @@ export function getConnectionOptions(): ConnectionOptions {
 }
 
 /* path to database index.js file for unit test */
-export const indexPath = path.join(appRoot, 'dist', 'database', 'src', 'index');
+export const indexPath = path.join(
+  appRoot,
+  'backend',
+  'dist',
+  'database',
+  'src',
+  'index',
+);
 
 /* type for database readystate */
 export const enum DBReadyState {

@@ -9,7 +9,14 @@ describe('Start server tests', function() {
     const path = require('path');
     const appRoot = require('app-root-path').toString();
 
-    let { config: configOriginal } = require(path.join(appRoot, 'dist', 'server', 'src','configServer'));
+    let { config: configOriginal } = require(path.join(
+      appRoot,
+      'backend',
+      'dist',
+      'server',
+      'src',
+      'configServer',
+    ));
     /* create a copy of config that you can edit */
     let config = {};
     let key = '';

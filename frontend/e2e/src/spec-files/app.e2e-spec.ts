@@ -8,7 +8,6 @@ import { getErrorInformationPage } from '../pages/error-information.page';
 import { getHelpers } from '../e2e-helpers';
 
 describe('Project Perform', () => {
-
   const {
     mockMembers,
     loadRootPage,
@@ -39,7 +38,7 @@ describe('Project Perform', () => {
       numTopMembers: 4,
       selectedMemberIndex: 2,
       selectedMember: { id: 0, name: '' },
-      foundMember: { id: 9, name: 'test118'},
+      foundMember: { id: 9, name: 'test118' },
       nameSuffix: 'X',
       newName: '',
       numMembers: Object.keys(mockMembers).length,
@@ -63,9 +62,12 @@ describe('Project Perform', () => {
       name: mockMembers[expected.selectedMemberIndex].name,
     };
     expected.newName = expected.selectedMember.name + expected.nameSuffix;
-    expected.messageFetchedId = expected.messageFetchedId + expected.selectedMember.id;
-    expected.messageDeletedId = expected.messageDeletedId + expected.selectedMember.id;
-    expected.messageUpdatedId = expected.messageUpdatedId + expected.selectedMember.id;
+    expected.messageFetchedId =
+      expected.messageFetchedId + expected.selectedMember.id;
+    expected.messageDeletedId =
+      expected.messageDeletedId + expected.selectedMember.id;
+    expected.messageUpdatedId =
+      expected.messageUpdatedId + expected.selectedMember.id;
     return {
       expected,
     };
@@ -77,7 +79,10 @@ describe('Project Perform', () => {
    * The expected.nameSuffix is added to the existing member name.
    * @param: save: The save button if clicked if, and only if, the input parameter 'save' is true.
    */
-  async function editNameInMemberDetails(suffix: string, save: Save = Save.True) {
+  async function editNameInMemberDetails(
+    suffix: string,
+    save: Save = Save.True,
+  ) {
     const { expected } = createExpected();
 
     /* the member detail page must be displayed */
@@ -88,18 +93,14 @@ describe('Project Perform', () => {
       await memberDetailPage.memberDetailElements.tag.isPresent(),
     ).toBeTruthy('shows member detail');
     /* get the member name displayed */
-    const originalMember = await memberDetailPage.memberDetailElements
-      .getMember();
+    const originalMember = await memberDetailPage.memberDetailElements.getMember();
     /* add a suffix to the name in the input field */
-    await memberDetailPage.memberInputElements.inputBox.sendKeys(
-      suffix,
-    );
+    await memberDetailPage.memberInputElements.inputBox.sendKeys(suffix);
 
     /* show the member card does not update to match the input text */
     const afterMember = await memberDetailPage.memberDetailElements.getMember();
     expect(originalMember.name).toEqual(afterMember.name);
     if (save) {
-
       /* clear messages list */
       await clearMessages();
 
@@ -115,10 +116,7 @@ describe('Project Perform', () => {
 
       /* wait until 2 new messages appear - updated and fetch all */
       await browser.wait(async () => {
-        return (
-          await getRootElements().messages.count()
-            === 2
-        );
+        return (await getRootElements().messages.count()) === 2;
       }, 5000);
 
       /* get the first message (of tw0) */
@@ -150,8 +148,7 @@ describe('Project Perform', () => {
     await memberDetailPage.memberInputElements.inputBox.clear();
     await browser.wait(async () => {
       return (
-        await memberDetailPage.memberInputElements.inputBox.getText()
-        === ''
+        (await memberDetailPage.memberInputElements.inputBox.getText()) === ''
       );
     }, 5000);
     /* slice off the last character of the member name */
@@ -189,14 +186,15 @@ describe('Project Perform', () => {
   });
 
   describe('has', () => {
-
-    beforeAll(async() => {
+    beforeAll(async () => {
       await loadRootPage();
     });
 
     it('the dashboard page as the start page', async () => {
       const dashboardPage = getDashboardPage();
-      expect(await dashboardPage.dashboardElements.tag.isPresent()).toBeTruthy();
+      expect(
+        await dashboardPage.dashboardElements.tag.isPresent(),
+      ).toBeTruthy();
     });
 
     it('a web page with the expected title', async () => {
@@ -280,7 +278,9 @@ describe('Project Perform', () => {
       const pageErrorInformationPage = getErrorInformationPage();
 
       /* wait until information card title is displayed */
-      await awaitElementVisible(pageErrorInformationPage.errorInformationElements.header);
+      await awaitElementVisible(
+        pageErrorInformationPage.errorInformationElements.header,
+      );
 
       /* shows the error information page */
       expect(
@@ -288,22 +288,23 @@ describe('Project Perform', () => {
       ).toBeTruthy('shows error information - page not found page');
 
       /* wait the header and hint text */
-      await browser.wait(async() => {
+      await browser.wait(async () => {
         return (
-          await pageErrorInformationPage.errorInformationElements.header.getText() === expected.messageNotFound
+          (await pageErrorInformationPage.errorInformationElements.header.getText()) ===
+          expected.messageNotFound
         );
       }, 5000);
-      await browser.wait(async() => {
+      await browser.wait(async () => {
         return (
-          await pageErrorInformationPage.errorInformationElements.hint.getText() === expected.messageClickAbove
+          (await pageErrorInformationPage.errorInformationElements.hint.getText()) ===
+          expected.messageClickAbove
         );
       }, 5000);
     });
   });
 
   describe('has a dashboard & member detail page flow that', () => {
-
-    beforeAll(async() => {
+    beforeAll(async () => {
       await loadRootPage();
     });
 
@@ -403,8 +404,7 @@ describe('Project Perform', () => {
   });
 
   describe('has a members list and member detail page flow that', () => {
-
-    beforeAll(async() => {
+    beforeAll(async () => {
       await loadRootPage();
     });
 
@@ -421,9 +421,7 @@ describe('Project Perform', () => {
       const membersPage = getMembersListPage();
 
       /* get the link of the selected member */
-      const {
-        memberName,
-      } = membersPage.memberListElements.selectMemberById(
+      const { memberName } = membersPage.memberListElements.selectMemberById(
         expected.selectedMember.id,
       );
       /* click on the member which takes us to the member detail view */
@@ -437,17 +435,16 @@ describe('Project Perform', () => {
       /* confirm member detail page is being displayed */
       await browser.wait(async () => {
         return (
-          (await memberDetailPage.memberDetailElements
-            .getMember()).id === expected.selectedMember.id
+          (await memberDetailPage.memberDetailElements.getMember()).id ===
+          expected.selectedMember.id
         );
       });
       await browser.wait(async () => {
         return (
-          (await memberDetailPage.memberDetailElements
-            .getMember()).name === expected.selectedMember.name
+          (await memberDetailPage.memberDetailElements.getMember()).name ===
+          expected.selectedMember.name
         );
       });
-
     });
 
     it('updates and saves a member name in members details page input box and routes back to members list which shows the updated name', async () => {
@@ -508,14 +505,13 @@ describe('Project Perform', () => {
       /* confirm count of members displayed is down by one */
       await browser.wait(async () => {
         return (
-          await membersListPage.memberListElements.allMemberIds.count()
-            === expected.numMembers - 1
+          (await membersListPage.memberListElements.allMemberIds.count()) ===
+          expected.numMembers - 1
         );
       });
 
       /* get the updated list of members */
-      const membersAfter
-        = await membersListPage.memberListElements.getMembersArray();
+      const membersAfter = await membersListPage.memberListElements.getMembersArray();
       /* filter deleted member for the members before array and compare */
       const expectedMembers = membersBefore.filter(
         (h) => h.name !== expected.newName,
@@ -568,7 +564,9 @@ describe('Project Perform', () => {
       /* confirm added member is displayed */
       await browser.wait(async () => {
         return (
-          (await membersListPage.memberListElements.getMembersArray()).length === numMembers + 1
+          (await membersListPage.memberListElements.getMembersArray())
+            .length ===
+          numMembers + 1
         );
       });
 
@@ -603,8 +601,7 @@ describe('Project Perform', () => {
   });
 
   describe('has a progressive member search that', () => {
-
-    beforeAll(async() => {
+    beforeAll(async () => {
       await loadRootPage();
     });
 
@@ -621,15 +618,15 @@ describe('Project Perform', () => {
       /* enter 'text' in search box */
       await dashboardPage.memberSearchElement.searchBox.sendKeys('test1');
 
-    /* await the appearance of the progress bar as should be loading from the database server */
-    await awaitElementVisible(getRootElements().progressBar);
-    /* await the disappearance of the progress bar */
-    await awaitElementInvisible(getRootElements().progressBar);
+      /* await the appearance of the progress bar as should be loading from the database server */
+      await awaitElementVisible(getRootElements().progressBar);
+      /* await the disappearance of the progress bar */
+      await awaitElementInvisible(getRootElements().progressBar);
 
       await browser.wait(async () => {
         return (
-          await dashboardPage.memberSearchElement.searchResults.count()
-            === expected.searchTest1
+          (await dashboardPage.memberSearchElement.searchResults.count()) ===
+          expected.searchTest1
         );
       }, 5000);
     });
@@ -645,8 +642,8 @@ describe('Project Perform', () => {
 
       await browser.wait(async () => {
         return (
-          await dashboardPage.memberSearchElement.searchResults.count()
-            === expected.searchTest11
+          (await dashboardPage.memberSearchElement.searchResults.count()) ===
+          expected.searchTest11
         );
       }, 5000);
     });
@@ -661,8 +658,8 @@ describe('Project Perform', () => {
       await dashboardPage.memberSearchElement.searchBox.sendKeys('8');
       await browser.wait(async () => {
         return (
-          await dashboardPage.memberSearchElement.searchResults.count()
-            === expected.searchTest18
+          (await dashboardPage.memberSearchElement.searchResults.count()) ===
+          expected.searchTest18
         );
       });
       /* confirm member found */
@@ -693,14 +690,14 @@ describe('Project Perform', () => {
       /* show the found member detail matches the expected member */
       await browser.wait(async () => {
         return (
-          (await memberDetailPage.memberDetailElements.getMember()).id
-            === expected.foundMember.id
+          (await memberDetailPage.memberDetailElements.getMember()).id ===
+          expected.foundMember.id
         );
       });
       await browser.wait(async () => {
         return (
-          (await memberDetailPage.memberDetailElements.getMember()).name
-            === expected.foundMember.name
+          (await memberDetailPage.memberDetailElements.getMember()).name ===
+          expected.foundMember.name
         );
       });
     });

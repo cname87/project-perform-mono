@@ -6,11 +6,10 @@ import { getMemberInputElements } from './elements/memberInput.element';
 import { getMessagesElements } from './elements/messages.elements';
 
 export function getMemberDetailPage() {
-
   /* navigate to a specific member detail page */
-  const navigateToPage = async(id: number) => {
+  const navigateToPage = async (id: number) => {
     await browser.get(`/members/:${id}`);
-  }
+  };
 
   const rootElements = getRootElements();
   const memberDetailElements = getMemberDetailElements();
@@ -23,5 +22,5 @@ export function getMemberDetailPage() {
     memberDetailElements,
     memberInputElements,
     messagesElement,
-  }
+  };
 }

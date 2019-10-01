@@ -13,7 +13,7 @@ describe('Application tests', function() {
   const path = require('path');
   const appRoot = require('app-root-path').toString();
   const indexPath = '../../dist/server/src/index';
-  const { config } = require(path.join(appRoot, 'dist', 'server', 'src','configServer'));
+  const { config } = require(path.join(appRoot, 'backend', 'dist', 'server', 'src','configServer'));
 
   const logger = new config.Logger;
   const DumpError = config.DumpError;

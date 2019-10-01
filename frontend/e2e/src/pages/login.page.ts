@@ -4,12 +4,10 @@ import { getRootElements } from './elements/root.elements';
 import { getInformationElements } from './elements/information.elements';
 import { getToastrElements } from './elements/toastr.elements';
 
-
 export function getLoginPage() {
-
-  const navigateToPage = async() => {
+  const navigateToPage = async () => {
     await browser.get('/');
-  }
+  };
 
   const rootElements = getRootElements();
   const loginInformationElement = getInformationElements();
@@ -20,5 +18,5 @@ export function getLoginPage() {
     rootElements,
     loginInformationElement,
     toastrElement,
-  }
+  };
 }

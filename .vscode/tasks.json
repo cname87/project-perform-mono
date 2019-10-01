@@ -110,6 +110,7 @@
       },
       "problemMatcher": []
     },
+    /* npm backend server-side watch */
     {
       "label": "npm backend server-side watch",
       "type": "npm",
@@ -123,6 +124,7 @@
         "panel": "dedicated"
       }
     },
+    /* npm backend client-side watch */
     {
       "label": "npm backend client-side watch",
       "type": "npm",

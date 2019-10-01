@@ -7,8 +7,8 @@
     ]
   },
   "rulesDirectory": [ // custom rules you can use
-    "./backend/node_modules/tslint-eslint-rules/dist/rules",
-    "./backend/node_modules/tslint-microsoft-contrib"
+    "./node_modules/tslint-eslint-rules/dist/rules",
+    "./node_modules/tslint-microsoft-contrib"
   ],
   "defaultSeverity": "error",
   "jsRules": {},

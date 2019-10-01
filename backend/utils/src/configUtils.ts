@@ -25,7 +25,7 @@ import path = require('path');
 
 export const loggerConfig = {
   /* log file paths used to set up the logger */
-  LOGS_DIR: path.join(appRoot, 'logs'),
+  LOGS_DIR: path.join(appRoot, 'backend', 'logs'),
   INFO_LOG: 'info.log',
   ERROR_LOG: 'error.log',
 };

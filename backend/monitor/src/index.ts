@@ -34,8 +34,8 @@ export { config };
 import forever = require('forever-monitor');
 import winston = require('winston');
 
-/* create instances of logger and dumpError for monitor
- * Note: the same logger will be used by index and all other module */
+/* create instances of logger and dumpError for monitor */
+/* Note: the same logger will be used by index and all other module */
 debug(modulename + ': loading loggers');
 const Logger = config.Logger;
 export const logger = new Logger() as winston.Logger;
@@ -99,28 +99,21 @@ async function runMonitor(): Promise<void> {
   const options = {
     /* required to communicate with child process */
     fork: true,
-    /* sets the maximum number of times child should be started
-     * including restarts after an error.
-     * set to 0 or 1 to disable restart on child error */
+    /* sets the maximum number of times child should be started including restarts after an error.set to 0 or 1 to disable restart on child error */
     max: config.MAX_STARTS,
     /* kills the entire child process tree on exit */
     killTree: true,
     /* silences the output from stdout and stderr in the parent process */
     silent: false,
-    /* minimum time a child process has to be up
-     * Forever will 'exit' otherwise */
+    /* minimum time a child process has to be up - forever will 'exit' otherwise */
     minUptime: 2000,
-    /* interval between restarts if a child is spinning
-     * (i.e. alive < minUptime) */
+    /* interval between restarts if a child is spinning (i.e. alive < minUptime) */
     spinSleepTime: 1000,
     /* set true to restart on file changes */
     watch: config.WATCH_FILES,
     /* whether to ignore files starting with a '.' */
     watchIgnoreDotFiles: true,
-    /* ignore glob patterns when watching for changes
-     * this setting appears to be ignored
-     * you need .foreverignore in project directory
-     * see .foreverignore for further information
+    /* ignore glob patterns when watching for changes this setting appears to be ignored you need .foreverignore in project directory see .foreverignore for further information
      */
     watchIgnorePatterns: [],
     /* top-level directory to watch from - must be specified */

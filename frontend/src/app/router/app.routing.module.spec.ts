@@ -100,9 +100,7 @@ describe('RoutingModule', () => {
     /* stub localAuthSetupSpy() */
     const localAuthSetupSpy = authServiceSpy.localAuthSetup.and.stub();
     /* mock isAuthenticated$ property to simulate an observable */
-    authServiceSpy.isAuthenticated$ = (of(authenticated) as any) as jasmine.Spy<
-      InferableFunction
-    >;
+    authServiceSpy.isAuthenticated$ = (of(authenticated) as any) as jasmine.Spy;
     return {
       localAuthSetupSpy,
     };

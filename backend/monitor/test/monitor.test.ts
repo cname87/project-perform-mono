@@ -101,8 +101,7 @@ describe('server monitor', () => {
   before('set up spies', async () => {
     debug(`Running ${modulename} before - set up spies`);
 
-    /* you can't start in watch mode as once started in watch mode
-     * the only way to exit is via a process.exit which closes mocha */
+    /* you can't start in watch mode as once started in watch mode the only way to exit is via a process.exit which closes mocha */
     config.WATCH_FILES = false;
     /* set maximum number of tries = 2 */
     config.MAX_STARTS = 2;

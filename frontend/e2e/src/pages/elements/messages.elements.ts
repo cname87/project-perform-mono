@@ -1,8 +1,7 @@
-import { by, element, } from 'protractor';
+import { by, element } from 'protractor';
 
 export function getMessagesElements() {
-
-  const messagesHeader = element(by.css('app-messages #header'))
+  const messagesHeader = element(by.css('app-messages #header'));
   const messagesClearBtn = element(by.css('app-messages #clearBtn'));
   const messages = element.all(by.css('app-messages #messages-container'));
 
@@ -10,5 +9,5 @@ export function getMessagesElements() {
     messagesHeader,
     messagesClearBtn,
     messages,
-  }
+  };
 }

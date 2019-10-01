@@ -7,11 +7,10 @@ import { getMessagesElements } from './elements/messages.elements';
 import { getToastrElements } from './elements/toastr.elements';
 
 export function getMembersListPage() {
-
   /* navigate to the members list page */
-  const navigateToPage = async() => {
+  const navigateToPage = async () => {
     await browser.get('/members');
-  }
+  };
 
   const rootElements = getRootElements();
   const memberListElements = getMembersListElement();
@@ -26,5 +25,5 @@ export function getMembersListPage() {
     memberInputElements,
     messagesElements,
     toastrElements,
-  }
+  };
 }

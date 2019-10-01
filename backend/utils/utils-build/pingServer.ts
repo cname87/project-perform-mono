@@ -31,9 +31,21 @@ import util = require('util');
 const sleep = util.promisify(setTimeout);
 
 /* internal dependencies */
-const ROOT_CA = path.join(appRoot, 'server', 'certs', 'rootCA.crt');
-const HTTPS_KEY = path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem');
-const HTTPS_CERT = path.join(appRoot, 'server', 'certs', 'nodeKeyAndCert.pem');
+const ROOT_CA = path.join(appRoot, 'backend', 'server', 'certs', 'rootCA.crt');
+const HTTPS_KEY = path.join(
+  appRoot,
+  'backend',
+  'server',
+  'certs',
+  'nodeKeyAndCert.pem',
+);
+const HTTPS_CERT = path.join(
+  appRoot,
+  'backend',
+  'server',
+  'certs',
+  'nodeKeyAndCert.pem',
+);
 
 /* server access options */
 const options = {

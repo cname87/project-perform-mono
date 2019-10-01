@@ -1,4 +1,4 @@
-service: perfrom-server
+service: perform-server
 runtime: nodejs10
 instance_class: F1
 automatic_scaling:

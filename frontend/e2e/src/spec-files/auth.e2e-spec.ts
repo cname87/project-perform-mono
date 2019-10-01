@@ -11,7 +11,6 @@ import { getHelpers } from '../e2e-helpers';
 import { getRootElements } from '../pages/elements/root.elements';
 
 describe('Authentication:', () => {
-
   const {
     awaitElementVisible,
     login,
@@ -43,7 +42,6 @@ describe('Authentication:', () => {
 
   /* need to log out first */
   describe('You can log out', () => {
-
     /* the app must be logged in at this point */
     beforeAll(async () => {
       await awaitElementVisible(getRootElements().logoutBtn);
@@ -65,16 +63,14 @@ describe('Authentication:', () => {
 
       await browser.wait(async () => {
         return (
-          await loginPage.loginInformationElement.header.getText()
-            === informationHeader
+          (await loginPage.loginInformationElement.header.getText()) ===
+          informationHeader
         );
       });
     });
-
   });
 
   describe('If not authenticated shows a login page', () => {
-
     /* the app must be logged out at this stage */
     beforeAll(async () => {
       await awaitElementVisible(getRootElements().loginBtn);
@@ -83,76 +79,79 @@ describe('Authentication:', () => {
     it(`with a banner containing a login button only`, async () => {
       const { bannerHeader } = createExpected();
       let loginPage = getLoginPage();
-      expect(await loginPage.rootElements.bannerHeader.getText())
-        .toEqual(bannerHeader);
-      expect(await loginPage.rootElements.loginBtn.isDisplayed())
-        .toBeTruthy();
-      expect(await loginPage.rootElements.logoutBtn.isPresent())
-        .not.toBeTruthy();
-      expect(await loginPage.rootElements.profileBtn.isPresent())
-        .not.toBeTruthy();
+      expect(await loginPage.rootElements.bannerHeader.getText()).toEqual(
+        bannerHeader,
+      );
+      expect(await loginPage.rootElements.loginBtn.isDisplayed()).toBeTruthy();
+      expect(
+        await loginPage.rootElements.logoutBtn.isPresent(),
+      ).not.toBeTruthy();
+      expect(
+        await loginPage.rootElements.profileBtn.isPresent(),
+      ).not.toBeTruthy();
     });
 
     it(`with a nav bar with all links disabled`, async () => {
       let loginPage = getLoginPage();
-      expect(await loginPage.rootElements.dashboardLink
-        .getAttribute('aria-disabled')
+      expect(
+        await loginPage.rootElements.dashboardLink.getAttribute(
+          'aria-disabled',
+        ),
       ).toEqual('true');
-      expect(await loginPage.rootElements.membersLink
-        .getAttribute('aria-disabled')
-      ).toEqual('true');;
-      expect(await loginPage.rootElements.detailLink
-        .getAttribute('aria-disabled')
+      expect(
+        await loginPage.rootElements.membersLink.getAttribute('aria-disabled'),
+      ).toEqual('true');
+      expect(
+        await loginPage.rootElements.detailLink.getAttribute('aria-disabled'),
       ).toEqual('true');
     });
 
     it(`with a information element`, async () => {
       const { informationHeader, informationHint } = createExpected();
       let loginPage = getLoginPage();
-      expect(await loginPage.loginInformationElement.header.getText())
-        .toEqual(informationHeader);
-      expect(await loginPage.loginInformationElement.hint.getText())
-        .toEqual(informationHint);
+      expect(await loginPage.loginInformationElement.header.getText()).toEqual(
+        informationHeader,
+      );
+      expect(await loginPage.loginInformationElement.hint.getText()).toEqual(
+        informationHint,
+      );
     });
 
     it(`with an empty messages element`, async () => {
       let loginPage = getLoginPage();
-      expect(await loginPage.rootElements.messagesHeader.isPresent())
-        .not.toBeTruthy();
+      expect(
+        await loginPage.rootElements.messagesHeader.isPresent(),
+      ).not.toBeTruthy();
     });
-
   });
 
   describe('You can log in', () => {
-
     /* the app must be logged out at this stage */
     beforeAll(async () => {
       await awaitElementVisible(getRootElements().loginBtn);
     });
 
     it(`by clicking on the login button`, async () => {
-     await login();
-     await awaitElementVisible(getRootElements().logoutBtn);
+      await login();
+      await awaitElementVisible(getRootElements().logoutBtn);
     });
 
     it(`and the profile button will be visible`, async () => {
       /* the dashboard page is shown */
       const dashboardPage = getDashboardPage();
-      expect(await dashboardPage.rootElements.profileBtn.isDisplayed())
-        .toBeTruthy();
+      expect(
+        await dashboardPage.rootElements.profileBtn.isDisplayed(),
+      ).toBeTruthy();
     });
-
   });
 
   describe('You can get the user profile', () => {
-
     /* the app must be logged in at this stage */
     beforeAll(async () => {
       await awaitElementVisible(getRootElements().logoutBtn);
     });
 
     it(`by clicking on the profile button`, async () => {
-
       /* dashboard page is initially displayed */
       const dashboardPage = getDashboardPage();
 
@@ -165,19 +164,18 @@ describe('Authentication:', () => {
       await awaitElementVisible(profilePage.userProfileElements.goBackBtn);
 
       await browser.wait(async () => {
-        return (
-          profilePage.userProfileElements.profileName.isDisplayed()
-        );
+        return profilePage.userProfileElements.profileName.isDisplayed();
       });
 
-      expect(await profilePage.userProfileElements.profileName.getText())
-        .toEqual('NAME: ' + process.env.TEST_NAME );
-      expect(await profilePage.userProfileElements.profileEmail.getText())
-        .toEqual('EMAIL: ' + process.env.TEST_EMAIL );
+      expect(
+        await profilePage.userProfileElements.profileName.getText(),
+      ).toEqual('NAME: ' + process.env.TEST_NAME);
+      expect(
+        await profilePage.userProfileElements.profileEmail.getText(),
+      ).toEqual('EMAIL: ' + process.env.TEST_EMAIL);
     });
 
     it(`and then click go back to return`, async () => {
-
       /* profile page is still displayed */
       const profilePage = getUserProfilePage();
 
@@ -189,11 +187,9 @@ describe('Authentication:', () => {
       /* wait for visibility before test */
       await awaitElementVisible(dashboardPage.memberSearchElement.searchBox);
 
-      expect(await dashboardPage.dashboardElements.topMembers.isDisplayed())
-        .toBeTruthy();
-
+      expect(
+        await dashboardPage.dashboardElements.topMembers.isDisplayed(),
+      ).toBeTruthy();
     });
-
   });
-
 });

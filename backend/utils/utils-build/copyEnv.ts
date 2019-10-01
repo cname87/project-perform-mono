@@ -7,7 +7,7 @@
  * The dist directory is passed in as a parameter.
  * package.com script: "npm run copyEnv.ts <pathToEnvFile> <pathToDistDir>".
  *
- * Both paths are relative to the package.json directory.
+ * Both paths must be relative to the directory that the node_modules directory (that contains 'app-root-path') is in.
  *
  * <pathToDistDir> must end in /dist.
  *

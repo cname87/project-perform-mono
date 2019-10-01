@@ -1,13 +1,13 @@
 /**
- * Utility to copy files in static folders to the dist directory.
+ * Utility used to copy files in static folders to the dist directory.
  *
  * Usage:
  * Used in package.com.
- * The directory containing the static files is passed in as a parameter.
- * The parent directory where you want the directory created is passed in as a parameter.
- * package.com script: "npm run copyDir.ts <pathToEnvFile> <pathToDistDir>".
+ * The source directory containing the static files is passed in as the first parameter.
+ * The parent directory where you want the directory created is passed in as the second parameter.
+ * package.com script: "npm run copyDir.ts <pathToSourceDir> <pathToDistDir>".
  *
- * Both paths are relative to the package.json directory.
+ * Both paths must be relative to the directory that the node_modules directory (that contains 'app-root-path') is in.
  *
  */
 

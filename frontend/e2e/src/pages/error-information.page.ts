@@ -5,12 +5,11 @@ import { getInformationElements } from './elements/information.elements';
 import { getToastrElements } from './elements/toastr.elements';
 
 export function getErrorInformationPage() {
-
   /* the pageNotFound component appears in the routerLink just like the other links */
 
-  const navigateToPage = async() => {
+  const navigateToPage = async () => {
     await browser.get('/nonexistentPage');
-  }
+  };
 
   const rootElements = getRootElements();
   const errorInformationElements = getInformationElements();
@@ -21,5 +20,5 @@ export function getErrorInformationPage() {
     rootElements,
     errorInformationElements,
     toastrElement,
-  }
+  };
 }

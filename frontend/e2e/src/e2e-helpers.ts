@@ -15,7 +15,6 @@ import { getMemberDetailPage } from './pages/memberDetail.page';
  */
 
 export const getHelpers = () => {
-
   const mockMembers = require('../onPrepare').mockMembers;
   const resetDatabase = require('../onPrepare').resetDatabase;
   const awaitElementVisible = require('../onPrepare').awaitElementVisible;
@@ -26,12 +25,15 @@ export const getHelpers = () => {
   const setTimeout = require('../onPrepare').setTimeout;
   const resetTimeout = (original: number) => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = original;
-  }
+  };
 
   /* set up the logs monitor to allow logs be tested against */
   const setupLogsMonitor = async (ignoreLogs = true) => {
     /* you must clear the browser logs before each test */
-    await browser.manage().logs().get('browser');
+    await browser
+      .manage()
+      .logs()
+      .get('browser');
     const logs = browserLogs(browser);
     /* ignore debug and info log messages */
     if (ignoreLogs) {
@@ -46,18 +48,22 @@ export const getHelpers = () => {
   /* get the browser logs for testing */
   const checkLogs = async (logs: browserLogs.BrowserLogs) => {
     /* use browser.wait to allow the browser return any logs that are to be tested - use await log.verify as it returns a promise (not void) */
-    await browser.wait(async () => {
-      try {
-        await logs.verify();
-        await browser.driver.sleep(100);
-        return true;
-      } catch (e) {
-        return false
-      };
-    }, 5000, 'Logs test fail');
+    await browser.wait(
+      async () => {
+        try {
+          await logs.verify();
+          await browser.driver.sleep(100);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      },
+      5000,
+      'Logs test fail',
+    );
   };
 
-    /**
+  /**
    * Clears the messages list and waist until zero messages shown.
    * If the message clear button is not shown it will do nothing.
    */
@@ -66,18 +72,14 @@ export const getHelpers = () => {
     await getRootElements().messagesClearBtn.click();
     /* wait until zero messages displayed */
     await browser.wait(async () => {
-      return (
-        await getRootElements().messages.count()
-        === 0
-      );
+      return (await getRootElements().messages.count()) === 0;
     }, 5000);
-  }
-
+  };
 
   const clearCache = async () => {
     await browser.executeScript('window.sessionStorage.clear();');
     await browser.executeScript('window.localStorage.clear();');
-  }
+  };
 
   /**
    * Clicks on the members link on the nav bar.
@@ -85,7 +87,6 @@ export const getHelpers = () => {
    * @param numberExpected: The expected number of members that will be displayed - defaults to 10.
    */
   async function getMembersList(numberExpected = 10) {
-
     /* click on members nav link */
     await getRootElements().membersLink.click();
 
@@ -96,7 +97,9 @@ export const getHelpers = () => {
     await awaitElementVisible(membersListPage.memberListElements.tag);
 
     /* test resolver prevents the page loading until data is available by testing for the full count of members list without browser.wait */
-    expect(await membersListPage.memberListElements.allMemberIds.count()).toEqual(numberExpected);
+    expect(
+      await membersListPage.memberListElements.allMemberIds.count(),
+    ).toEqual(numberExpected);
 
     /* await the disappearance of the progress bar */
     await awaitElementInvisible(getRootElements().progressBar);
@@ -108,19 +111,19 @@ export const getHelpers = () => {
    * @param numberExpected: The expected number of top members that will be displayed - defaults to 4.
    */
   async function getDashboard(numberExpected = 4) {
-
     /* click on members nav link */
     await getRootElements().dashboardLink.click();
 
-      /* the dashboard page should be displayed */
-      const dashboardPage = getDashboardPage();
+    /* the dashboard page should be displayed */
+    const dashboardPage = getDashboardPage();
 
     /* await visibility of an element */
     await awaitElementVisible(dashboardPage.dashboardElements.tag);
 
     /* test resolver prevents the page loading until data is available by testing for the members presence without browser.wait */
-    expect(await dashboardPage.dashboardElements.topMembers.count()).toEqual(numberExpected);
-
+    expect(await dashboardPage.dashboardElements.topMembers.count()).toEqual(
+      numberExpected,
+    );
   }
 
   /**
@@ -150,12 +153,13 @@ export const getHelpers = () => {
     await awaitElementVisible(memberDetailPage.memberDetailElements.tag);
 
     /* test resolver prevents the page loading until data is available by testing for the member name without browser.wait */
-    expect((await memberDetailPage.memberDetailElements.getMember()).name).toEqual(name);
+    expect(
+      (await memberDetailPage.memberDetailElements.getMember()).name,
+    ).toEqual(name);
 
     /* await the disappearance of the progress bar */
     await awaitElementInvisible(getRootElements().progressBar);
-
-  }
+  };
 
   return {
     mockMembers,
@@ -174,5 +178,5 @@ export const getHelpers = () => {
     getMembersList,
     getDashboard,
     dashboardClickMember,
-  }
-}
+  };
+};

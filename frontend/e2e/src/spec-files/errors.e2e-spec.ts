@@ -20,7 +20,6 @@ export const errorMember = {
 };
 
 describe('Error Handling', () => {
-
   const {
     awaitElementVisible,
     loadRootPage,
@@ -54,13 +53,11 @@ describe('Error Handling', () => {
   };
 
   describe('handles server request errors:', () => {
-
-    beforeAll(async() => {
+    beforeAll(async () => {
       await loadRootPage();
     });
 
     it(`GET /members?name='error' causes an unexpected error`, async () => {
-
       /* set up to test that an error is logged */
       const logs = await setupLogsMonitor();
       logs.expect(/Test unexpected error/, logs.ERROR);
@@ -76,39 +73,33 @@ describe('Error Handling', () => {
 
       /* wait until new message appears */
       await browser.wait(async () => {
-        return (
-          await dashboardPage.rootElements.messages.count()
-            === 1
-        );
+        return (await dashboardPage.rootElements.messages.count()) === 1;
       });
 
       /* check new message logged on screen */
       const message = await dashboardPage.rootElements.messages
         .get(0)
         .getText();
-      expect(message).toEqual('MembersService: ERROR: Failed to get members from server');
-
-      /* wait until toastr is displayed */
-      await browser.wait(dashboardPage.rootElements.toastr
-        .isDisplayed(), 5000
+      expect(message).toEqual(
+        'MembersService: ERROR: Failed to get members from server',
       );
 
+      /* wait until toastr is displayed */
+      await browser.wait(dashboardPage.rootElements.toastr.isDisplayed(), 5000);
+
       /* check toastr message */
-      expect(
-        await dashboardPage.rootElements.toastrTitle
-          .getText(),
-      ).toBe('A server access error has occurred');
-      expect(
-        await dashboardPage.rootElements.toastrMessage
-          .getText(),
-      ).toBe('ERROR!');
+      expect(await dashboardPage.rootElements.toastrTitle.getText()).toBe(
+        'A server access error has occurred',
+      );
+      expect(await dashboardPage.rootElements.toastrMessage.getText()).toBe(
+        'ERROR!',
+      );
 
       /* check logs report an error */
       await checkLogs(logs);
     });
 
     it('DELETE /members/10 causes an unexpected error', async () => {
-
       /* get expected values object */
       const { numMembers } = createExpected();
 
@@ -128,46 +119,41 @@ describe('Error Handling', () => {
       /* click DELETE members/10 => error */
       const {
         deleteButton,
-      } = membersListPage.memberListElements.selectMemberById(
-        errorMember.id,
-      );
+      } = membersListPage.memberListElements.selectMemberById(errorMember.id);
       await deleteButton.click();
 
       /* wait until new message appears */
       await browser.wait(async () => {
-        return (
-          await membersListPage.rootElements.messages.count()
-            === 1
-        );
+        return (await membersListPage.rootElements.messages.count()) === 1;
       });
 
       /* check message logged on screen */
       const message = await membersListPage.rootElements.messages
         .get(0)
         .getText();
-      expect(message).toEqual('MembersService: ERROR: Failed to delete member from server');
+      expect(message).toEqual(
+        'MembersService: ERROR: Failed to delete member from server',
+      );
 
       /* wait until toastr is displayed */
-      await browser.wait(membersListPage.rootElements.toastr
-        .isDisplayed(), 5000
+      await browser.wait(
+        membersListPage.rootElements.toastr.isDisplayed(),
+        5000,
       );
 
       /* check toastr message */
-      expect(
-        await membersListPage.rootElements.toastrTitle
-          .getText(),
-      ).toBe('A server access error has occurred');
-      expect(
-        await membersListPage.rootElements.toastrMessage
-          .getText(),
-            ).toBe('ERROR!');
+      expect(await membersListPage.rootElements.toastrTitle.getText()).toBe(
+        'A server access error has occurred',
+      );
+      expect(await membersListPage.rootElements.toastrMessage.getText()).toBe(
+        'ERROR!',
+      );
 
       /* check logs report an error */
       await checkLogs(logs);
     });
 
     it(`POST /members causes a server-side  error`, async () => {
-
       /* set up to test that an error is logged */
       const logs = await setupLogsMonitor();
       logs.expect(/Test server-side error/, logs.ERROR);
@@ -187,17 +173,16 @@ describe('Error Handling', () => {
 
       /* wait until the new message appears */
       await browser.wait(async () => {
-        return (
-          await membersListPage.rootElements.messages.count()
-            === 1
-        );
+        return (await membersListPage.rootElements.messages.count()) === 1;
       }, 5000);
 
       /* check message logged on screen */
       const message = await membersListPage.rootElements.messages
         .get(0)
         .getText();
-      expect(message).toEqual('MembersService: ERROR: Failed to add member to server');
+      expect(message).toEqual(
+        'MembersService: ERROR: Failed to add member to server',
+      );
 
       /* test that an error is logged */
       await checkLogs(logs);
@@ -223,30 +208,26 @@ describe('Error Handling', () => {
       /* get the link of the member 9 */
       const {
         memberName,
-      } = membersListPage.memberListElements.selectMemberById(
-        errorMember.id,
-      );
+      } = membersListPage.memberListElements.selectMemberById(errorMember.id);
 
       /* click on the member which will trigger an error */
       await memberName.click();
 
       /* wait until new message appears */
       await browser.wait(async () => {
-        return (
-          await membersListPage.rootElements.messages.count()
-            === 1
-        );
+        return (await membersListPage.rootElements.messages.count()) === 1;
       }, 5000);
 
       /* check message logged on screen */
       const message = await membersListPage.rootElements.messages
         .get(0)
         .getText();
-      expect(message).toEqual('MembersService: ERROR: Failed to get member from server');
+      expect(message).toEqual(
+        'MembersService: ERROR: Failed to get member from server',
+      );
 
       /* check logs report an error */
       await checkLogs(logs);
-
     });
 
     it('PUT /members causes a server-side error', async () => {
@@ -264,10 +245,8 @@ describe('Error Handling', () => {
       const membersPage = getMembersListPage();
 
       /* wait and get the link of the member 9 */
-      const {
-        memberName,
-      } = await browser.wait(async () => {
-        return  membersPage.memberListElements.selectMemberById(9);
+      const { memberName } = await browser.wait(async () => {
+        return membersPage.memberListElements.selectMemberById(9);
       });
       /* click on the member which takes us to the member detail view */
       await memberName.click();
@@ -299,17 +278,16 @@ describe('Error Handling', () => {
 
       /* wait until new message appears */
       await browser.wait(async () => {
-        return (
-          await memberDetailPage.rootElements.messages.count()
-            === 1
-        );
+        return (await memberDetailPage.rootElements.messages.count()) === 1;
       });
 
       /* check message logged on screen */
       const message = await memberDetailPage.rootElements.messages
         .get(0)
         .getText();
-      expect(message).toEqual('MembersService: ERROR: Failed to update member on the server');
+      expect(message).toEqual(
+        'MembersService: ERROR: Failed to update member on the server',
+      );
 
       /* check logs report an error */
       await checkLogs(logs);
@@ -317,13 +295,11 @@ describe('Error Handling', () => {
   });
 
   describe('handles application exceptions:', () => {
-
-    beforeAll(async() => {
+    beforeAll(async () => {
       await loadRootPage();
     });
 
     it('Unexpected application error', async () => {
-
       /* set up to test that an error is logged */
       const logs = await setupLogsMonitor();
       logs.expect(/Test application error/, logs.ERROR);
@@ -335,31 +311,36 @@ describe('Error Handling', () => {
       await clearMessages();
 
       /* enter dummy name in search box - triggers application error*/
-      await dashboardPage.memberSearchElement.searchBox.sendKeys('errorSearchTerm');
+      await dashboardPage.memberSearchElement.searchBox.sendKeys(
+        'errorSearchTerm',
+      );
 
       /* the error information page is displayed */
       const pageErrorInformationPage = getErrorInformationPage();
 
       /* wait until information card title is displayed */
-      await awaitElementVisible(pageErrorInformationPage.errorInformationElements.header);
+      await awaitElementVisible(
+        pageErrorInformationPage.errorInformationElements.header,
+      );
 
       /* wait the header and hint text */
-      await browser.wait(async() => {
+      await browser.wait(async () => {
         return (
-          await pageErrorInformationPage.errorInformationElements.header.getText() === 'UNEXPECTED ERROR!'
+          (await pageErrorInformationPage.errorInformationElements.header.getText()) ===
+          'UNEXPECTED ERROR!'
         );
       }, 5000);
-      await browser.wait(async() => {
+      await browser.wait(async () => {
         return (
-          await pageErrorInformationPage.errorInformationElements.hint.getText() === 'Click on a tab link above'
+          (await pageErrorInformationPage.errorInformationElements.hint.getText()) ===
+          'Click on a tab link above'
         );
       }, 5000);
 
       /* wait until new message appears */
       await browser.wait(async () => {
         return (
-          await pageErrorInformationPage.rootElements.messages.count()
-            === 1
+          (await pageErrorInformationPage.rootElements.messages.count()) === 1
         );
       }, 5000);
 
@@ -367,29 +348,32 @@ describe('Error Handling', () => {
       const message = await pageErrorInformationPage.rootElements.messages
         .get(0)
         .getText();
-      expect(message).toEqual('ErrorHandlerService: ERROR: An unknown error occurred');
+      expect(message).toEqual(
+        'ErrorHandlerService: ERROR: An unknown error occurred',
+      );
 
       /* wait until toastr is displayed */
-      await browser.wait(pageErrorInformationPage.rootElements.toastr
-        .isDisplayed(), 5000
+      await browser.wait(
+        pageErrorInformationPage.rootElements.toastr.isDisplayed(),
+        5000,
       );
 
       /* check toastr message */
       expect(
-        await pageErrorInformationPage.toastrElement.toastrTitle
-          .getText(),
+        await pageErrorInformationPage.toastrElement.toastrTitle.getText(),
       ).toBe('An unknown error has occurred');
       expect(
-        await pageErrorInformationPage.rootElements.toastrMessage
-          .getText(),
+        await pageErrorInformationPage.rootElements.toastrMessage.getText(),
       ).toBe('ERROR!');
 
       /* check toastr disappears after timeout */
       var EC = ExpectedConditions;
-      await browser.wait(EC.invisibilityOf(pageErrorInformationPage.toastrElement.toastr), 6000);
+      await browser.wait(
+        EC.invisibilityOf(pageErrorInformationPage.toastrElement.toastr),
+        6000,
+      );
       expect(
-        await pageErrorInformationPage.toastrElement.toastr
-          .isDisplayed(),
+        await pageErrorInformationPage.toastrElement.toastr.isDisplayed(),
       ).toBe(false);
 
       /* check logs report an error */

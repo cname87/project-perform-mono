@@ -8,7 +8,7 @@ describe('Server operations tests', function() {
 
     const path = require('path');
     const appRoot = require('app-root-path').toString();
-    let { config } = require(path.join(appRoot, 'dist', 'server', 'src','configServer'));
+    let { config } = require(path.join(appRoot, 'backend', 'dist', 'server', 'src','configServer'));
     const Server = config.Server;
     const http = require('http');
     const https = require('https');

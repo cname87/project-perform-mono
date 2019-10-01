@@ -1,7 +1,6 @@
-import { by, element, } from 'protractor';
+import { by, element } from 'protractor';
 
 export function getMemberSearchElement() {
-
   /* DOM elements */
   const tag = element(by.css('app-member-search'));
   const searchBox = element(by.css('app-member-search #search-box'));
@@ -13,5 +12,5 @@ export function getMemberSearchElement() {
     searchBox,
     searchResults,
     hint,
-  }
+  };
 }
