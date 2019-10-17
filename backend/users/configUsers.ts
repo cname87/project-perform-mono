@@ -17,7 +17,8 @@
  * Note: If you change the name of a database collection associated with a user then a new empty collection is created for that user - the old collection is not deleted.but is not accessible to the client.
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);

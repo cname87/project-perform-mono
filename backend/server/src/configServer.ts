@@ -6,12 +6,8 @@
  * It is also imported by all other modules to import types only.
  */
 
-/* import configuration parameters into process.env first */
-/* the .env file must be in process.cwd() */
-import dotenv = require('dotenv');
-dotenv.config();
-
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
@@ -20,8 +16,7 @@ debug(`Starting ${modulename}`);
 import { EventEmitter } from 'events';
 import { Request, Router, Application } from 'express';
 import { Connection, Document, Model } from 'mongoose';
-import appRootObject = require('app-root-path');
-import path = require('path');
+import appRootObject from 'app-root-path';
 const appRoot = appRootObject.toString();
 
 /* import all required modules */
@@ -30,8 +25,6 @@ const appRoot = appRootObject.toString();
 import { Server } from './server/serverOps';
 import { startServer } from './server/startserver';
 import { runServer } from './server/runServer';
-/* a configured morgan http(s) server logger */
-import { ServerLogger } from './server/serverlogger';
 // a configured winston general logger
 import { Logger } from '../../utils/src/logger';
 /* a utility to dump errors to the logger */
@@ -71,7 +64,6 @@ export const config = {
   Server,
   startServer,
   runServer,
-  ServerLogger,
   Logger,
   DumpError,
   ERROR_HANDLERS,
@@ -99,8 +91,8 @@ export const config = {
   IS_NO_DB_OK: true,
   /* directory for logs used by all backend components */
   LOGS_DIR: path.join(appRoot, 'backend', 'logs'),
-  // 'development' or 'production'
-  ENV: 'development',
+  /* 4 modes: development or production, debug true or false - set true to run debug elements when testing production */
+  DEBUG: true,
 
   /***********************************************************************/
   /* Angular app parameters                                              */
@@ -116,9 +108,17 @@ export const config = {
   /* HTTP/S server parameters                                            */
   /***********************************************************************/
 
-  /* port to be listened on */
-  PORT: +process.env.PORT!,
-  /* true for https with http on port 80 being redirected */
+  /**
+   * The server can be hosted remotely or locally:
+   * 1. If process.env.NODE_ENV = 'production' then the GCP host is in use, which requires a http server listening on process.env.PORT.  Note that process.env.PORT is only set by the GCP host i.e. it will be falsy if not set by the GCP host.
+   * 2. If process.env.NODE_ENV = 'development' then the GCP host is not in use and the server is hosted locally.  In this case we can set up a http or a https server.  If configHTTPS_ON then we set up a https server listening on config.PORT, otherwise we set up a http server listening on config.PORT
+   */
+
+  /* PORT is used in remote mode if process.env.PORT is not set by the GCP app engine - it must be set to the value required by the GCP host */
+  PORT: 8080, // 8080 is required value for GCP host
+  /* HTTPS_ON applies to local mode only */
+  /* true sets up a https server listening on PORT with a http server also on port 80 that is redirected to the https server */
+  /* false sets up a http server listening on PORT */
   HTTPS_ON: true,
   /* https credentials */
   ROOT_CA: path.join(appRoot, 'backend', 'server', 'certs', 'rootCA.crt'),
@@ -199,7 +199,7 @@ export const config = {
   WATCH_DIR: appRoot,
   // true for forever to start node executable in debug mode
   get IS_MONITOR_DEBUG() {
-    return this.ENV === 'development' ? true : false;
+    return process.env.NODE_ENV === 'development' ? true : false;
   },
   /* The logs directory referenced in the various log files
    * must exist. */
@@ -266,15 +266,12 @@ export interface IAppLocals {
   event: EventEmitter;
   /* logger service */
   logger: winston.Logger;
-
   membersApi: typeof membersApi;
   memberhandlers: typeof membersHandlers;
   /* database models object */
   models: {
     members: IModelExtended;
   };
-  /* morgan server logger */
-  serverLogger: ServerLogger;
   /* created http(s) servers */
   servers: Server[];
 }

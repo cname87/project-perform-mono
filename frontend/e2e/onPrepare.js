@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 const path = require('path');
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 const { browser, by } = require('protractor');
 const { SpecReporter } = require('jasmine-spec-reporter');
@@ -68,6 +68,9 @@ const testDatabaseInUse = async () => {
       `${process.env.HOST}testServer/isTestDatabase`,
       'GET',
     );
+  /* TODO - remove or set up e2e on gcp server */
+  // const testDatabaseResponseBody = await request('https://project-perform.appspot.com/testServer/isTestDatabase');
+  // console.log(testDatabaseResponseBody);
   /* body will contain { isTestDatabase: <boolean> } */
   if(!testDatabaseResponseBody.isTestDatabase){
     throw new Error('Test database not in use');

@@ -1,19 +1,28 @@
+// /* start gcp debug if in production debug mode */
+// import debugAgent = require('@google-cloud/debug-agent');
+// import profilerAgent = require('@google-cloud/profiler');
+
+// if (process.env.NODE_ENV === 'production') {
+//   debugAgent.start();
+//   profilerAgent.start({
+//     serviceContext: {
+//       service: 'default',
+//     },
+//   });
+// }
+
 /* import configuration parameters into process.env */
-/* the .env file must be in process.cwd() */
-import dotenv = require('dotenv');
-dotenv.config();
+/* the .env files must be in  */
+import './utils/src/loadEnvFile';
+
+/* imports */
+import path = require('path');
 
 /* file header */
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
 
-/* external dependencies */
-// import minimist = require('minimist');
-
 /* run the server */
 import('./server/src/index');
-
-/* capture command line arguments */
-// const argv = minimist(process.argv.slice(2));

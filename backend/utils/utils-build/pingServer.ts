@@ -7,26 +7,24 @@
  *
  * @returns a promise that resolves to the http response once the server responds or rejects with an error with err.message = 'Connection failed if it fails to connect.
  *
- * * Usage
- * This function is this is imported and the returned promise from the function is actioned as desired.
+ * Usage
+ * This function is imported, run, and the returned promise from the function is actioned as desired.
  */
 
-/* import configuration parameters into process.env first */
-/* the .env file must be in process.cwd() */
-import dotenv = require('dotenv');
-dotenv.config();
+/* import configuration parameters into process.env */
+import '../src/loadEnvFile';
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
 /* external dependencies */
-import appRootObject = require('app-root-path');
+import appRootObject from 'app-root-path';
 const appRoot = appRootObject.toString();
 import fs = require('fs');
 import request = require('request-promise-native');
-import path = require('path');
 import util = require('util');
 const sleep = util.promisify(setTimeout);
 

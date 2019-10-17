@@ -7,11 +7,11 @@
  * The parent directory where you want the directory created is passed in as the second parameter.
  * package.com script: "npm run copyDir.ts <pathToSourceDir> <pathToDistDir>".
  *
- * Both paths must be relative to the directory that the node_modules directory (that contains 'app-root-path') is in.
+ * Both paths must be relative to the directory that the node_modules directory (that contains the package 'app-root-path') is in.
  *
  */
 
-import appRootObject = require('app-root-path');
+import appRootObject from 'app-root-path';
 import fs = require('fs');
 import path = require('path');
 import shell = require('shelljs');

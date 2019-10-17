@@ -1,4 +1,6 @@
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+// import wtf from 'wtfnode'; // added to debug mocha not exiting      database.dbConnection.deleteModel(/.+/);
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
@@ -55,8 +57,8 @@ describe('Database models operations', () => {
 
   after('Close database connection', async () => {
     debug(`Running ${modulename} after - Close database connection`);
-
     await database.closeConnection(database.dbConnection);
+    // wtf.dump(); // debug mocha not exiting - shows mocha timers active after last error test
   });
 
   it('creates the tests model', async () => {

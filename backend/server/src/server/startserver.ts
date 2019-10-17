@@ -6,7 +6,8 @@
  * parameter, (so they can be closed later).
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
@@ -42,7 +43,10 @@ async function startServer(
   /* import serverops module */
   const Server = config.Server;
 
-  /* server connection utility function */
+  /**
+   * This function sets up the required http(x) server(s) listening on appropriate ports.
+   * See the server section in the configServer file for the configuration options.
+   */
   async function connectServer(
     svrType: any,
     svrName: string,
@@ -67,44 +71,51 @@ async function startServer(
     servers.push(server);
   }
 
-  /* set up http server connection variables */
+  /* the default mode is assumed to be when the server is hosted by the GCP host i.e. process.envNODE_ENV === 'production' */
+  /* the default mode is http as required by the GCP host */
   let serverType: any = http;
   let serverName = 'http';
   let serverOptions = {};
-  let serverPort = 80;
+  /* the default is that port is process.env.PORT as set by the GCP host (only)falling back to the known GCP port configured locally */
+  let serverPort = +process.env.PORT! || config.PORT;
 
-  /* redirects default port 80 traffic to the https port */
-  if (config.HTTPS_ON) {
-    /* set option for express-force-ssl */
-    app.set('forceSSLOptions', {
-      httpsPort: config.PORT,
-    });
-    /* force http redirection */
-    app.use(secure);
+  /* if in development mode it is assumed that the server is local => set up either a https server on a configured port and redirect default http port 80 traffic to the https server, or set up a http server listening on the configured port */
+  if (process.env.NODE_ENV === 'development') {
+    if (config.HTTPS_ON) {
+      /* set option for express-force-ssl */
+      app.set('forceSSLOptions', {
+        httpsPort: config.PORT,
+      });
+      /* force http redirection */
+      app.use(secure);
 
-    /* starts the http server which is redirected to https port*/
-    await connectServer(
-      serverType,
-      serverName,
-      serverOptions,
-      app,
-      serverPort,
-      config.SVR_LISTEN_TRIES,
-      config.SVR_LISTEN_TIMEOUT,
-    );
+      /* set http server port to 80 - requests to 80 will be redirected */
+      serverPort = 80;
 
-    /* overwrite default http server settings */
-    serverType = https;
-    serverName = 'https';
-    // ssl credentials
-    serverOptions = {
-      cert: fs.readFileSync(config.HTTPS_CERT),
-      key: fs.readFileSync(config.HTTPS_KEY),
-    };
-    serverPort = config.PORT;
+      /* starts the http server which is redirected to https port*/
+      await connectServer(
+        serverType,
+        serverName,
+        serverOptions,
+        app,
+        serverPort,
+        config.SVR_LISTEN_TRIES,
+        config.SVR_LISTEN_TIMEOUT,
+      );
+
+      /* overwrite default http server settings to set up a https server */
+      serverType = https;
+      serverName = 'https';
+      // ssl credentials
+      serverOptions = {
+        cert: fs.readFileSync(config.HTTPS_CERT),
+        key: fs.readFileSync(config.HTTPS_KEY),
+      };
+      serverPort = config.PORT;
+    }
   }
 
-  /* start the https server */
+  /* start the server */
   await connectServer(
     serverType,
     serverName,

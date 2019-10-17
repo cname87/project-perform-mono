@@ -37,6 +37,7 @@
     ],
     "interface-over-type-literal": true,
     "label-position": true,
+    "max-classes-per-file": [true, 1, "exclude-class-expressions"],
     "max-line-length": [
       true,
       { "limit": 120, "ignore-pattern": "/*" }
@@ -94,6 +95,7 @@
     // "no-unused-expression": [true, "allow-new"],  // replaced by no-unused-expression-chai package
     // "no-use-before-declare": true, // deprecated
     "no-var-keyword": true,
+    "object-literal-key-quotes": [true, "as-needed"],
     "object-literal-sort-keys": false,
     "one-line": [
       true,

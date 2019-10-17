@@ -17,11 +17,11 @@
  */
 
 /* import configuration parameters into process.env first */
-/* the .env file must be in process.cwd() */
-import dotenv = require('dotenv');
-dotenv.config();
+/* import configuration parameters into process.env */
+import '../../../utils/src/loadEnvFile';
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);

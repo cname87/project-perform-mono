@@ -1,10 +1,65 @@
-service: perform-server
+# [START project_perform_yaml]
 runtime: nodejs10
+
+env_variables:
+  DEBUG: PP*
+
+# set static file cache time
+default_expiration: 600s
+
 instance_class: F1
+
 automatic_scaling:
+  # 1 instance to control costs
   max_instances: 1
-  # Could maybe increase to 1?
-  min_instances: 0
-  max_idle_instances: 1
-    # Could maybe increase to 1?
-  min_idle_instances: 0
+  # maintain a resident instance to avoid startup latency
+  min_idle_instances: 1
+
+# start instances before requests sent
+inbound_services:
+- warmup
+
+# set up static file handler
+handlers:
+
+## set up app request handlers
+
+# send app engine cron to the app
+- url: /gcpCron
+  script: auto
+# send app engine warmup to the app
+- url: /_ah/warmup
+  script: auto
+# enable use of testServer requests
+- url: /testServer/.*
+  script: auto
+# send api requests to the app
+- url: /api-v1/.*
+  secure: always
+  redirect_http_response_code: 301
+  script: auto
+
+## set up static file handler
+
+# static files directory
+- url: /(.*)
+  secure: always
+  redirect_http_response_code: '301'
+  static_files: frontend/dist/\1
+  # passthrough if file not found
+  require_matching_file: true
+  upload: frontend/dist/.*
+# serve index.html for all remaining i.e. not found
+- url: (.*)
+  secure: always
+  redirect_http_response_code: 301
+  static_files: frontend/dist/index.html
+  upload:  frontend/dist/index.html
+
+# handlers for gcp errors
+error_handlers:
+  - error_code: over_quota
+    file: ./gcpError.html
+  - error_code: timeout
+    file: ./gcpError.html
+# [END project_perform_yaml]

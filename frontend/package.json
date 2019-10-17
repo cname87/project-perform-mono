@@ -17,7 +17,7 @@
   "scripts": {
     "delDist": "ts-node --project ./utils/tsconfig.utils.json ./utils/delDistDir.ts ./dist",
     "ngBuild": "ng build",
-    "ngBuild:prod": "ng build --prod",
+    "ngBuild:prod": "ng build --prod --aot",
     "ngBuild:e2e": "ng build --configuration e2eTest",
     "prettier": "prettier --write \"./**/*.{ts,tsx}\"",
     "tslint:app": "tslint ./src/**/*.ts --format verbose --project ./src/tsconfig.app.json --config ./src/tslint.json",

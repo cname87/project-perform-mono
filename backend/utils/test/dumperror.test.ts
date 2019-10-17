@@ -1,4 +1,5 @@
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction = require('debug');
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
@@ -15,8 +16,6 @@ sinon.assert.expose(chai.assert, {
 });
 
 /* external dependencies */
-import fs from 'fs';
-import path = require('path');
 import proxyquireObject = require('proxyquire');
 const proxyquire = proxyquireObject.noPreserveCache();
 import util = require('util');
@@ -29,61 +28,23 @@ import winston = require('winston');
  */
 
 /* configuration file expected in application root directory */
-import { IErr, loggerConfig } from '../src/configUtils';
-
-/* set up test log files */
-const infoLog = path.join(loggerConfig.LOGS_DIR, 'dumpInfoTest.log');
-const errorLog = path.join(loggerConfig.LOGS_DIR, 'dumpErrorTest.log');
+import { IErr } from '../src/configUtils';
 
 /* paths for proxyquire */
 const loggerPath = '../src/logger';
 const dumpErrorPath = '../src/dumpError';
 
-/**
- * Function to delete a file if it exists.
- * @params filepath: The path to file to be deleted.
- * @returns Void
- * Note: The file is only deleted when all hard links are closed, i.e. when programme closes.
- */
-function deleteFile(filePath: string) {
-  /* files only deleted when all hard links closed,
-   * i.e. when programme closes */
-  try {
-    fs.unlinkSync(filePath);
-  } catch (err) {
-    /* ok - file didn't exist */
-  }
-}
-
 describe('dumpError tests', () => {
   debug(`Running ${modulename}: describe - dumpError`);
-
-  after('Delete test log files', () => {
-    debug(`Running ${modulename}: after - Delete test log files`);
-
-    /* delete files */
-    deleteFile(infoLog);
-    deleteFile(errorLog);
-  });
 
   it('should log to files and console.log', async function runTest() {
     debug(`Running ${modulename}: it - should log to files and console.log`);
 
-    /* delete files in case they exist following an aborted test run*/
-    deleteFile(infoLog);
-    deleteFile(errorLog);
-
     /* use proxyquire to reload Logger and DumpError */
     const { Logger } = proxyquire(loggerPath, {});
-    const logger = new Logger(infoLog, errorLog) as winston.Logger;
+    const logger = new Logger() as winston.Logger;
     const { DumpError } = proxyquire(dumpErrorPath, {});
     const dumpError = new DumpError(logger) as (err: any) => void;
-
-    /* both log files should be empty */
-    let infoLogged = fs.readFileSync(infoLog).toString();
-    let errorLogged = fs.readFileSync(errorLog).toString();
-    expect(infoLogged.length === 0, 'info log file to be empty').to.be.true;
-    expect(errorLogged.length === 0, 'error log file to be empty').to.be.true;
 
     /* start intercepting console.log */
     let capturedConsoleLog = '';
@@ -109,41 +70,15 @@ describe('dumpError tests', () => {
     expect(capturedConsoleLog.includes('Error Message'), 'error message logged')
       .to.be.true;
 
-    /* error message dumped to both info and error logs */
-    infoLogged = fs.readFileSync(infoLog).toString();
-    errorLogged = fs.readFileSync(errorLog).toString();
-    expect(infoLogged.includes('Error Message'), 'error message printed').to.be
-      .true;
-    expect(errorLogged.includes('Error Message'), 'error message printed').to.be
-      .true;
-
-    /* error name */
-
     /* test that error name logged to console.log */
     expect(capturedConsoleLog.includes('Error Name'), 'error name logged').to.be
       .true;
-
-    /* error name dumped to both info and error logs */
-    infoLogged = fs.readFileSync(infoLog).toString();
-    errorLogged = fs.readFileSync(errorLog).toString();
-    expect(infoLogged.includes('Error Name'), 'error name printed').to.be.true;
-    expect(errorLogged.includes('Error Name'), 'error name printed').to.be.true;
-
-    /* error stack */
 
     /* test that error stack logged to console.log */
     expect(
       capturedConsoleLog.includes('Error Stacktrace'),
       'error stack logged',
     ).to.be.true;
-
-    /* error stack dumped to both info and error logs */
-    infoLogged = fs.readFileSync(infoLog).toString();
-    errorLogged = fs.readFileSync(errorLog).toString();
-    expect(infoLogged.includes('Error Stacktrace'), 'error stack printed').to.be
-      .true;
-    expect(errorLogged.includes('Error Stacktrace'), 'error stack printed').to
-      .be.true;
 
     /* clear and start intercepting console.log again */
     capturedConsoleLog = '';

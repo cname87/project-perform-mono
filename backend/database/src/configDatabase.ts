@@ -11,7 +11,8 @@
  * - getConnectionOptions - returns database connection options object.
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
@@ -21,7 +22,6 @@ import appRootObject = require('app-root-path');
 /* appRoot will be the directory containing the node_modules directory which includes app-root-path, i.e. should be in .../backend */
 const appRoot = appRootObject.toString();
 import { ConnectionOptions } from 'mongoose';
-import path = require('path');
 import { format } from 'util';
 import fs from 'fs';
 

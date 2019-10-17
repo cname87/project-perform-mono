@@ -1,4 +1,4 @@
-/*
+/**
  * This module starts a js file at a location defined in the configuration
  * file as a child process and restarts it if it should crash for any reason.
  * The maximum number of restarts can be set in the configuration file.
@@ -17,16 +17,21 @@
  */
 
 /* import configuration parameters into process.env */
-/* the .env file must be in process.cwd() */
-import dotenv = require('dotenv');
-dotenv.config();
+import '../../utils/src/loadEnvFile';
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+/* gcp stackdriver debug tool */
+// import * as gcpDebug from '@google-cloud/debug-agent';
+// if (process.env.NODE_ENV === 'production') {
+//   gcpDebug.start({ allowExpressions: true });
+// }
+
+import path from 'path';
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 export const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
-/* configuration file expected in directory above */
+/* configuration file expected in same directory */
 import { config, IChild, IMonitor } from './configMonitor';
 export { config };
 
@@ -120,13 +125,13 @@ async function runMonitor(): Promise<void> {
     watchDirectory: config.WATCH_DIR,
     /* append to logs */
     append: false,
-    /* path to log output from forever process (when daemonized) */
-    logFile: config.MONITOR_FOREVER_LOG,
-    /* path to log output from child stdout */
-    outFile: config.MONITOR_OUT_LOG,
-    /* path to log output from child stderr */
-    /* note that debug output is sent to this file */
-    errFile: config.MONITOR_ERR_LOG,
+    // /* path to log output from forever process (when daemonized) */
+    // logFile: config.MONITOR_FOREVER_LOG,
+    // /* path to log output from child stdout */
+    // outFile: config.MONITOR_OUT_LOG,
+    // /* path to log output from child stderr */
+    // /* note that debug output is sent to this file */
+    // errFile: config.MONITOR_ERR_LOG,
   };
 
   /* option for forever to start node with or without debug mode */

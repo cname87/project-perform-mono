@@ -3,7 +3,8 @@
  * It uses the winston logger utility.
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
@@ -60,11 +61,11 @@ class DumpError {
 }
 
 function dumpError(err: any) {
-  debug(modulename + ': running dumpError');
+  DumpError.dump('dumpError called');
 
   if (err && typeof err === 'object') {
     if (err.dumped) {
-      debug(modulename + ': error already dumped');
+      DumpError.dump('Error previously dumped');
       return;
     }
 

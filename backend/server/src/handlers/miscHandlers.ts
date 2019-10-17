@@ -5,7 +5,8 @@
  * The handles object is injected downstream from index.js.
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
@@ -134,6 +135,7 @@ const writeJson = (
     next(err);
   } else {
     /* no error */
+    debug(`${modulename}: sending response`);
     res.status(code).json(payload);
   }
 };

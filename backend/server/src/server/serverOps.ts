@@ -11,7 +11,8 @@
  * Stops the supplied server.
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
@@ -87,7 +88,7 @@ function setupServer(
   /* start and return the http(s) server & load express as listener */
   this.expressServer = serverType.createServer(serverOptions, app);
 
-  /* wrap extra shutdown functionality into server  to avoid shutdown issues when debug inspector listening */
+  /* wrap extra shutdown functionality into server to avoid shutdown issues when debug inspector listening */
   this.expressServer = shutdownHelper(this.expressServer);
 
   /* store a count of the number server listen errors allowed */
@@ -105,10 +106,10 @@ function setupServer(
  * port is occupied.
  * @param serverPort
  * The port that the server will listen on.
- * listenTries 3
+ * @param listenTries 3
  * The total number of listen tries made.
  * Retries are only made if the port is occupied.
- * listenTimeout 5
+ * @param listenTimeout 5
  * The time in seconds allowed between each retry.
  * @returns
  * Returns a promise.
@@ -197,7 +198,6 @@ async function listenServer(
 
     /* ask the server to listen and trigger event */
     this.expressServer.listen({
-      host: 'localhost',
       port: serverPort,
     });
   }

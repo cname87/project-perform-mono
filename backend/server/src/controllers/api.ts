@@ -3,7 +3,8 @@
  * It is to serve all api requests.
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);

@@ -1,15 +1,16 @@
 /**
- * This module provides a utility executable to allow a launch configuration to test is the server running and if not then start it and wait until it is running before proceeding.
+ * This module provides a utility executable to allow a launch configuration to test is the server running and, if not, then start it and wait until it is running before proceeding.
  *
  * See pingServer for the implementation.
  *
- * * Usage:
+ * Usage:
  * Set up a vscode task that runs this file as the argument to node.exe.
  * Set the task as a preLaunchTask in a launch configuration.
  *
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);

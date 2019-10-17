@@ -19,7 +19,7 @@ const appRoutes: Routes = [
     pathMatch: 'full',
   },
   {
-    /* callback from auth0 authentication  - it redirects */
+    /* callback from auth0 authentication - it redirects */
     path: 'callback',
     component: CallbackComponent,
   },

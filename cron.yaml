@@ -1,0 +1,4 @@
+cron:
+- description: "instance keep alive"
+  url: /gcpCron
+  schedule: every 1 minutes

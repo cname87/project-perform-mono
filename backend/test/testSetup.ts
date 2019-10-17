@@ -1,12 +1,12 @@
 /* import configuration parameters into process.env */
-/* the .env file must be in process.cwd() */
-import dotenv = require('dotenv');
-dotenv.config();
+import '../utils/src/loadEnvFile';
+
 /* set DB_MODE to 'test' to load the test database */
 process.env.DB_MODE = 'test';
 
 /* file header */
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);

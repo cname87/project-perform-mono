@@ -20,16 +20,9 @@ import shell = require('shelljs');
 
 const appRoot = appRootObject.toString();
 
-/* create path to .nyc_output file in same directory as node_modules (that contains 'app-root-path') */
+/* create path to .nyc_output file in same directory as node_modules (that contains the package 'app-root-path') */
 const filePath1 = path.join(appRoot, '.nyc_output');
 shell.rm('-rf', filePath1);
 if (fs.existsSync(filePath1)) {
-  console.error('.nyc_output file not deleted');
-}
-
-/* create path to .nyc_output file in project root */
-const filePath2 = path.join(appRoot, '..', '.nyc_output');
-shell.rm('-rf', filePath2);
-if (fs.existsSync(filePath2)) {
   console.error('.nyc_output file not deleted');
 }

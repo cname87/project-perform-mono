@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 const path = require('path');
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 exports.config = {
   allScriptsTimeout: 11000,
@@ -20,6 +20,7 @@ exports.config = {
         "--start-maximized",
         "--new-window",
         "--disable-popup-blocking",
+        "--disable-extensions",
       ]
     },
     /* enable browser logs for protractor-browser-logs */

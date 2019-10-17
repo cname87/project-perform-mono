@@ -13,13 +13,9 @@
  *
  */
 
-/* import configuration parameters into process.env */
-import path = require('path');
-import dotenv = require('dotenv');
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-
 /* file header */
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 export const debug = debugFunction(`PP_${modulename}`);
 debug(`Starting ${modulename}`);
@@ -67,8 +63,6 @@ const Logger = config.Logger;
 const logger = new Logger() as winston.Logger;
 const DumpError = config.DumpError;
 const dumpError = new DumpError(logger) as (err: any) => void;
-const { ServerLogger } = config;
-const serverLogger = new ServerLogger(config);
 
 /**
  * An applocals object is added to the express app object containing objects and variables needed across requests.
@@ -97,7 +91,6 @@ appLocals.logger = logger;
 appLocals.models = {
   members: ({} as any) as IModelExtended,
 };
-appLocals.serverLogger = serverLogger;
 
 /* the express app used throughout */
 /* add the appLocals object for access in middleware */
@@ -184,7 +177,7 @@ async function runApp() {
   if (isDbReady === DBReadyState.Connected || config.IS_NO_DB_OK) {
     debug(modulename + ': calling the http server');
 
-    logger.info('\n*** STARTING SERVER ***\n');
+    logger.info('\n*** STARTING THE HTTPx SERVER ***\n');
 
     /* start the server */
     try {
@@ -211,14 +204,7 @@ async function runApp() {
       }
 
       /* run the server functionality */
-      await runServer(
-        app,
-        config,
-        controllers,
-        errorHandlers,
-        miscHandlers,
-        serverLogger,
-      );
+      await runServer(app, config, controllers, errorHandlers, miscHandlers);
 
       debug(modulename + ': server up and running');
 
@@ -239,7 +225,7 @@ async function runApp() {
         logger.error(`\n*** DATABASE NOT CONNECTED ***`);
       }
 
-      logger.info(`\n*** SERVER LISTENING ON PORT ${config.PORT} ***`);
+      logger.info(`\n*** SERVER UP AND LISTENING ***`);
     } catch (err) {
       logger.error(modulename + ': server start up error - exiting');
       dumpError(err);

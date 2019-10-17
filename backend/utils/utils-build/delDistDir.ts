@@ -8,35 +8,36 @@
  * The dist directory to be deleted is passed in as a parameter.
  * package.com script: "npm run delDistDir.ts <pathToDistDir>".
  *
- * <pathToDistDir> is relative to the directory that the node_modules directory (that contains 'app-root-path') is in.
+ * <pathToDistDir> is relative to the directory that the node_modules directory (that contains the package 'app-root-path') is in.
  *
- * <pathToDistDir> must end in /dist.
+ * <pathToDistDir> must end in /dist/.
  *
  */
 
-import appRootObject = require('app-root-path');
+import appRootObject from 'app-root-path';
 import fs = require('fs');
 import path = require('path');
-import shell = require('shelljs');
+import rimraf = require('rimraf');
 
 const appRoot = appRootObject.toString();
 
-/* create path to dist directory from passed in parameter */
-const distPath = path.join(appRoot, process.argv[2]);
-
-if (process.argv[2].slice(-5) !== '/dist') {
-  console.error('dist directory not provided');
+/* confirm that the passed in path ends in /dist/ */
+if (process.argv[2].slice(-6) !== '/dist/') {
+  console.error('ERROR: dist directory not provided');
   process.exit(1);
 }
 
+/* create path to dist directory from passed in parameter */
+const distPath = path.join(appRoot, process.argv[2]);
+console.log(`Deleting: ${distPath}`);
+
 if (!fs.existsSync(distPath)) {
-  console.error('ERROR: dist directory not found');
-  // process.exit(1);
+  console.error('WARNING: dist directory not found');
 }
 
-shell.rm('-rf', distPath);
+rimraf.sync(distPath);
 
 if (fs.existsSync(distPath)) {
-  console.error('dist directory not deleted');
+  console.error('ERROR: dist directory not deleted');
   process.exit(1);
 }

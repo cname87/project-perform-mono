@@ -1,31 +1,21 @@
 /**
  * This module provides a Winston logger service.
- * It uses the file paths specified in the imported
- * configuration file.
- * The logs directory must exist but the files are created if they do not exist.
+ * It logs only to the GCP Winston logging service and to console.
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
 
-/* external dependencies */
-import fs = require('fs');
-import path = require('path');
 import winston = require('winston');
+import { LoggingWinston } from '@google-cloud/logging-winston';
 const { createLogger, format, transports } = winston;
 const { combine, timestamp, label, printf } = format;
 
-/* import configuration file */
-import { loggerConfig } from './configUtils';
-
 /**
  * Usage:
- *
- * A config file is imported that contains all configuration infomation:
- * - The logs directory, which must exist.
- * - The log files paths.
  *
  * In the module requiring a logger service add...
  * import { Logger } from '<path to><this file>';
@@ -35,54 +25,29 @@ import { loggerConfig } from './configUtils';
  * Logger class object.
  *
  * Then...
- * Use logger.info('text') to log 'text' to the info file,
- * and to console.log if not in production.
- * Use logger.error('text') to log 'text' to the info and error file,
- * and to console.log if not in production.
+ * Use logger.info('text') to log 'text' at the 'info' level and use logger.error('text') to log 'text' at.the 'error' level.
+ *
+ * The output goes to the GCP logging service if in production and to the console if not in production.
+ *
+ * The production logging level is set by the .env parameter 'DEBUG' which also controls logging to the 'debug' logger.  The console logging level is always 'debug', both 'info' and 'error' messages are always logged.
  *
  * format is <timestamp> [PP] <info/error> <message>
  */
 
-/* log file paths */
-const defaultInfoLog = path.join(loggerConfig.LOGS_DIR, loggerConfig.INFO_LOG);
-const defaultErrorLog = path.join(
-  loggerConfig.LOGS_DIR,
-  loggerConfig.ERROR_LOG,
-);
-
 class Logger {
   public static instance: winston.Logger;
 
-  public constructor(infoLog = defaultInfoLog, errorLog = defaultErrorLog) {
+  public constructor() {
     if (!Logger.instance) {
-      Logger.instance = makeLogger(infoLog, errorLog);
+      Logger.instance = makeLogger();
     }
 
     return Logger.instance;
   }
 }
 
-function makeLogger(infoFile: string, errorFile: string): winston.Logger {
-  debug(modulename + ': running logger');
-
-  /* log paths */
-  const arPaths: string[] = [];
-  arPaths.push(infoFile, errorFile);
-
-  /* create files if they don't exist */
-  for (const file of arPaths) {
-    try {
-      /* create file and write '' or fail if it exists */
-      fs.writeFileSync(file, '', { flag: 'wx' });
-    } catch (err) {
-      if (err.code === 'EEXIST') {
-        /* file exists */
-      } else {
-        /* unexpected error */
-        throw err;
-      }
-    }
-  }
+function makeLogger(): winston.Logger {
+  debug(modulename + ': running makeLogger');
 
   const myFormat = printf((info) => {
     return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
@@ -102,6 +67,9 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
   };
   winston.addColors(myLevels.colors);
 
+  /* set GCP logging level to 'debug' if any debug logging is active, otherwise set to 'error' */
+  const productionLevel = process.env.DEBUG ? 'debug' : 'error';
+
   const options = {
     console: {
       format: combine(
@@ -115,8 +83,7 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
       json: false,
       level: 'debug',
     },
-    errorFile: {
-      filename: errorFile,
+    stackDriver: {
       format: combine(
         label({ label: 'PP' }),
         timestamp(),
@@ -124,38 +91,22 @@ function makeLogger(infoFile: string, errorFile: string): winston.Logger {
         myFormat,
       ),
       handleExceptions: true,
-      json: true,
-      level: 'error',
-      maxFiles: 5,
-      maxsize: 5242880, // 5MB
-    },
-    infoFile: {
-      filename: infoFile,
-      format: combine(
-        label({ label: 'PP' }),
-        timestamp(),
-        winston.format.align(),
-        myFormat,
-      ),
-      handleExceptions: false,
-      json: true,
-      level: 'info',
-      maxFiles: 5,
-      maxsize: 5242880, // 5MB
+      json: false,
+      level: productionLevel, // GCP logging level
     },
   };
 
   const loggerObject = createLogger({
     levels: myLevels.levels,
-    transports: [
-      new transports.File(options.errorFile),
-      new transports.File(options.infoFile),
-    ],
+    transports: [],
   });
 
-  /* add console.log only if development environment */
-  /* using config setting which sets environment in runServer */
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV === 'production') {
+    /* if production environment add GCP Stackdriver Logging */
+    /* logs will be written to: "projects/YOUR_PROJECT_ID/logs/winston_log" */
+    loggerObject.add(new LoggingWinston(options.stackDriver));
+  } else {
+    /* if not production environment send to console */
     loggerObject.add(new transports.Console(options.console));
   }
 

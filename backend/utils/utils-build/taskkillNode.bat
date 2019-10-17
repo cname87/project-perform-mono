@@ -1,3 +1,7 @@
+REM Kills any node.exe processes running under Windows
+REM Useful to quickly close any node programs that failed to close properly
+
+
 @ECHO OFF
 SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
@@ -33,5 +37,4 @@ REM @EXIT 0
 ENDLOCAL
 REM ECHO ON
 @EXIT 0
-REM @PAUSE
-REM @EXIT /B 0
+

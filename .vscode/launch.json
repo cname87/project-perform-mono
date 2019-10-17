@@ -99,8 +99,6 @@
       "program": "${workspaceFolder}/backend/index.ts",
       "cwd": "${workspaceFolder}/backend",
       "env": {
-        /* set before all tests to choose test or production database */
-        // "DB_MODE": "production",
       },
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -134,10 +132,7 @@
       ],
       "port": 9229,
       "cwd": "${workspaceFolder}/backend",
-      "env": {
-        /* set before all tests to choose test or production database */
-        // "DB_MODE": "production",
-      },
+      "env": {},
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
@@ -253,10 +248,13 @@
         /* comment out files to select tests */
         "${workspaceFolder}/backend/dist/database/test/*.test.js",
         "${workspaceFolder}/backend/dist/models/test/*.test.js",
-        "${workspaceFolder}/backend/dist/utils/test/*.test.js",
+        "${workspaceFolder}/backend/dist/utils/test/dumpError.test.js",
+        "${workspaceFolder}/backend/dist/utils/test/logger.test.js",
         "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
         "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
-        "${workspaceFolder}/backend/server/test/*.js",
+        "${workspaceFolder}/backend/dist/server/test/index-test.js",
+        "${workspaceFolder}/backend/dist/server/test/server-test.js",
+        "${workspaceFolder}/backend/dist/server/test/startserver-test.js",
         "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
       ],
       "env": {
@@ -296,10 +294,13 @@
         /* comment out files to select tests */
         "${workspaceFolder}/backend/dist/database/test/*.test.js",
         "${workspaceFolder}/backend/dist/models/test/*.test.js",
-        "${workspaceFolder}/backend/dist/utils/test/*.test.js",
+        "${workspaceFolder}/backend/dist/utils/test/dumpError.test.js",
+        "${workspaceFolder}/backend/dist/utils/test/logger.test.js",
         "${workspaceFolder}/backend/dist/server/test/client-fired/api-server-side.test.js",
         "${workspaceFolder}/backend/dist/server/test/client-fired/errors-server-side.test.js",
-        "${workspaceFolder}/backend/server/test/*.js",
+        "${workspaceFolder}/backend/dist/server/test/index-test.js",
+        "${workspaceFolder}/backend/dist/server/test/server-test.js",
+        "${workspaceFolder}/backend/dist/server/test/startserver-test.js",
         "${workspaceFolder}/backend/dist/monitor/test/*.test.js",
       ],
       "env": {

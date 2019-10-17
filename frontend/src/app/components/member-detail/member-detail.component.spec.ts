@@ -306,10 +306,9 @@ describe('MemberDetailComponent', () => {
       /* dispatch an 'inputEnter' event to the member input element */
       const inputEvent: any = new Event('inputEnter');
       input.dispatchEvent(inputEvent);
-      /* test that save() was called with the event and the id string */
-      /* note: the '$event' emitted by the input box inputEnter event is the event passed in and not the input box name */
+      /* note that save() was called with the $event' emitted by the inputEnter event (not the input box text) and the id string */
       expect(saveSpy).toHaveBeenCalledWith(
-        inputEvent,
+        inputEvent as string,
         members[routeId].id.toString(),
       );
       /* await async data return */

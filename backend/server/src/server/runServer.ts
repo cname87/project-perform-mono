@@ -5,11 +5,15 @@
  * The application configuration file is also passed in.
  * It loads common express middleware and responds to
  * incoming web requests by calling the appropriate routing functions.
- * It loads the controllers, handles, objects and configuration object
- * into res.locals so they are available to every response.
+ * - It calls some test functions in development mode.
+ * - It calls an api handler for urls matching the api base path.
+ * - It loads the Angular static files from the configured directory.
+ * - It loads error handlers to handle errors.
+ * Note: The host (e.g. GCP) is expected to supply a request logger so none is provided.
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 const debug = debugFunction('PP_' + modulename);
 debug(`Starting ${modulename}`);
@@ -20,7 +24,6 @@ import compression = require('compression');
 import cookieParser = require('cookie-parser');
 import express = require('express');
 import { Request, NextFunction, Response } from 'express';
-import path = require('path');
 import urlParser = require('url');
 import util = require('util');
 import uuidv1 = require('uuid/v1');
@@ -29,10 +32,11 @@ import uuidv1 = require('uuid/v1');
 import { IExpressApp, IControllers } from '../configServer';
 
 /**
- * Sets up express middleware and responds to incoming requests.
- * @param app
- * The express app object
- * TODO - complete doc.
+ * Sets up express middleware and responds to incoming requests.  See the module description.
+ * @param app The express app object
+ * @param config Object with server configuration parameters
+ * @param controllers Route controllers
+ * @param handles Request handlers
  * @returns Void.
  */
 
@@ -42,22 +46,30 @@ async function runServer(
   controllers: IControllers,
   errorHandlers: any,
   handles: any,
-  serverLogger: any,
 ) {
   debug(modulename + ': running runServer');
 
-  /* 'development' or 'production' */
-  app.set('env', config.ENV);
+  /* GCP warmup request */
+  app.use('/_ah/warmup', (_req, res, _next) => {
+    res.status(200).end();
+  });
+  /* GCP app engine cron job */
+  const started = new Date().toUTCString();
+  app.get('/gcpCron', (_req, res, _next) => {
+    debug(`${modulename}: gcpCron: Instance started (UTC): ${started}`);
+    res.status(200).json({
+      started,
+    });
+  });
+
   /* use strong etag validation */
   app.set('etag', 'strong');
   /* /Foo different to /foo */
   app.set('case sensitive routing', true);
   /* /admin the same as /admin/ */
   app.set('strict routing', false);
-
   /* compress files before sending */
   app.use(compression());
-
   /* assign a unique id to each request */
   interface IRequestUuid extends Request {
     id?: string;
@@ -67,11 +79,6 @@ async function runServer(
     next();
   }
   app.use(assignId);
-
-  /* log simple format to default stdout */
-  app.use(serverLogger.logConsole);
-  /* log detailed format to file */
-  app.use(serverLogger.logFile);
 
   /* parse the body for 4 type options */
   app.use(express.json());
@@ -86,10 +93,15 @@ async function runServer(
   /* parse cookies to req.cookies / req.signedCookies */
   app.use(cookieParser(config.COOKIE_KEY));
 
-  /* debug log basic information from the request */
-  if (app.get('env') === 'development') {
+  /* GCP app engine operates behind a proxy */
+  if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', true);
+  }
+
+  /* log basic information from the request */
+  if (config.DEBUG) {
     app.use((req, _res, next) => {
-      debug('\n' + modulename + ': *** Request received ***\n');
+      debug(modulename + ': *** Request received ***');
       debug(modulename + ': req.url: ' + req.url);
       debug(modulename + ': req.baseUrl: ' + req.baseUrl);
       debug(modulename + ': req.originalUrl: ' + req.originalUrl);
@@ -100,7 +112,7 @@ async function runServer(
           urlParser.parse(req.originalUrl).search,
       );
       debug(modulename + ': body query string: ' + util.inspect(req.query));
-      debug(modulename + 'body: ' + util.inspect(req.body));
+      debug(modulename + ': body: ' + util.inspect(req.body));
       debug(
         modulename + ': signed cookies: ' + util.inspect(req.signedCookies),
       );
@@ -109,7 +121,7 @@ async function runServer(
   }
 
   /* enable test functionality in dev mode */
-  if (app.get('env') === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     /* serve server test files from a static server mounted on /testServer */
     const staticTestOptions = {
       redirect: false,
@@ -125,7 +137,7 @@ async function runServer(
       express.static(config.NODE_MODULES_PATH, staticTestOptions),
     );
 
-    /* respond to request whether test database is in use */
+    /* respond to a request asking whether test database is in use */
     app.use('/testServer/isTestDatabase', (_req, res, _next) => {
       debug(modulename + ': calling isTestDatabase');
       const result = {
@@ -146,7 +158,7 @@ async function runServer(
     app.post('/raiseEvent', handles['raiseEvent']);
   }
 
-  /* handle openapi-backend calls a handler based on the path and the api */
+  /* calls a handler based on the path and the api */
   app.use(
     /* use for api paths only */
     process.env.API_BASE_PATH as string,
@@ -168,6 +180,7 @@ async function runServer(
     /* skip /dummyUrl for server test purposes */
     if (req.path.slice(0, 9) !== '/dummyUrl') {
       const filepath = path.join(config.APP_PATH, 'index.html');
+      debug(modulename + ' : serving index.html for an unknown path');
       res.sendFile(filepath);
     } else {
       next();

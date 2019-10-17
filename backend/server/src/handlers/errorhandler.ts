@@ -4,7 +4,8 @@
  * through without a route being identified.
  */
 
-const modulename = __filename.slice(__filename.lastIndexOf('\\'));
+import path = require('path');
+const modulename = __filename.slice(__filename.lastIndexOf(path.sep));
 import debugFunction from 'debug';
 export const debug = debugFunction('PP_' + modulename); // exported for mocha
 debug(`Starting ${modulename}`);
@@ -29,6 +30,7 @@ let logger: winston.Logger;
 /**
  * Catches any request that passes through all middleware
  * to this point without error and creates a 'Not Found' error.
+ * Note: This does not catch errors but rather requests that get this far.
  */
 
 function notFound(_req: IRequestApp, _res: Response, next: NextFunction) {
@@ -89,7 +91,9 @@ function logError(
   logger = req.app.appLocals.logger;
   const dumpError = req.app.appLocals.dumpError;
 
-  logger.error(modulename + ': server logger called');
+  logger.error(
+    modulename + ': Logging detail on the request that caused the error',
+  );
 
   logger.error(
     modulename +
