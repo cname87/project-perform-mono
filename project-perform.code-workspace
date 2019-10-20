@@ -91,7 +91,8 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.fontLigatures": "'ss02', 'ss19'",
     },
     "[html]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -110,5 +111,9 @@
     "files.exclude": {},
     "editor.smoothScrolling": false,
     "editor.mouseWheelScrollSensitivity": 0,
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+
+
+    "editor.fontLigatures": true,
 	}
 }

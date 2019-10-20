@@ -3,30 +3,25 @@
     "branches": 0,
     "cache": true,
     "check-coverage": true,
+    "include": [
+      "backend/dist/src/**/*.js"
+    ],
     "exclude": [
-      "**/*.d.ts",
-      "coverage/**/*.*",
-      "node_modules/**",
-      "**/test/*.*",
-      "**/test/**/*.*",
-      "**/utils-build/**/*.*"
+      "**/test/**/*.*"
     ],
     "exclude-after-remap": false,
-    "extension": [
-      ".js"
-    ],
     "functions": 0,
-    "include": [
-      "**/*.js"
-    ],
-    "lines": 60,
+    "lines": 0,
     "per-file": true,
     "produce-source-map": true,
+    "report-dir": "./backend/coverage",
     "reporter": [
         "html",
         "text"
     ],
+    "require": "@istanbuljs/nyc-config-typescript",
     "statements": 0,
+    "temp-dir": "./backend/coverage/.nyc_output",
     "watermarks": {
         "branches": [
             60,

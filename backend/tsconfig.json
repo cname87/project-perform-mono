@@ -2,17 +2,10 @@
   "extends": "../tsconfig.json",
   "include": [
     "./**/*.ts",
-    // "./index.ts",
-    // "./**/src/**/*.nopts",
-    // "./**/test/**/*.test.ts",
-    // "./utils/utils-build/*.ts",
-    // "./test/testSetup.ts",
-    "./**/types/*.d.ts",
-    "./server/types/types.d.ts",
-    "./utils/types.d.ts"
+    "./**/types/*.d.ts"
   ],
   "exclude": [
-    "./server/test/client", // client-side files compiled separately
+    "./src/test/client", // client-side files must be compiled separately
     "node_modules"
   ],
 
@@ -23,6 +16,8 @@
     "outDir": "./dist",
     "rootDir": ".",
 
+    "sourceMap": true,
+
     /* target and lib */
     "target": "esnext",  // Compiles to this JS version - higher for better debug support, lower for wider browser support
     "lib": [
@@ -30,6 +25,6 @@
     ], // for browser-side scripts - extra types which you know browser will support
 
     /* module option */
-    "module": "commonjs"  // module loader format (independent of target) - commonjs for node
+    "module": "commonjs"  // module loader format (independent of target) commonjs for node
   }
 }

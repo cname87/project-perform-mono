@@ -11,7 +11,7 @@
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "extendedDiagnostics": true,
+    // "extendedDiagnostics": true,
     // "forceConsistentCasingInFileNames": true,  // causes ng test error
     "importHelpers": true,
     "listEmittedFiles": true,
@@ -31,7 +31,7 @@
     "strictPropertyInitialization": true,
     "suppressImplicitAnyIndexErrors":true,
     // "traceResolution": true,
-    "typeRoots": [
+    "typeRoots": [ //avoids mocha vs jasmine clash
       "node_modules/@types"
     ],
     "plugins": [

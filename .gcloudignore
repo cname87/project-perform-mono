@@ -6,43 +6,32 @@ node_modules/
 .editorconfig
 .gcloudignore
 .gitignore
+.npmrc
 .prettierrc
 app.yaml
+cron.yaml
 debug.log
 LICENSE
 package-lock.json
 project-perform.code-workspace
 README.md
 tsconfig.json
-tslint-backend.json
 tslint.json
 
 # ignore from backend
 backend/coverage/
-backend/database/src/
-backend/database/test/
-backend/logs/
-backend/models/
-backend/monitor
-backend/server/
-backend/test/
-backend/users/
-backend/utils/
+backend/src
+backend/utils-build/
 backend/.envDevelopment
 backend/.mocharc.json
-backend/.npmrc
 backend/.nycrc.json
-backend/index.ts
 backend/tsconfig.json
-backend/**/test/
-backend/**/utils-build/
 
 # ignore from backend/dist
 backend/dist/**test/
 backend/dist/**/*.map
 
 # ignore from frontend
-frontend/certs/
 frontend/coverage/
 frontend/e2e/
 frontend/node_modules/

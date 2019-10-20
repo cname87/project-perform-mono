@@ -42,6 +42,10 @@ export class E2eTestInterceptor implements HttpInterceptor {
     );
 
     /* specific urls will trigger a specific response */
+    /* a string constructed from the url is compared with configured strings and if a match is found a simulated error is thrown...
+      - simulated http server-side error,
+      - simulated http client-side or network error
+      - simulated frontend unexpected application error. */
     switch (`${req.method}:${req.urlWithParams}`) {
       case errorTestUrls.post:
       case errorTestUrls.put: {

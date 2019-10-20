@@ -114,7 +114,7 @@
     {
       "label": "npm backend server-side watch",
       "type": "npm",
-      "script": "tscServerWatch",
+      "script": "tscBackendServerWatch",
       "path": "backend/",
       "problemMatcher": [],
       "group": "build",
@@ -128,7 +128,7 @@
     {
       "label": "npm backend client-side watch",
       "type": "npm",
-      "script": "tscClientWatch",
+      "script": "tscBackendClientWatch",
       "path": "backend/",
       "problemMatcher": [],
       "group": "build",
@@ -253,7 +253,7 @@
       "label": "Taskkill node.exe",
       "type": "shell",
       "windows": {
-        "command": "${workspaceFolder}/backend/utils/utils-build/taskkillNode.bat"
+        "command": "${workspaceFolder}/backend/utils-build/taskkillNode.bat"
       },
       "group": "test",
       "presentation": {
@@ -269,7 +269,7 @@
       "type": "process",
       "command": "node",
       "args": [
-        "${workspaceFolder}/backend/dist/utils/utils-build/isServerUp.js"
+        "${workspaceFolder}/backend/dist/utils-build/isServerUp.js"
       ],
       "options": {
         "env": {
@@ -292,7 +292,7 @@
       "type": "process",
       "command": "node",
       "args": [
-        "${workspaceFolder}/backend/dist/utils/utils-build/startServer.js"
+        "${workspaceFolder}/backend/dist/utils-build/startServer.js"
       ],
       "isBackground": true,
       "options": {
@@ -327,25 +327,6 @@
           }
         }
       ]
-    },
-    /* npm delete nyc file */
-    {
-      "label": "npm delete nyc file",
-      "type": "shell",
-      "command": "npm",
-      "args": [
-        "run",
-        "--prefix",
-        "${workspaceRoot}/backend",
-        "delNyc"
-      ],
-      "presentation": {
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared"
-      },
-      "group": "build",
-      "problemMatcher": []
     },
   ]
 }

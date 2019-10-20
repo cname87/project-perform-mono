@@ -9,10 +9,6 @@ const fs = require('fs');
 const { promisify } = require('util');
 const { NgxLoggerLevel } = require('ngx-logger');
 
-const certFile = path.resolve(__dirname, '..//certs/nodeKeyAndCert.pem')
-const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem')
-const caFile = path.resolve(__dirname, '../certs/rootCA.crt')
-
 import { getDashboardPage } from './src/pages/dashboard.page';
 import { getRootElements } from './src/pages/elements/root.elements';
 import { NGXLogger } from 'ngx-logger';
@@ -51,9 +47,6 @@ const askServer = async(
     url,
     method,
     headers,
-    cert: fs.readFileSync(certFile),
-    key: fs.readFileSync(keyFile),
-    ca: fs.readFileSync(caFile),
     body,
     resolveWithFullResponse,
     json: true,

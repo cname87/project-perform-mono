@@ -1,5 +1,5 @@
 # [START project_perform_yaml]
-runtime: nodejs10
+runtime: nodejs12
 
 env_variables:
   DEBUG: PP*
