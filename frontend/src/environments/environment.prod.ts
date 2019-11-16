@@ -7,7 +7,6 @@ export const environment = {
   logLevel: NgxLoggerLevel.OFF,
   /* GCP port must be 8080 */
   PORT: 8080,
-  /* server logs go to this url */
   get apiUrl() {
     return `https://localhost:${this.PORT}/api-v1/`;
   },

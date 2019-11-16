@@ -10,17 +10,16 @@ export const environment = {
   logLevel: NgxLoggerLevel.OFF,
   /* GCP port must be 8080 */
   PORT: 8080,
-  /* server logs go to this url */
+  /* sets audience - note that the audience could be anything - the reference to https://localhost is not relevant but cannot be changed */
   get apiUrl() {
     return `https://localhost:${this.PORT}/api-v1/`;
   },
 };
 
-/*
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact on performance if an error is thrown.
+/* For easier debugging in development mode, you can import the following file
+ to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
+
+ This import should be commented out in production mode because it will have a negative impact on performance if an error is thrown.
  */
 /* leave commented out by default to simulate production */
 // import 'zone.js/dist/zone-error'; // Included with Angular CLI.
