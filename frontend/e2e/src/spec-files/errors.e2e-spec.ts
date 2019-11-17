@@ -194,7 +194,8 @@ describe('Error Handling', () => {
 
       /* set up to test that an error is logged */
       const logs = await setupLogsMonitor();
-      logs.expect(/Http client-side/, logs.ERROR);
+      /* isTrusted = false is hiding the original error object from being displayed- see https://stackoverflow.com/questions/44815172/log-shows-error-object-istrustedtrue-instead-of-actual-error-data so I'm just looking for the statusText */
+      logs.expect(/Test 999 error/, logs.ERROR);
 
       /* click on members list link and pass in number of members expected */
       await getMembersList(numMembers);
@@ -205,7 +206,7 @@ describe('Error Handling', () => {
       /* clear messages list */
       await clearMessages();
 
-      /* get the link of the member 9 */
+      /* get the link of the member */
       const {
         memberName,
       } = membersListPage.memberListElements.selectMemberById(errorMember.id);

@@ -5,6 +5,7 @@ import { NGXLogger } from 'ngx-logger';
 import { AppModule } from '../../app.module';
 import { HttpErrorInterceptor } from './http-error.interceptor';
 import { of, throwError, defer } from 'rxjs';
+import { errorTypes } from '../../config';
 
 interface INgxLoggerSpy {
   trace: jasmine.Spy;
@@ -247,7 +248,7 @@ describe('HttpErrorInterceptor', () => {
             'HttpErrorInterceptor: Server returned an unsuccessful response code',
           );
           /* test an error report property */
-          expect(error.allocatedType).toBe('Http server-side');
+          expect(error.allocatedType).toBe(errorTypes.httpServerSide);
           expect(error.error.message).toBe(serverError.message);
           expect(error.error.status).toBe(serverError.status);
           expect(error.error.error).toEqual(serverError.error);
@@ -282,7 +283,7 @@ describe('HttpErrorInterceptor', () => {
             'HttpErrorInterceptor: Client-side or network error',
           );
           /* test error report properties */
-          expect(error.allocatedType).toBe('Http client-side');
+          expect(error.allocatedType).toBe(errorTypes.httpClientSide);
 
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Throwing error report on',
@@ -317,7 +318,7 @@ describe('HttpErrorInterceptor', () => {
             'Server returned an unsuccessful response code',
           );
           /* test error report properties */
-          expect(error.allocatedType).toBe('None');
+          expect(error.allocatedType).toBe(errorTypes.notAssigned);
 
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Throwing error report on',

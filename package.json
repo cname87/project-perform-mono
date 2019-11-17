@@ -18,15 +18,15 @@
     "scripts": {
       "debug": "run only from vscode as it needs to connect",
       "isServerUp": "pings server",
-      "startServer": "starts local server and pings it to ensure it's up"
+      "checkServer": "checks if the local server is up & starts it if necessary"
     }
   },
   "scripts": {
     "test": "",
     "start": "node ./backend/dist/src/index.js",
     "debug": "node --inspect-brk=9229 ./backend/dist/src/index.js",
-    "isServerUp": "node ./backend/dist/utils-build/isServerUp.js",
-    "startServer": "node ./backend/dist/utils-build/startServer.js",
+    "isServerUp": "ts-node --project ./backend/tsconfig.json ./backend/utils-build/isServerUp.ts",
+    "checkServer": "ts-node --project ./backend/tsconfig.json ./backend/utils-build/checkServer.ts",
     "delDist": "ts-node ./backend/utils-build/delDistDir.ts ./backend/dist/",
     "tscBackend": "tsc --project ./backend/tsconfig.json",
     "tscBackendWatch": "tsc --watch --project ./backend/tsconfig.json",

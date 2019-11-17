@@ -15,7 +15,12 @@ import { asyncData, asyncError } from '../test-helpers';
 import { members } from '../mocks/mock-members';
 import { ICount } from '../../data-providers/models/count';
 import { AppModule } from '../../app.module';
-import { IErrReport, E2E_TESTING, errorSearchTerm } from '../../config';
+import {
+  IErrReport,
+  E2E_TESTING,
+  errorSearchTerm,
+  errorTypes,
+} from '../../config';
 
 interface IMembersApiStub {
   getMembers: jasmine.Spy;
@@ -52,7 +57,7 @@ describe('MembersService', () => {
         (id: number): Observable<any> => {
           if (id === 0) {
             const errReport: IErrReport = {
-              allocatedType: 'Http server-side',
+              allocatedType: errorTypes.httpServerSide,
               error: new HttpErrorResponse({
                 error: { name: 'HttpErrorResponse' },
                 status: 404,
@@ -83,7 +88,7 @@ describe('MembersService', () => {
         (member: IMember | number): Observable<ICount> => {
           if (member === 0) {
             const errReport: IErrReport = {
-              allocatedType: 'Http server-side',
+              allocatedType: errorTypes.httpServerSide,
               error: new HttpErrorResponse({
                 error: { name: 'HttpErrorResponse' },
                 status: 404,
@@ -101,7 +106,7 @@ describe('MembersService', () => {
         (member: IMember): Observable<IMember> => {
           if (member.id === 0) {
             const errReport: IErrReport = {
-              allocatedType: 'Http server-side',
+              allocatedType: errorTypes.httpServerSide,
               error: new HttpErrorResponse({
                 error: { name: 'HttpErrorResponse' },
                 status: 404,

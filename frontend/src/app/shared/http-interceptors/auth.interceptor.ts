@@ -10,6 +10,7 @@ import { mergeMap, catchError } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
 import { AuthService } from '../auth.service/auth.service';
+import { IErrReport } from '../../config';
 
 /**
  * Intercepts a http request and adds an Authorization header containing a jwt token.
@@ -35,7 +36,12 @@ export class AuthInterceptor implements HttpInterceptor {
         });
         return next.handle(tokenReq);
       }),
-      catchError((err) => throwError(err)),
+      catchError((err: IErrReport) => {
+        this.logger.trace(AuthService.name + ': catchError called');
+        /* fail with warning */
+        err.isHandled = false;
+        return throwError(err);
+      }),
     );
   }
 }

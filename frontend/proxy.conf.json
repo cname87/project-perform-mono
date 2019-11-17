@@ -1,5 +1,4 @@
 {
-  /* diverts all calls from localhost:4200 */
   "/api-v1": {
     "target": "https://localhost:8080",
     "secure": false

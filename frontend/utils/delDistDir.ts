@@ -30,7 +30,7 @@ if (process.argv[2].slice(-5) !== '/dist') {
 }
 
 if (!fs.existsSync(distPath)) {
-  console.error('ERROR: dist directory not found');
+  console.error('WARNING: dist directory not found');
   // process.exit(1);
 }
 

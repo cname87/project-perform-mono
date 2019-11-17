@@ -25,6 +25,11 @@ export class MembersListResolverService implements Resolve<IMember[]> {
     );
   }
 
+  /**
+   * Called before membersList is loaded and stores the object returned in route data.
+   * @param _route Not used.
+   * @param _state Not used.
+   */
   resolve(
     _route: ActivatedRouteSnapshot,
     _state: RouterStateSnapshot,
@@ -41,7 +46,7 @@ export class MembersListResolverService implements Resolve<IMember[]> {
       catchError((error: any) => {
         if (!errorHandlerCalled) {
           this.logger.trace(
-            MembersListResolverService.name + ': catchError called',
+            MembersListResolverService.name + ': getMembers catchError called',
           );
           errorHandlerCalled = true;
           this.errorHandler.handleError(error);

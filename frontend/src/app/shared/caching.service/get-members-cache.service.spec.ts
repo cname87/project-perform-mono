@@ -294,7 +294,10 @@ describe('RequestCacheService', () => {
 
       const dummyDeleteRequest = new HttpRequest('DELETE', 'dummyUrl/299');
       const expectedCache = new HttpResponse({
-        body: [{ id: 1, name: 'a' }, { id: 3, name: 'c' }],
+        body: [
+          { id: 1, name: 'a' },
+          { id: 3, name: 'c' },
+        ],
         url: 'dummyUrlCache',
       });
 

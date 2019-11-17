@@ -81,22 +81,14 @@ export const configDatabase = {
    */
   getConnectionOptions: (): ConnectionOptions => {
     /* read the certificate authority */
-    const ROOT_CA = join(
-      appRoot,
-      'backend',
-      'src',
-      'database',
-      'certs',
-      'rootCA.crt',
-    );
+    const ROOT_CA = join(appRoot, 'backend', 'certs', 'database', 'rootCA.crt');
     const ca = [fs.readFileSync(ROOT_CA)];
     /* read the private key and public cert (both stored in the same file) */
     const HTTPS_KEY = join(
       appRoot,
       'backend',
-      'src',
-      'database',
       'certs',
+      'database',
       'mongoKeyAndCert.pem',
     );
     const key = fs.readFileSync(HTTPS_KEY);

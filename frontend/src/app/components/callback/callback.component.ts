@@ -22,6 +22,7 @@ export class CallbackComponent implements OnInit {
     this.logger.trace(
       `${CallbackComponent.name}: Calling authentication callback handler`,
     );
+    /* note: the url state query parameter is queried directly by the auth0 client instance handleRedirectCallback function */
     this.auth.handleAuthCallback();
   }
 }

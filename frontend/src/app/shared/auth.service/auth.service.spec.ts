@@ -8,7 +8,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppModule } from '../../app.module';
 import { AuthService, CREATE_AUTH0_CLIENT } from './auth.service';
-import { auth0Config, routes } from '../../config';
+import { auth0Config, routes, IErrReport, errorTypes } from '../../config';
+import { HttpErrorResponse } from '@angular/common/http';
 
 describe('AuthService', () => {
   /* set any expected values */
@@ -88,8 +89,13 @@ describe('AuthService', () => {
     };
 
     /* CREATE_AUTH0_CLIENT is a function called upon service creation (which is created once the testbed is created => must declare here */
+    const testErr: IErrReport = {
+      error: ({} as any) as HttpErrorResponse,
+      allocatedType: errorTypes.notAssigned,
+      isHandled: true,
+    };
     const mockCreateAuth0Client = createFail
-      ? () => throwError('testError')
+      ? () => throwError(testErr)
       : () => {
           const auth0 = {
             isAuthenticated: isAuthenticatedSpy,
@@ -183,7 +189,7 @@ describe('AuthService', () => {
       await authService['auth0Client$'].toPromise();
       fail('Should not reach this path');
     } catch (err) {
-      expect(err).toEqual('testError');
+      expect(err.isHandled).toEqual(false); // was initially 'true'
     }
   });
 

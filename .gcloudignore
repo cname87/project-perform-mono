@@ -1,7 +1,9 @@
 
-# ignore from root...
-.git
+## ignore from root...
+.git/
 .vscode/
+# backend included - see below
+# frontend included - see below
 node_modules/
 .editorconfig
 .gcloudignore
@@ -11,27 +13,34 @@ node_modules/
 app.yaml
 cron.yaml
 debug.log
+# gcpError.html included
 LICENSE
 package-lock.json
+# package.json included
 project-perform.code-workspace
 README.md
 tsconfig.json
 tslint.json
 
-# ignore from backend
+## ignore from backend
+# backend/api included as called
+# backend/certs included as needed for database access
 backend/coverage/
+# backend/dist included
 backend/src
 backend/utils-build/
 backend/.envDevelopment
+# backend/.envProduction included
 backend/.mocharc.json
 backend/.nycrc.json
 backend/tsconfig.json
+backend/tslint.json
 
-# ignore from backend/dist
+## ignore from backend/dist
 backend/dist/**test/
 backend/dist/**/*.map
 
-# ignore from frontend
+## ignore from frontend - all but dist
 frontend/coverage/
 frontend/e2e/
 frontend/node_modules/
@@ -40,6 +49,7 @@ frontend/utils/
 frontend/.prettierignore
 frontend/angular.json
 frontend/browserslist
+frontend/debug.log
 frontend/package.lock-json
 frontend/package.json
 frontend/proxy.conf.json
