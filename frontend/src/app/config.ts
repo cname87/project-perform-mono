@@ -30,6 +30,9 @@ const profile = {
 const loginPage = {
   path: '/information/login',
 };
+const errorPage = {
+  path: '/information/error',
+};
 const loginTarget = {
   path: '/dashboard',
 };
@@ -42,6 +45,7 @@ export const routes = {
   detail,
   profile,
   loginPage,
+  errorPage,
   loginTarget,
   callback,
 };

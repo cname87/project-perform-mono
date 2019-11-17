@@ -20,6 +20,9 @@ interface ILocationSpy {
 
 interface IAuthServiceSpy {
   isLoggedIn: boolean;
+  isAuthenticated$: {
+    subscribe: (object: { next: () => any }) => void;
+  };
 }
 describe('InformationComponent', () => {
   /* setup function run by each sub test suite */
@@ -34,7 +37,11 @@ describe('InformationComponent', () => {
     let authServiceSpy = jasmine.createSpyObj('authService', ['dummy']);
     authServiceSpy = {
       ...authServiceSpy,
-      isLoggedIn: true,
+      isAuthenticated$: {
+        subscribe: (object: any) => {
+          object.next(true);
+        },
+      },
     };
 
     /* set up Testbed */
@@ -76,12 +83,14 @@ describe('InformationComponent', () => {
   ) {
     const backSpy = locationSpy.back.and.stub();
 
-    authServiceSpy.isLoggedIn = isAuthenticated;
-    const isAuthenticatedSpy = authServiceSpy.isLoggedIn;
+    authServiceSpy.isAuthenticated$ = {
+      subscribe: (object: any) => {
+        object.next(isAuthenticated);
+      },
+    };
 
     return {
       backSpy,
-      isAuthenticatedSpy,
     };
   }
 

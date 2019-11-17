@@ -85,7 +85,7 @@ export class AuthService {
   );
 
   /**
-   * Calls the Auth0 client instance to check whether the user has logged in and been authenticated.  Sets isLoggedIn to the result.
+   * Calls the Auth0 client instance to check whether the user has logged in and been authenticated.  Emits true if authenticated and false if not and sets isLoggedIn to the result.
    * Note: Called by AuthGuard to check status, i.e. when the login expires AuthGuard will direct to the login page.
    */
   public isAuthenticated$ = this.auth0Client$.pipe(

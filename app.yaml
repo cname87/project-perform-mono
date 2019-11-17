@@ -2,7 +2,6 @@
 runtime: nodejs12
 
 env_variables:
-  DEBUG: PP*
 
 # set static file cache time
 default_expiration: 600s

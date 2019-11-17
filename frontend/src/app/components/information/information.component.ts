@@ -50,12 +50,15 @@ export class InformationComponent implements OnInit {
 
       /* set up log in only if a mode query parameter of 'login' is passed in */
     } else if (this.mode === 'login') {
-      this.header = this.auth.isLoggedIn ? 'Log Out' : 'Log In';
-      this.hint = this.auth.isLoggedIn
-        ? 'Click on the log out button above (or click on a link above)'
-        : 'Click on the Log In button above';
-      this.isGoBackVisible = false;
-
+      this.auth.isAuthenticated$.subscribe({
+        next: (loggedIn) => {
+          this.header = loggedIn ? 'Log Out' : 'Log In';
+          this.hint = loggedIn
+            ? 'Click on the log out button above (or click on a link above)'
+            : 'Click on the Log In button above';
+          this.isGoBackVisible = false;
+        },
+      });
       /* else set up the page not found */
     } else {
       this.header = 'Page Not Found';
