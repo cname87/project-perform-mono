@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { MessageService } from '../message-service/message.service';
 import { AuthService } from '../auth.service/auth.service';
-import { errorTypes } from '../../config';
+import { errorTypes, routes } from '../../config';
 import { environment } from '../../../environments/environment';
 
 /* set up the rollbar service */
@@ -122,7 +122,7 @@ export class ErrorHandlerService implements ErrorHandler {
         );
         /* redirects to the login page (which will show 'login' or 'logout') */
         this.zone.run(() => {
-          this.router.navigateByUrl('/information/login');
+          this.router.navigateByUrl(routes.loginPage.path);
         });
         return;
       }
@@ -149,7 +149,7 @@ export class ErrorHandlerService implements ErrorHandler {
       this.zone.run(() => {
         this.log('ERROR: An unknown error occurred');
         /* navigate to error information page and then show toastr message */
-        this.router.navigateByUrl('/information/error').then(() => {
+        this.router.navigateByUrl(routes.errorPage.path).then(() => {
           this.logger.trace(
             ErrorHandlerService.name + ': Showing toastr message',
           );
