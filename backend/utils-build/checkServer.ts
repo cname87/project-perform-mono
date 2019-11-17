@@ -11,6 +11,9 @@
 
 import { pingServer } from './pingServer';
 
+/* need the path to the .js server index file */
+const indexJsPath = '../dist/src/index';
+
 /* try connect to server until it's up and then return and exit */
 async function test() {
   try {
@@ -20,7 +23,7 @@ async function test() {
   } catch (err) {
     console.log('Trying to start server');
     /* start the server */
-    import('../src/index');
+    import(indexJsPath);
   }
   try {
     console.log('starting ping');

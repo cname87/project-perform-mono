@@ -10,7 +10,7 @@ import { Observable, throwError, iif, of } from 'rxjs';
 import { catchError, retryWhen, delay, concatMap } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
-import { IErrReport } from '../../config';
+import { errorTypes, IErrReport } from '../../config';
 import { RequestCacheService } from '../caching.service/request-cache.service';
 
 /**
@@ -84,7 +84,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         /* add an error type to identified errors  */
         const errReport: IErrReport = {
           error: caughtError, // pass on original error
-          allocatedType: 'None', // add a http error type
+          allocatedType: errorTypes.notAssigned, // add an error type property
         };
 
         /* mark as client-side if error is an ErrorEvent */
@@ -94,7 +94,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             HttpErrorInterceptor.name + ': Client-side or network error',
           );
 
-          errReport.allocatedType = 'Http client-side';
+          errReport.allocatedType = errorTypes.httpClientSide;
 
           /* else mark as server-side (if error.status exists) */
         } else if (caughtError.status) {
@@ -104,7 +104,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
               ': Server returned an unsuccessful response code',
           );
 
-          errReport.allocatedType = 'Http server-side';
+          errReport.allocatedType = errorTypes.httpServerSide;
         }
 
         this.logger.trace(

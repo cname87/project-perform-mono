@@ -7,7 +7,7 @@ export const environment = {
   e2eTesting: true,
   /* console logging level OFF - same as production setting */
   /* change to TRACE for debug only */
-  logLevel: NgxLoggerLevel.OFF,
+  logLevel: NgxLoggerLevel.TRACE,
   /* GCP port must be 8080 */
   PORT: 8080,
   /* sets audience - note that the audience could be anything - the reference to https://localhost is not relevant but cannot be changed */

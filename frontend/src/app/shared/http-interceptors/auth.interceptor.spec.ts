@@ -2,13 +2,14 @@ import { TestBed } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
 import { Type } from '@angular/core';
-import { HttpRequest } from '@angular/common/http';
+import { HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { AppModule } from '../../app.module';
 import { AuthInterceptor } from './auth.interceptor';
 import { MockAuthService } from '../mocks/mock-auth.service';
 import { AuthService } from '../auth.service/auth.service';
+import { IErrReport, errorTypes } from '../../config';
 
 describe('AuthInterceptor', () => {
   async function mainSetup() {
@@ -55,9 +56,9 @@ describe('AuthInterceptor', () => {
     const authInterceptor: AuthInterceptor = TestBed.get(
       AuthInterceptor as Type<AuthInterceptor>,
     );
-    const authService: AuthService = TestBed.get(AuthService as Type<
-      AuthService
-    >);
+    const authService: AuthService = TestBed.get(
+      AuthService as Type<AuthService>,
+    );
 
     return {
       authInterceptor,
@@ -95,13 +96,18 @@ describe('AuthInterceptor', () => {
     it('should return an error if incoming observable errors', async () => {
       const { authService, authInterceptor, nextSpy } = await setup();
       authService.getTokenSilently$ = () => {
-        return throwError('testError') as any;
+        const testErr: IErrReport = {
+          error: ({} as any) as HttpErrorResponse,
+          allocatedType: errorTypes.notAssigned,
+          isHandled: true,
+        };
+        return throwError(testErr);
       };
       const req = new HttpRequest('GET', 'www.test.com');
       try {
         await authInterceptor.intercept(req, nextSpy).toPromise();
       } catch (err) {
-        expect(err).toEqual('testError');
+        expect(err.isHandled).toEqual(false); // initially true
       }
     });
   });

@@ -43,16 +43,11 @@
       { "limit": 120, "ignore-pattern": "/*" }
     ],
     "member-access": false,
+    /**
+    * TODO */
     "member-ordering": [
-      true,
-      {
-        "order": [
-          "static-field",
-          "instance-field",
-          "static-method",
-          "instance-method"
-        ]
-      }
+      false,
+      { "order": "fields-first" }
     ],
     "no-arg": true,
     "no-bitwise": true,
@@ -83,7 +78,7 @@
     "no-object-literal-type-assertion": [
       true,
       { "allow-arguments": true }
-    ], // spurious error warning
+    ], // 191118 tslint generating a spurious error warning
     "no-redundant-jsdoc": true,
     "no-shadowed-variable": true,
     "no-string-literal": false,

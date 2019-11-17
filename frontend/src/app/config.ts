@@ -54,16 +54,18 @@ export interface IErrReport {
   /* the handled error is always stored here */
   error: HttpErrorResponse;
   /* every handled error will have allocatedType set */
-  allocatedType: 'Http client-side' | 'Http server-side' | 'None';
+  allocatedType: errorTypes;
   /*  set true if user is informed etc => errorHandlerService will not send error message etc */
   isHandled?: boolean;
 }
 
 /* handled error types */
-export const errorTypes = {
-  httpClientSide: 'Http client-side',
-  httpServerSide: 'Http server-side',
-};
+export const enum errorTypes {
+  httpClientSide,
+  httpServerSide,
+  auth0Redirect,
+  notAssigned,
+}
 
 /* test urls for E2eTestInterceptor */
 export const errorTestUrls = {

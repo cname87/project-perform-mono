@@ -26,7 +26,6 @@ const options = {
   url: 'http://localhost:8080/',
 };
 const pingServer = (numRetries = 10) => {
-  let response;
   return new Promise(async (resolve, reject) => {
     for (
       let tryConnectCount = 1;
@@ -35,7 +34,7 @@ const pingServer = (numRetries = 10) => {
     ) {
       try {
         console.log('Connect to local host' + ` - attempt ${tryConnectCount}`);
-        response = await request.get(options);
+        const response = await request.get(options);
         resolve(response);
         break; // loop will continue even though promise resolved
       } catch (err) {

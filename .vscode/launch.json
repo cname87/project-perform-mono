@@ -77,7 +77,7 @@
         "${workspaceFolder}/frontend/e2e/protractor.conf.js",
       ],
       "cwd": "${workspaceFolder}/frontend/e2e",
-      "preLaunchTask": "Start Server",
+      "preLaunchTask": "Check Server",
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",

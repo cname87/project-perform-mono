@@ -23,16 +23,15 @@
     "tslint:app": "tslint ./src/**/*.ts --format verbose --project ./src/tsconfig.app.json --config ./src/tslint.json",
     "tslint:spec": "tslint ./src/**/spec.ts --format verbose --project ./src/tsconfig.spec.json --config ./src/tslint.json",
     "tslint": "npm-run-all tslint:app tslint:spec",
-    "build:dev": "npm-run-all delDist ngBuild prettier tslint",
-    "build:e2e": "npm-run-all delDist ngBuild:e2e prettier tslint",
-    "build:prod": "npm-run-all delDist ngBuild:prod prettier tslint:app",
-    "startServer": "cd ../backend && npm run startServer",
+    "build:dev": "npm-run-all delDist ngBuild tslint prettier",
+    "build:e2e": "npm-run-all delDist ngBuild:e2e tslint prettier",
+    "build:prod": "npm-run-all delDist ngBuild:prod tslint:app prettier",
+    "checkServer": "cd ../backend && npm run checkServer",
     "ngServe": "sleepms 1000 && ng serve --open=false --proxy-config proxy.conf.json",
-    "start": "npm-run-all -p -r startServer ngServe",
+    "start": "npm-run-all -p -r checkServer ngServe",
     "test": "ng test --code-coverage",
     "ngE2e": "sleepms 1000 && ng e2e",
-    "e2e": "npm-run-all -p -r startServer ngE2e",
-    "resetTestDatabase": "ts-node --project ./utils/tsconfig.utils.json ./e2e/server-utils/reset-testDatabase.ts run"
+    "e2e": "npm-run-all -p -r checkServer ngE2e"
   },
   "dependencies": {
     "@angular/animations": "^8.2.14",

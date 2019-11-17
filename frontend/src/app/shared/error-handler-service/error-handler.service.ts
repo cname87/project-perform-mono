@@ -11,6 +11,7 @@ import { NGXLogger, NgxLoggerLevel } from 'ngx-logger';
 import { ToastrService } from 'ngx-toastr';
 
 import { MessageService } from '../message-service/message.service';
+import { AuthService } from '../auth.service/auth.service';
 import { errorTypes } from '../../config';
 import { environment } from '../../../environments/environment';
 
@@ -75,6 +76,10 @@ export class ErrorHandlerService implements ErrorHandler {
     return this.injectors.get<MessageService>(MessageService);
   }
 
+  get authService(): AuthService {
+    return this.injectors.get<AuthService>(AuthService);
+  }
+
   get rollbar(): Rollbar {
     return this.injectors.get<Rollbar>(RollbarService);
   }
@@ -101,11 +106,25 @@ export class ErrorHandlerService implements ErrorHandler {
 
     this.logger.trace(ErrorHandlerService.name + ': handleError called');
 
+    /* categorize error based on allocatedType property */
     switch (errReport.allocatedType) {
       case errorTypes.httpClientSide:
       case errorTypes.httpServerSide: {
         this.logger.trace(ErrorHandlerService.name + ': Http error reported');
         break;
+      }
+      case errorTypes.auth0Redirect: {
+        this.logger.trace(
+          ErrorHandlerService.name + ': Auth0 redirect error reported',
+        );
+        this.logger.trace(
+          ErrorHandlerService.name + ': Redirecting to /information/login',
+        );
+        /* redirects to the login page (which will show 'login' or 'logout') */
+        this.zone.run(() => {
+          this.router.navigateByUrl('/information/login');
+        });
+        return;
       }
       default: {
         /* this was an unexpected error */
