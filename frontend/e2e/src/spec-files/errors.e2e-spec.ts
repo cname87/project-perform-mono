@@ -10,7 +10,7 @@ import { getDashboardPage } from '../pages/dashboard.page';
 import { getMemberDetailPage } from '../pages/memberDetail.page';
 import { getMembersListPage } from '../pages/membersList.page';
 import { getErrorInformationPage } from '../pages/error-information.page';
-import { getHelpers } from '../e2e-helpers';
+import { getHelpers } from '../helpers/e2e-helpers';
 
 /* dummy member for e2e error testing - must match the value in config.ts */
 /* can't easily import config.ts as would need to mock global window variable and also import 'zone...' in environment import causes a problem */

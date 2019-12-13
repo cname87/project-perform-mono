@@ -3,7 +3,9 @@
  * This module provides a utility function to allow a test that the server is up.
  * It pings the localhost server until it is up or else it times out after a number of attempts (with 1s intervals).
  *
- * @params The number of attempts to be made can be sent as an argument in the function call.  The default is 10 attempts.
+ * @params
+ * - numTries: The number of attempts to be made can be sent as an argument in the function call.  The default is 10 attempts.
+ * - url: The url of the backend server to be pinged.  the default is 'http://localhost:8080/'
  *
  * @returns a promise that resolves to the http response once the server responds or rejects with an error with err.message = 'Connection failed if it fails to connect.
  *
@@ -19,13 +21,11 @@ import request from 'request-promise-native';
 import util from 'util';
 const sleep = util.promisify(setTimeout);
 
-/* internal dependencies */
-
-/* server access options */
-const options = {
-  url: 'http://localhost:8080/',
-};
-const pingServer = (numRetries = 10) => {
+const pingServer = (numRetries = 10, url = 'http://localhost:8080/') => {
+  /* server access options */
+  const options = {
+    url,
+  };
   return new Promise(async (resolve, reject) => {
     for (
       let tryConnectCount = 1;

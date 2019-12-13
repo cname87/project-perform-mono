@@ -1,5 +1,4 @@
 {
-  "extends": "../tsconfig.json",
 
   "exclude": [
     "node_modules"
@@ -28,6 +27,52 @@
       "core-js/es6/*": [
         "node_modules/core-js/es/*"
       ]
-    }
+    },
+
+    /* All other compiler options */
+    "allowJs": true,
+    "alwaysStrict": true,
+    // "declaration": true, // generates declaration .d.ts files
+    // "declarationMap": true, // generates map files for declaration files
+    // "diagnostics": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    // "extendedDiagnostics": true,
+    // "forceConsistentCasingInFileNames": true,  // causes ng test error
+    "importHelpers": true,
+    "listEmittedFiles": true,
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "showConfig": true,
+    "sourceMap": true,
+    "strict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "suppressImplicitAnyIndexErrors":true,
+    // "traceResolution": true,
+    "typeRoots": [ //avoids mocha vs jasmine clash
+      "node_modules/@types"
+    ],
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin",
+        "alwaysShowRuleFailuresAsWarnings": false,
+        "ignoreDefinitionFiles": true,
+        "configFile": "./tslint.json",
+        "suppressWhileTypeErrorsPresent": false,
+        "mockTypeScriptVersion": false,
+        "jsEnable": false,
+        "exclude": [
+        ]
+      }
+    ]
   }
 }

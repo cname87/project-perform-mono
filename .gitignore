@@ -1,34 +1,3 @@
-### Windows ###
-# Created by https://www.gitignore.io/api/windows
-# Edit at https://www.gitignore.io/?templates=windows
-
-# Windows thumbnail cache files
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-ehthumbs_vista.db
-
-# Dump file
-*.stackdump
-
-# Folder config file
-[Dd]esktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msix
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
-### End of https://www.gitignore.io/api/windows ###
-
 ### Node ###
  Created by https://www.gitignore.io/api/node
 # Edit at https://www.gitignore.io/?templates=node
@@ -100,8 +69,6 @@ typings/
 # dotenv environment variables file
 .env
 .env.test
-.envDevelopment
-.envProduction
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -126,38 +93,25 @@ typings/
 
 ### End of https://www.gitignore.io/api/node ###
 
-# ignore all dist' directories
-**/dist/
-# ignore all '/types' directories
-# **/types/
+### Security-relevant ignores ###
 
-### security-relevant ignores ###
-
-# ignore istanbul report directories
-.nyc_output/
-# ignore istanbul coverage directories
-coverage/
-# ignore all all 'logs/' directories
-logs/
-# ignore all all '.log' files
-**/*.log
-# ignore all node_module dependencies
-node_modules/
-# ignore all files and directories in all public/ directories
-public/
-# ignore all '/types'mdirectories
-# types/
-# ignore all compiled 'dist' directories
-dist/
 # ignore all credential certs directories
 **/certs/
+
 # ignore all .env files
 .env
-.env.test
-.envDevelopment
-.envProduction
+.env*
 
 ### End of security-relevant ignores ###
+
+### Other ignores ###
+
+# ignore all compiled 'dist' directories
+dist/
+
+
+### End of other ignores ###
+
 
 # If files are not being ignored then they may have been previously added
 # try git rm --cached <filename>, or git rm -r --cached <dirname> to get git

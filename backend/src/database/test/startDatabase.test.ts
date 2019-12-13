@@ -27,11 +27,19 @@ const { startDatabasePath } = configDatabase;
 describe('startDatabase', () => {
   debug(`Running ${modulename} describe - startDatabase`);
 
-  after('reset to remote database', () => {
-    process.env.DB_IS_LOCAL = 'false';
+  let originalDbSetting: string | undefined;
+  before('save database setting', () => {
+    originalDbSetting = process.env.DB_IS_LOCAL;
   });
 
-  const tests = [{ db_is_local: 'false' }, { db_is_local: 'true' }];
+  after('reset database setting', () => {
+    process.env.DB_IS_LOCAL = originalDbSetting;
+  });
+
+  const tests =
+    process.env.TEST_DB_LOCAL === 'true'
+      ? [{ db_is_local: 'false' }, { db_is_local: 'true' }]
+      : [{ db_is_local: 'false' }];
 
   tests.forEach((test) => {
     it('connects to a database', async () => {

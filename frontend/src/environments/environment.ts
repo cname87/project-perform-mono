@@ -9,12 +9,9 @@ export const environment = {
   e2eTesting: false,
   /* console logging level */
   logLevel: NgxLoggerLevel.TRACE,
-  /* GCP port must be 8080 */
-  PORT: 8080,
-  HOST: 'https://localhost',
-  API_BASE_URL: 'api-v1',
+  /* sets audience which is the unique identifier to the OAuth API - note that the reference to https://localhost:8080 is not relevant but cannot be changed */
   get apiUrl() {
-    return `${this.HOST}:${this.PORT}/${this.API_BASE_URL}/`;
+    return `https://localhost:8080/api-v1/`;
   },
 };
 

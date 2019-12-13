@@ -15,6 +15,7 @@ interface IConfigurationParameters {
   withCredentials?: boolean;
 }
 class Configuration {
+  /* note that the same server is assumed e.g. a basePath of /api is added to localhost:8080 or whatever the host domain that is running */
   basePath: string;
   servicePath: string;
   defaultHeaders: HttpHeaders;

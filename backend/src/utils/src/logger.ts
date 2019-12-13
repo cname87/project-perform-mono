@@ -66,11 +66,13 @@ function makeLogger(): winston.Logger {
 
   /* set GCP logging level to 'debug' if any debug logging is active, otherwise set to 'error' */
   const productionLevel = process.env.DEBUG ? 'debug' : 'error';
+  /* only output console in color for development (vscode) environment */
+  const outputInColor = process.env.NODE_ENV === 'development';
 
   const options = {
     console: {
       format: combine(
-        colorize({ all: true }),
+        colorize({ all: outputInColor }),
         timestamp(),
         label({ label: 'PP' }), // set the label used in the output
         align(), // adds a \t delimiter before the message to align it

@@ -3,16 +3,14 @@ import { NgxLoggerLevel } from 'ngx-logger';
 export const environment = {
   /* default to production */
   production: true,
-  /* used to inform error testing interceptor */
+  /* used to enable error testing interceptor */
   e2eTesting: true,
   /* console logging level OFF - same as production setting */
   /* change to TRACE for debug only */
-  logLevel: NgxLoggerLevel.TRACE,
-  /* GCP port must be 8080 */
-  PORT: 8080,
-  /* sets audience - note that the audience could be anything - the reference to https://localhost is not relevant but cannot be changed */
+  logLevel: NgxLoggerLevel.OFF,
+  /* sets audience which is the unique identifier to the OAuth API - note that the reference to https://localhost:8080 is not relevant but cannot be changed */
   get apiUrl() {
-    return `https://localhost:${this.PORT}/api-v1/`;
+    return `https://localhost:8080/api-v1/`;
   },
 };
 

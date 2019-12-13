@@ -1,28 +1,25 @@
-import dotenv from 'dotenv';
-import path from 'path';
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
 import { browser } from 'protractor';
 import browserLogs from 'protractor-browser-logs';
 
-import { getRootElements } from './pages/elements/root.elements';
-import { getMembersListPage } from './pages/membersList.page';
-import { getDashboardPage } from './pages/dashboard.page';
-import { getMemberDetailPage } from './pages/memberDetail.page';
+import { getRootElements } from '../pages/elements/root.elements';
+import { getMembersListPage } from '../pages/membersList.page';
+import { getDashboardPage } from '../pages/dashboard.page';
+import { getMemberDetailPage } from '../pages/memberDetail.page';
 
 /**
  * This module provides a function that returns common helper functions.
  */
 
 export const getHelpers = () => {
-  const mockMembers = require('../onPrepare').mockMembers;
-  const resetDatabase = require('../onPrepare').resetDatabase;
-  const awaitElementVisible = require('../onPrepare').awaitElementVisible;
-  const awaitElementInvisible = require('../onPrepare').awaitElementInvisible;
-  const loadRootPage = require('../onPrepare').loadRootPage;
-  const login = require('../onPrepare').login;
+  const onPreparePath = './onPrepare'
+  const mockMembers = require(onPreparePath).mockMembers;
+  const resetDatabase = require(onPreparePath).resetDatabase;
+  const awaitElementVisible = require(onPreparePath).awaitElementVisible;
+  const awaitElementInvisible = require(onPreparePath).awaitElementInvisible;
+  const loadRootPage = require(onPreparePath).loadRootPage;
+  const login = require(onPreparePath).login;
   const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-  const setTimeout = require('../onPrepare').setTimeout;
+  const setTimeout = require(onPreparePath).setTimeout;
   const resetTimeout = (original: number) => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = original;
   };
@@ -143,11 +140,11 @@ export const getHelpers = () => {
     /* click on the selected member which brings up the member detail page */
     await link.click();
 
-    /* the members detail page should be displayed */
-    const memberDetailPage = getMemberDetailPage();
-
     /* await the appearance of the progress bar as should be loading from the database server */
     await awaitElementVisible(getRootElements().progressBar);
+
+    /* the members detail page should be displayed */
+    const memberDetailPage = getMemberDetailPage();
 
     /* await until element visible */
     await awaitElementVisible(memberDetailPage.memberDetailElements.tag);

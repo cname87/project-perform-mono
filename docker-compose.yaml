@@ -1,0 +1,15 @@
+version: '3.7'
+services:
+  backend:
+    image: gcr.io/project-perform/application
+    # this name is used in build environment e2e baseUrl and proxy.conf settings
+    container_name: backend
+    environment:
+      - NODE_ENV
+    # no need for command: as default is 'npm run start'
+    ports:
+      - "8080"
+networks:
+  default:
+      external:
+          name: cloudbuild

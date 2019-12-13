@@ -4,33 +4,33 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-    // Start frontend - use for frontend debug with watch
+    // Serve frontend with backend - use for frontend debug with watch
     {
       /*
-      Runs npm run start.
-      proxy.conf is configured in angular.json => backend server needs to be started first => started in the script.
+      Runs  the task 'Serve Frontend with Backend'.
+      proxy.conf is configured in angular.json => backend server needs to be started first => started in the task.
       Close all open Chrome instances if Chrome won't start. */
-      "name": "Start frontend",
+      "name": "Serve frontend with backend",
       "type": "chrome",
       "request": "launch",
       "cwd": "${workspaceFolder}/frontend",
-      "preLaunchTask": "npm start frontend",
+      "preLaunchTask": "Serve Frontend with Backend",
       "url": "http://localhost:4200/", // proxy to 8080 for api calls
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {
       },
     },
-    // Test frontend - use for frontend unit test debug
+    // Test frontend- use for frontend unit test debug with watch
     {
       /*
-      Runs 'npm run test, i.e. ng test, first which compiles the front end and opens chrome and connects to the Karma runner, and THEN starts Chrome again and connects to the Karma runner.  Debug should work on the second session.
-      Run 'npm run test' manually first if problems with preLaunch task.
+      Runs 'Test Frontend' task first, i.e. 'ng test:dev', which compiles the front end and opens Chrome and connects to the Karma runner, and THEN it starts Chrome again and connects to the Karma runner.  Debug should work on the second session.
+      Run the preLaunch task manually first if problems.
       Close all open Chrome instances if Chrome won't start.
        */
       "name": "Test frontend",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "npm test frontend",
+      "preLaunchTask": "Test Frontend",
       "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
       "runtimeArgs": [
         "--remote-debugging-port=9222",
@@ -60,24 +60,28 @@
         "${workspaceFolder}/frontend/node_modules/**/*.js",
       ],
     },
-    // Test e2e frontend - use for frontend e2e test debug
+    // e2e frontend with backend - use for frontend e2e test debug
     {
-      /*
-      Runs npm run e2e.
-      baseUrl is configured in protractor.conf to be localhost:8080
-      backend server needs to be started first => started in script.
-       */
-      "name": "Test e2e frontend",
+      /**
+      Runs e2e tests allowing VSCode debug.
+      NOTE: Protractor uses a configured baseUrl to point to the frontend server and the frontend server routes any backend calls to the same host with an added path (e.g. /api-v1). This does NOT use a proxy to redirect the backend calls, as ng e2e does, so the configured server must handle both frontend and backend calls.
+      NOTE: The frontend/backend server needs to be started first => a preLaunchTask starts the server and a postDebugTask closes it.
+      NOTE: This does NOT pre-compile the backend like ng e2e - the already-compiled front-end is used.  Thus the already-compiled build must be compiled using the e2e enviroment file if you want to run the cache or error test files (whihc rely on e2e environment settings).
+      Choose .dev or .production configuration by editing args below.
+      Choose which spec files to run in the .env files.
+      */
+      "name": "E2e frontend with backend",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/frontend//node_modules/protractor/bin/protractor",
       "protocol": "inspector",
       "args": [
-        /* choose which spec files to run in protractor.conf.js */
-        "${workspaceFolder}/frontend/e2e/protractor.conf.js",
+        /* Edit here to choose the .dev or .production configuration file to run under .dev of .rpoduction environment settings */
+        "${workspaceFolder}/frontend/e2e/src/config/protractor-production.conf.js",
       ],
-      "cwd": "${workspaceFolder}/frontend/e2e",
+      "cwd": "${workspaceFolder}/frontend",
       "preLaunchTask": "Check Server",
+      "postDebugTask": "Terminate All Tasks",
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -97,7 +101,7 @@
       "request": "launch",
       "name": "Run backend index.js",
       "program": "${workspaceFolder}/backend/src/index.ts",
-      "cwd": "${workspaceFolder}/backend",
+      "cwd": "${workspaceFolder}",
       "env": {
       },
       "outputCapture": "std",
@@ -131,8 +135,10 @@
         "--silent"
       ],
       "port": 9229,
-      "cwd": "${workspaceFolder}/backend",
-      "env": {},
+      "cwd": "${workspaceFolder}",
+      "env": {
+        // "NODE_ENV": "production",
+      },
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
@@ -200,20 +206,20 @@
         /* comment out files to select tests */
         "${workspaceFolder}/backend/dist/src/database/test/startDatabase.test.js",
         "${workspaceFolder}/backend/dist/src/database/test/database.test.js",
-        "${workspaceFolder}/backend/dist/src/models/test/*.test.js",
+        "${workspaceFolder}/backend/dist/src/models/test/models.test.js",
         "${workspaceFolder}/backend/dist/src/utils/test/dumpError.test.js",
         "${workspaceFolder}/backend/dist/src/utils/test/logger.test.js",
         "${workspaceFolder}/backend/dist/src/controllers/test/api-controller.test.js",
         "${workspaceFolder}/backend/dist/src/controllers/test/errors-controller.test.js",
-        "${workspaceFolder}/backend/dist/src/server/test/startserver-test.js",
-        "${workspaceFolder}/backend/dist/src/server/test/server-test.js",
-        "${workspaceFolder}/backend/dist/src/test/index-test.js",
+        "${workspaceFolder}/backend/dist/src/server/test/startserver.test.js",
+        "${workspaceFolder}/backend/dist/src/server/test/server.test.js",
+        "${workspaceFolder}/backend/dist/src/test/index.test.js",
       ],
       "env": {
         /* set to 'false' (or omit) to automatically run chrome and set to 'true' when using a compound configuration to launch chrome manually */
         "DISABLE_CHROME": "false",
       },
-      "cwd": "${workspaceFolder}/backend",
+      "cwd": "${workspaceFolder}",
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
@@ -239,16 +245,16 @@
         /* include testSetup.js */
         "${workspaceFolder}/backend/dist/src/test/testSetup.js",
         /* comment out files to select tests */
-        "${workspaceFolder}/backend/dist/src/database/test/startDatabase.test.js",
-        "${workspaceFolder}/backend/dist/src/database/test/database.test.js",
-        "${workspaceFolder}/backend/dist/src/models/test/*.test.js",
-        "${workspaceFolder}/backend/dist/src/utils/test/dumpError.test.js",
-        "${workspaceFolder}/backend/dist/src/utils/test/logger.test.js",
-        "${workspaceFolder}/backend/dist/src/controllers/test/api-controller.test.js",
-        "${workspaceFolder}/backend/dist/src/controllers/test/errors-controller.test.js",
-        "${workspaceFolder}/backend/dist/src/server/test/server-test.js",
-        "${workspaceFolder}/backend/dist/src/server/test/startserver-test.js",
-        "${workspaceFolder}/backend/dist/src/test/index-test.js",
+        // "${workspaceFolder}/backend/dist/src/database/test/startDatabase.test.js",
+        // "${workspaceFolder}/backend/dist/src/database/test/database.test.js",
+        // "${workspaceFolder}/backend/dist/src/models/test/*.test.js",
+        // "${workspaceFolder}/backend/dist/src/utils/test/dumpError.test.js",
+        // "${workspaceFolder}/backend/dist/src/utils/test/logger.test.js",
+        // "${workspaceFolder}/backend/dist/src/controllers/test/api-controller.test.js",
+        // "${workspaceFolder}/backend/dist/src/controllers/test/errors-controller.test.js",
+        // "${workspaceFolder}/backend/dist/src/server/test/server-test.js",
+        // "${workspaceFolder}/backend/dist/src/server/test/startserver-test.js",
+        // "${workspaceFolder}/backend/dist/src/test/index-test.js",
 
       ],
       "env": {
@@ -257,7 +263,7 @@
         /* set to 'false' (or omit) to automatically run chrome and set to 'true' when using a compound configuration to launch chrome manually */
         "DISABLE_CHROME": "false",
       },
-      "cwd": "${workspaceFolder}/backend",
+      "cwd": "${workspaceFolder}",
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
@@ -292,7 +298,7 @@
         /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome manually */
         "DISABLE_CHROME": "false",
       },
-      "cwd": "${workspaceFolder}/backend",
+      "cwd": "${workspaceFolder}",
       "outputCapture": "std",
       "console": "integratedTerminal", // allows you use CTRL+C to exit
       "internalConsoleOptions": "neverOpen",
@@ -361,7 +367,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch the currently opened .ts file",
-      "cwd": "${workspaceFolder}/backend",
+      "cwd": "${workspaceFolder}",
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -395,7 +401,7 @@
       "name": "Backend/ng serve",
       "configurations": [
         "Run backend index.js",
-        "Start frontend",
+        "Serve frontend with backend",
       ]
     },
     /* Run backend server and ng e2e - debug e2e */
@@ -404,7 +410,7 @@
       "name": "Backend/ng e2e",
       "configurations": [
         "Run backend index.js",
-        "Test e2e frontend",
+        "E2e frontend with backend",
       ]
     },
     /* Mocha client tests backend/frontend */

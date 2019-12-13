@@ -4,7 +4,7 @@
 import { browser } from 'protractor';
 
 import { getDashboardPage } from '../pages/dashboard.page';
-import { getHelpers } from '../e2e-helpers';
+import { getHelpers } from '../helpers/e2e-helpers';
 
 describe('Cache', () => {
   const {

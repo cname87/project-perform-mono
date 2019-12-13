@@ -33,7 +33,7 @@ sinon.assert.expose(chai.assert, {
 /* use proxyquire for index.js module loading */
 import proxyquire from 'proxyquire';
 import { EventEmitter } from 'events';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer';
 import winston from 'winston';
 import { Request } from 'express';
 
@@ -43,13 +43,12 @@ import { configServer } from '../../configServer';
 /* variables */
 const indexPath = '../../index';
 const dbTestName = 'test';
-/* path to chrome executable */
-const chromeExec =
-  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
 /* url that initiates the client-fired tests */
 const fireTestUrl = `${configServer.HOST}testServer/api-loadMocha.html`;
-/* hold browser open for this time (ms) */
-const browserDelay = 5000;
+/* hold browser open for this time (ms) to allow for visual inspection */
+const browserDelay = process.env.BROWSER_DELAY
+  ? parseInt(process.env.BROWSER_DELAY, 10)
+  : 0;
 /* event names */
 const indexRunApp = 'indexRunApp';
 const indexSigint = 'indexSigint';
@@ -375,8 +374,7 @@ describe('server API', () => {
       if (process.env.DISABLE_CHROME !== 'true') {
         (async () => {
           browserInstance = await puppeteer.launch({
-            headless: false,
-            executablePath: chromeExec,
+            headless: process.env.DISABLE_HEADLESS !== 'true',
             defaultViewport: {
               width: 800,
               height: 800,
@@ -386,6 +384,7 @@ describe('server API', () => {
               '--start-maximized',
               '--new-window',
               '--disable-popup-blocking',
+              '--no-sandbox', // needed by GCP
             ],
           });
           const page = await browserInstance.newPage();

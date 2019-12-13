@@ -1,0 +1,11 @@
+steps:
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-f', 'Dockerfile',
+    '-t', 'gcr.io/$PROJECT_ID/node12.13.0-with-puppeteer',
+    '.',
+  ]
+
+images: ['gcr.io/$PROJECT_ID/node12.13.0-with-puppeteer']

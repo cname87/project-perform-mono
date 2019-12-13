@@ -12,13 +12,10 @@ import { setupDebug } from '../utils/src/debugOutput';
 const { modulename, debug } = setupDebug(__filename);
 
 /* external dependencies */
-import appRootObject from 'app-root-path';
-/* appRoot will be the directory containing the node_modules directory which includes app-root-path, i.e. should be in .../backend */
-const appRoot = appRootObject.toString();
 import { ConnectionOptions } from 'mongoose';
 import { format } from 'util';
 import fs from 'fs';
-import { join } from 'path';
+import { resolve } from 'path';
 
 export const configDatabase = {
   /* the name of the individual databases within the mongoDB server */
@@ -81,11 +78,10 @@ export const configDatabase = {
    */
   getConnectionOptions: (): ConnectionOptions => {
     /* read the certificate authority */
-    const ROOT_CA = join(appRoot, 'backend', 'certs', 'database', 'rootCA.crt');
+    const ROOT_CA = resolve('backend', 'certs', 'database', 'rootCA.crt');
     const ca = [fs.readFileSync(ROOT_CA)];
     /* read the private key and public cert (both stored in the same file) */
-    const HTTPS_KEY = join(
-      appRoot,
+    const HTTPS_KEY = resolve(
       'backend',
       'certs',
       'database',
@@ -108,9 +104,6 @@ export const configDatabase = {
       useCreateIndex: true,
       useUnifiedTopology: true,
       poolSize: 10, // default = 5
-      connectTimeoutMS: 30000, // default = 30000 - does not apply to replica set?
-      reconnectTries: Number.MAX_VALUE, // default 30 (tries) - does not apply to replica sets
-      reconnectInterval: 500, // default 1000 (ms)  - does not apply to replica sets
       keepAlive: true, // default true
       keepAliveInitialDelay: 300000, // default 300000
       socketTimeoutMS: 0, // default 360000
@@ -121,8 +114,7 @@ export const configDatabase = {
   },
 
   /* path to database index.js file for unit test */
-  startDatabasePath: join(
-    appRoot,
+  startDatabasePath: resolve(
     'backend',
     'dist',
     'src',

@@ -26,19 +26,19 @@ import {
  * Auth0 Operation:
  * ---------------
  * 1. An AuthService instance is created which creates...
- * - A public observable to share the user authenticated status.
- * - Public methods to get the user profile, login, handle the login call back, & logout.
- *
- * 2. app.component ngOnInit calls authService.localAuthSetup().
- * - This results in a call to getAuth0Client() creating a singleton Auth0Client instance, and checks if the user is authenticated and sets the public variable, isLogged, to either false or to the logged-in user profile.
- *
+ * - A public observable to obtain the user authenticated status from the authentication utility.  Note: The authentication logged-in status has a timer that will time out as per configured OAuth0 server settings.
+ * - A public variable to share the current user authenticated status - does not time out by itself.
+ * - Public methods to get the user profile, to login, to handle the login call back, & to logout.
+ * 2. The app.component ngOnInit calls authService.localAuthSetup().
+ * - This results in a call to getAuth0Client() creating a singleton Auth0Client instance, and checks with the server if the user is authenticated and sets the public variable, isLogged, to either false or to the logged-in user profile.
  * 3. If the login prompt is clicked then the Auth0 client instance loginWithRedirect() function is called which calls the Auth0 server which, on first call, presents a login page to the user, and following receipt of valid credentials, redirects to the CallbackComponent with a query parameter holding state data.  The CallbackComponent opens a configured page (dashboard).
  * - The Auth0 server response includes a cookie to the client which sets up a session in the client - the client can determine that the user is logged in without having to contact the server. Thus if a browser if closed and reopened a login page does not have to be presented to the user.  A client-side timer will eventually timeout following which the login page will again be presented to the user.
  * - The Auth0 client also sends a token which can be used to authorize access to a backend API.
  * - The backend server confirms the token with the Auth0 server which sends back the relevant user information, including the configured scopes, to the server. (The token is unique to each user).
- * - See https://auth0.com/docs/flows/concepts/implicit for the authorization flow.  Note that server can also authenticate via the Auth0 server using a client-credentials flow.
+ * - See https://auth0.com/docs/flows/concepts/implicit for the authorization flow.  Note that server can also authenticate via the Auth0 server using a client-credentials flow, which requires no user input.
  * 4. The isLogged status sets the views E.g. the logout button shows when isLogged is true.
- * 5. On clicking logout the authentication service is informed (and acts accordingly) and the application is reloaded.
+ * 5. Sensitive pages are guarded with a call to the authentication observable - see 1. above.
+ * 6. On clicking logout the authentication service is informed (and acts accordingly) and the application is reloaded.
  */
 
 /* inject auth0-spa-js create auth0 client instance function via DI for ease of testing */
@@ -86,7 +86,7 @@ export class AuthService {
 
   /**
    * Calls the Auth0 client instance to check whether the user has logged in and been authenticated.  Emits true if authenticated and false if not and sets isLoggedIn to the result.
-   * Note: Called by AuthGuard to check status, i.e. when the login expires AuthGuard will direct to the login page.
+   * Note: Called initially by the app component and then called by AuthGuard before routing to any sensitive pages, i.e. when the login expires AuthGuard will direct to the login page instead of to the sensitive page.
    */
   public isAuthenticated$ = this.auth0Client$.pipe(
     concatMap((client: Auth0Client) => from(client.isAuthenticated())),
@@ -146,7 +146,7 @@ export class AuthService {
   };
 
   /**
-   * Sets isLoggedIn to true if user is authenticated, otherwise it sets isLoggedIn to false.
+   * Sets isLoggedIn to true if the user is authenticated, otherwise it sets isLoggedIn to false.
    * Sets userProfile$ to the user profile if user is authenticated, otherwise it does not modify userProfile$.
    * Note: Called by the app component on app initialization only.
    */

@@ -8,18 +8,15 @@
  * The dist directory to be deleted is passed in as a parameter.
  * package.com script: "npm run delDistDir.ts <pathToDistDir>".
  *
- * <pathToDistDir> is relative to the directory that the node_modules directory (that contains the package 'app-root-path') is in.
+ * <pathToDistDir> is relative to the application base directory.
  *
  * <pathToDistDir> must end in /dist/.
  *
  */
 
-import appRootObject from 'app-root-path';
 import fs from 'fs';
-import path from 'path';
 import rimraf from 'rimraf';
-
-const appRoot = appRootObject.toString();
+import { resolve } from 'path';
 
 /* confirm that the passed in path ends in /dist/ */
 if (process.argv[2].slice(-6) !== '/dist/') {
@@ -28,7 +25,7 @@ if (process.argv[2].slice(-6) !== '/dist/') {
 }
 
 /* create path to dist directory from passed in parameter */
-const distPath = path.join(appRoot, process.argv[2]);
+const distPath = resolve(process.argv[2]);
 console.log(`Deleting: ${distPath}`);
 
 if (!fs.existsSync(distPath)) {
@@ -40,4 +37,6 @@ rimraf.sync(distPath, { maxBusyTries: 100 });
 if (fs.existsSync(distPath)) {
   console.error('ERROR: dist directory not deleted');
   process.exit(1);
+} else {
+  console.log(`The directory ${distPath} is deleted or was not found`);
 }

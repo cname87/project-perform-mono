@@ -1,6 +1,4 @@
-const dotenv = require('dotenv');
 const path = require('path');
-dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 const { browser, by } = require('protractor');
 const { SpecReporter } = require('jasmine-spec-reporter');
@@ -9,8 +7,8 @@ const fs = require('fs');
 const { promisify } = require('util');
 const { NgxLoggerLevel } = require('ngx-logger');
 
-import { getDashboardPage } from './src/pages/dashboard.page';
-import { getRootElements } from './src/pages/elements/root.elements';
+import { getDashboardPage } from '../pages/dashboard.page';
+import { getRootElements } from '../pages/elements/root.elements';
 import { NGXLogger } from 'ngx-logger';
 
 /**
@@ -27,48 +25,51 @@ import { NGXLogger } from 'ngx-logger';
 
 /* awaits for an element to be visible on the page */
 const awaitElementVisible = async (element) => {
-  return await browser.wait(ExpectedConditions.visibilityOf(element), 5000);
+  return await browser.wait(ExpectedConditions.visibilityOf(element), 120000);
 };
 
 /* awaits for an element to be invisible on the page */
 const awaitElementInvisible = async (element) => {
-  return await browser.wait(ExpectedConditions.invisibilityOf(element), 5000);
+  return await browser.wait(ExpectedConditions.invisibilityOf(element), 120000);
 };
 
 /* sends a configured request to the server */
 const askServer = async(
-  url,
+  uri,
   method,
-  body = {},
   headers = {},
-  resolveWithFullResponse = false, // get either the full response or the body
+  body = '',
+  resolveWithFullResponse = false, // true to get the full response, false to get the body
 ) => {
   let options = {
-    url,
+    uri,
     method,
     headers,
-    body,
     resolveWithFullResponse,
-    json: true,
+    json: true,  //  sets body to JSON representation of value and adds Content-type: application/json header. Additionally, parses the response body as JSON
+    simple: false, // false => don't reject the promise on non 2xx status codes
+  }
+  if (body) {
+    options.body = body;
   }
   return await request(options);
 }
 
 /* check that the test database is in use */
 const testDatabaseInUse = async () => {
+  console.log('Checking database');
   const testDatabaseResponseBody
     = await askServer(
-      `${process.env.HOST}testServer/isTestDatabase`,
+      `${process.env.BASE_URL}/testServer/isTestDatabase`,
       'GET',
     );
-  /* TODO - remove or set up e2e on gcp server */
-  // const testDatabaseResponseBody = await request('https://project-perform.appspot.com/testServer/isTestDatabase');
-  // console.log(testDatabaseResponseBody);
+
   /* body will contain { isTestDatabase: <boolean> } */
   if(!testDatabaseResponseBody.isTestDatabase){
-    throw new Error('Test database not in use');
+    console.error('*** WARNING: Test database not in use')
+    // throw new Error('Test database not in use');
   } else {
-    console.log('Test database in use')
+    console.log('NOTE: Test database in use')
   }
 }
 
@@ -92,11 +93,12 @@ export const mockMembers = [
 
 /* delete all 'test' database members */
 const resetDatabase = async () => {
+  console.log('Resetting database');
 
   /* request a token */
   const options = {
     method: 'POST',
-    url: 'https://projectperform.eu.auth0.com/oauth/token',
+    uri: 'https://projectperform.eu.auth0.com/oauth/token',
     headers: { 'content-type': 'application/json' },
     body: process.env.AUTH0_REQUEST_BODY,
   };
@@ -106,24 +108,26 @@ const resetDatabase = async () => {
 
   /* delete all members in the test database */
   const deleteResponseBody  = await askServer(
-    `${process.env.HOST}${process.env.API_PATH}members`,
+    `${process.env.BASE_URL}/${process.env.API_PATH}/members`,
     'DELETE',
-    {},
     { Authorization: `Bearer ${token}` },
   );
   /* the response body will contain { count: <integer> } */
-  if(!Number.isInteger(deleteResponseBody.count)) {
-    throw new Error('Error resetting test database');
+  if(!deleteResponseBody || !Number.isInteger(deleteResponseBody.count)) {
+    throw new Error('Error resetting test collection on the database');
   }
 
   /* add test database members here */
   for (const member of mockMembers) {
-    await askServer(
-      `${process.env.HOST}${process.env.API_PATH}members`,
+    const response = await askServer(
+      `${process.env.BASE_URL}/${process.env.API_PATH}/members`,
       'POST',
-      member,
       { Authorization: `Bearer ${token}` },
+      member,
     );
+    if (!response.id) {
+      throw new Error('Member not added => database access issue');
+    }
   }
 
   console.log('Completed database reset and loaded test members');
@@ -135,8 +139,10 @@ const resetDatabase = async () => {
  */
 const loadRootPage = async (isLoggedIn = true, numberExpected = 4) => {
   console.log('Loading root page');
+
   await browser.get('/');
   if (!isLoggedIn) {
+    /* if not logged in or testing a staged version */
     /* just wait for the login button to show */
     await awaitElementVisible(getRootElements().loginBtn);
   } else {
@@ -165,34 +171,6 @@ const loadRootPage = async (isLoggedIn = true, numberExpected = 4) => {
   }
   console.log('Root page loaded');
 };
-
-/* check that the e2e build environment is in use - this is needed for the error testing spec file */
-const checkE2eEnvironment = async () => {
-  /* the app-login element is configured with a custom attribute */
-  const el = browser.findElement(by.css('app-login'));
-  const isE2eTesting = await el.getAttribute('data-isE2eTesting');
-  const production = await el.getAttribute('data-production');
-  const logLevel = await el.getAttribute('data-logLevel');
-
-  if(isE2eTesting === 'true') {
-    console.log(`E2e build environment in use`);
-  } else {
-    throw new Error('E2e build environment not in use');
-  }
-  /* print out other environment properties if not as expected */
-  if(production === 'true') {
-    console.log(`Production is true`);
-  } else {
-    console.log(`*** WARN: environment.production should be true`);
-  }
-  if(+logLevel === NgxLoggerLevel.OFF) {
-    console.log(`LogLevel is NGXLoggerLevel.OFF`);
-  } else {
-    console.log(`*** WARN: environment.logLevel should be NGXLoggerLevel.OFF`);
-  }
-
-}
-
 
 /* login - assumes the non-logged in root page is open */
 const login = async() => {
@@ -225,8 +203,36 @@ const login = async() => {
   console.log('Completed login routine');
 }
 
+/* check that the e2e build environment is in use - this is needed for the error testing spec file */
+const checkE2eEnvironment = async () => {
+  console.log('Checking if e2e build is in use');
+
+  /* root page loaded - the app-login element is configured with a custom attribute */
+  const el = browser.findElement(by.css('app-login'));
+  const isE2eTesting = await el.getAttribute('data-isE2eTesting');
+  const production = await el.getAttribute('data-production');
+  const logLevel = await el.getAttribute('data-logLevel');
+
+  if(isE2eTesting === 'true') {
+    console.log(`NOTE: E2e build environment in use`);
+  } else {
+    console.error('*** WARNING: E2e build environment not in use');
+  }
+  /* print out other environment properties if not as expected */
+  if(production === 'true') {
+    console.log(`Production is true`);
+  } else {
+    console.log(`*** WARNING: environment.production is not true`);
+  }
+  if(+logLevel === NgxLoggerLevel.OFF) {
+    console.log(`LogLevel is NgxLoggerLevel.OFF`);
+  } else {
+    console.log(`*** WARNING: environment.logLevel is not NgxLoggerLevel.OFF`);
+  }
+}
+
 /* set long timeout to allow for debug */
-const setTimeout = (timeout = 120000) => {
+const setTimeout = (timeout = 1200000) => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout;
 }
 export const run = async () => {

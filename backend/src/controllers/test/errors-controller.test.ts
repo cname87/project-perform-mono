@@ -28,10 +28,11 @@ sinon.assert.expose(chai.assert, {
   prefix: '',
 });
 
+import path from 'path';
 /* use proxyquire for index.js module loading */
 import proxyquire from 'proxyquire';
 import { EventEmitter } from 'events';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer';
 import winston from 'winston';
 
 /* internal dependencies */
@@ -40,13 +41,11 @@ import * as errorHandlerModule from '../../handlers/error-handlers';
 
 /* variables */
 const indexPath = '../../index';
-/* path to chrome executable */
-const chromeExec =
-  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
 /* url that initiates the client-fired tests */
 const fireTestUrl = `${configServer.HOST}testServer/errors-loadMocha.html`;
-/* hold browser open for this time (ms) */
-const browserDelay = 5000;
+const browserDelay = process.env.BROWSER_DELAY
+  ? parseInt(process.env.BROWSER_DELAY, 10)
+  : 0;
 /* event names */
 const indexRunApp = 'indexRunApp';
 const indexSigint = 'indexSigint';
@@ -189,11 +188,10 @@ describe('Server Errors', () => {
               sinon.resetHistory();
               break;
             case 'Sent test end':
-              // debug message informs on header already sent
+              /* debug message informs on header already sent */
               expect(
                 spyErrorHandlerDebug.calledWith(
-                  '\\error-handlers.js: not sending a client ' +
-                    'response as headers already sent',
+                  `${path.sep}error-handlers.js: not sending a client response as headers already sent`,
                 ),
               ).to.be.true;
               expect(spyDumpError.callCount).to.eql(1);
@@ -208,7 +206,7 @@ describe('Server Errors', () => {
               /* debug message reports that error not thrown as in test */
               expect(
                 spyErrorHandlerDebug.calledWith(
-                  '\\error-handlers.js: *** In test mode => blocking an error from been thrown ***',
+                  `${path.sep}error-handlers.js: *** In test mode => blocking an error from been thrown ***`,
                 ),
               ).to.be.true;
               sinon.resetHistory();
@@ -263,8 +261,7 @@ describe('Server Errors', () => {
       if (process.env.DISABLE_CHROME !== 'true') {
         (async () => {
           browserInstance = await puppeteer.launch({
-            headless: false,
-            executablePath: chromeExec,
+            headless: process.env.DISABLE_HEADLESS !== 'true',
             defaultViewport: {
               width: 800,
               height: 800,
@@ -274,6 +271,7 @@ describe('Server Errors', () => {
               '--start-maximized',
               '--new-window',
               '--disable-popup-blocking',
+              '--no-sandbox',
             ],
           });
           const page = await browserInstance.newPage();

@@ -5,7 +5,7 @@ import { getDashboardPage } from '../pages/dashboard.page';
 import { getMemberDetailPage } from '../pages/memberDetail.page';
 import { getMembersListPage } from '../pages/membersList.page';
 import { getErrorInformationPage } from '../pages/error-information.page';
-import { getHelpers } from '../e2e-helpers';
+import { getHelpers } from '../helpers/e2e-helpers';
 
 describe('Project Perform', () => {
   const {

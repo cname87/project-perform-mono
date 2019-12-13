@@ -4,14 +4,14 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "npm start frontend",
+      "label": "Serve Frontend with Backend",
       "type": "shell",
       "command": "npm",
       "args": [
         "run",
         "--prefix",
         "${workspaceRoot}/frontend",
-        "start"
+        "serveWithBackend"
       ],
       "isBackground": true,
       "presentation": {
@@ -44,14 +44,14 @@
       }
     },
     {
-      "label": "npm test frontend",
+      "label": "Test Frontend",
       "type": "shell",
       "command": "npm",
       "args": [
         "run",
         "--prefix",
         "${workspaceRoot}/frontend",
-        "test"
+        "test:dev"
       ],
       "isBackground": true,
       "presentation": {
@@ -107,7 +107,7 @@
     {
       "label": "npm backend server-side watch",
       "type": "npm",
-      "script": "tscBackendServerWatch",
+      "script": "tscBackendWatch",
       "path": "backend/",
       "problemMatcher": [],
       "group": "build",
@@ -233,6 +233,20 @@
       "problemMatcher": []
     },
     {
+      "label": "gcloudBuild.bat",
+      "type": "shell",
+      "windows": {
+        "command": "${workspaceFolder}/backend/utils-build/gcloudBuild.bat"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Is Server Up?",
       "type": "shell",
       "command": "npm",
@@ -248,25 +262,19 @@
         "focus": true,
         "panel": "dedicated"
       },
-      "problemMatcher": [
-        {
-          "pattern": [
-            {
-              "regexp": ".",
-              "file": 1,
-              "location": 2,
-              "message": 3
-            }
-          ],
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": {
-              "regexp": "(.*?)"
-            },
-            "endsPattern": "Connected to"
-          }
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Connected to",
         }
-      ]
+      }
     },
     {
       "label": "Check Server",
@@ -285,32 +293,33 @@
         "panel": "dedicated"
       },
       "group": "test",
-      "problemMatcher": [
-        {
-          "pattern": [
-            {
-              "regexp": ".",
-              "file": 1,
-              "location": 2,
-              "message": 3
-            }
-          ],
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": {
-              "regexp": "(.*?)"
-            },
-            "endsPattern": "Connected to"
-          }
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Connected to",
         }
-      ]
+      }
     },
     {
-      "type": "npm",
-      "script": "build:dev",
-      "path": "frontend/",
-      "group": "build",
+      "label": "Terminate All Tasks",
+      "command": "echo ${input:terminate}",
+      "type": "shell",
       "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "terminate",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "terminateAll"
     }
   ]
 }

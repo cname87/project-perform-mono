@@ -323,7 +323,7 @@ async function runApp(store: Perform.IAppLocals) {
     /* starts database and stores database and connection in store */
     const isFail = await storeDatabase(store);
     if (isFail) {
-      await sleep(5000);
+      await sleep(configServer.DATABASE_ERROR_DELAY);
     }
     isDbReady = store.dbConnection.readyState;
   }

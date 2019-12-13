@@ -33,7 +33,6 @@ REM @EXIT /B 0
 REM To close window (and return 0)
 REM @EXIT 0
 
-:END
 ENDLOCAL
 REM ECHO ON
 @EXIT 0

@@ -1,4 +1,4 @@
-import { setupDebug } from '../../utils/src/debugOutput';
+import { setupDebug } from '../src/debugOutput';
 const { modulename, debug } = setupDebug(__filename);
 
 /* set up mocha, sinon & chai */
@@ -123,9 +123,9 @@ describe('dumpError tests', () => {
       .true;
   });
 
-  it('should log to console.error and console.log', async function runTest() {
+  it('should log to console.error but not console.log', async function runTest() {
     debug(
-      `Running ${modulename}: it - should log to console.error and console.log`,
+      `Running ${modulename}: it - should log to console.error but not console.log`,
     );
 
     /* a logger is not passed so dumpError sends to console.error (stderr). Note that there will be no formatting provided by a logger */
@@ -159,7 +159,7 @@ describe('dumpError tests', () => {
     expect(capturedConsoleError.includes(err.message), 'error message logged')
       .to.be.true;
 
-    /* test that stderr is empty - logger sends to stdout */
+    /* test that nothing logged to console.out */
     expect(capturedConsoleLog).to.eql('', 'stdlog will be empty');
   });
 });

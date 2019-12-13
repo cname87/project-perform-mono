@@ -1,0 +1,141 @@
+steps:
+
+- id: 'build backend and frontend'
+# build an image that can be used in docker-compose to start the server in the background
+# see Dockerfile for detail
+# builds the backend
+# builds the frontend - production version
+  name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+     '--tag=gcr.io/$PROJECT_ID/application',
+     '--cache-from=gcr.io/$PROJECT_ID/application',
+     ".",
+  ]
+
+- id: 'push build to GCP image registry'
+# push the image so available to all steps
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/application']
+
+- id: 'copy backend to workspace'
+# copy node_modules from created image to persisted workspace
+  name: 'gcr.io/$PROJECT_ID/application'
+  args: ['cp', '-r', '../node_modules', './node_modules']
+
+- id: 'build backend'
+# build the backend in the persisted workspace (replacing the copied in dist files - the built files are deployed)
+  name: 'gcr.io/$PROJECT_ID/application'
+  args: ['npm', 'run', 'build']
+
+- id: 'copy frontend to workspace'
+# copy node_modules from created image to persisted workspace
+  name: 'gcr.io/$PROJECT_ID/application'
+  args: ['cp', '-r', '../frontend/node_modules', './frontend/node_modules']
+
+- id: 'build frontend'
+# build the frontend in the persisted workspace (replacing the copied in dist files - the built files are deployed)
+  dir: './frontend'
+  name: 'gcr.io/$PROJECT_ID/application'
+  args: ['npm', 'run', 'build:prod']
+
+- id: 'unit test backend'
+# run all backend unit tests
+  name: 'gcr.io/$PROJECT_ID/application'
+  env: ['NODE_ENV=staging']
+  args: ['npm', 'run', 'test']
+
+- id: 'unit test frontend'
+# run all frontend unit tests
+  name: 'gcr.io/$PROJECT_ID/application'
+  dir: './frontend'
+  args: ['npm', 'run', 'test:staging']
+
+- id: 'run backend server'
+# run the backend server in the background using docker-compose
+# server is run with NODE_ENV=staging => TEST_PATHS available
+# NOTE: Could add a step to ping server and check it's up
+  name: 'docker/compose'
+  args: ['up', '-d']
+  env:
+  - 'NODE_ENV=staging'
+
+- id: 'e2e test in build environment'
+# run the frontend e2e using e2e:staging => runs a fresh compile with the environment.e2e file => e2e environment parameters available
+# backend is running already with TEST_PATHs available
+  name: 'gcr.io/$PROJECT_ID/application'
+  dir: './frontend'
+  args: ['npm', 'run', 'e2e:staging']
+
+- id: 'stop backend server'
+# stops the running backend server
+  name: 'docker/compose'
+  args: ['down']
+
+- id: 'deploy build for e2e test'
+# deploys using the frontend and backend that are built
+# frontend production build (=> e2e environment parameters not set)
+# (backend build has only one type)
+# (app engine runs using NODE_ENV=production so production database in use)
+# note: this will overwrite any previously build deployed using this step
+  name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+    'app',
+    'deploy',
+    '--no-promote',
+    '--version=ci-test',
+  ]
+  timeout: '600s'
+
+- id: 'e2e test the test build'
+# runs e2e test against the newly deployed build
+# does not use ng e2e => frontend production build from image => e2e environment parameters not available => no cache or errors test
+# backend runs with NODE_ENV=production => no TEST_PATHS and production database in use
+  name: 'gcr.io/$PROJECT_ID/application'
+  dir: './frontend'
+  env: ['BASE_URL=https://ci-test-dot-$PROJECT_ID.appspot.com']
+  args: ['npm', 'run', 'e2e:production']
+
+- id: 'deploy build for go-live but no-promote'
+# deploys using the frontend and backend that are built
+# frontend production build (=> e2e environment parameters not set)
+# (backend build has only one type)
+# (app engine runs using NODE_ENV=production so production database in use)
+  name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+    'app',
+    'deploy',
+    '--no-promote',
+    '--version=ci-live-$SHORT_SHA',
+  ]
+  timeout: '600s'
+
+- id: 'promote go-live build'
+# promotes the newly deployed build so it takes all traffic
+  name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+    'app',
+    'versions',
+    'migrate',
+    'ci-live-$SHORT_SHA',
+  ]
+  timeout: '600s'
+
+- id: 'e2e test the promoted go-live build'
+# runs e2e test against the newly promoted build
+# does not use ng e2e => frontend production build from image => e2e environment parameters not available => no cache or errors test
+# backend runs with NODE_ENV=production => no TEST_PATHS and production database in use
+  name: 'gcr.io/$PROJECT_ID/application'
+  dir: './frontend'
+  args: ['npm', 'run', 'e2e:production']
+
+substitutions:
+# will be overridden in the command line or by github
+  _SHORT_SHA: no-sha
+
+options:
+  machineType: 'N1_HIGHCPU_32'
+
+timeout: 1800s
+
+images: ['gcr.io/$PROJECT_ID/application']

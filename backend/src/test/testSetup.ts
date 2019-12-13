@@ -14,23 +14,22 @@ import 'mocha';
 
 /* Note: All test modules that need a server use index.js to start the server (parhaps on each 'it' function) and then close it before they exit. */
 
-// before('Before all tests', async () => {});
+let originalTestPaths: string | undefined;
+before('Before all tests', async () => {
+  /* open testServer routes */
+  originalTestPaths = process.env.TEST_PATHS;
+  process.env.TEST_PATHS = 'true';
+});
 
 /* Creating a Winston logger appears to leave a process 'uncaughtException' listeners.  When this exceeds 10 a warning is output to console.error which can cause tests to fail. See https://github.com/winstonjs/winston/issues/1334. So the following removes any such listeners created within and left after a test. It does remove the listeners created when logger.js is called outside of a test but that results in only 2 listeners. */
 
 let beforeCount = 0;
-let originalTestPaths: string | undefined;
 beforeEach('Before each test', () => {
-  /* open testServer routes */
-  originalTestPaths = process.env.TEST_PATHS;
-  process.env.TEST_PATHS = 'true';
   /* count listeners */
   beforeCount = process.listenerCount('uncaughtException');
 });
 
 afterEach('After each test', () => {
-  /* reset testServer routes setting */
-  process.env.TEST_PATHS = originalTestPaths;
   const afterCount = process.listenerCount('uncaughtException');
   /* close listeners */
   const arrayListeners = process.listeners('uncaughtException');
@@ -42,4 +41,7 @@ afterEach('After each test', () => {
   }
 });
 
-// after('After all tests', async () => {});
+after('After all tests', async () => {
+  /* reset testServer routes setting */
+  process.env.TEST_PATHS = originalTestPaths;
+});

@@ -126,10 +126,9 @@ async function listenServer(
     function listenHandler(this: any) {
       /* remove the unused error handle */
       this.expressServer.removeListener('error', errorHandler);
-      debug(
-        `${modulename}: ${this.name} server` +
-          ` listening on port ${this.expressServer.address().port}`,
-      );
+      const host = this.expressServer.address().address;
+      const port = this.expressServer.address().port;
+      debug(`${modulename}: ${this.name} server listening on ${host}:${port}`);
       resolve(this.expressServer);
     }
 
@@ -182,6 +181,7 @@ async function listenServer(
     /* ask the server to listen and trigger event */
     this.expressServer.listen({
       port: serverPort,
+      // GCP requires to listen on 0.0.0.0 - If host is omitted, the server will accept connections on the unspecified IPv6 address (::) when IPv6 is available, or the unspecified IPv4 address (0.0.0.0) otherwise.
     });
   }
 

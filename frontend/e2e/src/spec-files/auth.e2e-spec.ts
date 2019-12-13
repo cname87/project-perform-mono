@@ -7,7 +7,7 @@ import { browser } from 'protractor';
 import { getLoginPage } from '../pages/login.page';
 import { getDashboardPage } from '../pages/dashboard.page';
 import { getUserProfilePage } from '../pages/user-profile.page';
-import { getHelpers } from '../e2e-helpers';
+import { getHelpers } from '../helpers/e2e-helpers';
 import { getRootElements } from '../pages/elements/root.elements';
 
 describe('Authentication:', () => {

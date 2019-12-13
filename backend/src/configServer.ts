@@ -3,9 +3,7 @@
  */
 
 /* external dependencies */
-import appRootObject from 'app-root-path';
-const appRoot = appRootObject.toString();
-import path from 'path';
+import { resolve } from 'path';
 
 // tslint:disable:object-literal-sort-keys
 export const configServer = {
@@ -14,10 +12,8 @@ export const configServer = {
    * application programme.
    */
 
-  /* time for which a database ping is awaited */
-  DB_PING_TIME: 1500,
   /* the path to the directory containing Angular files to be set up a static directory */
-  CLIENT_APP_PATH: path.join(appRoot, 'frontend', 'dist'),
+  CLIENT_APP_PATH: resolve('frontend', 'dist'),
 
   /**
    * The server can be hosted remotely or locally:
@@ -31,22 +27,20 @@ export const configServer = {
   },
   /* number of times a server will attempt to listen on an occupied port a number from 0 to 10 */
   SVR_LISTEN_TRIES: 3,
-  /* time between retries in seconds a number between 1 to 10 */
+  /* time in seconds between server retries - a number between 1 to 10 */
   SVR_LISTEN_TIMEOUT: 3,
-  // path to static server for server tests
-  STATIC_TEST_PATH: path.join(
-    appRoot,
-    'backend',
-    'src',
-    'test',
-    'client-static',
-  ),
-  NODE_MODULES_PATH: path.join(appRoot, 'node_modules'),
+  /* time in ms between database connection retries */
+  DATABASE_ERROR_DELAY: 5000,
+  /* path to static server for server tests */
+  STATIC_TEST_PATH: resolve('backend', 'src', 'test', 'client-static'),
+  NODE_MODULES_PATH: resolve('node_modules'),
 
   /**
    * This section sets all configuration parameters for the API middleware.
    */
   /* base path for all calls to the api */
   API_BASE_PATH: '/api-v1',
-  OPENAPI_FILE: path.join(appRoot, 'backend', 'api', 'openapi.json'),
+  OPENAPI_FILE: resolve('backend', 'api', 'openapi.json'),
+  /* time for which a database ping (in a GCP cron response) is awaited */
+  DB_PING_TIME: 1500,
 };

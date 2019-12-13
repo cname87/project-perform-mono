@@ -2,7 +2,7 @@
 root = true
 
 [*]
-end_of_line = crlf
+# end_of_line = crlf # Let VSCode handle this in case I need some files LF
 charset = utf-8
 indent_style = space
 indent_size = 2
