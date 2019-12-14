@@ -23,6 +23,9 @@ CD C:\Users\cname\dropbox\software\projects\projects\project-perform
 
 ECHO "Running gcloud --quiet builds submit --config=cloudbuild.yaml . --substitutions=_SHORT_SHA=%_TAG%"
 
+REM _SHORT_SHA is used to set the GCP App Engine version
+REM _SHORT_SHA will be set by github when triggered from github
+
 REM Run the gcloud command
 gcloud --quiet builds submit --config=cloudbuild.yaml --substitutions=_SHORT_SHA=%_TAG%
 

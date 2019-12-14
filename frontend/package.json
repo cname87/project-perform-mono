@@ -23,9 +23,10 @@
     "tslint:app": "tslint ./src/**/*.ts --format verbose --project ./src/tsconfig.app.json --config ./src/tslint.json",
     "tslint:spec": "tslint ./src/**/spec.ts --format verbose --project ./src/tsconfig.spec.json --config ./src/tslint.json",
     "tslint": "npm run tslint:app && npm run tslint:spec",
-    "build:dev": "npm-run-all delDist ngBuild:dev tslint prettier",
-    "build:e2e": "npm-run-all delDist ngBuild:e2e tslint prettier",
-    "build:prod": "npm-run-all delDist ngBuild:prod tslint:app prettier",
+    "syncGCPFiles": "ts-node ../backend/utils-build/syncGCPStorage.ts env-frontend-e2e",
+    "build:dev": "npm-run-all delDist ngBuild:dev syncGCPFiles tslint prettier",
+    "build:e2e": "npm-run-all delDist ngBuild:e2e syncGCPFiles tslint prettier",
+    "build:prod": "npm-run-all delDist ngBuild:prod syncGCPFiles tslint:app prettier",
     "delay": "sleepms 2000",
     "startBackend": " cd .. && npm run checkServer",
     "serve": "ng run project-perform:serve",
@@ -39,6 +40,7 @@
     "e2e:staging": "cross-env E2E=staging ng run project-perform:e2e:staging",
     "e2e:production": "cross-env E2E=production ng run project-perform:e2e:production"
   },
+
   "dependencies": {
     "@angular/animations": "^8.2.14",
     "@angular/cdk": "^8.2.3",
@@ -69,7 +71,6 @@
     "@angular/cli": "^8.3.20",
     "@angular/compiler-cli": "^8.2.14",
     "@angular/platform-server": "^8.2.14",
-    "@types/app-root-path": "^1.2.4",
     "@types/jasmine": "^3.5.0",
     "@types/jasminewd2": "^2.0.8",
     "@types/node": "^12.12.17",

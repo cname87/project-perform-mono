@@ -20,7 +20,7 @@
 
   "defaultSeverity": "error",
 
-  "jsRules": {},
+  "jsRules": true,
 
   "rules": {
     "arrow-return-shorthand": true,

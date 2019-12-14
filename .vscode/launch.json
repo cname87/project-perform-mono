@@ -204,16 +204,17 @@
         /* include testSetup.js */
         "${workspaceFolder}/backend/dist/src/test/testSetup.js",
         /* comment out files to select tests */
-        "${workspaceFolder}/backend/dist/src/database/test/startDatabase.test.js",
-        "${workspaceFolder}/backend/dist/src/database/test/database.test.js",
-        "${workspaceFolder}/backend/dist/src/models/test/models.test.js",
-        "${workspaceFolder}/backend/dist/src/utils/test/dumpError.test.js",
-        "${workspaceFolder}/backend/dist/src/utils/test/logger.test.js",
-        "${workspaceFolder}/backend/dist/src/controllers/test/api-controller.test.js",
-        "${workspaceFolder}/backend/dist/src/controllers/test/errors-controller.test.js",
-        "${workspaceFolder}/backend/dist/src/server/test/startserver.test.js",
-        "${workspaceFolder}/backend/dist/src/server/test/server.test.js",
-        "${workspaceFolder}/backend/dist/src/test/index.test.js",
+        "${workspaceFolder}/backend/dist/utils-build/syncGCPStorage.test.js",
+        // "${workspaceFolder}/backend/dist/src/database/test/startDatabase.test.js",
+        // "${workspaceFolder}/backend/dist/src/database/test/database.test.js",
+        // "${workspaceFolder}/backend/dist/src/models/test/models.test.js",
+        // "${workspaceFolder}/backend/dist/src/utils/test/dumpError.test.js",
+        // "${workspaceFolder}/backend/dist/src/utils/test/logger.test.js",
+        // "${workspaceFolder}/backend/dist/src/controllers/test/api-controller.test.js",
+        // "${workspaceFolder}/backend/dist/src/controllers/test/errors-controller.test.js",
+        // "${workspaceFolder}/backend/dist/src/server/test/startserver.test.js",
+        // "${workspaceFolder}/backend/dist/src/server/test/server.test.js",
+        // "${workspaceFolder}/backend/dist/src/test/index.test.js",
       ],
       "env": {
         /* set to 'false' (or omit) to automatically run chrome and set to 'true' when using a compound configuration to launch chrome manually */

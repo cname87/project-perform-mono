@@ -1,6 +1,8 @@
 ## Listed files are not uploaded by 'gcloud builds submit and 'gcloud app deploy' - using the same file for each to avoid environment differences introducing error => all files needed for the build or deployment are included
 
-# dist directories are not ignored even though they are rebuilt in the build steps - the newly built dist directories are included when you deploy
+# dist directories are not ignored even though they are rebuilt in the build steps - if you ignore them here then the newly built dist directories would be ignored when you deploy
+
+# .envProduction is not ignored (as it is in .gitignore) even though the staging and production versions are copied into the GCP environment from GCP Storage because they must be there when you deploy.
 
 ## ignore from root...
 .git/
@@ -8,14 +10,19 @@
 .vscode/
 coverage/
 node_modules/
+.envDevelopment
+.envStaging
 .gitignore
 cron.yaml
+debug.log
 project-perform.code-workspace
 README.md
 
 ## ignore from backend
+backend/debug.log
 backend/coverage/
 
 ## ignore from frontend
+frontend/debug.log
 frontend/coverage/
 frontend/node_modules/

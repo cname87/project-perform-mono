@@ -42,7 +42,7 @@
         "configFile": "./tslint.json",
         "suppressWhileTypeErrorsPresent": false,
         "mockTypeScriptVersion": false,
-        "jsEnable": false,
+        "jsEnable": true,
         "exclude": [
         ]
       }

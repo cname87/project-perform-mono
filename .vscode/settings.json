@@ -1,4 +1,9 @@
-// all settings in workspace json
+/* 3 settings files:
+ - in .vscode applies to project-perform folder
+ - in workspace.json - applies to workspace
+ - in AppData/.. - applies to User
+ - I keep all settings in workspace.json
+ */
 {
   "cSpell.words": [
     "ADMIN",
@@ -28,6 +33,7 @@
     "Prefs",
     "Qsfp",
     "Seán",
+    "Solarized",
     "TSKILL",
     "Toastr",
     "Truthy",
@@ -61,6 +67,7 @@
     "detection",
     "devkit",
     "devtool",
+    "dont",
     "dotenv",
     "dynamodb",
     "eofline",
@@ -145,6 +152,7 @@
     "processsed",
     "promisify",
     "proxyquired",
+    "pwsh",
     "redumped",
     "reload",
     "resave",
@@ -167,7 +175,9 @@
     "untrack",
     "untrapped",
     "uuidv",
+    "vuepress",
     "vscode",
+    "vsicons",
     "warmup",
     "workdir",
     "wscript",

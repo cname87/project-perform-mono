@@ -3,7 +3,7 @@
  *
  * Usage:
  *
- * Used in package.com.
+ * Used in package.json.
  *
  * The dist directory to be deleted is passed in as a parameter.
  * package.com script: "npm run delDistDir.ts <pathToDistDir>".
@@ -13,6 +13,8 @@
  * <pathToDistDir> must end in /dist/.
  *
  */
+
+console.log('Deleting dist directory');
 
 import fs from 'fs';
 import rimraf from 'rimraf';

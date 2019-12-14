@@ -5,7 +5,7 @@
     "./**/types/*.d.ts"
   ],
   "exclude": [
-    "./utils-build", // only needed by npm scripts using ts-node
+    // "./utils-build", // only needed by npm scripts using ts-node
     "./src/test/client-static", // if necessary, then client-side ts files must be compiled separately
     "node_modules"
   ],
