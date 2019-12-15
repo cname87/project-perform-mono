@@ -23,21 +23,51 @@ steps:
   name: 'gcr.io/$PROJECT_ID/application'
   args: ['cp', '-r', '../node_modules', './node_modules']
 
-- id: 'build backend'
-# build the backend in the persisted workspace (replacing the copied in dist files - the built files are deployed)
-  name: 'gcr.io/$PROJECT_ID/application'
-  args: ['npm', 'run', 'build']
-
 - id: 'copy frontend to workspace'
 # copy node_modules from created image to persisted workspace
   name: 'gcr.io/$PROJECT_ID/application'
   args: ['cp', '-r', '../frontend/node_modules', './frontend/node_modules']
+
+- id: 'download backend environment files'
+# copy backend .env files from GCP Storage to persisted workspace
+  name: 'gcr.io/cloud-builders/gsutil'
+  dir: '.'
+  args: [
+    'cp', 'gs://project-perform-gcp-environment-files/env-backend/*'
+  ]
+
+- id: 'download frontend e2e environment files'
+# copy frontend e2e .env files from GCP Storage to persisted workspace
+  name: 'gcr.io/cloud-builders/gsutil'
+  dir: './frontend/e2e'
+  args: [
+    'cp', 'gs://project-perform-gcp-environment-files/env-frontend-e2e/*'
+  ]
+
+- id: 'download backend database credentials files'
+# copy backend database .pem and .crt files from GCP Storage to persisted workspace
+  name: 'gcr.io/cloud-builders/gsutil'
+  dir: './backend/certs/database'
+  args: [
+    'cp', 'gs://project-perform-gcp-environment-files/certs-database/*'
+  ]
+
+- id: 'build backend'
+# build the backend in the persisted workspace (replacing the copied in dist files - the built files are deployed)
+  name: 'gcr.io/$PROJECT_ID/application'
+  args: ['npm', 'run', 'build']
+  # signal that download from GCP Storage not required
+  env:
+    - 'IS_GCP_BUILD=true'
 
 - id: 'build frontend'
 # build the frontend in the persisted workspace (replacing the copied in dist files - the built files are deployed)
   dir: './frontend'
   name: 'gcr.io/$PROJECT_ID/application'
   args: ['npm', 'run', 'build:prod']
+  # signal that download from GCP Storage not required
+  env:
+    - 'IS_GCP_BUILD=true'
 
 - id: 'unit test backend'
 # run all backend unit tests
