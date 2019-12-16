@@ -3,8 +3,9 @@
 
 # ignore all credential keys and certs
 # (but keep directory stuncture for copying from GCP storage)
-**/certs/database/*.*
-**/certs/gcpStorage/*.*
+backend/certs/database/mongoKeyAndCert.pem
+backend/certs/database/rootCA.crt
+backend/certs/gcpStorage/gcpStorageKey.json
 
 # ignore all .env files
 .env

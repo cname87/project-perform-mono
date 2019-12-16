@@ -1,82 +1,69 @@
 steps:
 
-- id: 'build backend and frontend'
-# build an image that can be used in docker-compose to start the server in the background
-# see Dockerfile for detail
-# builds the backend
-# builds the frontend - production version
-  name: 'gcr.io/cloud-builders/docker'
-  args: [
-    'build',
-     '--tag=gcr.io/$PROJECT_ID/application',
-     '--cache-from=gcr.io/$PROJECT_ID/application',
-     ".",
-  ]
-
-- id: 'push build to GCP image registry'
-# push the image so available to all steps
-  name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/application']
-
-- id: 'copy backend to workspace'
-# copy node_modules from created image to persisted workspace
-  name: 'gcr.io/$PROJECT_ID/application'
-  args: ['cp', '-r', '../node_modules', './node_modules']
-
-- id: 'copy frontend to workspace'
-# copy node_modules from created image to persisted workspace
-  name: 'gcr.io/$PROJECT_ID/application'
-  args: ['cp', '-r', '../frontend/node_modules', './frontend/node_modules']
-
-- id: 'download backend environment files'
-# copy backend .env files from GCP Storage to persisted workspace
+ # NOTE: When a build is executed from GCP via a github trigger the secret files, and any empty directories, are not there => download from GCP Storage.  The structure of the storage bucket MUST match the expected destination of the files including directory structure as a recursive copy is carried out to copy the directory structure and files.
+- id: 'download environment and certs files'
+# copy backend .env, frontend e2e .env, database certs, & GCP Storage key files from GCP Storage to persisted workspace
   name: 'gcr.io/cloud-builders/gsutil'
   dir: '.'
   args: [
-    'cp', 'gs://project-perform-gcp-environment-files/env-backend/*'
+    '-m', 'cp', '-r', '-n',
+    'gs://project-perform-gcp-environment-files/*',
+    './',
   ]
 
-- id: 'download frontend e2e environment files'
-# copy frontend e2e .env files from GCP Storage to persisted workspace
-  name: 'gcr.io/cloud-builders/gsutil'
-  dir: './frontend/e2e'
-  args: [
-    'cp', 'gs://project-perform-gcp-environment-files/env-frontend-e2e/*'
-  ]
+- id: 'install backend node_modules'
+# install the backend node_modules directory in the persisted workspace
+  name: node:12.13.0
+  entrypoint: npm
+  args: ['install']
 
-- id: 'download backend database credentials files'
-# copy backend database .pem and .crt files from GCP Storage to persisted workspace
-  name: 'gcr.io/cloud-builders/gsutil'
-  dir: './backend/certs/database'
-  args: [
-    'cp', 'gs://project-perform-gcp-environment-files/certs-database/*'
-  ]
+- id: 'install frontend node_modules'
+# install the backend node_modules directory in the persisted workspace
+  name: node:12.13.0
+  entrypoint: npm
+  dir: './frontend'
+  args: ['install']
 
 - id: 'build backend'
 # build the backend in the persisted workspace (replacing the copied in dist files - the built files are deployed)
-  name: 'gcr.io/$PROJECT_ID/application'
-  args: ['npm', 'run', 'build']
+  name: node:12.13.0
+  entrypoint: npm
+  args: ['run', 'build']
   # signal that download from GCP Storage not required
   env:
     - 'IS_GCP_BUILD=true'
 
 - id: 'build frontend'
 # build the frontend in the persisted workspace (replacing the copied in dist files - the built files are deployed)
+  name: node:12.13.0
+  entrypoint: npm
   dir: './frontend'
-  name: 'gcr.io/$PROJECT_ID/application'
-  args: ['npm', 'run', 'build:prod']
+  args: ['run', 'build:prod']
   # signal that download from GCP Storage not required
   env:
     - 'IS_GCP_BUILD=true'
 
+- id: 'build backend and frontend'
+# build an image with node and puppeteer that can be used for unit test and also in docker-compose to start the server in the background
+# see Dockerfile for detail - simply copies in context and exposes a port
+  name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '--tag=gcr.io/$PROJECT_ID/application',
+    '--cache-from=gcr.io/$PROJECT_ID/application',
+    '.',
+  ]
+
 - id: 'unit test backend'
 # run all backend unit tests
+# must use an image with node & puppeteer
   name: 'gcr.io/$PROJECT_ID/application'
   env: ['NODE_ENV=staging']
   args: ['npm', 'run', 'test']
 
 - id: 'unit test frontend'
 # run all frontend unit tests
+# must use an image with node & puppeteer
   name: 'gcr.io/$PROJECT_ID/application'
   dir: './frontend'
   args: ['npm', 'run', 'test:staging']
@@ -84,11 +71,9 @@ steps:
 - id: 'run backend server'
 # run the backend server in the background using docker-compose
 # server is run with NODE_ENV=staging => TEST_PATHS available
-# NOTE: Could add a step to ping server and check it's up
+# NOTE: could add a step to ping server and check it's up
   name: 'docker/compose'
   args: ['up', '-d']
-  env:
-  - 'NODE_ENV=staging'
 
 - id: 'e2e test in build environment'
 # run the frontend e2e using e2e:staging => runs a fresh compile with the environment.e2e file => e2e environment parameters available
@@ -96,11 +81,6 @@ steps:
   name: 'gcr.io/$PROJECT_ID/application'
   dir: './frontend'
   args: ['npm', 'run', 'e2e:staging']
-
-- id: 'stop backend server'
-# stops the running backend server
-  name: 'docker/compose'
-  args: ['down']
 
 - id: 'deploy build for e2e test'
 # deploys using the frontend and backend that are built
@@ -158,10 +138,6 @@ steps:
   name: 'gcr.io/$PROJECT_ID/application'
   dir: './frontend'
   args: ['npm', 'run', 'e2e:production']
-
-substitutions:
-# will be overridden in the command line or by github
-  _SHORT_SHA: no-sha
 
 options:
   machineType: 'N1_HIGHCPU_32'

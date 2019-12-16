@@ -76,9 +76,13 @@
       "program": "${workspaceFolder}/frontend//node_modules/protractor/bin/protractor",
       "protocol": "inspector",
       "args": [
-        /* Edit here to choose the .dev or .production configuration file to run under .dev of .rpoduction environment settings */
+        /* Edit here to choose the .dev or .production configuration file to run under dev or production environment settings */
         "${workspaceFolder}/frontend/e2e/src/config/protractor-production.conf.js",
       ],
+      "env": {
+        /* can set the base-url to a specific deployed build */
+        "BASE_URL": "https://ci-test-dot-project-perform.appspot.com"
+      },
       "cwd": "${workspaceFolder}/frontend",
       "preLaunchTask": "Check Server",
       "postDebugTask": "Terminate All Tasks",

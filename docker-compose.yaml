@@ -5,7 +5,7 @@ services:
     # this name is used in build environment e2e baseUrl and proxy.conf settings
     container_name: backend
     environment:
-      - NODE_ENV
+      - NODE_ENV=Staging
     # no need for command: as default is 'npm run start'
     ports:
       - "8080"

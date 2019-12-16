@@ -81,35 +81,29 @@ function makeLogger(): winston.Logger {
       ),
       handleExceptions: true,
       json: false,
-      level: 'debug',
-    },
-    stackDriver: {
-      format: combine(
-        timestamp(),
-        label({ label: 'PP' }),
-        align(),
-        splat(),
-        myFormat,
-      ),
-      handleExceptions: true, // will catch and log uncaughtException events
-      json: false,
-      level: productionLevel, // GCP logging level
+      level: 'debug', // always 'debug' level for development environment
     },
   };
 
   const loggerObject = createLogger({
+    level: productionLevel, // sets level for the GCP logs
     levels: myLevels.levels, // custom levels
     transports: [],
     exitOnError: true, // default -exit after an uncaughtException
   });
 
+  /* logger for GCP stackdriver */
+  const loggingWinston = new LoggingWinston();
+
   /* if running from GCP then add GCP Stackdriver Logging */
   if (process.env.GAE_ENV) {
-    /* logs will be written to: "projects/YOUR_PROJECT_ID/logs/winston_log" */
-    loggerObject.add(new LoggingWinston(options.stackDriver));
+    /* logs will be visible on GCP stackdriver logs viewer page */
+    loggerObject.add(loggingWinston);
   } else {
     /* if not production environment send to stdout */
     loggerObject.add(new transports.Console(options.console));
+    /* to add stackdriver for test then define GOOGLE_APPLICATION_CREDENTIAL and logs will be written to 'global' on the logs viewer page */
+    // loggerObject.add(loggingWinston);
   }
 
   const logger: winston.Logger = Object.create(loggerObject);

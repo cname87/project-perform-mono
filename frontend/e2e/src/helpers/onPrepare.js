@@ -66,7 +66,7 @@ const testDatabaseInUse = async () => {
 
   /* body will contain { isTestDatabase: <boolean> } */
   if(!testDatabaseResponseBody.isTestDatabase){
-    console.error('*** WARNING: Test database not in use')
+    console.log('*** WARNING: Test database not in use')
     // throw new Error('Test database not in use');
   } else {
     console.log('NOTE: Test database in use')
@@ -216,7 +216,7 @@ const checkE2eEnvironment = async () => {
   if(isE2eTesting === 'true') {
     console.log(`NOTE: E2e build environment in use`);
   } else {
-    console.error('*** WARNING: E2e build environment not in use');
+    console.log('*** WARNING: E2e build environment not in use');
   }
   /* print out other environment properties if not as expected */
   if(production === 'true') {

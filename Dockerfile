@@ -1,23 +1,11 @@
 # use an image with node that also supports puppeteer */
 FROM 'gcr.io/project-perform/node12.13.0-with-puppeteer'
 
-# leave the image workdir as the base workdir
+# leave the image workdir as the base directory
 WORKDIR /
 
-# copy the local project files from the source environment to the image (relative to workdir).
+# copy the files from the source context to the image (relative to workdir).
 COPY . .
-
-# install and build the backend
-RUN npm install
-RUN npm run build
-
-# change the workdir to the frontend directory, install and build the frontend
-WORKDIR /frontend
-RUN npm install
-RUN npm run build:prod
-
-# return the workdir to root so can start server without changing directories e.g. from docker-compose, or during GCP App Engine start
-WORKDIR /
 
 # expose 8080 port to allow access to a running backend server
 EXPOSE 8080

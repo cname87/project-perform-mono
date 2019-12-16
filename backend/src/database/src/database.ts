@@ -98,6 +98,7 @@ async function connectToDB(
 
   try {
     debug(modulename + ': trying to connect to the database server');
+
     const dbConnection = await mongoose.createConnection(uri, options);
 
     /* for all models => disable buffering commands so an error is thrown immediately when a connection goes down */

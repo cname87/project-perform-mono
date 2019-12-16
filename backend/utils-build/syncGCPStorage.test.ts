@@ -12,7 +12,7 @@ sinon.assert.expose(chai.assert, {
   prefix: '',
 });
 
-import { downloadFile } from './syncGCPStorage';
+import { uploadFile } from './syncGCPStorage';
 
 describe('Sync with GCP Local Storage', () => {
   debug(`Running ${modulename} describe - Sync with GCP Local Storage`);
@@ -27,6 +27,6 @@ describe('Sync with GCP Local Storage', () => {
     debug('download a file');
 
     debug('run tests');
-    expect(downloadFile).not.to.throw();
+    expect(uploadFile).not.to.throw();
   });
 });
