@@ -16,6 +16,14 @@ const user2 = new User(
   process.env.user2Id as string,
   process.env.user2Db as string,
 );
+const user3 = new User(
+  process.env.user3Id as string,
+  process.env.user3Db as string,
+);
+const user4 = new User(
+  process.env.user4Id as string,
+  process.env.user4Db as string,
+);
 const userTest = new User(
   process.env.userTestId as string,
   process.env.userTestDb as string,
@@ -25,7 +33,7 @@ const server = new User(
   process.env.userServerDb as string,
 );
 
-const users = [user1, user2, userTest, server];
+const users = [user1, user2, user3, user4, userTest, server];
 
 /* application users pseudo database */
 class Users {
