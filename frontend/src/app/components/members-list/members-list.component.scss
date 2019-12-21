@@ -1,44 +1,71 @@
 /* import theme with styling variables */
 @import 'src/styles/main-theme.scss';
 
-/* hide list item 'shadow' during mouse hover */
-mat-list-item.mat-list-item.ng-star-inserted {
-  width: $element-width;
+@mixin styling(
+  $default-gap: $default-gap,
+  $element-width: $element-width,
+  $button-height: $button-height,
+  $button-width: $button-width,
+  $inner-spacing: $inner-spacing,
+  $memberlist-height: $memberlist-height,
+) {
+
+  /* restrict list item 'shadow' during hover to the width of the elements */
+  /* 16px is the standard list element padding but using $default-gap*/
+  mat-list-item.mat-list-item {
+    width: $element-width + (2 * $default-gap);
+  }
+
+  #memberId {
+    height: $memberlist-height;
+    line-height: calc(36rem/16);  // default 36px
+    width: $button-width;
+    /* space to the right of id element */
+    margin-right: $inner-spacing;
+  }
+
+  /* size central name element */
+  #memberName {
+    height: $memberlist-height;
+    line-height: calc(36rem/16);  // default 36px
+    // width: calc(30vw);
+    width: ($element-width - (2 * $button-width) - (2 * $inner-spacing));
+    /* space to the right of name element */
+    margin-right: $inner-spacing;
+  }
+
+  #deleteBtn {
+    height: $memberlist-height;
+    line-height: calc(36rem/16);  // default 36px
+    width: $button-width;
+  }
+
+  /* hover darker over member button and name */
+  .memberData:hover {
+    background-color: mat-color($primary, darker);
+  }
+
+  /* hover darker */
+  #deleteBtn:hover {
+    background-color: mat-color($accent, darker);
+  }
+
+  /* provide a margin around the divider */
+  mat-divider.mat-divider {
+    margin: $default-gap;
+  }
 }
 
-#memberId {
-  height: $button-height;
-  width: $button-width;
-  /* space to the right of id element */
-  margin-right: $inner-spacing;
+/* narrow element width for small screen */
+@media screen and (max-width: 520px) {
+  @include styling(
+    $element-width: $element-width-sm,
+  )
+
 }
 
-/* size central name element */
-#memberName {
-  height: $button-height;
-  width: ($element-width - (2 * $button-width) - (3 * $inner-spacing));
-  /* space to the right of name element */
-  margin-right: $inner-spacing;
+/* global defaults */
+@media screen and (min-width: 520px) {
+  @include styling();
 }
 
-#deleteBtn {
-  height: $button-height;
-  width: $button-width;
-  /* extra space to the left of the delete button */
-  margin-left: $inner-spacing;
-}
-
-/* hover darker */
-.memberData:hover {
-  background-color: mat-color($primary, darker);
-}
-
-/* hover darker */
-#deleteBtn:hover {
-  background-color: mat-color($accent, darker);
-}
-
-/* provide a margin around the divider */
-mat-divider.mat-divider {
-  margin: $default-gap;
-}

@@ -1,21 +1,45 @@
 /* import theme with styling variables */
 @import 'src/styles/main-theme.scss';
 
-.member-card {
-  margin-left: $default-gap;
-  margin-right: $default-gap;
-  width: ($element-width - (2 * $default-gap));
-  background-color: mat-color($primary);
-}
-mat-list-item.mat-list-item {
-  height: $button-height;
+@mixin styling(
+  $default-gap: $default-gap,
+  $element-width: $element-width,
+  $button-height: $button-height,
+  $button-width: $button-width,
+  $inner-spacing: $inner-spacing,
+  $memberlist-height: $memberlist-height,
+) {
+
+  .member-card {
+    margin-left: $default-gap;
+    margin-right: $default-gap;
+    width: ($element-width - (2 * $default-gap));
+    background-color: mat-color($primary);
+  }
+  mat-list-item.mat-list-item {
+    height: $button-height;
+  }
+
+  #goBackBtn {
+    background-color: mat-color($accent);
+  }
+
+  /* provide a margin around the divider */
+  mat-divider.mat-divider {
+    margin: $default-gap;
+  }
+
 }
 
-#goBackBtn {
-  background-color: mat-color($accent);
+/* narrow element width for small screen */
+@media screen and (max-width: 520px) {
+  @include styling(
+    $element-width: $element-width-sm,
+  )
+
 }
 
-/* provide a margin around the divider */
-mat-divider.mat-divider {
-  margin: $default-gap;
+/* global defaults */
+@media screen and (min-width: 520px) {
+  @include styling();
 }

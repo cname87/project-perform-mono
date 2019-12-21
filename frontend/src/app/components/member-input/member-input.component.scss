@@ -1,8 +1,32 @@
 /* import theme with styling variables */
 @import 'src/styles/main-theme.scss';
 
-/* position and size the member add input */
-mat-form-field.mat-form-field {
-  margin-left: $default-gap;
-  width: $element-width;
+@mixin styling(
+  $default-gap: $default-gap,
+  $element-width: $element-width,
+  $button-height: $button-height,
+  $button-width: $button-width,
+  $inner-spacing: $inner-spacing,
+  $memberlist-height: $memberlist-height,
+) {
+
+  /* position and size the member add input */
+  mat-form-field.mat-form-field {
+    margin-left: $default-gap;
+    width: $element-width;
+  }
+
+}
+
+/* narrow element width for small screen */
+@media screen and (max-width: 520px) {
+  @include styling(
+    $element-width: $element-width-sm,
+  )
+
+}
+
+/* global defaults */
+@media screen and (min-width: 520px) {
+  @include styling();
 }

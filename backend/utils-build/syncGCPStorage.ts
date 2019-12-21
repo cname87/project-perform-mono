@@ -84,22 +84,12 @@ const envBackend = {
 };
 const envFrontendE2e = {
   /* files to be synced */
-  envFiles: [
-    '.env-e2e-dev',
-    '.env-e2e-production',
-    '.env-e2e-staging',
-  ],
+  envFiles: ['.env-e2e-dev', '.env-e2e-production', '.env-e2e-staging'],
   /* backend directory on GCP Storage - include '/' as POSIX-based */
   gsDirectory: 'frontend/e2e/',
   /* local directory for frontend e2e .env files relative to this file */
-  localDirectory: path.resolve(
-    __dirname,
-    '..',
-    '..',
-    'frontend',
-    'e2e',
-  ),
-  };
+  localDirectory: path.resolve(__dirname, '..', '..', 'frontend', 'e2e'),
+};
 const dbCerts = {
   /* files to be synced */
   envFiles: ['mongoKeyAndCert.pem', 'rootCA.crt'],
@@ -130,7 +120,7 @@ const storageKey = {
     'gcpStorage',
   ),
 };
-const downloads = [ envBackend, envFrontendE2e, dbCerts, storageKey ];
+const downloads = [envBackend, envFrontendE2e, dbCerts, storageKey];
 
 /* run the set of downloads */
 for (const job of downloads) {

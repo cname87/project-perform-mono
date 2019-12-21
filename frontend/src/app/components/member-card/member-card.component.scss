@@ -8,8 +8,8 @@
   display: block;
   /* inner padding */
   padding: $default-gap;
-  border: 1px solid black;
-  border-radius: 6px;
+  border: 0.05rem solid black;
+  border-radius: 0.5rem;
   /* set the background color to a variation of the theme primary */
   background-color: mat-color($primary);
   /* override anchor font color */

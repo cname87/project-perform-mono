@@ -1,6 +1,46 @@
 /* Note: Need to keep this separate from file where mat-core is included so I can import it into component files */
 @import '~@angular/material/theming';
 
+
+html {
+  font-size: calc(16px); // default same as standard user agent: 16px
+}
+
+/* default config with the default typography levels but referenced to rem with the ratio 16px = 1rem */
+$config: mat-typography-config(
+  $font-family:   'Roboto, "Helvetica Neue", sans-serif',
+  /* each defines font size, line height and font weight */
+  $display-4:     mat-typography-level(calc(112rem/16), calc(112rem/16), 300),
+  $display-3:     mat-typography-level(calc(56rem/16), calc(56rem/16), 400),
+  $display-2:     mat-typography-level(calc(45rem/16), calc(48rem/16), 400),
+  $display-1:     mat-typography-level(calc(34rem/16), calc(40rem/16), 400),
+  $headline:      mat-typography-level(calc(24rem/16), calc(32rem/16), 400),
+  $title:         mat-typography-level(calc(20rem/16), calc(32rem/16), 500),
+  $subheading-2:  mat-typography-level(calc(16rem/16), calc(28rem/16), 400),
+  $subheading-1:  mat-typography-level(calc(15rem/16), calc(24rem/16), 400),
+  $body-2:        mat-typography-level(calc(14rem/16), calc(24rem/16), 500),
+  $body-1:        mat-typography-level(calc(14rem/16), calc(20rem/16), 400),
+  $caption:       mat-typography-level(calc(12rem/16), calc(20rem/16), 400),
+  $button:        mat-typography-level(calc(14rem/16), calc(14rem/16), 500),
+  /* line-height must be unit-less fraction of the font-size */
+  $input:         mat-typography-level(calc(16rem/16), 1.125, 400),
+);
+@include angular-material-typography($config);
+
+/* /* default material-icons with the default level (24px) but referenced to rem with the ratio 16px = 1rem */
+.material-icons { font-size: calc(24rem/16); }
+
+/* create variables for use throughout the app */
+$default-gap: 1rem;
+$element-width: 30rem;
+$button-height: 2rem;
+$button-width: 4rem;
+$inner-spacing: 0.5rem;
+$memberlist-height: 2rem;
+
+/* narrow width for small screen */
+$element-width-sm: 22rem;
+
 /* create a custom theme - can match a prebuilt theme*/
 $primary: mat-palette($mat-deep-purple, 200, 100, 300);
 $accent: mat-palette($mat-amber, 100, 50, 300);
@@ -10,13 +50,3 @@ $theme: mat-light-theme(
   $accent,
   $warn,
 );
-
-/* create a config with the default typography levels */
-$config: mat-typography-config();
-
-/* create variables for use throughout the app */
-$default-gap: 16px;
-$element-width: 450px;
-$button-height: 32px;
-$button-width: 64px;
-$inner-spacing: 4px;
