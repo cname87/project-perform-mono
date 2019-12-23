@@ -25,6 +25,8 @@ export class InformationComponent implements OnInit {
   hint = '';
   /* go back button */
   isGoBackVisible = false;
+  /* card click action */
+  clickAction = () => {};
 
   constructor(
     private route: ActivatedRoute,
@@ -43,7 +45,6 @@ export class InformationComponent implements OnInit {
 
     /* set up error only if a mode query parameter of 'error' is passed in */
     if (this.mode === 'error') {
-      /* main information */
       this.header = 'Unexpected Error!';
       this.hint = 'Click on a tab link above';
       this.isGoBackVisible = true;
@@ -57,6 +58,9 @@ export class InformationComponent implements OnInit {
             ? 'Click on the log out button above (or click on a link above)'
             : 'Click on the Log In button above';
           this.isGoBackVisible = false;
+          this.clickAction = loggedIn
+            ? () => this.auth.logout()
+            : () => this.auth.login();
         },
       });
       /* else set up the page not found */
