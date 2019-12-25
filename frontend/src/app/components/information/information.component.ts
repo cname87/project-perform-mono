@@ -17,8 +17,7 @@ import { AuthService } from '../../shared/auth.service/auth.service';
 })
 export class InformationComponent implements OnInit {
   /* component mode determines text and prompts */
-  private mode = '';
-
+  mode = '';
   /* default information if no mode passed in, i.e. page not found */
   header = '';
   /* advice */
@@ -55,8 +54,9 @@ export class InformationComponent implements OnInit {
         next: (loggedIn) => {
           this.header = loggedIn ? 'Log Out' : 'Log In';
           this.hint = loggedIn
-            ? 'Click on the log out button above (or click on a link above)'
-            : 'Click on the Log In button above';
+            ? `Click here or on the Log Out button above
+            (or click on a link above)`
+            : 'Click here or on the Log In button above';
           this.isGoBackVisible = false;
           this.clickAction = loggedIn
             ? () => this.auth.logout()

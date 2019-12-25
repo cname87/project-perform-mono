@@ -1,4 +1,9 @@
-<mat-card class="member-card" (click)="clickAction()">
+  <!-- include class=LogPage when paramMap 'mode' = 'login' -->
+<mat-card
+  class="member-card"
+  (click)="clickAction()"
+  [class.logPage]="mode === 'login'"
+>
 
   <mat-card-header>
     <mat-card-title>{{ header | uppercase }}</mat-card-title>

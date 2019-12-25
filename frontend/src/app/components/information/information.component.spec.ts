@@ -23,6 +23,8 @@ interface IAuthServiceSpy {
   isAuthenticated$: {
     subscribe: (object: { next: () => any }) => void;
   };
+  login: jasmine.Spy;
+  logout: jasmine.Spy;
 }
 describe('InformationComponent', () => {
   /* setup function run by each sub test suite */
@@ -35,6 +37,8 @@ describe('InformationComponent', () => {
     const locationSpy = jasmine.createSpyObj('location', ['back']);
     /* stub authService isAuthenticated property - define spy strategy below */
     let authServiceSpy = jasmine.createSpyObj('authService', ['dummy']);
+    const loginSpy = jasmine.createSpy();
+    const logoutSpy = jasmine.createSpy();
     authServiceSpy = {
       ...authServiceSpy,
       isAuthenticated$: {
@@ -42,6 +46,8 @@ describe('InformationComponent', () => {
           object.next(true);
         },
       },
+      login: loginSpy,
+      logout: logoutSpy,
     };
 
     /* set up Testbed */
@@ -63,6 +69,9 @@ describe('InformationComponent', () => {
 
   class Page {
     /* get DOM elements */
+    get card() {
+      return findTag<HTMLElement>(this.fixture, 'mat-card');
+    }
     get header() {
       return findTag<HTMLElement>(this.fixture, 'mat-card-title');
     }
@@ -90,6 +99,7 @@ describe('InformationComponent', () => {
     };
 
     return {
+      authServiceSpy,
       backSpy,
     };
   }
@@ -130,6 +140,7 @@ describe('InformationComponent', () => {
       fixture,
       component,
       page,
+      authServiceSpy,
       backSpy,
       activatedRouteStub,
     };
@@ -205,6 +216,10 @@ describe('InformationComponent', () => {
       /* default constructor member shown */
       expect(page.header.innerText).toBe('PAGE NOT FOUND');
       expect(page.hint.innerText).toBe('Click on a tab link above');
+      const cursorStyle = window
+        .getComputedStyle(page.card)
+        .getPropertyValue('cursor');
+      expect(cursorStyle).toBe('auto');
     });
 
     it('should show the error values if error mode is set', async () => {
@@ -219,6 +234,10 @@ describe('InformationComponent', () => {
       /* default constructor member shown */
       expect(page.header.innerText).toBe('UNEXPECTED ERROR!');
       expect(page.hint.innerText).toBe('Click on a tab link above');
+      const cursorStyle = window
+        .getComputedStyle(page.card)
+        .getPropertyValue('cursor');
+      expect(cursorStyle).toBe('auto');
     });
 
     it('should show the login values if login mode is set and app is not authenticated ', async () => {
@@ -230,9 +249,14 @@ describe('InformationComponent', () => {
       /* await component ngOnInit and data binding */
       fixture.detectChanges();
       await fixture.whenStable();
-      /* default constructor member shown */
       expect(page.header.innerText).toBe('LOG IN');
-      expect(page.hint.innerText).toBe('Click on the Log In button above');
+      expect(page.hint.innerText).toBe(
+        'Click here or on the Log In button above',
+      );
+      const cursorStyle = window
+        .getComputedStyle(page.card)
+        .getPropertyValue('cursor');
+      expect(cursorStyle).toBe('pointer');
     });
 
     it('should show the logout values if login mode is set and app is authenticated ', async () => {
@@ -244,11 +268,14 @@ describe('InformationComponent', () => {
       /* await component ngOnInit and data binding */
       fixture.detectChanges();
       await fixture.whenStable();
-      /* default constructor member shown */
       expect(page.header.innerText).toBe('LOG OUT');
       expect(page.hint.innerText).toBe(
-        'Click on the log out button above (or click on a link above)',
+        'Click here or on the Log Out button above (or click on a link above)',
       );
+      const cursorStyle = window
+        .getComputedStyle(page.card)
+        .getPropertyValue('cursor');
+      expect(cursorStyle).toBe('pointer');
     });
 
     it('should show the header in uppercase', async () => {
@@ -265,16 +292,65 @@ describe('InformationComponent', () => {
       expect(page.header.innerText).toBe('TEST');
     });
 
+    it('should click login', async () => {
+      const { fixture, page, authServiceSpy, activatedRouteStub } = await setup(
+        false,
+      );
+      /* set up route that the component will get */
+      const routeMode = 'login';
+      activatedRouteStub.setParameter(routeMode);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      /* click the card */
+      click(page.card);
+      expect(authServiceSpy.login).toHaveBeenCalledTimes(1);
+    });
+
+    it('should click logout', async () => {
+      const {
+        fixture,
+        page,
+        authServiceSpy,
+        activatedRouteStub,
+      } = await setup();
+      /* set up route that the component will get */
+      const routeMode = 'login';
+      activatedRouteStub.setParameter(routeMode);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      /* click the card */
+      click(page.card);
+      expect(authServiceSpy.logout).toHaveBeenCalledTimes(1);
+    });
+
     it('should click the go back button', async () => {
       const { fixture, page, backSpy, activatedRouteStub } = await setup();
       /* set up route that the component will get */
-      const routeId = 'edit';
-      activatedRouteStub.setParameter(routeId);
+      const routeMode = 'edit';
+      activatedRouteStub.setParameter(routeMode);
       fixture.detectChanges();
       await fixture.whenStable();
       /* click the go back button */
       click(page.goBackButton);
       expect(backSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not click login or logout', async () => {
+      const {
+        fixture,
+        page,
+        authServiceSpy,
+        activatedRouteStub,
+      } = await setup();
+      /* set up route that the component will get */
+      const routeMode = 'edit';
+      activatedRouteStub.setParameter(routeMode);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      /* click the card */
+      click(page.card);
+      expect(authServiceSpy.login).toHaveBeenCalledTimes(0);
+      expect(authServiceSpy.logout).toHaveBeenCalledTimes(0);
     });
   });
 });

@@ -1,6 +1,6 @@
 const path = require('path');
 
-const { browser, by } = require('protractor');
+const { browser, by, element } = require('protractor');
 const { SpecReporter } = require('jasmine-spec-reporter');
 const request = require('request-promise-native');
 const fs = require('fs');
@@ -9,6 +9,7 @@ const { NgxLoggerLevel } = require('ngx-logger');
 
 import { getDashboardPage } from '../pages/dashboard.page';
 import { getRootElements } from '../pages/elements/root.elements';
+import { getInformationElements } from '../pages/elements/information.elements';
 import { NGXLogger } from 'ngx-logger';
 
 /**
@@ -172,12 +173,18 @@ const loadRootPage = async (isLoggedIn = true, numberExpected = 4) => {
   console.log('Root page loaded');
 };
 
+
 /* login - assumes the non-logged in root page is open */
-const login = async() => {
+const login = async(login = 'button') => {
 
   console.log('Beginning login routine');
 
-  await browser.findElement(by.id('loginBtn')).click();
+  /* test both information.page card click and login button click */
+  if (login === 'card') {
+    await browser.findElement(by.css('mat-card.member-card')).click();
+  } else {
+    await browser.findElement(by.id('loginBtn')).click();
+  }
 
   /* disable wait for angular (as auth0 has redirected and therefore the page is not seen as an angular page?) */
   await browser.waitForAngularEnabled(false);
@@ -245,7 +252,7 @@ export const run = async () => {
   await resetDatabase();
   await loadRootPage(false);
   await checkE2eEnvironment();
-  await login();
+  await login('card');
   setTimeout(120000);
 }
 

@@ -17,17 +17,14 @@
     width: ($element-width - (2 * $default-gap));
     background-color: mat-color($warn, default);
   }
-  mat-list-item.mat-list-item {
-    height: $button-height;
+
+  /* pointer cursor only when login page showing */
+  .logPage {
+    cursor: pointer;
   }
 
   #goBackBtn {
     background-color: mat-color($primary, default);
-  }
-
-  /* provide a margin around the divider */
-  mat-divider.mat-divider {
-    margin: $default-gap;
   }
 
 }

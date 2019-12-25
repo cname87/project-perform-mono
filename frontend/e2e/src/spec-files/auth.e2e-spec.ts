@@ -24,7 +24,7 @@ describe('Authentication:', () => {
     return {
       bannerHeader: 'Team Members',
       informationHeader: 'LOG IN',
-      informationHint: 'Click on the Log In button above',
+      informationHint: 'Click here or on the Log In button above',
     };
   };
 
