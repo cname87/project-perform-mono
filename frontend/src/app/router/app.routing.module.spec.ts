@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Location, APP_BASE_HREF } from '@angular/common';
 import { DebugElement, Type } from '@angular/core';
 import { By } from '@angular/platform-browser';
@@ -7,6 +8,7 @@ import { SpyLocation } from '@angular/common/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NGXLogger } from 'ngx-logger';
 
+import { of, Observable } from 'rxjs';
 import { click } from '../shared/test-helpers';
 import { AppModule } from '../app.module';
 import { AppComponent } from '../components/app/app.component';
@@ -14,7 +16,6 @@ import { DashboardComponent } from '../components/dashboard/dashboard.component'
 import { MembersListComponent } from '../components/members-list/members-list.component';
 import { MembersService } from '../shared/members-service/members.service';
 import { IMember } from '../data-providers/models/models';
-import { of, Observable } from 'rxjs';
 import { MemberDetailComponent } from '../components/member-detail/member-detail.component';
 import { routes } from '../config';
 import { InformationComponent } from '../components/information/information.component';
@@ -34,24 +35,20 @@ interface IAuthServiceSpy {
 describe('RoutingModule', () => {
   /* setup function run by each 'it' test suite */
   async function mainSetup() {
-    /* stub logger to avoid console logs */
+    /* create a stub to stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
 
-    /* create stub instances with spies for injection */
+    /* stub membersService to return dummy members */
     const membersServiceStub: IMembersServiceStub = {
-      getMembers: () => {
-        return of([{ id: 1, name: 'testName1' }]);
-      },
-      getMember: () => {
-        return of({ id: 2, name: 'testName2' });
-      },
+      getMembers: () => of([{ id: 1, name: 'testName1' }]),
+      getMember: () => of({ id: 2, name: 'testName2' }),
     };
 
-    /* stub authService getAuth0Client method - define spy strategy below */
+    /* stub authService method - define spy implementation below */
     let authServiceSpy = jasmine.createSpyObj('authService', [
       'localAuthSetup',
     ]);
-    /* stub authService properties isLoggedIn - define values below */
+    /* stub authService properties - define values below */
     authServiceSpy = {
       ...authServiceSpy,
       isAuthenticated$: {
@@ -81,7 +78,9 @@ describe('RoutingModule', () => {
   /* create an object capturing all key DOM elements */
   class Page {
     links: DebugElement[];
+
     dashboardLinkDe: DebugElement;
+
     membersLinkDe: DebugElement;
 
     constructor(readonly fixture: ComponentFixture<AppComponent>) {
@@ -93,11 +92,12 @@ describe('RoutingModule', () => {
     }
   }
 
+  /* create the spy implementations */
   function createSpies(
     authServiceSpy: IAuthServiceSpy,
     authenticated: boolean,
   ) {
-    /* stub localAuthSetupSpy() */
+    /* stub localAuthSetup in AuthService spy */
     const localAuthSetupSpy = authServiceSpy.localAuthSetup.and.stub();
     /* mock isAuthenticated$ property to simulate an observable */
     authServiceSpy.isAuthenticated$ = (of(authenticated) as any) as jasmine.Spy;
@@ -111,7 +111,7 @@ describe('RoutingModule', () => {
     const fixture = TestBed.createComponent(AppComponent);
 
     /* get the injected instances */
-    const injector = fixture.debugElement.injector;
+    const { injector } = fixture.debugElement;
     const spyLocation = injector.get<SpyLocation>(Location as any);
     const membersServiceInjected = injector.get<MembersService>(
       MembersService as any,
@@ -169,14 +169,16 @@ describe('RoutingModule', () => {
     type: Type<any>,
   ): any {
     const el = fixture.debugElement.query(By.directive(type));
-    expect(el).toBeTruthy('expected an element for ' + type.name);
+    expect(el).toBeTruthy(`expected an element for ${type.name}`);
     return el;
   }
 
   it('should navigate to "/information/login" if not authenticated', async () => {
     const { fixture, spyLocation } = await setup(false);
+
     fixture.detectChanges();
     await fixture.whenStable();
+
     expect(spyLocation.path()).toEqual(
       '/information/login',
       'after initialNavigation() not authenticated',
@@ -211,7 +213,7 @@ describe('RoutingModule', () => {
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + routes.membersList.path,
+      `/${routes.membersList.path}`,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);
@@ -233,7 +235,7 @@ describe('RoutingModule', () => {
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + routes.membersList.path,
+      `/${routes.membersList.path}`,
       'after clicking members link',
     );
     expectElementOf(fixture, MembersListComponent);
@@ -256,13 +258,13 @@ describe('RoutingModule', () => {
     );
     expectElementOf(fixture, DashboardComponent);
     fixture.ngZone!.run(() => {
-      spyLocation.go('/' + routes.membersList.path);
+      spyLocation.go(`/${routes.membersList.path}`);
     });
     fixture.detectChanges();
     await fixture.whenStable();
     expectPathToBe(
       spyLocation,
-      '/' + routes.membersList.path,
+      `/${routes.membersList.path}`,
       'after url change to/members',
     );
     expectElementOf(fixture, MembersListComponent);

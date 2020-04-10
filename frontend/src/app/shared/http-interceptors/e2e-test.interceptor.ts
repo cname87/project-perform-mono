@@ -18,7 +18,7 @@ export class E2eTestInterceptor implements HttpInterceptor {
     private logger: NGXLogger,
   ) {
     this.logger.trace(
-      E2eTestInterceptor.name + ': Starting E2eTestInterceptor',
+      `${E2eTestInterceptor.name}: Starting E2eTestInterceptor`,
     );
   }
 
@@ -26,7 +26,7 @@ export class E2eTestInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
-    this.logger.trace(E2eTestInterceptor.name + ': intercept called');
+    this.logger.trace(`${E2eTestInterceptor.name}: intercept called`);
 
     this.logger.trace(
       `${E2eTestInterceptor.name} + : isTesting is ${this.isTesting}`,
@@ -55,7 +55,7 @@ export class E2eTestInterceptor implements HttpInterceptor {
         }
 
         this.logger.trace(
-          E2eTestInterceptor.name + ': throwing a simulated server error',
+          `${E2eTestInterceptor.name}: throwing a simulated server error`,
         );
         const httpError = new HttpErrorResponse({
           error: {
@@ -70,8 +70,7 @@ export class E2eTestInterceptor implements HttpInterceptor {
 
       case errorTestUrls.getOne: {
         this.logger.trace(
-          E2eTestInterceptor.name +
-            ': throwing a simulated client-side or network ErrorEvent error',
+          `${E2eTestInterceptor.name}: throwing a simulated client-side or network ErrorEvent error`,
         );
 
         const httpError = new HttpErrorResponse({
@@ -88,7 +87,7 @@ export class E2eTestInterceptor implements HttpInterceptor {
       case errorTestUrls.delete:
       case errorTestUrls.getAll: {
         this.logger.trace(
-          E2eTestInterceptor.name + ': throwing a simulated unexpected error',
+          `${E2eTestInterceptor.name}: throwing a simulated unexpected error`,
         );
 
         throw new Error('Test unexpected error');

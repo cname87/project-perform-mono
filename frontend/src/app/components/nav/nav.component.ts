@@ -22,19 +22,22 @@ interface ILink {
 export class NavComponent {
   /* routerLink links */
   private dashboard = routes.dashboard;
+
   private membersList = routes.membersList;
+
   private detail = routes.detail;
+
   links: ILink[] = [
     {
-      path: '/' + this.dashboard.path,
+      path: `/${this.dashboard.path}`,
       display: this.dashboard.displayName,
     },
     {
-      path: '/' + this.membersList.path,
+      path: `/${this.membersList.path}`,
       display: this.membersList.displayName,
     },
     {
-      path: '/' + this.detail.path,
+      path: `/${this.detail.path}`,
       display: this.detail.displayName,
       disabled: true,
     },

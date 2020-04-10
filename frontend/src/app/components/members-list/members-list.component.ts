@@ -2,14 +2,14 @@ import { Component, OnInit, ErrorHandler } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { IsLoadingService } from '@service-work/is-loading';
 
-import { MembersService } from '../../shared/members-service/members.service';
+import { Observable, of } from 'rxjs';
+import { ActivatedRoute, Data } from '@angular/router';
+import { catchError, publishReplay, refCount } from 'rxjs/operators';
 import {
   IMember,
   IMemberWithoutId,
 } from '../../data-providers/members.data-provider';
-import { Observable, of } from 'rxjs';
-import { ActivatedRoute, Data } from '@angular/router';
-import { catchError, publishReplay, refCount } from 'rxjs/operators';
+import { MembersService } from '../../shared/members-service/members.service';
 
 /**
  * This component displays a list of members.
@@ -24,6 +24,7 @@ import { catchError, publishReplay, refCount } from 'rxjs/operators';
 export class MembersListComponent implements OnInit {
   /* observable of array of members returned from search */
   members$!: Observable<IMember[]>;
+
   /* mode for input box */
   inputMode = 'add';
 
@@ -35,7 +36,7 @@ export class MembersListComponent implements OnInit {
     private isLoadingService: IsLoadingService,
   ) {
     this.logger.trace(
-      MembersListComponent.name + ': Starting MembersListComponent',
+      `${MembersListComponent.name}: Starting MembersListComponent`,
     );
   }
 
@@ -48,7 +49,7 @@ export class MembersListComponent implements OnInit {
 
   /* getMembers called after add() and delete() to reload from server */
   getMembers() {
-    this.logger.trace(MembersListComponent.name + ': Calling getMembers');
+    this.logger.trace(`${MembersListComponent.name}: Calling getMembers`);
 
     let errorHandlerCalled = false;
     const dummyMembers: IMember[] = [];
@@ -59,7 +60,7 @@ export class MembersListComponent implements OnInit {
       refCount(),
       catchError((error: any) => {
         if (!errorHandlerCalled) {
-          this.logger.trace(MembersListComponent.name + ': catchError called');
+          this.logger.trace(`${MembersListComponent.name}: catchError called`);
           errorHandlerCalled = true;
           this.errorHandler.handleError(error);
         }
@@ -70,7 +71,7 @@ export class MembersListComponent implements OnInit {
   }
 
   add(name: string) {
-    this.logger.trace(MembersListComponent.name + ': Calling addMember');
+    this.logger.trace(`${MembersListComponent.name}: Calling addMember`);
 
     /* ignore if the input text is empty */
     if (!name) {
@@ -94,7 +95,7 @@ export class MembersListComponent implements OnInit {
   }
 
   delete(member: IMember): void {
-    this.logger.trace(MembersListComponent.name + ': Calling deleteMember');
+    this.logger.trace(`${MembersListComponent.name}: Calling deleteMember`);
 
     /* set an isLoadingService indicator (that loads a progress bar) and clears it when the returned observable emits. */
     this.isLoadingService.add(

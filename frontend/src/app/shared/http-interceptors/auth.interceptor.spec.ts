@@ -39,9 +39,9 @@ describe('AuthInterceptor', () => {
   function createSpies() {
     /* create a next.handle function that can be spied upon */
     const nextSpy = jasmine.createSpyObj('next', ['handle']);
-    const nextHandleSpy = nextSpy.handle.and.callFake((req: any) => {
-      return of(req) as any;
-    });
+    const nextHandleSpy = nextSpy.handle.and.callFake(
+      (req: any) => of(req) as any,
+    );
 
     return {
       nextSpy,
@@ -52,7 +52,7 @@ describe('AuthInterceptor', () => {
   /**
    * Get the service, initialize it, set test variables.
    */
-  async function getService() {
+  function getService() {
     const authInterceptor: AuthInterceptor = TestBed.get(
       AuthInterceptor as Type<AuthInterceptor>,
     );
@@ -76,14 +76,14 @@ describe('AuthInterceptor', () => {
     return getService();
   }
 
-  describe('interceptor', async () => {
+  describe('interceptor', () => {
     it('should be created', async () => {
       const { authInterceptor } = await setup();
       expect(authInterceptor).toBeTruthy();
     });
   });
 
-  describe('intercept function', async () => {
+  describe('intercept function', () => {
     it('should return a request with an Authorization header', async () => {
       const { authInterceptor, nextSpy } = await setup();
       const req = new HttpRequest('GET', 'www.test.com');

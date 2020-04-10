@@ -18,14 +18,20 @@ import { AuthService } from '../../shared/auth.service/auth.service';
 export class InformationComponent implements OnInit {
   /* component mode determines text and prompts */
   mode = '';
+
   /* default information if no mode passed in, i.e. page not found */
   header = '';
+
   /* advice */
   hint = '';
+
   /* go back button */
   isGoBackVisible = false;
+
   /* card click action */
-  clickAction = () => {};
+  clickAction = () => {
+    /* initialise as empty function */
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -34,11 +40,11 @@ export class InformationComponent implements OnInit {
     private logger: NGXLogger,
   ) {
     this.logger.trace(
-      InformationComponent.name + ': Starting InformationComponent',
+      `${InformationComponent.name}: Starting InformationComponent`,
     );
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     /* get the component mode from the query parameter */
     this.mode = this.route.snapshot.paramMap.get('mode') as string;
 

@@ -5,7 +5,6 @@
 /* external dependencies */
 import { resolve } from 'path';
 
-// tslint:disable:object-literal-sort-keys
 export const configServer = {
   /**
    * This section sets misc configuration parameters used by the

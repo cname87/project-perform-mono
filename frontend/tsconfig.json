@@ -1,6 +1,16 @@
 {
 
+
+  // "files": [
+  //   "src/main.ts",
+  //   "src/polyfills.ts"
+  // ],
+  // "include": [
+  //   "src/**/*.d.ts"
+  // ],
   "exclude": [
+    "coverage",
+    "dist",
     "node_modules"
   ],
 
@@ -19,13 +29,13 @@
       "dom"
     ],
 
-    /* workaround for core.js - see https://github.com/angular/angular-cli/issues/13954 */
     "paths": {
-      "core-js/es7/reflect": [
-        "node_modules/core-js/proposals/reflect-metadata"
-      ],
+      /* workaround for core.js - see https://github.com/angular/angular-cli/issues/13954 */
       "core-js/es6/*": [
         "node_modules/core-js/es/*"
+      ],
+      "core-js/es7/*": [
+        "node_modules/core-js/es"
       ]
     },
 
@@ -62,17 +72,10 @@
       "node_modules/@types"
     ],
     "plugins": [
-      {
-        "name": "typescript-tslint-plugin",
-        "alwaysShowRuleFailuresAsWarnings": false,
-        "ignoreDefinitionFiles": true,
-        "configFile": "./tslint.json",
-        "suppressWhileTypeErrorsPresent": false,
-        "mockTypeScriptVersion": false,
-        "jsEnable": true,
-        "exclude": [
-        ]
-      }
     ]
+  },
+  "angularCompilerOptions": {
+    "enableIvy": true,
+    "allowEmptyCodegenFiles": true
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -179,7 +180,7 @@ describe('MembersService', () => {
   describe('updateMember', describeUpdateMember);
   describe('testError', describeTestError);
 
-  async function describeGetMembers() {
+  function describeGetMembers() {
     it('should have getMembers(" ") return [] without accessing the server', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService.getMembers(' ').toPromise();
@@ -295,7 +296,7 @@ describe('MembersService', () => {
       );
     });
   }
-  async function describeGetMember() {
+  function describeGetMember() {
     it('should have getMember(id) return a member', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService.getMember(1).toPromise();
@@ -375,7 +376,7 @@ describe('MembersService', () => {
       expect(result).toBe(undefined, 'no member returned');
     });
   }
-  async function describeAddMember() {
+  function describeAddMember() {
     it('should have addMember(memberWithoutId) return a member', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService
@@ -400,7 +401,7 @@ describe('MembersService', () => {
     it('should have addMember({ "errorTest500" }) fail', async () => {
       const { membersService, membersApi, messageService } = await setup();
 
-      await membersService.addMember({ name: 'errorTest500' }).subscribe(
+      membersService.addMember({ name: 'errorTest500' }).subscribe(
         () => {
           fail('Successfull response not expected');
         },
@@ -427,7 +428,7 @@ describe('MembersService', () => {
       );
     });
   }
-  async function describeDeleteMember() {
+  function describeDeleteMember() {
     it('should have deleteMember(id) return count', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService.deleteMember(1).toPromise();
@@ -478,7 +479,7 @@ describe('MembersService', () => {
       const { membersService, membersApi, messageService } = await setup();
 
       /* server will return 404 error */
-      await membersService.deleteMember(0).subscribe(
+      membersService.deleteMember(0).subscribe(
         () => {
           fail('Successful response not expected');
         },
@@ -507,7 +508,7 @@ describe('MembersService', () => {
       const { membersService, membersApi, messageService } = await setup();
 
       /* server will return 500 error */
-      await membersService.deleteMember(-1).subscribe(
+      membersService.deleteMember(-1).subscribe(
         () => {
           fail('Successfull response not expected');
         },
@@ -532,7 +533,7 @@ describe('MembersService', () => {
       );
     });
   }
-  async function describeUpdateMember() {
+  function describeUpdateMember() {
     it('should have updateMember(member) return a member', async () => {
       const { membersService, membersApi, messageService } = await setup();
       const result = await membersService.updateMember(members[0]).toPromise();
@@ -556,7 +557,7 @@ describe('MembersService', () => {
       const { membersService, membersApi, messageService } = await setup();
 
       /* server will return 404 error */
-      await membersService.updateMember({ id: 0, name: 'test' }).subscribe(
+      membersService.updateMember({ id: 0, name: 'test' }).subscribe(
         () => {
           fail('Successfull response not expected');
         },
@@ -585,7 +586,7 @@ describe('MembersService', () => {
       const { membersService, membersApi, messageService } = await setup();
 
       /* server will return 500 error */
-      await membersService.updateMember({ id: -1, name: 'test' }).subscribe(
+      membersService.updateMember({ id: -1, name: 'test' }).subscribe(
         () => {
           fail('Successfull response not expected');
         },
@@ -611,7 +612,7 @@ describe('MembersService', () => {
     });
   }
   /* tests the test error functionality in getMembers */
-  async function describeTestError() {
+  function describeTestError() {
     it('should throw a test error', async () => {
       const { membersService } = await setup({ isTesting: true });
 

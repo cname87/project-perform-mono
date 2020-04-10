@@ -2,9 +2,9 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
 
+import { of, throwError, defer } from 'rxjs';
 import { AppModule } from '../../app.module';
 import { HttpErrorInterceptor } from './http-error.interceptor';
-import { of, throwError, defer } from 'rxjs';
 import { errorTypes } from '../../config';
 
 interface INgxLoggerSpy {
@@ -54,15 +54,14 @@ describe('HttpErrorInterceptor', () => {
     const serverErrorNoStatus = {
       allocatedType: 'None',
       message: 'Server error message',
-      /// no 'status' property
+      // / no 'status' property
       error: 'Error property in test error',
     };
 
     let tryNumber = 0;
 
-    const nextFactory = () => {
-      return tryNumber++ ? of(noError) : throwError(serverError);
-    };
+    const nextFactory = () =>
+      tryNumber++ ? of(noError) : throwError(serverError);
 
     const traceCallsExErrors = 3;
 
@@ -105,7 +104,7 @@ describe('HttpErrorInterceptor', () => {
   /**
    * Get the service, initialize it, set test variables.
    */
-  async function getService() {
+  function getService() {
     /* create the service */
     const httpErrorInterceptor = TestBed.get(HttpErrorInterceptor);
 
@@ -122,7 +121,7 @@ describe('HttpErrorInterceptor', () => {
     };
   }
 
-  describe('interceptor', async () => {
+  describe('interceptor', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -137,12 +136,12 @@ describe('HttpErrorInterceptor', () => {
     it('should have local variables at initial values', async () => {
       const { httpErrorInterceptor, totalTries, retryDelay } = await setup();
 
-      expect(httpErrorInterceptor['totalTries']).toBe(totalTries);
-      expect(httpErrorInterceptor['retryDelay']).toBe(retryDelay);
+      expect(httpErrorInterceptor.totalTries).toBe(totalTries);
+      expect(httpErrorInterceptor.retryDelay).toBe(retryDelay);
     });
   });
 
-  describe('has a intercept function that', async () => {
+  describe('has a intercept function that', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -241,9 +240,11 @@ describe('HttpErrorInterceptor', () => {
         nextServerError,
       );
       result.subscribe(
-        (_ok: any) => {},
+        (_ok: any) => {
+          // empty
+        },
         (error: any) => {
-          /* non-ErrorEvent path*/
+          /* non-ErrorEvent path */
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Server returned an unsuccessful response code',
           );
@@ -276,9 +277,11 @@ describe('HttpErrorInterceptor', () => {
         nextClientError,
       );
       result.subscribe(
-        (_ok: any) => {},
+        (_ok: any) => {
+          // empty
+        },
         (error: any) => {
-          /* non-ErrorEvent path*/
+          /* non-ErrorEvent path */
           expect(traceLoggerSpy).toHaveBeenCalledWith(
             'HttpErrorInterceptor: Client-side or network error',
           );
@@ -308,9 +311,11 @@ describe('HttpErrorInterceptor', () => {
         nextServerErrorNoStatus,
       );
       result.subscribe(
-        (_ok: any) => {},
+        (_ok: any) => {
+          // empty
+        },
         (error: any) => {
-          /* non-ErrorEvent path*/
+          /* non-ErrorEvent path */
           expect(traceLoggerSpy).not.toHaveBeenCalledWith(
             'HttpErrorInterceptor: Client-side or network error',
           );

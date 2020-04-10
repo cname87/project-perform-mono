@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { NGXLogger } from 'ngx-logger';
 
+import { APP_BASE_HREF } from '@angular/common';
 import { MessageService } from './message.service';
 import { AppModule } from '../../app.module';
-import { APP_BASE_HREF } from '@angular/common';
 
 describe('MessageService', () => {
   async function mainSetup() {
@@ -20,7 +20,7 @@ describe('MessageService', () => {
     }).compileComponents();
   }
 
-  async function getService() {
+  function getService() {
     const messageService = TestBed.get(MessageService);
     return {
       messageService,

@@ -12,7 +12,7 @@ interface IAuthServiceSpy {
 }
 
 describe('CallbackComponent', () => {
-  /* setup function run by each sub test suite*/
+  /* setup function run by each sub test suite */
   async function mainSetup() {
     /* stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
@@ -48,12 +48,12 @@ describe('CallbackComponent', () => {
   }
 
   /* create the component, and get test variables */
-  async function createComponent() {
+  function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(CallbackComponent);
 
     /* get the injected instances */
-    const injector = fixture.debugElement.injector;
+    const { injector } = fixture.debugElement;
     const authServiceSpy = injector.get<IAuthServiceSpy>(AuthService as any);
 
     const expected = createExpected();
@@ -75,7 +75,7 @@ describe('CallbackComponent', () => {
   /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
   async function preSetup() {
     await mainSetup();
-    const testVars = await createComponent();
+    const testVars = createComponent();
     return testVars;
   }
 
@@ -90,7 +90,7 @@ describe('CallbackComponent', () => {
     return testVars;
   }
 
-  describe('after ngOnInit', async () => {
+  describe('after ngOnInit', () => {
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component created');

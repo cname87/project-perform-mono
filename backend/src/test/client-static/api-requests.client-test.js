@@ -7,11 +7,7 @@ const HOST = `http://localhost:${PORT}/`;
 const API_PATH = 'api-v1/';
 const API_URL = `${HOST}${API_PATH}`;
 
-async function sendRequest(
-  url,
-  method,
-  data,
-) {
+async function sendRequest(url, method, data) {
   const myRequest = new Request(url);
   const headers = data
     ? {
@@ -595,10 +591,7 @@ describe('fall back to the angular index.html', () => {
   /* tests a path not recognised by angular frontend */
   it('should fall back to angular index.html', async () => {
     const dt = new Date().toString();
-    testWindow = window.open(
-      `${HOST}notfound.html?timestamp==${dt}`,
-      '_blank',
-    );
+    testWindow = window.open(`${HOST}notfound.html?timestamp==${dt}`, '_blank');
 
     if (!testWindow) {
       throw new Error('Window did not open');
@@ -699,7 +692,7 @@ describe('page and file retrieval', () => {
 
     /* test content type */
     const contentType = response.headers.get('content-type');
-    console.log('favicon content type: ' + contentType);
+    console.log(`favicon content type: ${contentType}`);
     chai.expect(contentType, 'response content type').to.eql('image/x-icon');
   });
 });

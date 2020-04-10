@@ -1,20 +1,25 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
+import karmaJasmine from 'karma-jasmine';
+import karmaChromeLauncher from 'karma-chrome-launcher';
+import karmaJasmineHtmlReporter from 'karma-jasmine-html-reporter';
+import karmaCoverageIstanbulReporter from 'karma-coverage-istanbul-reporter';
+import angularDevkitPluginKarma from '@angular-devkit/build-angular/plugins/karma';
 
 /* Set path to the Chrome executable - using Chromium from Puppeteer for GCP */
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
-module.exports = function (config) {
+export default function main(config) {
   config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
     plugins: [
-      require('karma-jasmine'),
-      require('karma-chrome-launcher'),
-      require('karma-jasmine-html-reporter'),
-      require('karma-coverage-istanbul-reporter'),
-      require('@angular-devkit/build-angular/plugins/karma')
+      karmaJasmine,
+      karmaChromeLauncher,
+      karmaJasmineHtmlReporter,
+      karmaCoverageIstanbulReporter,
+      angularDevkitPluginKarma,
     ],
     client: {
       clearContext: false, // leave Jasmine Spec Runner output visible in browser
@@ -23,8 +28,8 @@ module.exports = function (config) {
         seed: '4321',
         oneFailurePerSpec: true,
         failFast: true,
-        timeoutInterval: 30000
-      }
+        timeoutInterval: 30000,
+      },
     },
 
     reporters: ['progress', 'kjhtml'],
@@ -33,16 +38,16 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: false,
 
-    /* choose browser in angular.json configurations */
+    /* choose browser in angular.json configuration */
     //  browsers: ['Chrome', 'ChromeHeadless_NoSandbox'],
 
     customLaunchers: {
-      ChromeHeadless_NoSandbox: {
+      ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox'],  // needed for GCP Docker build
-        displayName: 'ChromeHeadless_NoSandbox'
-      }
+        flags: ['--no-sandbox'], // needed for GCP Docker build
+        displayName: 'ChromeHeadlessNoSandbox',
+      },
     },
-    singleRun: true
+    singleRun: true,
   });
-};
+}

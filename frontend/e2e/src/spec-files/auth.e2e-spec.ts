@@ -20,13 +20,11 @@ describe('Authentication:', () => {
     resetDatabase,
   } = getHelpers();
 
-  const createExpected = () => {
-    return {
-      bannerHeader: 'Team Members',
-      informationHeader: 'LOG IN',
-      informationHint: 'Click here or on the Log In button above',
-    };
-  };
+  const createExpected = () => ({
+    bannerHeader: 'Team Members',
+    informationHeader: 'LOG IN',
+    informationHint: 'Click here or on the Log In button above',
+  });
 
   /* Note: app must start in logged in state */
 
@@ -47,7 +45,7 @@ describe('Authentication:', () => {
       await awaitElementVisible(getRootElements().logoutBtn);
     });
 
-    it(`by clicking on the logout button`, async () => {
+    it('by clicking on the logout button', async () => {
       const { informationHeader } = createExpected();
 
       /* dashboard page is initially displayed */
@@ -56,17 +54,16 @@ describe('Authentication:', () => {
       await dashboardPage.rootElements.logoutBtn.click();
 
       /* the login page is now displayed */
-      let loginPage = getLoginPage();
+      const loginPage = getLoginPage();
 
       /* test visibility to ensure page shown */
       await awaitElementVisible(loginPage.rootElements.loginBtn);
 
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await loginPage.loginInformationElement.header.getText()) ===
-          informationHeader
-        );
-      });
+          informationHeader,
+      );
     });
   });
 
@@ -76,9 +73,9 @@ describe('Authentication:', () => {
       await awaitElementVisible(getRootElements().loginBtn);
     });
 
-    it(`with a banner containing a login button only`, async () => {
+    it('with a banner containing a login button only', async () => {
       const { bannerHeader } = createExpected();
-      let loginPage = getLoginPage();
+      const loginPage = getLoginPage();
       expect(await loginPage.rootElements.bannerHeader.getText()).toEqual(
         bannerHeader,
       );
@@ -91,8 +88,8 @@ describe('Authentication:', () => {
       ).not.toBeTruthy();
     });
 
-    it(`with a nav bar with all links disabled`, async () => {
-      let loginPage = getLoginPage();
+    it('with a nav bar with all links disabled', async () => {
+      const loginPage = getLoginPage();
       expect(
         await loginPage.rootElements.dashboardLink.getAttribute(
           'aria-disabled',
@@ -106,9 +103,9 @@ describe('Authentication:', () => {
       ).toEqual('true');
     });
 
-    it(`with a information element`, async () => {
+    it('with a information element', async () => {
       const { informationHeader, informationHint } = createExpected();
-      let loginPage = getLoginPage();
+      const loginPage = getLoginPage();
       expect(await loginPage.loginInformationElement.header.getText()).toEqual(
         informationHeader,
       );
@@ -117,8 +114,8 @@ describe('Authentication:', () => {
       );
     });
 
-    it(`with an empty messages element`, async () => {
-      let loginPage = getLoginPage();
+    it('with an empty messages element', async () => {
+      const loginPage = getLoginPage();
       expect(
         await loginPage.rootElements.messagesHeader.isPresent(),
       ).not.toBeTruthy();
@@ -131,12 +128,12 @@ describe('Authentication:', () => {
       await awaitElementVisible(getRootElements().loginBtn);
     });
 
-    it(`by clicking on the login button`, async () => {
+    it('by clicking on the login button', async () => {
       await login();
       await awaitElementVisible(getRootElements().logoutBtn);
     });
 
-    it(`and the profile button will be visible`, async () => {
+    it('and the profile button will be visible', async () => {
       /* the dashboard page is shown */
       const dashboardPage = getDashboardPage();
       expect(
@@ -151,7 +148,7 @@ describe('Authentication:', () => {
       await awaitElementVisible(getRootElements().logoutBtn);
     });
 
-    it(`by clicking on the profile button`, async () => {
+    it('by clicking on the profile button', async () => {
       /* dashboard page is initially displayed */
       const dashboardPage = getDashboardPage();
 
@@ -163,19 +160,19 @@ describe('Authentication:', () => {
       /* wait for visibility before test */
       await awaitElementVisible(profilePage.userProfileElements.goBackBtn);
 
-      await browser.wait(async () => {
-        return profilePage.userProfileElements.profileName.isDisplayed();
-      });
+      await browser.wait(async () =>
+        profilePage.userProfileElements.profileName.isDisplayed(),
+      );
 
       expect(
         await profilePage.userProfileElements.profileName.getText(),
-      ).toEqual('NAME: ' + process.env.TEST_NAME);
+      ).toEqual(`NAME: ${process.env.TEST_NAME}`);
       expect(
         await profilePage.userProfileElements.profileEmail.getText(),
-      ).toEqual('EMAIL: ' + process.env.TEST_EMAIL);
+      ).toEqual(`EMAIL: ${process.env.TEST_EMAIL}`);
     });
 
-    it(`and then click go back to return`, async () => {
+    it('and then click go back to return', async () => {
       /* profile page is still displayed */
       const profilePage = getUserProfilePage();
 

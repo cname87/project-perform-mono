@@ -8,20 +8,20 @@ import {
 } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 
+import { from } from 'rxjs';
 import { AppModule } from '../../app.module';
 import { AuthGuard } from './auth.guard';
 import { MockAuthService } from '../../shared/mocks/mock-auth.service';
 import { AuthService } from '../../shared/auth.service/auth.service';
 import { routes } from '../../config';
-import { Observable, from } from 'rxjs';
 
 describe('AuthGuard', () => {
-  /* setup function run by each sub test suite*/
+  /* setup function run by each sub test suite */
   async function mainSetup() {
     /* stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
 
-    /* stub router for ease of test*/
+    /* stub router for ease of test */
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     /* note that AuthService is mocked */
@@ -39,7 +39,7 @@ describe('AuthGuard', () => {
   }
 
   /* create the guard, and get test variables */
-  async function createElement() {
+  function createElement() {
     /* get the injected instances */
     const testBed = getTestBed();
     const guard = testBed.get<AuthGuard>(AuthGuard) as AuthGuard;
@@ -56,24 +56,24 @@ describe('AuthGuard', () => {
   /* setup function run by each it test function */
   async function setup() {
     await mainSetup();
-    const testVars = await createElement();
+    const testVars = createElement();
     return testVars;
   }
 
-  describe('after setup', async () => {
+  describe('after setup', () => {
     it('should be created', async () => {
       const { guard } = await setup();
       expect(guard).toBeTruthy('guard created');
     });
   });
 
-  describe('canActivate', async () => {
+  describe('canActivate', () => {
     it('should return true when authenticated', async () => {
       const { guard } = await setup();
       const result$ = guard.canActivate(
         {} as ActivatedRouteSnapshot,
         {} as RouterStateSnapshot,
-      ) as Observable<boolean>;
+      );
       expect(await result$.toPromise()).toEqual(true);
     });
     it('should return false when not authenticated', async () => {
@@ -83,7 +83,7 @@ describe('AuthGuard', () => {
       const result$ = guard.canActivate(
         {} as ActivatedRouteSnapshot,
         {} as RouterStateSnapshot,
-      ) as Observable<boolean>;
+      );
       expect(await result$.toPromise()).toEqual(false);
     });
     it('should route to login when not authenticated', async () => {
@@ -95,7 +95,7 @@ describe('AuthGuard', () => {
       const result$ = guard.canActivate(
         {} as ActivatedRouteSnapshot,
         {} as RouterStateSnapshot,
-      ) as Observable<boolean>;
+      );
       expect(await result$.toPromise()).toEqual(false);
       expect(routerNavigateSpy).toHaveBeenCalledWith([routes.loginPage.path]);
     });

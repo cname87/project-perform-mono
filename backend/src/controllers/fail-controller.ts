@@ -3,14 +3,14 @@
  * It is to test server fail scenarios.
  */
 
-import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
 /* external dependencies */
 import express from 'express';
-const router = express.Router();
 import asyncHandler from 'express-async-handler';
 import createError from 'http-errors';
+import { setupDebug } from '../utils/src/debugOutput';
+
+const { modulename, debug } = setupDebug(__filename);
+const router = express.Router();
 
 /**
  * Tests various error scenarios: If the url query matches...
@@ -26,11 +26,11 @@ import createError from 'http-errors';
  */
 
 router.get('/', (req, res, next) => {
-  debug(modulename + ': running an error scenario');
+  debug(`${modulename}: running an error scenario`);
 
   /* throws an unhandled promise rejection - tested below */
   async function asyncFail(_req: any, _res: any, _next: () => void) {
-    debug(modulename + ': throwing an unhandled rejection');
+    debug(`${modulename}: throwing an unhandled rejection`);
     await Promise.reject(
       createError(501, 'Testing trapped unhandled promise rejection'),
     );
@@ -39,48 +39,48 @@ router.get('/', (req, res, next) => {
   /* read url query */
   switch (req.query.fail) {
     case 'coffee':
-      debug(modulename + ': coffee requested - sending a 418 code');
+      debug(`${modulename}: coffee requested - sending a 418 code`);
       return next(createError(418, "Test: I'm a teapot!"));
     case 'sent':
-      debug(modulename + ': testing sending a response and calling next()');
+      debug(`${modulename}: testing sending a response and calling next()`);
       res.status(200);
       const message = JSON.parse('{"message": "Test: Response sent"}');
       res.json(message);
       /* call next(err) even though response sent */
       return next(createError(503, 'Test: next(503) after headers sent'));
     case 'trap-503':
-      debug(modulename + ': testing creating an error with an error code');
+      debug(`${modulename}: testing creating an error with an error code`);
       const err = {
         message: 'Test error',
         statusCode: 503,
       };
       return next(err);
     case 'async-handled':
-      debug(modulename + ': testing a trapped promise rejection');
+      debug(`${modulename}: testing a trapped promise rejection`);
       return asyncHandler(asyncFail)(req, res, next);
     case 'error':
       /* test throwing an error, with nothing sent */
-      debug(modulename + ': throwing a test error');
-      throw new Error(modulename + ': Test error');
+      debug(`${modulename}: throwing a test error`);
+      throw new Error(`${modulename}: Test error`);
     case 'async':
-      /* test an unhandled rejection - will trigger a shutdown*/
-      debug(modulename + ': generating an unhandled rejection');
+      /* test an unhandled rejection - will trigger a shutdown */
+      debug(`${modulename}: generating an unhandled rejection`);
       /* test sending a response before error */
       res.status(200);
       res.send(
         'Test: ' + 'Server shutting down due to unhandled promise rejection',
       );
       Promise.reject(
-        new Error(modulename + ': Test unhandled promise rejection'),
+        new Error(`${modulename}: Test unhandled promise rejection`),
       );
       break;
     case 'crash':
-      debug(modulename + ': forcing server process exit(-1)');
+      debug(`${modulename}: forcing server process exit(-1)`);
       res.status(200);
       res.send('Test: ' + 'Server shutting down due to process.exit');
       return process.exit(-1);
     default:
-      debug(modulename + ': /fail query not sent or not recognised');
+      debug(`${modulename}: /fail query not sent or not recognised`);
       return next(createError(404, '/fail query not sent or not recognised'));
   }
 });

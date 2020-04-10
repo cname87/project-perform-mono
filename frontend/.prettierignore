@@ -1,2 +1,7 @@
-# ignore e/2 until I clean it up
-e2e
+# don't ever prettier node_modules
+node_modules
+# don't prettier build output
+dist
+# don't prettier nyc coverage output
+coverage
+

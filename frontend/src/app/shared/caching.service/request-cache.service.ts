@@ -9,17 +9,16 @@ import { GetMembersCache } from './get-members-cache.service';
 
 @Injectable({ providedIn: 'root' })
 export class RequestCacheService {
-  private baseUrl =
-    membersConfiguration.basePath + '/' + membersConfiguration.servicePath;
+  private baseUrl = `${membersConfiguration.basePath}/${membersConfiguration.servicePath}`;
 
   constructor(private cache: GetMembersCache, private logger: NGXLogger) {
     this.logger.trace(
-      RequestCacheService.name + ': Starting RequestCacheService',
+      `${RequestCacheService.name}: Starting RequestCacheService`,
     );
   }
 
   public clearCache(): void {
-    this.logger.trace(RequestCacheService.name + ': clearing cache');
+    this.logger.trace(`${RequestCacheService.name}: clearing cache`);
     this.cache.clearCache();
   }
 
@@ -31,15 +30,14 @@ export class RequestCacheService {
    * - Returns undefined if there is no cached response.
    */
   public getCache(request: HttpRequest<any>): HttpResponse<any> | undefined {
-    this.logger.trace(RequestCacheService.name + ': getting cache');
+    this.logger.trace(`${RequestCacheService.name}: getting cache`);
 
     /* return cache for /members, i.e. get all members */
     if (request.method === 'GET' && request.urlWithParams === this.baseUrl) {
       return this.cache.response;
-    } else {
-      /* otherwise return that the cache is empty */
-      return undefined;
     }
+    /* otherwise return that the cache is empty */
+    return undefined;
   }
 
   /**
@@ -52,7 +50,7 @@ export class RequestCacheService {
     request: HttpRequest<any>,
     response: HttpResponse<any>,
   ): void {
-    this.logger.trace(RequestCacheService.name + ': putting cache');
+    this.logger.trace(`${RequestCacheService.name}: putting cache`);
 
     /* clear cache if anything other than a 200 or 201 response */
     if (response.status !== OK && response.status !== CREATED) {

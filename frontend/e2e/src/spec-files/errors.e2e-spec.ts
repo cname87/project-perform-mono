@@ -46,18 +46,16 @@ describe('Error Handling', () => {
   });
 
   /* run before each 'it' function to supply local variables e.g. expected values for tests */
-  const createExpected = () => {
-    return {
-      numMembers: 10, // resetDatbase loads 10 members
-    };
-  };
+  const createExpected = () => ({
+    numMembers: 10, // resetDatbase loads 10 members
+  });
 
   describe('handles server request errors:', () => {
     beforeAll(async () => {
       await loadRootPage();
     });
 
-    it(`GET /members?name='error' causes an unexpected error`, async () => {
+    it("GET /members?name='error' causes an unexpected error", async () => {
       /* set up to test that an error is logged */
       const logs = await setupLogsMonitor();
       logs.expect(/Test unexpected error/, logs.ERROR);
@@ -72,9 +70,9 @@ describe('Error Handling', () => {
       await dashboardPage.memberSearchElement.searchBox.sendKeys('error');
 
       /* wait until new message appears */
-      await browser.wait(async () => {
-        return (await dashboardPage.rootElements.messages.count()) === 1;
-      });
+      await browser.wait(
+        async () => (await dashboardPage.rootElements.messages.count()) === 1,
+      );
 
       /* check new message logged on screen */
       const message = await dashboardPage.rootElements.messages
@@ -111,7 +109,7 @@ describe('Error Handling', () => {
       await getMembersList(numMembers);
 
       /* the members list page should be displayed */
-      let membersListPage = getMembersListPage();
+      const membersListPage = getMembersListPage();
 
       /* clear messages list */
       await clearMessages();
@@ -123,9 +121,9 @@ describe('Error Handling', () => {
       await deleteButton.click();
 
       /* wait until new message appears */
-      await browser.wait(async () => {
-        return (await membersListPage.rootElements.messages.count()) === 1;
-      });
+      await browser.wait(
+        async () => (await membersListPage.rootElements.messages.count()) === 1,
+      );
 
       /* check message logged on screen */
       const message = await membersListPage.rootElements.messages
@@ -153,13 +151,13 @@ describe('Error Handling', () => {
       await checkLogs(logs);
     });
 
-    it(`POST /members causes a server-side  error`, async () => {
+    it('POST /members causes a server-side  error', async () => {
       /* set up to test that an error is logged */
       const logs = await setupLogsMonitor();
       logs.expect(/Test server-side error/, logs.ERROR);
 
       /* the member list page is still displayed */
-      let membersListPage = getMembersListPage();
+      const membersListPage = getMembersListPage();
 
       /* clear messages list */
       await clearMessages();
@@ -172,9 +170,10 @@ describe('Error Handling', () => {
       await membersListPage.memberInputElements.actionBtn.click();
 
       /* wait until the new message appears */
-      await browser.wait(async () => {
-        return (await membersListPage.rootElements.messages.count()) === 1;
-      }, 5000);
+      await browser.wait(
+        async () => (await membersListPage.rootElements.messages.count()) === 1,
+        5000,
+      );
 
       /* check message logged on screen */
       const message = await membersListPage.rootElements.messages
@@ -215,9 +214,10 @@ describe('Error Handling', () => {
       await memberName.click();
 
       /* wait until new message appears */
-      await browser.wait(async () => {
-        return (await membersListPage.rootElements.messages.count()) === 1;
-      }, 5000);
+      await browser.wait(
+        async () => (await membersListPage.rootElements.messages.count()) === 1,
+        5000,
+      );
 
       /* check message logged on screen */
       const message = await membersListPage.rootElements.messages
@@ -246,9 +246,9 @@ describe('Error Handling', () => {
       const membersPage = getMembersListPage();
 
       /* wait and get the link of the member 9 */
-      const { memberName } = await browser.wait(async () => {
-        return membersPage.memberListElements.selectMemberById(9);
-      });
+      const { memberName } = await browser.wait(async () =>
+        membersPage.memberListElements.selectMemberById(9),
+      );
       /* click on the member which takes us to the member detail view */
       await memberName.click();
 
@@ -259,11 +259,11 @@ describe('Error Handling', () => {
       await awaitElementVisible(memberDetailPage.memberDetailElements.tag);
 
       /* confirm you have member 9 */
-      await browser.wait(async () => {
-        return (
-          (await memberDetailPage.memberDetailElements.getMember()).id === 9
-        );
-      }, 5000);
+      await browser.wait(
+        async () =>
+          (await memberDetailPage.memberDetailElements.getMember()).id === 9,
+        5000,
+      );
 
       /* clear messages list */
       await clearMessages();
@@ -278,9 +278,10 @@ describe('Error Handling', () => {
       await memberDetailPage.memberInputElements.actionBtn.click();
 
       /* wait until new message appears */
-      await browser.wait(async () => {
-        return (await memberDetailPage.rootElements.messages.count()) === 1;
-      });
+      await browser.wait(
+        async () =>
+          (await memberDetailPage.rootElements.messages.count()) === 1,
+      );
 
       /* check message logged on screen */
       const message = await memberDetailPage.rootElements.messages
@@ -306,12 +307,12 @@ describe('Error Handling', () => {
       logs.expect(/Test application error/, logs.ERROR);
 
       /* the dashboard page should be displayed */
-      let dashboardPage = getDashboardPage();
+      const dashboardPage = getDashboardPage();
 
       /* clear messages list */
       await clearMessages();
 
-      /* enter dummy name in search box - triggers application error*/
+      /* enter dummy name in search box - triggers application error */
       await dashboardPage.memberSearchElement.searchBox.sendKeys(
         'errorSearchTerm',
       );
@@ -325,25 +326,25 @@ describe('Error Handling', () => {
       );
 
       /* wait the header and hint text */
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await pageErrorInformationPage.errorInformationElements.header.getText()) ===
-          'UNEXPECTED ERROR!'
-        );
-      }, 5000);
-      await browser.wait(async () => {
-        return (
+          'UNEXPECTED ERROR!',
+        5000,
+      );
+      await browser.wait(
+        async () =>
           (await pageErrorInformationPage.errorInformationElements.hint.getText()) ===
-          'Click on a tab link above'
-        );
-      }, 5000);
+          'Click on a tab link above',
+        5000,
+      );
 
       /* wait until new message appears */
-      await browser.wait(async () => {
-        return (
-          (await pageErrorInformationPage.rootElements.messages.count()) === 1
-        );
-      }, 5000);
+      await browser.wait(
+        async () =>
+          (await pageErrorInformationPage.rootElements.messages.count()) === 1,
+        5000,
+      );
 
       /* check message logged on screen */
       const message = await pageErrorInformationPage.rootElements.messages
@@ -368,7 +369,7 @@ describe('Error Handling', () => {
       ).toBe('ERROR!');
 
       /* check toastr disappears after timeout */
-      var EC = ExpectedConditions;
+      const EC = ExpectedConditions;
       await browser.wait(
         EC.invisibilityOf(pageErrorInformationPage.toastrElement.toastr),
         6000,

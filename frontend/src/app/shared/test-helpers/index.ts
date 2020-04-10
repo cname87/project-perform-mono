@@ -79,7 +79,7 @@ export function findAllCssOrNot<T>(
 }
 
 export function findId<T>(fixture: ComponentFixture<any>, id: string): T {
-  const element = fixture.debugElement.query(By.css('#' + id));
+  const element = fixture.debugElement.query(By.css(`#${id}`));
   return element.nativeElement;
 }
 
@@ -95,5 +95,5 @@ export function findRouterLinks<T>(
   /* get the debugElements with an attached RouterLinkStubDirective */
   const routerLinksDes = fixture.debugElement.queryAll(By.directive(directive));
   /* each debugElement exposes a dependency injector with the specific instance of the directive attached to that element */
-  return routerLinksDes.map((de) => de.injector.get<T>(directive as Type<T>));
+  return routerLinksDes.map((de) => de.injector.get<T>(directive));
 }

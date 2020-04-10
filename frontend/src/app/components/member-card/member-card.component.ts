@@ -14,7 +14,7 @@ export class MemberCardComponent {
 
   constructor(private logger: NGXLogger) {
     this.logger.trace(
-      MemberCardComponent.name + ': Starting MemberCardComponent',
+      `${MemberCardComponent.name}: Starting MemberCardComponent`,
     );
   }
 }

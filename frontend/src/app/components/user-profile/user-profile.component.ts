@@ -19,7 +19,7 @@ export class ProfileComponent {
     private location: Location,
     private logger: NGXLogger,
   ) {
-    this.logger.trace(ProfileComponent.name + ': Starting ProfileComponent');
+    this.logger.trace(`${ProfileComponent.name}: Starting ProfileComponent`);
   }
 
   get userProfile$() {

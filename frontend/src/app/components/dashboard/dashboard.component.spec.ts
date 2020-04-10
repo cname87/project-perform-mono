@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
@@ -40,6 +41,7 @@ describe('DashboardComponent', () => {
     get membersCards() {
       return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'app-card');
     }
+
     get membersLinks() {
       return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'a');
     }
@@ -51,7 +53,7 @@ describe('DashboardComponent', () => {
     };
   }
 
-  async function createComponent() {
+  function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(DashboardComponent);
 
@@ -83,7 +85,7 @@ describe('DashboardComponent', () => {
   /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
   async function preSetup() {
     await mainSetup();
-    const methods = await createComponent();
+    const methods = createComponent();
     return methods;
   }
 
@@ -116,17 +118,17 @@ describe('DashboardComponent', () => {
 
   it('should display 1st member', async () => {
     const { component, page } = await setup();
-    const member = component['firstMemberOnDisplay'];
+    const member = (component as any).firstMemberOnDisplay;
     expect(page.membersCards![member - 1].innerText).toBe(
-      'Name: ' + members[member - 1].name,
+      `Name: ${members[member - 1].name}`,
     );
   });
 
   it('should display last member', async () => {
     const { component, page } = await setup();
-    const member = component['lastMemberOnDisplay'];
+    const member = (component as any).lastMemberOnDisplay;
     expect(page.membersCards![member - 1].innerText).toBe(
-      'Name: ' + members[member - 1].name,
+      `Name: ${members[member - 1].name}`,
     );
   });
 

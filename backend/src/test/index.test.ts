@@ -2,29 +2,29 @@
 import '../utils/src/loadEnvFile';
 
 import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
-import { configServer } from '../configServer';
-import { Logger } from '../utils/src/logger';
-import { DumpError } from '../utils/src/dumpError';
 
 /* set up mocha, sinon & chai */
 import chai from 'chai';
 import 'mocha';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-chai.use(sinonChai);
-const expect = chai.expect;
-sinon.assert.expose(chai.assert, {
-  prefix: '',
-});
 
 import path from 'path';
 import winston from 'winston';
 import proxyquire from 'proxyquire';
 import util from 'util';
-const sleep = util.promisify(setTimeout);
 import httpRequest from 'request-promise-native';
+import { DumpError } from '../utils/src/dumpError';
+import { Logger } from '../utils/src/logger';
+import { configServer } from '../configServer';
+
+const { modulename, debug } = setupDebug(__filename);
+chai.use(sinonChai);
+const { expect } = chai;
+sinon.assert.expose(chai.assert, {
+  prefix: '',
+});
+const sleep = util.promisify(setTimeout);
 
 describe('the application', () => {
   debug(`Running ${modulename} describe - the application`);
@@ -55,8 +55,7 @@ describe('the application', () => {
       for (let tryConnectCount = 1; tryConnectCount <= 10; tryConnectCount++) {
         try {
           debug(
-            modulename +
-              ': connect to local host' +
+            `${modulename}: connect to local host` +
               ` - attempt ${tryConnectCount}`,
           );
           response = await httpRequest(options);
@@ -64,8 +63,7 @@ describe('the application', () => {
           break; // loop will continue even though promise resolved
         } catch (err) {
           debug(
-            modulename +
-              ': failed to connect to local host' +
+            `${modulename}: failed to connect to local host` +
               ` - attempt ${tryConnectCount}`,
           );
           await sleep(500);
@@ -82,13 +80,12 @@ describe('the application', () => {
     return new Promise(async (resolve) => {
       for (let checkDebugCount = 1; checkDebugCount <= 10; checkDebugCount++) {
         debug(
-          modulename +
-            ': index still running' +
+          `${modulename}: index still running` +
             ` - attempt ${checkDebugCount}`,
         );
         if (spy.calledWith(spyString) === true) {
           debug(
-            modulename + ': Index exited' + ` - attempt ${checkDebugCount}`,
+            `${modulename}: Index exited` + ` - attempt ${checkDebugCount}`,
           );
           resolve('Index has exited');
           break;
@@ -116,7 +113,6 @@ describe('the application', () => {
       const proxyOptionsDefault = {
         './utils/src/debugOutput': {
           setupDebug: (prefix: string) => {
-            // tslint:disable-next-line: no-shadowed-variable
             const { debug } = setupDebug(prefix);
             return {
               debug: (message: any) => {
@@ -282,7 +278,7 @@ describe('the application', () => {
           const startDb = () => {
             throw new Error('Test error');
           };
-          startDb['readyState'] = 1;
+          startDb.readyState = 1;
           return {
             dbConnection: startDb,
           };

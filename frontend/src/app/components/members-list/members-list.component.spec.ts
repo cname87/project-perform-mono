@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Location, APP_BASE_HREF } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -16,7 +17,6 @@ import {
   click,
   asyncError,
   ActivatedRouteStub,
-  RouterLinkDirectiveStub,
 } from '../../shared/test-helpers';
 import {
   IMember,
@@ -36,7 +36,7 @@ interface IErrorHandlerSpy {
 }
 
 describe('MembersListComponent', () => {
-  /* setup function run by each sub test suite*/
+  /* setup function run by each sub test suite */
   async function mainSetup() {
     /* stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
@@ -54,7 +54,7 @@ describe('MembersListComponent', () => {
 
     /* set up Testbed */
     await TestBed.configureTestingModule({
-      imports: [AppModule, RouterTestingModule],
+      imports: [AppModule],
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
@@ -66,13 +66,11 @@ describe('MembersListComponent', () => {
     })
       .overrideModule(AppModule, {
         remove: {
-          /* removing router module and replacing it below to avoid spurious errors in authGuard etc */
+          /* removing router module as test below where you click to go to /detail/13 won't work otherwise. */
           imports: [AppRoutingModule],
         },
         add: {
-          /* declare RouterLinkDirective in AppModule override (rather than declaring it in AppModule). Declaring locally whilst importing AppModule appears not to work) */
-          declarations: [RouterLinkDirectiveStub],
-          /* adding RouterTestingModule and sending all paths to a dummy component */
+          /* adding RouterTestingModule test below where you click to go to /detail/13 won't work otherwise. */
           imports: [
             RouterTestingModule.withRoutes([
               { path: '**', component: MembersListComponent },
@@ -88,12 +86,15 @@ describe('MembersListComponent', () => {
     get linksArray() {
       return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'a');
     }
+
     get memberIdArray() {
       return findAllCssOrNot<HTMLAnchorElement>(this.fixture, '#memberId');
     }
+
     get deleteBtnArray() {
       return findAllCssOrNot<HTMLButtonElement>(this.fixture, '#deleteBtn');
     }
+
     get memberInput() {
       return findCssOrNot<HTMLInputElement>(this.fixture, 'app-member-input');
     }
@@ -109,11 +110,8 @@ describe('MembersListComponent', () => {
   ) {
     const getMembersSpy = memberServiceSpy.getMembers.and.callFake(
       /* returns the mock members array unless an input flag parameter is set in which case an error is thrown. */
-      () => {
-        return isError
-          ? asyncError(new Error('Test Error'))
-          : asyncData(membersArray);
-      },
+      () =>
+        isError ? asyncError(new Error('Test Error')) : asyncData(membersArray),
     );
     const addMemberSpy = memberServiceSpy.addMember.and.callFake(
       (member: IMemberWithoutId) => {
@@ -154,12 +152,12 @@ describe('MembersListComponent', () => {
 
   /* create the component, and get test variables */
   /* isError is passed to create a getMembersSpy that returns an error */
-  async function createComponent(isError = false) {
+  function createComponent(isError = false) {
     /* create the fixture */
     const fixture = TestBed.createComponent(MembersListComponent);
 
     /* get the injected instances */
-    const injector = fixture.debugElement.injector;
+    const { injector } = fixture.debugElement;
     const spyLocation = injector.get<SpyLocation>(Location as any);
     const membersServiceSpy = injector.get<IMembersServiceSpy>(
       MembersService as any,
@@ -209,7 +207,7 @@ describe('MembersListComponent', () => {
   /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
   async function preSetup(isError = false) {
     await mainSetup();
-    const testVars = await createComponent(isError);
+    const testVars = createComponent(isError);
     return testVars;
   }
 
@@ -224,7 +222,7 @@ describe('MembersListComponent', () => {
     return testVars;
   }
 
-  describe('after ngOnInit', async () => {
+  describe('after ngOnInit', () => {
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component created');
@@ -233,7 +231,7 @@ describe('MembersListComponent', () => {
     it('should have the members after ngOnInit called', async () => {
       const { fixture, component, page, expected } = await setup();
       /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
+      fixture.detectChanges();
       await fixture.whenStable();
       const membersLoaded = await component.members$.toPromise();
       expect(membersLoaded.length).toEqual(expected.membersArray.length);
@@ -327,7 +325,7 @@ describe('MembersListComponent', () => {
     });
   });
 
-  describe('page setup', async () => {
+  describe('page setup', () => {
     it('should show the right values on start up', async () => {
       const { fixture, page, expected } = await preSetup();
       /* page fields will be null before ngOnInit */
@@ -361,7 +359,7 @@ describe('MembersListComponent', () => {
     });
   });
 
-  describe('page', async () => {
+  describe('page', () => {
     it('should respond to input event', async () => {
       const { component, page } = await setup();
       /* stub on the add() method */
@@ -423,9 +421,11 @@ describe('MembersListComponent', () => {
         );
       });
       /* initiate ngOnInit and view changes etc */
-      await fixture.detectChanges();
+      fixture.detectChanges();
       await fixture.whenStable();
-      const id = expected.membersArray[expected.memberIndex].id;
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const { id } = expected.membersArray[expected.memberIndex];
       expect(spyLocation.path()).toEqual(
         `/detail/${id}`,
         'after clicking members link',

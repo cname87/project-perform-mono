@@ -11,7 +11,7 @@ async function postData(url = '', data = {}) {
   const myRequest = new Request(url);
   const myInit = {
     method: 'POST',
-    cache: "no-cache",
+    cache: 'no-cache',
     credentials: 'omit',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
@@ -123,7 +123,7 @@ describe('page not found', () => {
     chai.expect(response.ok).to.eql(false);
 
     /* the http response should report 404 */
-    console.log('response status: ' + response.status);
+    console.log(`response status: ${response.status}`);
     chai.expect(response.status).to.eql(404);
   });
 });
@@ -164,7 +164,7 @@ describe('coffee not found - return 418', () => {
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
-    console.log('response status: ' + response.status);
+    console.log(`response status: ${response.status}`);
     chai.expect(response.status).to.eql(418);
   });
 });
@@ -236,7 +236,7 @@ describe('throw a specific error', () => {
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
-    console.log('response status: ' + response.status);
+    console.log(`response status: ${response.status}`);
     chai.expect(response.status).to.eql(503);
   });
 });
@@ -277,7 +277,7 @@ describe('trap a promise rejection and throw a specific error', () => {
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
-    console.log('response status: ' + response.status);
+    console.log(`response status: ${response.status}`);
     chai.expect(response.status).to.eql(501);
   });
 });
@@ -320,7 +320,7 @@ describe('throw an error', () => {
     const response = await getData(url);
     chai.expect(response.ok).to.eql(false);
 
-    console.log('response status: ' + response.status);
+    console.log(`response status: ${response.status}`);
     chai.expect(response.status).to.eql(500);
   });
 });
@@ -381,9 +381,7 @@ describe('unhandled promise rejection', () => {
     console.log('Page body: ', readBody);
     chai
       .expect(readBody, 'Page body')
-      .to.eql(
-        'Test: ' + 'Server shutting down due to unhandled promise rejection',
-      );
+      .to.eql('Test: Server shutting down due to unhandled promise rejection');
   });
 });
 
@@ -484,7 +482,7 @@ describe('fail query not recognised', () => {
     chai.expect(response.ok).to.eql(false);
 
     /* the http response should report 404 */
-    console.log('response status: ' + response.status);
+    console.log(`response status: ${response.status}`);
     chai.expect(response.status).to.eql(404);
   });
 });

@@ -9,43 +9,11 @@
  * Stops the supplied server.
  */
 
-import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
 import http from 'http';
 import shutdownHelper from 'http-shutdown';
+import { setupDebug } from '../utils/src/debugOutput';
 
-/**
- * The exported server class.
- */
-export class Server {
-  public name: string;
-  public logger: { error: () => void };
-  public dumpError: Perform.DumpErrorFunction;
-  public listenErrors: number;
-  public expressServer: http.Server;
-  public setupServer: (...params: any) => any;
-  public listenServer: (...params: any) => any;
-  public stopServer: (...params: any) => any;
-  public configureServer: (...params: any) => any;
-
-  constructor() {
-    /* properties */
-    this.name = 'not_named';
-    this.logger = { error: console.error };
-    this.dumpError = console.error;
-    /* a count of the number server listen errors allowed */
-    this.listenErrors = 3;
-    /* the server object returned by express createServer */
-    this.expressServer = ({} as any) as http.Server;
-
-    /* operations methods */
-    this.setupServer = setupServer;
-    this.listenServer = listenServer;
-    this.stopServer = stopServer;
-    this.configureServer = configureServer;
-  }
-}
+const { modulename, debug } = setupDebug(__filename);
 
 /**
  * @description
@@ -69,7 +37,7 @@ function setupServer(
   serverOptions: http.ServerOptions,
   app: http.RequestListener,
 ) {
-  debug(modulename + ': running setupServer');
+  debug(`${modulename}: running setupServer`);
 
   /* start and return the http(s) server & load express as listener */
   this.expressServer = serverType.createServer(serverOptions, app);
@@ -80,7 +48,7 @@ function setupServer(
   /* store a count of the number server listen errors allowed */
   this.listenErrors = 0;
 
-  debug(modulename + `: server.expressServer ${this.name} created`);
+  debug(`${modulename}: server.expressServer ${this.name} created`);
   return this.expressServer;
 }
 
@@ -114,20 +82,21 @@ async function listenServer(
   listenTries = 3,
   listenTimeout = 5,
 ) {
-  debug(modulename + ': running listenServer');
+  debug(`${modulename}: running listenServer`);
 
   async function listenCallback(
     this: any,
     resolve: (x: any) => void,
     reject: (x: Perform.IErr) => void,
   ) {
-    debug(modulename + ': running listenCallback');
+    debug(`${modulename}: running listenCallback`);
 
     function listenHandler(this: any) {
       /* remove the unused error handle */
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       this.expressServer.removeListener('error', errorHandler);
       const host = this.expressServer.address().address;
-      const port = this.expressServer.address().port;
+      const { port } = this.expressServer.address();
       debug(`${modulename}: ${this.name} server listening on ${host}:${port}`);
       resolve(this.expressServer);
     }
@@ -140,8 +109,7 @@ async function listenServer(
         this.listenErrors++;
         if (this.listenErrors < listenTries) {
           this.logger.error(
-            modulename +
-              ': Port ' +
+            `${modulename}: Port ` +
               `${serverPort} is in use following attempt ` +
               `${this.listenErrors} of ` +
               `${listenTries} - retrying in ${listenTimeout}s`,
@@ -155,8 +123,7 @@ async function listenServer(
         } else {
           /* we have retried the configured number of times */
           this.logger.error(
-            modulename +
-              ': Port ' +
+            `${modulename}: Port ` +
               `${serverPort} is still in use following ` +
               `${listenTries} attempts` +
               ' - reporting error and shutting down',
@@ -166,7 +133,7 @@ async function listenServer(
       } else {
         /* all other reported errors are immediately fatal */
         this.logger.error(
-          modulename + ': Server listen error other than EADDRINUSE',
+          `${modulename}: Server listen error other than EADDRINUSE`,
         );
         reject(err);
       }
@@ -189,11 +156,10 @@ async function listenServer(
     /* only ask to listen if the server is not already listening */
     if (!this.expressServer.listening) {
       return await new Promise(listenCallback.bind(this));
-    } else {
-      return;
     }
+    return;
   } catch (err) {
-    this.logger.error(modulename + ': Unrecoverable server listen error');
+    this.logger.error(`${modulename}: Unrecoverable server listen error`);
     this.dumpError(err);
     throw err;
   }
@@ -209,7 +175,7 @@ async function listenServer(
  * (Note: The error is returned and not thrown).
  */
 async function stopServer(this: any) {
-  debug(modulename + ': running stopServer');
+  debug(`${modulename}: running stopServer`);
 
   function shutServer(
     this: any,
@@ -218,17 +184,17 @@ async function stopServer(this: any) {
   ) {
     this.expressServer.shutdown((err: any) => {
       if (err) {
-        debug(modulename + `: server \'${this.name}\' shut down error`);
+        debug(`${modulename}: server \'${this.name}\' shut down error`);
         reject(err);
       }
 
-      debug(modulename + ': server connection ' + `\'${this.name}\' closed`);
+      debug(`${modulename}: server connection ` + `\'${this.name}\' closed`);
       resolve(err);
     });
   }
 
   try {
-    debug(modulename + `: stopping server ${this.name}`);
+    debug(`${modulename}: stopping server ${this.name}`);
     return await new Promise(shutServer.bind(this));
   } catch (err) {
     const message = ': error running stopServer';
@@ -259,4 +225,44 @@ function configureServer(
   this.name = name;
   this.logger = logger;
   this.dumpError = dumpError;
+}
+
+/**
+ * The exported server class.
+ */
+export class Server {
+  public name: string;
+
+  public logger: { error: () => void };
+
+  public dumpError: Perform.DumpErrorFunction;
+
+  public listenErrors: number;
+
+  public expressServer: http.Server;
+
+  public setupServer: (...params: any) => any;
+
+  public listenServer: (...params: any) => any;
+
+  public stopServer: (...params: any) => any;
+
+  public configureServer: (...params: any) => any;
+
+  constructor() {
+    /* properties */
+    this.name = 'not_named';
+    this.logger = { error: console.error };
+    this.dumpError = console.error;
+    /* a count of the number server listen errors allowed */
+    this.listenErrors = 3;
+    /* the server object returned by express createServer */
+    this.expressServer = ({} as any) as http.Server;
+
+    /* operations methods */
+    this.setupServer = setupServer;
+    this.listenServer = listenServer;
+    this.stopServer = stopServer;
+    this.configureServer = configureServer;
+  }
 }

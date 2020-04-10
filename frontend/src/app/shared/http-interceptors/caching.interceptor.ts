@@ -20,7 +20,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class CachingInterceptor implements HttpInterceptor {
   constructor(private cache: RequestCacheService, private logger: NGXLogger) {
-    this.logger.trace(CachingInterceptor.name + ': intercept called');
+    this.logger.trace(`${CachingInterceptor.name}: intercept called`);
   }
 
   /**
@@ -28,7 +28,7 @@ export class CachingInterceptor implements HttpInterceptor {
    * Otherwise it passes the request to sendRequest.
    */
   intercept(request: HttpRequest<any>, next: HttpHandler) {
-    this.logger.trace(CachingInterceptor.name + ': intercept called');
+    this.logger.trace(`${CachingInterceptor.name}: intercept called`);
 
     /* check if there is for a cached response */
     const cachedResponse = this.cache.getCache(request);
@@ -41,7 +41,7 @@ export class CachingInterceptor implements HttpInterceptor {
     }
 
     if (cachedResponse) {
-      this.logger.trace(CachingInterceptor.name + ': reading from cache');
+      this.logger.trace(`${CachingInterceptor.name}: reading from cache`);
     }
 
     /* if e2e testing reset logger level */
@@ -69,7 +69,7 @@ export class CachingInterceptor implements HttpInterceptor {
       originalLogLevel = this.logger.getConfigSnapshot().level;
       this.logger.updateConfig({ level: NgxLoggerLevel.TRACE });
     }
-    this.logger.trace(CachingInterceptor.name + ': reading from server');
+    this.logger.trace(`${CachingInterceptor.name}: reading from server`);
     /* if e2e testing reset logger level */
     if (environment.e2eTesting) {
       this.logger.updateConfig({ level: originalLogLevel });

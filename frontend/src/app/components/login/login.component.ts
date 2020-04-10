@@ -25,9 +25,11 @@ export class LoginComponent {
   get isLoggedIn() {
     return this.auth.isLoggedIn;
   }
+
   get login() {
     return this.auth.login;
   }
+
   get logout() {
     return this.auth.logout;
   }

@@ -16,8 +16,6 @@
  */
 
 /* output a header */
-import { setupDebug } from '../../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
 
 /* external type dependencies */
 import mongoose, {
@@ -29,51 +27,9 @@ import mongoose, {
   SchemaDefinition,
 } from 'mongoose';
 import winston from 'winston';
+import { setupDebug } from '../../utils/src/debugOutput';
 
-/**
- * The class constructor for the exported database object.
- */
-class Database {
-  public set dbConnection(connection: Connection) {
-    this._dbConnection = connection;
-  }
-  public get dbConnection(): Connection {
-    return this._dbConnection;
-  }
-  public closeConnection: (
-    this: Database,
-    dbConnection: Connection,
-    force?: boolean,
-  ) => Promise<void>;
-  public createModel: (
-    this: Database,
-    ModelName: string,
-    modelSchema: SchemaDefinition,
-    dbCollectionName: string,
-  ) => Model<Document, {}>;
-  public connectToDB: (
-    this: Database,
-    uri?: string,
-    options?: ConnectionOptions,
-  ) => Promise<Connection>;
-
-  private _dbConnection: Connection = ({} as unknown) as Connection;
-  protected _connectionUrl = '';
-  protected _connectionOptions: ConnectionOptions = {};
-
-  constructor(
-    readonly connectionUrl: string,
-    readonly connectionOptions: ConnectionOptions,
-    readonly logger: winston.Logger | Console = console,
-    readonly dumpError: Perform.DumpErrorFunction = console.error,
-  ) {
-    this._connectionUrl = connectionUrl;
-    this._connectionOptions = connectionOptions;
-    this.closeConnection = closeConnection;
-    this.createModel = createModel;
-    this.connectToDB = connectToDB;
-  }
-}
+const { modulename, debug } = setupDebug(__filename);
 
 /**
  * Creates a connection to a database on the MongoDB server.
@@ -94,10 +50,10 @@ async function connectToDB(
   uri = this._connectionUrl,
   options = this._connectionOptions,
 ): Promise<Connection> {
-  debug(modulename + ': running connectToDB');
+  debug(`${modulename}: running connectToDB`);
 
   try {
-    debug(modulename + ': trying to connect to the database server');
+    debug(`${modulename}: trying to connect to the database server`);
 
     const dbConnection = await mongoose.createConnection(uri, options);
 
@@ -105,11 +61,11 @@ async function connectToDB(
     mongoose.set('bufferCommands', false);
 
     debug(
-      modulename + ` : database \'${dbConnection.db.databaseName}\' connected`,
+      `${modulename} : database \'${dbConnection.db.databaseName}\' connected`,
     );
 
     if (debug.enabled) {
-      debug(modulename + ': printing db stats');
+      debug(`${modulename}: printing db stats`);
       const stats = await dbConnection.db.command({ dbStats: 1 });
       debug(stats);
     }
@@ -117,7 +73,7 @@ async function connectToDB(
     return dbConnection;
   } catch (err) {
     this.logger.error(
-      modulename + ': database error during connection attempt',
+      `${modulename}: database error during connection attempt`,
     );
     this.dumpError(err);
     throw err;
@@ -142,7 +98,7 @@ async function closeConnection(
   dbConnection: Connection,
   force = false,
 ): Promise<void> {
-  debug(modulename + ': running closeConnection');
+  debug(`${modulename}: running closeConnection`);
 
   try {
     /* remove close event listeners to avoid triggering an error */
@@ -150,8 +106,7 @@ async function closeConnection(
     dbConnection.removeAllListeners('disconnected');
     const connection = await dbConnection.close(force);
     debug(
-      modulename +
-        ': database connection successfully closed by closeConnection',
+      `${modulename}: database connection successfully closed by closeConnection`,
     );
     return connection;
   } catch (err) {
@@ -182,7 +137,7 @@ function createModel(
   modelSchema: SchemaDefinition, // accepts a Schema
   dbCollectionName: string,
 ): Model<Document, {}> {
-  debug(modulename + ': running createModel');
+  debug(`${modulename}: running createModel`);
 
   /* id the database collection, define its schema and its model */
   const DbSchema = new Schema(modelSchema, {
@@ -194,12 +149,63 @@ function createModel(
     const DbModel =
       this.dbConnection.models[ModelName] ||
       this.dbConnection.model(ModelName, DbSchema);
-    debug(modulename + `: mongoose model \'${DbModel.modelName}\' created`);
+    debug(`${modulename}: mongoose model \'${DbModel.modelName}\' created`);
     return DbModel;
   } catch (err) {
-    this.logger.error(modulename + ': database model creation error');
+    this.logger.error(`${modulename}: database model creation error`);
     this.dumpError(err);
     throw err;
+  }
+}
+
+/**
+ * The class constructor for the exported database object.
+ */
+class Database {
+  public set dbConnection(connection: Connection) {
+    this._dbConnection = connection;
+  }
+
+  public get dbConnection(): Connection {
+    return this._dbConnection;
+  }
+
+  public closeConnection: (
+    this: Database,
+    dbConnection: Connection,
+    force?: boolean,
+  ) => Promise<void>;
+
+  public createModel: (
+    this: Database,
+    ModelName: string,
+    modelSchema: SchemaDefinition,
+    dbCollectionName: string,
+  ) => Model<Document, {}>;
+
+  public connectToDB: (
+    this: Database,
+    uri?: string,
+    options?: ConnectionOptions,
+  ) => Promise<Connection>;
+
+  private _dbConnection: Connection = ({} as unknown) as Connection;
+
+  protected _connectionUrl = '';
+
+  protected _connectionOptions: ConnectionOptions = {};
+
+  constructor(
+    readonly connectionUrl: string,
+    readonly connectionOptions: ConnectionOptions,
+    readonly logger: winston.Logger | Console = console,
+    readonly dumpError: Perform.DumpErrorFunction = console.error,
+  ) {
+    this._connectionUrl = connectionUrl;
+    this._connectionOptions = connectionOptions;
+    this.closeConnection = closeConnection;
+    this.createModel = createModel;
+    this.connectToDB = connectToDB;
   }
 }
 

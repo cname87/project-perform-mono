@@ -1,15 +1,15 @@
 /* import configuration parameters into process.env */
 import '../utils/src/loadEnvFile';
 
-/* set DB_MODE to 'test' (or anything but 'production') to ensure the test database is loaded */
-process.env.DB_MODE = 'test';
-
 /* file header */
 import { setupDebug } from '../utils/src/debugOutput';
-setupDebug(__filename);
 
 /* external dependencies */
 import 'mocha';
+
+/* set DB_MODE to 'test' (or anything but 'production') to ensure the test database is loaded */
+process.env.DB_MODE = 'test';
+setupDebug(__filename);
 // import { afterEach, beforeEach } from 'mocha';
 
 /* Note: All test modules that need a server use index.js to start the server (parhaps on each 'it' function) and then close it before they exit. */

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { APP_BASE_HREF } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+// import { RouterTestingModule } from '@angular/router/testing';
 import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
@@ -13,7 +14,6 @@ import {
   RouterLinkDirectiveStub,
 } from '../../shared/test-helpers';
 import { routes } from '../../config';
-import { AppRoutingModule } from '../../router/app.routing.module';
 
 /* spy interfaces */
 interface IAuthServiceSpy {
@@ -23,7 +23,7 @@ interface IAuthServiceSpy {
 }
 
 describe('LoginComponent', () => {
-  /* setup function run by each sub test suite*/
+  /* setup function run by each sub test suite */
   async function mainSetup() {
     /* stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
@@ -50,19 +50,9 @@ describe('LoginComponent', () => {
       ],
     })
       .overrideModule(AppModule, {
-        remove: {
-          /* removing router module and replacing it below to avoid spurious errors in authGuard etc */
-          imports: [AppRoutingModule],
-        },
         add: {
-          /* declare RouterLinkDirective in AppModule override (rather than declaring it in AppModule). Declaring locally whilst importing AppModule appears not to work) */
+          /* must declare RouterLinkDirective in AppModule override */
           declarations: [RouterLinkDirectiveStub],
-          /* adding RouterTestingModule and sending all paths to a dummy component */
-          imports: [
-            RouterTestingModule.withRoutes([
-              { path: '**', component: LoginComponent },
-            ]),
-          ],
         },
       })
       .compileComponents();
@@ -76,12 +66,15 @@ describe('LoginComponent', () => {
         'mat-toolbar > span.header',
       );
     }
+
     get loginButton() {
       return findCssOrNot<HTMLButtonElement>(this.fixture, '#loginBtn');
     }
+
     get logoutButton() {
       return findCssOrNot<HTMLButtonElement>(this.fixture, '#logoutBtn');
     }
+
     get profileButton() {
       return findCssOrNot<HTMLAnchorElement>(this.fixture, '#profileBtn');
     }
@@ -118,12 +111,12 @@ describe('LoginComponent', () => {
   }
 
   /* create the component, and get test variables */
-  async function createComponent() {
+  function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(LoginComponent);
 
     /* get the injected instances */
-    const injector = fixture.debugElement.injector;
+    const { injector } = fixture.debugElement;
     const authServiceSpy = injector.get<IAuthServiceSpy>(AuthService as any);
 
     const { loginSpy, logoutSpy } = createSpies(authServiceSpy);
@@ -149,7 +142,7 @@ describe('LoginComponent', () => {
   /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
   async function preSetup() {
     await mainSetup();
-    const testVars = await createComponent();
+    const testVars = createComponent();
     return testVars;
   }
 
@@ -164,14 +157,14 @@ describe('LoginComponent', () => {
     return testVars;
   }
 
-  describe('after ngOnInit', async () => {
+  describe('after ngOnInit', () => {
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component created');
     });
   });
 
-  describe('page', async () => {
+  describe('page', () => {
     it('should have the expected header', async () => {
       const { page, expected } = await setup();
       expect(page.header!.innerText).toBe(expected.header, 'header');
@@ -191,7 +184,7 @@ describe('LoginComponent', () => {
       authServiceSpy.isLoggedIn = false;
       /* await page update */
       fixture.detectChanges();
-      fixture.whenStable();
+      await fixture.whenStable();
       expect(page.header!.innerText).toBe(expected.header, 'header');
       expect(page.logoutButton).toBeFalsy('logout button');
       expect(page.profileButton).toBeFalsy('profile button');
@@ -199,13 +192,13 @@ describe('LoginComponent', () => {
     });
   });
 
-  describe('user actions', async () => {
+  describe('user actions', () => {
     it('should allow login', async () => {
       const { fixture, page, authServiceSpy, loginSpy } = await setup();
       authServiceSpy.isLoggedIn = false;
       /* await page update */
       fixture.detectChanges();
-      fixture.whenStable();
+      await fixture.whenStable();
       const button = page.loginButton;
       click(button!);
       expect(loginSpy).toHaveBeenCalled();
@@ -227,7 +220,7 @@ describe('LoginComponent', () => {
       const routerLink = page.routerLinks[0];
       expect(routerLink.navigatedTo).toBeNull('not navigated yet');
 
-      /* click the profile button which is captured by RouterLinkDirectiveStub*/
+      /* click the profile button which is captured by RouterLinkDirectiveStub */
       click(page.profileButton!);
 
       /* the correct url is sent to route to the profile component */

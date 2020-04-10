@@ -6,5 +6,5 @@
   "singleQuote": true,
   "parser": "typescript",
   "arrowParens": "always",
-  "endOfLine": "crlf"
+  "endOfLine": "lf"
 }

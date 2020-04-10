@@ -1,8 +1,11 @@
-/* 3 settings files:
- - in .vscode applies to project-perform folder
- - in workspace.json - applies to workspace
- - in AppData/.. - applies to User
- - I keep all settings in workspace.json
+/* There are 3 settings files:
+ - settings.json in the .vscode directory in the workspace root which applies to project-perform folder
+ - in the 'xxx-workspace.json' file in the workspace root which applies to the workspace
+ - in the Users/cname87/AppData/roaming/code/settings.json directory on Window, or ~/.vscode/settings.json on linux, which applies to the User.
+ - I try keep all settings in the 'xxx-workspace.json' file.
+ */
+
+ /* Note also there is a keybindings.json file containing custom keyboard shortcuts that is stored in the same place as the User settings file i.e. dependent on the OS.
  */
 {
   "cSpell.words": [
@@ -13,6 +16,7 @@
     "Arial",
     "Bombasto",
     "Btns",
+    "CLOUDSDK",
     "CTRL",
     "Cambria",
     "Celeritas",
@@ -96,6 +100,7 @@
     "jsyaml",
     "jwks",
     "kjhtml",
+    "kubernetes",
     "lcov",
     "lcovonly",
     "lerna",
@@ -189,5 +194,6 @@
     "xdescribe",
     "xframe",
     "xmlresults"
-  ],
+  ]
+
 }

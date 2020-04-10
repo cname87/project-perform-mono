@@ -2,10 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
 
-import { AppModule } from '../../app.module';
-import { RequestCacheService } from './request-cache.service';
 import { of } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
+import { AppModule } from '../../app.module';
+import { RequestCacheService } from './request-cache.service';
 import { GetMembersCache } from './get-members-cache.service';
 
 interface INgxLoggerSpy {
@@ -102,7 +102,7 @@ describe('RequestCacheService', () => {
   /**
    * Get the service, initialize it, set test variables.
    */
-  async function getService() {
+  function getService() {
     /* create the service */
     const requestCache = TestBed.get(RequestCacheService);
 
@@ -118,7 +118,7 @@ describe('RequestCacheService', () => {
     };
   }
 
-  describe('service', async () => {
+  describe('service', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -131,7 +131,7 @@ describe('RequestCacheService', () => {
     });
   });
 
-  describe('has a clear cache function', async () => {
+  describe('has a clear cache function', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -148,7 +148,7 @@ describe('RequestCacheService', () => {
     });
   });
 
-  describe('has a get cache function', async () => {
+  describe('has a get cache function', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -195,7 +195,7 @@ describe('RequestCacheService', () => {
     });
   });
 
-  describe('has a put cache function', async () => {
+  describe('has a put cache function', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -333,7 +333,7 @@ describe('RequestCacheService', () => {
       const { requestCache, clearCacheSpy, setDeleteOneSpy } = await setup();
       const request = {
         method: 'DELETE',
-        urlWithParams: requestCache.baseUrl + '/21', // will fail
+        urlWithParams: `${requestCache.baseUrl}/21`, // will fail
       };
       const response = {
         status: 200, // test 200

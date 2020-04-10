@@ -4,9 +4,6 @@
  * through without a route being identified.
  */
 
-import { setupDebug } from '../utils/src/debugOutput';
-export const { modulename, debug } = setupDebug(__filename);
-
 /**
  * Import external dependencies
  */
@@ -14,6 +11,9 @@ import { Request, Response, NextFunction } from 'express';
 import createError from 'http-errors';
 import urlParser from 'url';
 import util from 'util';
+import { setupDebug } from '../utils/src/debugOutput';
+
+export const { modulename, debug } = setupDebug(__filename);
 
 /**
  * Catches any request that passes through all middleware
@@ -22,7 +22,7 @@ import util from 'util';
  */
 
 function notFound(_req: Request, _res: Response, next: NextFunction) {
-  debug(modulename + ': notFound called');
+  debug(`${modulename}: notFound called`);
   next(createError(404));
 }
 
@@ -40,7 +40,7 @@ function assignCode(
   res: Response,
   next: NextFunction,
 ) {
-  debug(modulename + ': assignCode called');
+  debug(`${modulename}: assignCode called`);
 
   if (typeof err !== 'object') {
     err = new Error(String(err));
@@ -69,32 +69,26 @@ function assignCode(
  * Log detail on all errors passed in.
  */
 function logError(err: any, req: Request, res: Response, next: NextFunction) {
-  debug(modulename + ': logError started');
+  debug(`${modulename}: logError started`);
 
-  const logger = req.app.appLocals.logger;
-  const dumpError = req.app.appLocals.dumpError;
+  const { logger } = req.app.appLocals;
+  const { dumpError } = req.app.appLocals;
 
   logger.error(
-    modulename + ': Logging detail on the request that caused the error',
+    `${modulename}: Logging detail on the request that caused the error`,
   );
 
   logger.error(
-    modulename +
-      ': http request detail:' +
-      '\nreq.url: ' +
-      req.url +
-      '\nreq.ip: ' +
-      req.ip +
-      '\nreq.method: ' +
-      req.method +
-      '\nurl query string: ' +
-      urlParser.parse(req.originalUrl).search +
-      '\nbody query string: ' +
-      util.inspect(req.query) +
-      '\nsigned cookies: ' +
-      util.inspect(req.signedCookies) +
-      '\nResponse http status code: ' +
-      res.statusCode,
+    `${modulename}: http request detail:` +
+      `\nreq.url: ${req.url}\nreq.ip: ${req.ip}\nreq.method: ${
+        req.method
+      }\nurl query string: ${
+        urlParser.parse(req.originalUrl).search
+      }\nbody query string: ${util.inspect(
+        req.query,
+      )}\nsigned cookies: ${util.inspect(
+        req.signedCookies,
+      )}\nResponse http status code: ${res.statusCode}`,
   );
 
   /* dump the error */
@@ -127,7 +121,7 @@ function sendErrorResponse(
   } else {
     /* send nothing if headers already sent */
     debug(
-      modulename + ': not sending a client response as headers already sent',
+      `${modulename}: not sending a client response as headers already sent`,
     );
     /* override 404 res.statusCode as 404 will be returned if a next is called in error after headers have been sent */
     res.statusCode = res.statusCode === 404 ? 500 : res.statusCode;
@@ -150,17 +144,16 @@ function throwError(
   res: Response,
   next: NextFunction,
 ) {
-  debug(modulename + ': throwError called');
+  debug(`${modulename}: throwError called`);
 
   /* throw an exception */
   if (res.statusCode === 500 || res.statusCode === 503) {
-    debug(modulename + ': throwing an exception to shut server');
+    debug(`${modulename}: throwing an exception to shut server`);
     /* reset the server after a delay to allow error data be sent */
     setTimeout(() => {
       if (process.env.TEST_PATHS === 'true') {
         debug(
-          modulename +
-            ': *** In test mode => blocking an error from been thrown ***',
+          `${modulename}: *** In test mode => blocking an error from been thrown ***`,
         );
       } else {
         /* will be caught by express final handler and not my uncaughtException handler */
@@ -168,7 +161,7 @@ function throwError(
       }
     }, 1000);
   } else {
-    debug(modulename + ': not 500 or 503 (or testing) - not throwing an error');
+    debug(`${modulename}: not 500 or 503 (or testing) - not throwing an error`);
   }
 
   next();

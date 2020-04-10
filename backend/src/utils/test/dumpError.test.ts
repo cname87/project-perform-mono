@@ -1,21 +1,22 @@
 import { setupDebug } from '../src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
 
 /* set up mocha, sinon & chai */
 import chai from 'chai';
 import 'mocha';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-chai.use(sinonChai);
-const expect = chai.expect;
-sinon.assert.expose(chai.assert, {
-  prefix: '',
-});
 
 /* external dependencies */
 import proxyquire from 'proxyquire';
 import intercept from 'intercept-stdout';
 import winston from 'winston';
+
+const { modulename, debug } = setupDebug(__filename);
+chai.use(sinonChai);
+const { expect } = chai;
+sinon.assert.expose(chai.assert, {
+  prefix: '',
+});
 
 /* paths for proxyquire */
 const loggerPath = '../src/logger';
@@ -49,8 +50,8 @@ describe('dumpError tests', () => {
 
     /* dump an error */
     const err: Perform.IErr = new Error('Test error');
-    err['statusCode'] = 100;
-    err['dumped'] = false;
+    err.statusCode = 100;
+    err.dumped = false;
     dumpError(err);
 
     /* stop intercepting console.log */
@@ -148,8 +149,8 @@ describe('dumpError tests', () => {
     );
     /* dump an error */
     const err: Perform.IErr = new Error('Test error');
-    err['statusCode'] = 100;
-    err['dumped'] = false;
+    err.statusCode = 100;
+    err.dumped = false;
     dumpError(err);
 
     /* stop intercepting console.log */

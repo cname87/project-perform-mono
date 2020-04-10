@@ -2,9 +2,9 @@ import { TestBed } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
 
+import { HttpResponse, HttpRequest } from '@angular/common/http';
 import { AppModule } from '../../app.module';
 import { GetMembersCache } from './get-members-cache.service';
-import { HttpResponse, HttpRequest } from '@angular/common/http';
 
 interface INgxLoggerSpy {
   trace: jasmine.Spy;
@@ -48,7 +48,7 @@ describe('RequestCacheService', () => {
   /**
    * Get the service, initialize it, set test variables.
    */
-  async function getService() {
+  function getService() {
     /* get the service */
     const getMembersCache = TestBed.get(GetMembersCache);
 
@@ -63,7 +63,7 @@ describe('RequestCacheService', () => {
     };
   }
 
-  describe('service', async () => {
+  describe('service', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -76,7 +76,7 @@ describe('RequestCacheService', () => {
     });
   });
 
-  describe('response property', async () => {
+  describe('response property', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -87,7 +87,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
       /* set cache */
       const cache = 'dummy';
-      getMembersCache['_response'] = cache;
+      getMembersCache._response = cache;
       /* get response */
       const result = getMembersCache.response;
       /* test result equals cache */
@@ -95,7 +95,7 @@ describe('RequestCacheService', () => {
     });
   });
 
-  describe('setGetAll()', async () => {
+  describe('setGetAll()', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -112,7 +112,7 @@ describe('RequestCacheService', () => {
     });
   });
 
-  describe('setPostOne()', async () => {
+  describe('setPostOne()', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -123,7 +123,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* set cache and a parameter with no body */
-      getMembersCache['_response'] = 'dummyCache';
+      getMembersCache._response = 'dummyCache';
       const dummyParameter = {
         body: '', // falsy value
       };
@@ -133,7 +133,7 @@ describe('RequestCacheService', () => {
       expect(getMembersCache.response).toEqual(undefined);
 
       /* set empty cache and a parameter with a body */
-      getMembersCache['_response'] = {
+      getMembersCache._response = {
         body: undefined,
       };
       dummyParameter.body = 'dummy';
@@ -147,7 +147,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* create cache and input parameter */
-      getMembersCache['_response'] = new HttpResponse({
+      getMembersCache._response = new HttpResponse({
         body: ['a', 'b', 'c'],
         url: 'dummyUrlCache',
       });
@@ -168,7 +168,7 @@ describe('RequestCacheService', () => {
     });
   });
 
-  describe('setPutOne()', async () => {
+  describe('setPutOne()', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -179,7 +179,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* set cache and a parameter with no body */
-      getMembersCache['_response'] = 'dummyCache';
+      getMembersCache._response = 'dummyCache';
       const dummyParameter = {
         body: '', // falsy value
       };
@@ -189,7 +189,7 @@ describe('RequestCacheService', () => {
       expect(getMembersCache.response).toEqual(undefined);
 
       /* set empty cache and a parameter with a body */
-      getMembersCache['_response'] = {
+      getMembersCache._response = {
         body: undefined,
       };
       dummyParameter.body = 'dummy';
@@ -203,7 +203,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* create cache and input parameter */
-      getMembersCache['_response'] = new HttpResponse({
+      getMembersCache._response = new HttpResponse({
         body: [
           { id: 1, name: 'a' },
           { id: 2, name: 'b' },
@@ -234,7 +234,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* create cache and input parameter */
-      getMembersCache['_response'] = new HttpResponse({
+      getMembersCache._response = new HttpResponse({
         body: [
           { id: 1, name: 'a' },
           { id: 2, name: 'b' },
@@ -256,7 +256,7 @@ describe('RequestCacheService', () => {
     });
   });
 
-  describe('setDeleteOne()', async () => {
+  describe('setDeleteOne()', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -267,7 +267,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* set empty cache and a parameter with a body */
-      getMembersCache['_response'] = {
+      getMembersCache._response = {
         body: undefined,
       };
       const dummyParameter = {
@@ -283,7 +283,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* create cache and input parameter */
-      getMembersCache['_response'] = new HttpResponse({
+      getMembersCache._response = new HttpResponse({
         body: [
           { id: 1, name: 'a' },
           { id: 299, name: 'b' },
@@ -311,7 +311,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* create cache and input parameter */
-      getMembersCache['_response'] = new HttpResponse({
+      getMembersCache._response = new HttpResponse({
         body: [
           { id: 1, name: 'a' },
           { id: 2, name: 'b' },
@@ -336,7 +336,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* create cache and input parameter */
-      getMembersCache['_response'] = new HttpResponse({
+      getMembersCache._response = new HttpResponse({
         body: [
           { id: 1, name: 'a' },
           { id: 2, name: 'b' },
@@ -361,7 +361,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* create cache and input parameter */
-      getMembersCache['_response'] = new HttpResponse({
+      getMembersCache._response = new HttpResponse({
         body: [
           { id: 1, name: 'a' },
           { id: 2, name: 'b' },
@@ -380,7 +380,7 @@ describe('RequestCacheService', () => {
     });
   });
 
-  describe('setDeleteAll()', async () => {
+  describe('setDeleteAll()', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -391,7 +391,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* set empty cache and a parameter with a body */
-      getMembersCache['_response'] = {
+      getMembersCache._response = {
         body: undefined,
       };
       /* run test */
@@ -404,7 +404,7 @@ describe('RequestCacheService', () => {
       const { getMembersCache } = await setup();
 
       /* create cache */
-      getMembersCache['_response'] = new HttpResponse({
+      getMembersCache._response = new HttpResponse({
         body: [
           { id: 1, name: 'a' },
           { id: 2, name: 'b' },

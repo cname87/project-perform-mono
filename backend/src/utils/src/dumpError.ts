@@ -3,9 +3,6 @@
  * It uses the winston logger utility.
  */
 
-import { setupDebug } from './debugOutput';
-const { modulename } = setupDebug(__filename);
-
 /**
  * Usage:
  *
@@ -30,6 +27,9 @@ const { modulename } = setupDebug(__filename);
 /* external dependencies */
 import winston from 'winston';
 import util from 'util';
+import { setupDebug } from './debugOutput';
+
+const { modulename } = setupDebug(__filename);
 
 class DumpError {
   /* holds the singleton instance */
@@ -44,6 +44,7 @@ class DumpError {
       DumpError.dump = initialLogger
         ? initialLogger.error.bind(initialLogger)
         : console.error;
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       DumpError.instance = dumpError;
     }
     return DumpError.instance;
@@ -51,20 +52,20 @@ class DumpError {
 }
 
 function dumpError(err: any) {
-  DumpError.dump(modulename + ': dumpError called');
+  DumpError.dump(`${modulename}: dumpError called`);
 
   if (err && typeof err === 'object') {
     if (err.dumped) {
-      DumpError.dump(modulename + ': error previously dumped');
+      DumpError.dump(`${modulename}: error previously dumped`);
       return;
     }
 
-    DumpError.dump('Error Object: \n' + util.format('%O', err) + '\n');
+    DumpError.dump(`Error Object: \n${util.format('%O', err)}\n`);
 
     /* mark so not dumped twice */
     err.dumped = true;
   } else if (typeof err === 'string') {
-    DumpError.dump('Error String: ' + err);
+    DumpError.dump(`Error String: ${err}`);
   } else {
     DumpError.dump('DumpError: err is null or not an object or string');
   }

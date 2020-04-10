@@ -1,16 +1,19 @@
+/* eslint-disable import/no-unresolved */
+/* eslint-disable no-unused-vars */
+import { NGXLogger } from 'ngx-logger';
+import { getDashboardPage } from '../pages/dashboard.page';
+
+import { getRootElements } from '../pages/elements/root.elements';
+import { getInformationElements } from '../pages/elements/information.elements';
+
 const path = require('path');
 
-const { browser, by, element } = require('protractor');
+const { browser, by, ExpectedConditions } = require('protractor');
 const { SpecReporter } = require('jasmine-spec-reporter');
 const request = require('request-promise-native');
 const fs = require('fs');
 const { promisify } = require('util');
 const { NgxLoggerLevel } = require('ngx-logger');
-
-import { getDashboardPage } from '../pages/dashboard.page';
-import { getRootElements } from '../pages/elements/root.elements';
-import { getInformationElements } from '../pages/elements/information.elements';
-import { NGXLogger } from 'ngx-logger';
 
 /**
  * This module...
@@ -25,54 +28,51 @@ import { NGXLogger } from 'ngx-logger';
  */
 
 /* awaits for an element to be visible on the page */
-const awaitElementVisible = async (element) => {
-  return await browser.wait(ExpectedConditions.visibilityOf(element), 120000);
-};
+const awaitElementVisible = async (element) =>
+  browser.wait(ExpectedConditions.visibilityOf(element), 120000);
 
 /* awaits for an element to be invisible on the page */
-const awaitElementInvisible = async (element) => {
-  return await browser.wait(ExpectedConditions.invisibilityOf(element), 120000);
-};
+const awaitElementInvisible = async (element) =>
+  browser.wait(ExpectedConditions.invisibilityOf(element), 120000);
 
 /* sends a configured request to the server */
-const askServer = async(
+const askServer = async (
   uri,
   method,
   headers = {},
   body = '',
   resolveWithFullResponse = false, // true to get the full response, false to get the body
 ) => {
-  let options = {
+  const options = {
     uri,
     method,
     headers,
     resolveWithFullResponse,
-    json: true,  //  sets body to JSON representation of value and adds Content-type: application/json header. Additionally, parses the response body as JSON
+    json: true, //  sets body to JSON representation of value and adds Content-type: application/json header. Additionally, parses the response body as JSON
     simple: false, // false => don't reject the promise on non 2xx status codes
-  }
+  };
   if (body) {
     options.body = body;
   }
-  return await request(options);
-}
+  return request(options);
+};
 
 /* check that the test database is in use */
 const testDatabaseInUse = async () => {
   console.log('Checking database');
-  const testDatabaseResponseBody
-    = await askServer(
-      `${process.env.BASE_URL}/testServer/isTestDatabase`,
-      'GET',
-    );
+  const testDatabaseResponseBody = await askServer(
+    `${process.env.BASE_URL}/testServer/isTestDatabase`,
+    'GET',
+  );
 
   /* body will contain { isTestDatabase: <boolean> } */
-  if(!testDatabaseResponseBody.isTestDatabase){
-    console.log('*** WARNING: Test database not in use')
+  if (!testDatabaseResponseBody.isTestDatabase) {
+    console.log('*** WARNING: Test database not in use');
     // throw new Error('Test database not in use');
   } else {
-    console.log('NOTE: Test database in use')
+    console.log('NOTE: Test database in use');
   }
-}
+};
 
 /* define mock members */
 const errorMember = {
@@ -103,23 +103,25 @@ const resetDatabase = async () => {
     headers: { 'content-type': 'application/json' },
     body: process.env.AUTH0_REQUEST_BODY,
   };
-  /* the response body will contain "{"access_token":"xxx...", ... }"*/
+  /* the response body will contain "{"access_token":"xxx...", ... }" */
   const tokenRequestBody = await request(options);
   const token = JSON.parse(tokenRequestBody).access_token;
 
   /* delete all members in the test database */
-  const deleteResponseBody  = await askServer(
+  const deleteResponseBody = await askServer(
     `${process.env.BASE_URL}/${process.env.API_PATH}/members`,
     'DELETE',
     { Authorization: `Bearer ${token}` },
   );
   /* the response body will contain { count: <integer> } */
-  if(!deleteResponseBody || !Number.isInteger(deleteResponseBody.count)) {
+  if (!deleteResponseBody || !Number.isInteger(deleteResponseBody.count)) {
     throw new Error('Error resetting test collection on the database');
   }
 
   /* add test database members here */
+  // eslint-disable-next-line no-restricted-syntax
   for (const member of mockMembers) {
+    // eslint-disable-next-line no-await-in-loop
     const response = await askServer(
       `${process.env.BASE_URL}/${process.env.API_PATH}/members`,
       'POST',
@@ -132,7 +134,7 @@ const resetDatabase = async () => {
   }
 
   console.log('Completed database reset and loaded test members');
-}
+};
 
 /**
  * Loads the root page and awaits either the log in button or the message saying that members have been loaded from the server (or not).
@@ -157,30 +159,28 @@ const loadRootPage = async (isLoggedIn = true, numberExpected = 4) => {
     await awaitElementVisible(dashboardPage.dashboardElements.tag);
 
     /* test resolver prevents the page loading until data is available by testing for the members presence without browser.wait */
-    expect(await dashboardPage.dashboardElements.topMembers.count()).toEqual(numberExpected);
+    expect(await dashboardPage.dashboardElements.topMembers.count()).toEqual(
+      numberExpected,
+    );
 
     /* await the disappearance of the progress bar */
     await awaitElementInvisible(getRootElements().progressBar);
 
     /* await the message denoting the loading of members appears as this is slow to appear */
-    await browser.wait(async () => {
-      return (
-        await getRootElements().messages.count()
-          === 1
-      );
-    }, 10000);
+    await browser.wait(
+      async () => (await getRootElements().messages.count()) === 1,
+      10000,
+    );
   }
   console.log('Root page loaded');
 };
 
-
 /* login - assumes the non-logged in root page is open */
-const login = async(login = 'button') => {
-
+const login = async (btn = 'button') => {
   console.log('Beginning login routine');
 
   /* test both information.page card click and login button click */
-  if (login === 'card') {
+  if (btn === 'card') {
     await browser.findElement(by.css('mat-card.member-card')).click();
   } else {
     await browser.findElement(by.id('loginBtn')).click();
@@ -194,7 +194,9 @@ const login = async(login = 'button') => {
   await nameInput.sendKeys(process.env.TEST_EMAIL);
   const passwordInput = await browser.driver.findElement(by.name('password'));
   await passwordInput.sendKeys(process.env.TEST_PASSWORD);
-  const continueButton = await browser.driver.findElement(by.css('.ulp-button'));
+  const continueButton = await browser.driver.findElement(
+    by.css('.ulp-button'),
+  );
   await continueButton.click();
 
   /* Note: Because waitForAngular is disabled you need to wait until page is shown and all asynchronous operations have been closed, or otherwise you will see intermittent errors such as caching not working. So check for the slowest elements and manually check for stability. */
@@ -208,7 +210,7 @@ const login = async(login = 'button') => {
   */
 
   console.log('Completed login routine');
-}
+};
 
 /* check that the e2e build environment is in use - this is needed for the error testing spec file */
 const checkE2eEnvironment = async () => {
@@ -220,33 +222,33 @@ const checkE2eEnvironment = async () => {
   const production = await el.getAttribute('data-production');
   const logLevel = await el.getAttribute('data-logLevel');
 
-  if(isE2eTesting === 'true') {
-    console.log(`NOTE: E2e build environment in use`);
+  if (isE2eTesting === 'true') {
+    console.log('NOTE: E2e build environment in use');
   } else {
-    console.log('*** WARNING: E2e build environment not in use');
+    console.warn('*** WARNING: E2e build environment is not in use');
   }
   /* print out other environment properties if not as expected */
-  if(production === 'true') {
-    console.log(`Production is true`);
+  if (production === 'true') {
+    console.log('Production optimization is enabled');
   } else {
-    console.log(`*** WARNING: environment.production is not true`);
+    console.warn('*** WARNING: Build optimization) is not true');
   }
-  if(+logLevel === NgxLoggerLevel.OFF) {
-    console.log(`LogLevel is NgxLoggerLevel.OFF`);
+  if (+logLevel === NgxLoggerLevel.OFF) {
+    console.log('LogLevel is NgxLoggerLevel.OFF');
   } else {
-    console.log(`*** WARNING: environment.logLevel is not NgxLoggerLevel.OFF`);
+    console.warn('*** WARNING: LogLevel is not NgxLoggerLevel.OFF');
   }
-}
+};
 
 /* set long timeout to allow for debug */
 const setTimeout = (timeout = 1200000) => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout;
-}
+};
 export const run = async () => {
   /* set up a jasmine reporter */
   jasmine
     .getEnv()
-    .addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
+    .addReporter(new SpecReporter({ spec: { displayStacktrace: 'pretty' } }));
 
   await testDatabaseInUse();
   await resetDatabase();
@@ -254,7 +256,7 @@ export const run = async () => {
   await checkE2eEnvironment();
   await login('card');
   setTimeout(120000);
-}
+};
 
 /* export login */
 module.exports.mockMembers = mockMembers;

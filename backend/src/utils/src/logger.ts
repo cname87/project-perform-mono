@@ -3,11 +3,11 @@
  * It logs only to the GCP Winston logging service and to console.
  */
 
-import { setupDebug } from './debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
 import winston from 'winston';
 import { LoggingWinston } from '@google-cloud/logging-winston';
+import { setupDebug } from './debugOutput';
+
+const { modulename, debug } = setupDebug(__filename);
 const { createLogger, format, transports } = winston;
 const { align, colorize, combine, timestamp, label, printf, splat } = format;
 
@@ -31,20 +31,8 @@ const { align, colorize, combine, timestamp, label, printf, splat } = format;
  * format is <timestamp> [PP] <info/error> <message>
  */
 
-class Logger {
-  public static instance: winston.Logger;
-
-  public constructor() {
-    if (!Logger.instance) {
-      Logger.instance = makeLogger();
-    }
-
-    return Logger.instance;
-  }
-}
-
 function makeLogger(): winston.Logger {
-  debug(modulename + ': running makeLogger');
+  debug(`${modulename}: running makeLogger`);
 
   const myFormat = printf((info) => {
     return `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
@@ -113,6 +101,18 @@ function makeLogger(): winston.Logger {
   // });
 
   return logger;
+}
+
+class Logger {
+  public static instance: winston.Logger;
+
+  public constructor() {
+    if (!Logger.instance) {
+      Logger.instance = makeLogger();
+    }
+
+    return Logger.instance;
+  }
 }
 
 /* export Logger class */

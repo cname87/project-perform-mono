@@ -1,22 +1,24 @@
+import chai from 'chai';
+import express from 'express';
 import { setupDebug } from '../../utils/src/debugOutput';
-setupDebug(__filename);
 
 import { configServer as configOriginal } from '../../configServer';
 import { Logger } from '../../utils/src/logger';
 import { DumpError } from '../../utils/src/dumpError';
 
 /* set up mocha, sinon & chai */
-import chai from 'chai';
 import 'mocha';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+
+import winston from 'winston';
+
+setupDebug(__filename);
 chai.use(sinonChai);
-const expect = chai.expect;
+const { expect } = chai;
 sinon.assert.expose(chai.assert, {
   prefix: '',
 });
-
-import winston from 'winston';
 
 describe('Start server tests', () => {
   /* create a copy of config that you can edit */
@@ -39,7 +41,7 @@ describe('Start server tests', () => {
   before('Set up objects', () => {
     startServer = require('../startserver').startServer;
     /* set up the objects object */
-    app = require('express')();
+    app = express();
     objects = app.locals = {
       servers: [], // holds created http servers
       config,
@@ -50,12 +52,12 @@ describe('Start server tests', () => {
 
   afterEach('Stop servers', async () => {
     /* shutdown the servers after */
-    for (const svr of objects['servers']) {
+    for (const svr of objects.servers) {
       await svr.stopServer();
       svr.expressServer.removeAllListeners();
     }
 
-    objects['servers'] = [];
+    objects.servers = [];
   });
 
   it('Start http server only', async () => {

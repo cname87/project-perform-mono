@@ -3,12 +3,12 @@
  * details.
  */
 
-import { setupDebug } from '../../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
 /* external dependencies */
 import { Document, DocumentToObjectOptions, Schema } from 'mongoose';
 import { autoIncrement } from 'mongoose-plugin-autoinc';
+import { setupDebug } from '../../utils/src/debugOutput';
+
+const { modulename, debug } = setupDebug(__filename);
 
 /**
  * Creates a Members schema and returns a Mongoose model.
@@ -22,7 +22,7 @@ function createModelMembers(
   ModelName: string,
   collection: string,
 ): Perform.IModelExtended {
-  debug(modulename + ': running createModelMembers');
+  debug(`${modulename}: running createModelMembers`);
 
   /* set up schema, collection, and model name */
   const memberSchema = new Schema({

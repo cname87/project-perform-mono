@@ -3,7 +3,6 @@
  */
 
 import { setupDebug } from '../../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
 
 import { configDatabase } from '../configDatabase';
 
@@ -12,14 +11,16 @@ import chai from 'chai';
 import 'mocha';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-chai.use(sinonChai);
-const expect = chai.expect;
-sinon.assert.expose(chai.assert, {
-  prefix: '',
-});
 
 /* use proxyquire for startDatabase.js module loading */
 import proxyquire from 'proxyquire';
+
+const { modulename, debug } = setupDebug(__filename);
+chai.use(sinonChai);
+const { expect } = chai;
+sinon.assert.expose(chai.assert, {
+  prefix: '',
+});
 
 const { startDatabasePath } = configDatabase;
 
@@ -38,15 +39,15 @@ describe('startDatabase', () => {
 
   const tests =
     process.env.TEST_DB_LOCAL === 'true'
-      ? [{ db_is_local: 'false' }, { db_is_local: 'true' }]
-      : [{ db_is_local: 'false' }];
+      ? [{ dbIsLocal: 'false' }, { dbIsLocal: 'true' }]
+      : [{ dbIsLocal: 'false' }];
 
   tests.forEach((test) => {
     it('connects to a database', async () => {
       debug(`Running ${modulename} it - connects to a database`);
 
       /* configure for a remote and then local database */
-      process.env.DB_IS_LOCAL = test.db_is_local;
+      process.env.DB_IS_LOCAL = test.dbIsLocal;
 
       const message =
         process.env.DB_IS_LOCAL === 'true'

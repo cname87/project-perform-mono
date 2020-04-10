@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   async,
   TestBed,
@@ -8,7 +9,7 @@ import {
 import { APP_BASE_HREF } from '@angular/common';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { ErrorHandler } from '@angular/core';
+import { ErrorHandler, DebugElement } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 
 import { AppModule } from '../../app.module';
@@ -33,7 +34,7 @@ interface IErrorHandlerSpy {
 
 describe('memberSearchComponent', () => {
   /* setup function run by each sub test suite */
-  async function mainSetup() {
+  async function mainSetup(): Promise<void> {
     /* stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
     /* create spy objects */
@@ -61,22 +62,27 @@ describe('memberSearchComponent', () => {
 
   class Page {
     /* get DOM elements */
-    get searchInput() {
+    get searchInput(): HTMLInputElement {
       return this.findTag<HTMLInputElement>('input');
     }
-    get header() {
+
+    get header(): HTMLElement {
       return this.findTag<HTMLElement>('mat-label');
     }
-    get clearBtn() {
+
+    get clearBtn(): HTMLButtonElement {
       return this.findTag<HTMLButtonElement>('button');
     }
-    get hint() {
+
+    get hint(): HTMLElement {
       return this.findTag<HTMLElement>('mat-hint');
     }
-    get hintDebugElement() {
+
+    get hintDebugElement(): DebugElement[] {
       return this.fixture.debugElement.queryAll(By.css('mat-hint'));
     }
-    get anchors() {
+
+    get anchors(): HTMLAnchorElement[] | null {
       return findAllCssOrNot<HTMLAnchorElement>(this.fixture, 'a');
     }
 
@@ -92,27 +98,40 @@ describe('memberSearchComponent', () => {
     memberServiceSpy: IMembersServiceSpy,
     errorHandlerSpy: IErrorHandlerSpy,
     isError = false,
-  ) {
+  ): {
+    getMembersSpy: jasmine.Spy<jasmine.Func>;
+    handleErrorSpy: jasmine.Spy<jasmine.Func>;
+  } {
     /* return the mock members array unless '' is the search term */
     const getMembersSpy = memberServiceSpy.getMembers.and.callFake(
-      (search: string) => {
-        return isError
+      (search: string) =>
+        isError
           ? asyncError(new Error('Test Error'))
           : search === ''
           ? of(undefined)
-          : of(members);
-      },
+          : of(members),
     );
     const handleErrorSpy = errorHandlerSpy.handleError.and.stub();
     return { getMembersSpy, handleErrorSpy };
   }
 
-  function expected() {
+  function expected(): {
+    debounceDelay: number;
+  } {
     return {
       debounceDelay: 300,
     };
   }
-  async function createComponent(isError = false) {
+  function createComponent(
+    isError = false,
+  ): {
+    debounceDelay: number;
+    fixture: ComponentFixture<MemberSearchComponent>;
+    component: MemberSearchComponent;
+    page: Page;
+    getMembersSpy: jasmine.Spy<jasmine.Func>;
+    handleErrorSpy: jasmine.Spy<jasmine.Func>;
+  } {
     /* create the fixture */
     const fixture = TestBed.createComponent(MemberSearchComponent);
 
@@ -154,7 +173,16 @@ describe('memberSearchComponent', () => {
   }
 
   /* setup function run by each sub test function */
-  async function setup(isError = false) {
+  async function setup(
+    isError = false,
+  ): Promise<{
+    debounceDelay: number;
+    fixture: ComponentFixture<MemberSearchComponent>;
+    component: MemberSearchComponent;
+    page: Page;
+    getMembersSpy: jasmine.Spy<jasmine.Func>;
+    handleErrorSpy: jasmine.Spy<jasmine.Func>;
+  }> {
     await mainSetup();
     return createComponent(isError);
   }
@@ -168,7 +196,7 @@ describe('memberSearchComponent', () => {
     const { component, page, debounceDelay } = await setup();
     expect(page.header.innerText).toBe(component.header, 'header');
     /* check debounce delay against local variable */
-    expect(component['debounce']).toBe(debounceDelay, 'check delay');
+    expect((component as any).debounce).toBe(debounceDelay, 'check delay');
   }));
 
   it('should take input and show search results', fakeAsync(async () => {
@@ -180,6 +208,8 @@ describe('memberSearchComponent', () => {
     expect(getMembersSpy.calls.count()).toBe(1, 'only one search');
     expect(page.anchors!.length).toEqual(members.length, 'members found');
     /* hint will show as members found */
+    // known issue - expect with unbound-method
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(page.hint).not.toBeNull;
   }));
 
@@ -199,6 +229,8 @@ describe('memberSearchComponent', () => {
     /* no search made */
     expect(getMembersSpy.calls.count()).toBe(0);
     /* no hint shown */
+    // eslint expect does not work well with unbound-method rule
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(page.hintDebugElement).toBeNull;
     /* clear timer */
     tick(debounceDelay);

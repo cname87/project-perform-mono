@@ -4,26 +4,34 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
     // Serve frontend with backend - use for frontend debug with watch
     {
       /*
-      Runs  the task 'Serve Frontend with Backend'.
-      proxy.conf is configured in angular.json => backend server needs to be started first => started in the task.
+      First it calls a task which starts the backend server, and then compiles the frontend with watch and serves it on localhost:4200 (i.e. a local server that serves up the Angular SPA is started listening to port 4200). Note: proxy.conf is configured in angular.json to route api requests (e.g. those headed api-v1) to the backend server.  Thus you need to start the backend server in advance to handle the api requests.
+      Second, once the task ends, this launches Chrome.
+      For debug, you may need to use Chrome DevTools sources to put in the first breakpoint, which should then sync with VSCode.
       Close all open Chrome instances if Chrome won't start. */
       "name": "Serve frontend with backend",
       "type": "chrome",
+      "preLaunchTask": "Serve Frontend with Backend",
+      "postDebugTask": "Taskkill node.exe",
       "request": "launch",
       "cwd": "${workspaceFolder}/frontend",
-      "preLaunchTask": "Serve Frontend with Backend",
       "url": "http://localhost:4200/", // proxy to 8080 for api calls
-      "webRoot": "${workspaceFolder}",
+      "webRoot": "${workspaceFolder}/frontend/dist",
+      "pathMapping": {
+        "/": "${workspaceFolder}/frontend/dist/",
+      },
       "sourceMapPathOverrides": {
+        "webpack:///./*":   "${workspaceFolder}/frontend/*",
       },
     },
     // Test frontend- use for frontend unit test debug with watch
     {
       /*
-      Runs 'Test Frontend' task first, i.e. 'ng test:dev', which compiles the front end and opens Chrome and connects to the Karma runner, and THEN it starts Chrome again and connects to the Karma runner.  Debug should work on the second session.
+      Runs 'Test Frontend' task first, i.e. 'ng test:dev', which compiles and serves the front end and opens Chrome and connects to the Karma runner and runs the unit tests.  Once this task exits without error, following the test run, it THEN starts Chrome again and connects to the Karma runner for a second test run.  Debug should work on the second session.
+      You may need to use Chrome DevTools sources to put in the first breakpoint.
       Run the preLaunch task manually first if problems.
       Close all open Chrome instances if Chrome won't start.
        */
@@ -31,12 +39,17 @@
       "type": "chrome",
       "request": "launch",
       "preLaunchTask": "Test Frontend",
-      "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "linux": {
+        "runtimeExecutable": "/usr/bin/google-chrome",
+      },
+      "windows": {
+        "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      },
       "runtimeArgs": [
         "--remote-debugging-port=9222",
         "--incognito",
-        "--start-maximized",
         "--new-window",
+        "--start-maximized",
         "--disable-popup-blocking", // necessary for window.open() to work
       ],
       "cwd": "${workspaceFolder}/frontend",
@@ -47,13 +60,14 @@
         "/": "${workspaceFolder}/frontend/dist/",
       },
       "sourceMapPathOverrides": {
-        "./*": "${workspaceFolder}/frontend/*",
-        "webpack:///./*": "${workspaceFolder}/frontend/*",
+        "webpack:///./*":   "${workspaceFolder}/frontend/*",
       },
       "sourceMaps": true,
       "smartStep": true,
       "disableNetworkCache": true,
       "showAsyncStacks": true,
+      "breakOnLoad": true,
+      "breakOnLoadStrategy": "instrument",
       "skipFiles": [
         "<node_internals>/**/*.js",
         "${workspaceFolder}/frontend/node_modules/**/*",
@@ -63,21 +77,28 @@
     // e2e frontend with backend - use for frontend e2e test debug
     {
       /**
-      Runs e2e tests allowing VSCode debug.
-      NOTE: Protractor uses a configured baseUrl to point to the frontend server and the frontend server routes any backend calls to the same host with an added path (e.g. /api-v1). This does NOT use a proxy to redirect the backend calls, as ng e2e does, so the configured server must handle both frontend and backend calls.
-      NOTE: The frontend/backend server needs to be started first => a preLaunchTask starts the server and a postDebugTask closes it.
-      NOTE: This does NOT pre-compile the backend like ng e2e - the already-compiled front-end is used.  Thus the already-compiled build must be compiled using the e2e enviroment file if you want to run the cache or error test files (whihc rely on e2e environment settings).
-      Choose .dev or .production configuration by editing args below.
-      Choose which spec files to run in the .env files.
+      Starts the server and runs e2e tests against it allowing VSCode debug of the e2e .spec files. (Use Chrome DevTools if browser-side debug is needed)
+      NOTE: Protractor uses a configured baseUrl to point all url requests to a host.  My frontend SPA routes any backend calls to the same host with an added path (e.g. /api-v1). This does NOT use a proxy to redirect the backend calls, as ng e2e does, so the server that protractor poinys to must both serve the SPA and handle backend calls.
+      NOTE: The frontend/backend server needs to be started first => a preLaunchTask starts the server.
+      *** NOTE: This does NOT pre-compile the backend like ng e2e - the already-compiled front-end is used.  Thus the front end must be compiled using the e2e enviroment file if you want to run the cache or error test files (which rely on e2e environment settings) - run the npm script or the VSCode task that compiles with the e2e environment file.
+      Choose .dev or .production configuration by editing args below - edit the .env files to select which spec files to run.
+      VALID OPTIONS:
+      - Compile ngBuild:e2e (which allows error and cache testing) and choose -dev conf file (which is configured to test against a local server and test cache and error testing).
+      - Compile ngBuild:prod and choose -production conf file (which is configured to test against the GCP server and skip cache and error testing).  (You can use the other two compile types with this conf file without error).
+      - Compile ngBuild:staging and choose -staging conf file (which is configured to test against a local server and skip cache and error testing). (You can use the other two compile types with this conf file without error).
+      NOTE: You can run this against a deployed build by setting the BASE_URL below.
       */
       "name": "E2e frontend with backend",
       "type": "node",
       "request": "launch",
+      "preLaunchTask": "Check Server",
+      "postDebugTask": "Taskkill node.exe",
       "program": "${workspaceFolder}/frontend//node_modules/protractor/bin/protractor",
       "protocol": "inspector",
       "args": [
-        /* Edit here to choose the .dev or .production configuration file to run under dev or production environment settings */
+        /* Edit here to choose one of either -dev or -production configuration file . */
         "${workspaceFolder}/frontend/e2e/src/config/protractor-dev.conf.js",
+        // "${workspaceFolder}/frontend/e2e/src/config/protractor-staging.conf.js",
         // "${workspaceFolder}/frontend/e2e/src/config/protractor-production.conf.js",
       ],
       "env": {
@@ -86,26 +107,20 @@
         // "BASE_URL": "https://ci-test-dot-project-perform.appspot.com"
       },
       "cwd": "${workspaceFolder}/frontend",
-      "preLaunchTask": "Check Server",
-      "postDebugTask": "Terminate All Tasks",
       "outputCapture": "std",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "sourceMapPathOverrides": {
-        "./*": "${workspaceFolder}/frontend/*",
-        "webpack:///./*": "${workspaceFolder}/frontend/*",
-      },
       "skipFiles": [
         "<node_internals>/**/*.js",
         "${workspaceFolder}/frontend/node_modules/**/*",
         "${workspaceFolder}/frontend/node_modules/**/*.js",
       ],
     },
-    // Run backend server index.js
+    // Run the backend server (index.ts).
     {
+      "name": "Run backend index.js",
       "type": "node",
       "request": "launch",
-      "name": "Run backend index.js",
       "program": "${workspaceFolder}/backend/src/index.ts",
       "cwd": "${workspaceFolder}",
       "env": {
@@ -125,85 +140,48 @@
       ],
       "smartStep": true,
     },
-    // npm run server index.js
-    {
-      /* Runs an npm script to start index.js.
-      Note that CTRL+C does not exit without manual intervention.
-      Click on the VSCode 'stop' icon to exit without manual intervention
-      */
-      "type": "node",
-      "request": "launch",
-      "name": "Launch npm backend index.js",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run-script",
-        "debug",
-        "--silent"
-      ],
-      "port": 9229,
-      "cwd": "${workspaceFolder}",
-      "env": {
-        // "NODE_ENV": "production",
-      },
-      "outputCapture": "std",
-      "console": "integratedTerminal", // allows you use CTRL+C to exit
-      "internalConsoleOptions": "neverOpen",
-      "skipFiles": [
-        "<node_internals>/**/*.js",
-        "${workspaceFolder}/node_modules/**/*",
-        "${workspaceFolder}/node_modules/**/*.js",
-      ],
-      "autoAttachChildProcesses": true,
-      "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/backend/dist/**/*.js"
-      ],
-      "smartStep": false,
-    },
     // https://localhost:8080/
     {
-      // starts Chrome and connect to the home page
-      // the server must be started in advance of running this
+      /* Starts Chrome and connects to the home page.
+      The server is started in a prelaunch task. */
       "name": "Open http://localhost:8080/",
       "type": "chrome",
+      "preLaunchTask": "Check Server",
+      "postDebugTask": "Taskkill node.exe",
       "request": "launch",
-      "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "linux": {
+        "runtimeExecutable": "/usr/bin/google-chrome",
+      },
+      "windows": {
+        "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      },
       "runtimeArgs": [
-        // "--remote-debugging-port=9222",
         "--incognito",
         "--start-maximized",
         "--new-window",
         "--disable-popup-blocking", // necessary for window.open() to work
-        "--disable-application-cache",
-        "--media-cache-size=1",
-        "--disk-cache-size=1"
       ],
       "userDataDir": true,
       "url": "http://localhost:8080/",
       // tell vscode where to find scripts on the server
+      "webRoot": "${workspaceFolder}/frontend/dist",
       "pathMapping": {
         "/": "${workspaceFolder}/frontend/dist/",
         "/testServer": "${workspaceFolder}/backend/dist/test/client/",
       },
       "sourceMapPathOverrides": {
-        "webpack:///./node_modules/*": "${workspaceFolder}/frontend/node_modules/*",
-        // "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
         "webpack:///./*": "${workspaceFolder}/frontend/*",
-        "webpack:///*": "frontend/*",
-        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
       },
       "smartStep": false,
       "disableNetworkCache": true,
       "showAsyncStacks": true,
       "sourceMaps": true,
-      "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
-      "trace": true,
     },
-    // Mocha backend tests
+    // Run Mocha backend tests
     {
+      "name": "Run Mocha backend tests",
       "type": "node",
       "request": "launch",
-      "name": "Run Mocha backend tests",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
         "--config", "${workspaceFolder}/backend/.mocharc.json",
@@ -235,14 +213,12 @@
         "${workspaceFolder}/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
-      // "preLaunchTask": "Taskkill node.exe", // kill any failed node runs
-      // "postDebugTask": "",
     },
-    // Mocha backend tests with Istanbul
+    // Run Mocha backend tests with Istanbul
     {
+      "name": "Run Mocha backend tests with Istanbul",
       "type": "node",
       "request": "launch",
-      "name": "Run Mocha backend tests with Istanbul",
       "program": "${workspaceFolder}/node_modules/nyc/bin/nyc",
       "args": [
         "--nycrc-path", "./backend/.nycrc.json",
@@ -258,9 +234,9 @@
         "${workspaceFolder}/backend/dist/src/utils/test/logger.test.js",
         "${workspaceFolder}/backend/dist/src/controllers/test/api-controller.test.js",
         "${workspaceFolder}/backend/dist/src/controllers/test/errors-controller.test.js",
-        "${workspaceFolder}/backend/dist/src/server/test/server-test.js",
-        "${workspaceFolder}/backend/dist/src/server/test/startserver-test.js",
-        "${workspaceFolder}/backend/dist/src/test/index-test.js",
+        "${workspaceFolder}/backend/dist/src/server/test/server.test.js",
+        "${workspaceFolder}/backend/dist/src/server/test/startserver.test.js",
+        "${workspaceFolder}/backend/dist/src/test/index.test.js",
 
       ],
       "env": {
@@ -279,30 +255,29 @@
         "${workspaceFolder}/node_modules/**/*.js",
       ],
       "autoAttachChildProcesses": true,
-      // "preLaunchTask": "Taskkill node.exe", // kill any failed node runs
-      // "postDebugTask": "",
     },
-    // Mocha client-fired server tests - use in compound for client-side debug
+    // Run Mocha client-fired server tests only.
     {
-      /* This runs a server-side mocha client test file to test the server-side behaviour during client-side fired tests. */
-      /* If DISABLE_CHROME is set false it kicks off the browser tests that fire the client-side tests.  Otherwise you can load testServer/loadmocha.html manually after running this, or if you need debug of the browser-side then use a launch configuration to load the matching loadMocha.html. */
-      /* Note: Make sure you use the correct matching file */
-      /* A compound configuration is set up for use when debugging client-side test scripts */
+      /* This calls mocha to run one or two server-side test files.
+      The test files set up some mocks to simulate errors and also event handlers to recive reports of test starts and completions from a browser.
+      Chrome must then be started with a specific url that loads browser-side mocha scripts that test server functionality such as including error condition responses.
+      The files start Chrome automatically if process.env.DISABLE_CHROME is false.  This does not allow for using VSCode for client-side debug.
+      Otherwise (to allow using VSCODE for client-side debug) you can load the testServer/xxx-loadmocha.html file manually after running this on one file only, or, if you would like VSCode debug of the browser-side, then use a Chrome launch configuration to load the matching xxx-loadMocha.html - there are two xxx-loadmocha.html files - make sure you use the one that matches the server-side test file. */
+      "name": "Run Mocha client-fired server tests",
       "type": "node",
       "request": "launch",
-      "name": "Run server and start Mocha client-fired tests",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
         "--config", "${workspaceFolder}/backend/.mocharc.json",
         /* include testSetup.js to load .env */
         "${workspaceFolder}/backend/dist/src/test/testSetup.js",
-        /* comment out files to select a test */
+        /* Comment out to select the tests to run */
         // "${workspaceFolder}/backend/dist/src/controllers/test/api-controller.test.js",
         "${workspaceFolder}/backend/dist/src/controllers/test/errors-controller.test.js",
       ],
       "env": {
-        /* set to 'true' to automatically run chrome and set to 'false' when using a compound configuration to launch chrome manually */
-        "DISABLE_CHROME": "false",
+        /* set to 'false' to automatically run chrome and set to 'true' to launch chrome manually */
+        "DISABLE_CHROME": "true",
       },
       "cwd": "${workspaceFolder}",
       "outputCapture": "std",
@@ -315,49 +290,46 @@
       ],
       "autoAttachChildProcesses": true,
     },
-    // http://localhost:8080/testServer/xxx/loadMocha.html
+    // http://localhost:8080/testServer/xxx-loadMocha.html
     {
-      /* starts Chrome and loads the a client-side browser test runner */
-      /* the equivalent server-side client tests (with Run Chrome disabled) must be started in advance of running this */
-      /* make sure you use the correct matching file */
-      "name": "Open http://localhost:8080/testServer/xxx/loadMocha.html",
+      /* Starts Chrome and loads one of two client-side browser test files. */
+      /* The equivalent server-side test file must be started in advance of running this, (with automatic start of Chrome disabled). */
+      /* Note: There are two xxx-loadmocha.html files - make sure you use the one that matches the server-side test file. */
+      "name": "Open http://localhost:8080/testServer/xxx-loadMocha.html",
       "type": "chrome",
       "request": "launch",
-      "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      "linux": {
+        "runtimeExecutable": "/usr/bin/google-chrome",
+      },
+      "windows": {
+        "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      },
       "runtimeArgs": [
-        "--remote-debugging-port=9222",
         "--incognito",
         "--start-maximized",
         "--new-window",
         "--disable-popup-blocking", // necessary for window.open() to work
       ],
+      "breakOnLoad": true, // set a breakpoint in the client-static test file before launch
       "userDataDir": true,
-      /* comment out to run a specific loadMocha*/
-      "url": "http://localhost:8080/testServer/api-loadmocha.html",
-      // "url": "http://localhost:8080/testServer/errors-loadmocha.html",
+      /* NOTE: comment out to run a specific xxx-loadMocha*/
+      // "url": "http://localhost:8080/testServer/api-loadMocha.html",
+      "url": "http://localhost:8080/testServer/errors-loadMocha.html",
       // tell vscode where to find scripts on the server
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/",
-        "/testServer": "${workspaceFolder}/backend/dist/server/test/client",
+        "/testServer": "${workspaceFolder}/backend/src/test/client-static",
       },
-      "sourceMapPathOverrides": {
-        "webpack:///./~/*": "${workspaceFolder}/frontend/node_modules/*",
-        "webpack:///./*": "${workspaceFolder}/frontend/*",
-        "webpack:///*": "frontend/*",
-        "webpack:///src/*": "${workspaceFolder}/frontend/src*",
-      },
+      /* Note that sourceMapPathOverrides are not necessary as only loadmocha and the client-static test files are loaded directly. */
       "smartStep": true,
       "disableNetworkCache": true,
       "showAsyncStacks": true,
       "sourceMaps": true,
-      "preLaunchTask": "Is Server Up?", // must delay to allow server start for use in compounds
-      "trace": true,
     },
-    // current .js file
+    // Run current .js file
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch the currently opened .js file",
+      "name": "Run the currently opened .js file",
       "program": "${file}",
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -368,11 +340,11 @@
         "${workspaceFolder}/node_modules/**/*.js",
       ],
     },
-    // current .ts file
+    // Run current .ts file
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch the currently opened .ts file",
+      "name": "Run the currently opened .ts file",
       "cwd": "${workspaceFolder}",
       "outputCapture": "std",
       "console": "integratedTerminal",
@@ -394,42 +366,11 @@
   "compounds": [
     /* Run backend server and browse to root */
     {
-      /* To debug angular you may need to go into Chrome and ensure filesystem added. If you have difficulty setting breakpoints in vscode then set them in Chrome. */
+      /* To debug angular you may need to go into Chrome and set the first breakpoint. If you have difficulty setting breakpoints in vscode then use Chrome DevTools. */
       "name": "Backend/Frontend",
       "configurations": [
         "Run backend index.js",
         "Open http://localhost:8080/",
-      ]
-    },
-    /* Run backend server and ng serve - debug frontend with watch */
-    {
-      /* relies on ng serve taking some time.  If it has previously been launched and is still running in the background then the browser will start too fast for the server => refresh the browser */
-      "name": "Backend/ng serve",
-      "configurations": [
-        "Run backend index.js",
-        "Serve frontend with backend",
-      ]
-    },
-    /* Run backend server and ng e2e - debug e2e */
-    {
-      /* relies on Is ServerUp in 'ng e2e' launch to hold browser start until the server is up */
-      "name": "Backend/ng e2e",
-      "configurations": [
-        "Run backend index.js",
-        "E2e frontend with backend",
-      ]
-    },
-    /* Mocha client tests backend/frontend */
-    /* Useful for debugging client-side test scripts */
-    {
-      "name": "Mocha client tests Backend/Frontend",
-      /* use when debugging client-side mocha scripts */
-      /* You must set DISABLE_CHROME to 'false' and disable Taskkill on Mocha Client-fired server Tests before running this */
-      /* you must close Chrome manually afterwards */
-      /* you must match the tests in both configurations below */
-      "configurations": [
-        "Run server and start Mocha client-fired tests",
-        "Open http://localhost:8080/testServer/xxx/loadMocha.html",
       ]
     },
   ],

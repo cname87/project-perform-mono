@@ -17,10 +17,12 @@ export class MessagesComponent implements OnInit {
     public messageService: MessageService,
     private logger: NGXLogger,
   ) {
-    this.logger.trace(MessagesComponent.name + ': Starting MessagesComponent');
+    this.logger.trace(`${MessagesComponent.name}: Starting MessagesComponent`);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    /* d nothing */
+  }
 
   trackByFn(index: number, _message: string): number {
     return index;

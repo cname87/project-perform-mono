@@ -1,5 +1,4 @@
 ﻿import { setupDebug } from '../../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
 
 import { configDatabase } from '../configDatabase';
 import { Database } from '../src/database';
@@ -9,15 +8,17 @@ import chai from 'chai';
 import 'mocha';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-chai.use(sinonChai);
-const expect = chai.expect;
-sinon.assert.expose(chai.assert, {
-  prefix: '',
-});
 
 /* other external dependencies */
 import { SchemaDefinition } from 'mongoose';
 import proxyquire from 'proxyquire';
+
+const { modulename, debug } = setupDebug(__filename);
+chai.use(sinonChai);
+const { expect } = chai;
+sinon.assert.expose(chai.assert, {
+  prefix: '',
+});
 
 const { getConnectionOptions, getMongoUri, startDatabasePath } = configDatabase;
 

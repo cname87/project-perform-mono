@@ -1,0 +1,10 @@
+# don't lint the following:
+.nyc_output
+.vscode
+coverage
+node_modules
+backend/api
+backend/certs
+backend/coverage
+backend/dist
+frontend

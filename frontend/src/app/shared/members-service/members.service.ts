@@ -26,7 +26,7 @@ export class MembersService {
     private logger: NGXLogger,
     private toastr: ToastrService,
   ) {
-    this.logger.trace(MembersService.name + ': starting members.service');
+    this.logger.trace(`${MembersService.name}: starting members.service`);
   }
 
   /* common toastr message */
@@ -43,20 +43,19 @@ export class MembersService {
    * - Throws an observable with an error if any response other than a successful response, or a Not Found/404, is received from the server.
    */
   getMembers(term?: string): Observable<IMember[]> {
-    this.logger.trace(MembersService.name + ': getMembers called');
+    this.logger.trace(`${MembersService.name}: getMembers called`);
 
     /* e2e error test - only if e2e test and match to a specific term */
     if (this.isTesting && term === errorSearchTerm) {
       this.logger.trace(
-        MembersService.name + ': e2e testing - throwing an error',
+        `${MembersService.name}: e2e testing - throwing an error`,
       );
       throw new Error('Test application error');
     }
 
     if (typeof term === 'string' && term.trim() === '') {
       this.logger.trace(
-        MembersService.name +
-          ': Search term exists but is blank - returning empty members array',
+        `${MembersService.name}: Search term exists but is blank - returning empty members array`,
       );
       return of([]);
     }
@@ -69,23 +68,21 @@ export class MembersService {
           } else {
             this.log('Fetched all members');
           }
+        } else if (term) {
+          this.log(`Did not find any members matching "${term}"`);
         } else {
-          if (term) {
-            this.log(`Did not find any members matching "${term}"`);
-          } else {
-            this.log('There are no members to fetch');
-          }
+          this.log('There are no members to fetch');
         }
       }),
       catchError((err: IErrReport) => {
-        this.logger.trace(MembersService.name + ': catchError called');
+        this.logger.trace(`${MembersService.name}: catchError called`);
 
         /* inform user and mark as handled */
         this.log('ERROR: Failed to get members from server');
         this.toastr.error('ERROR!', this.toastrMessage);
         err.isHandled = true;
 
-        this.logger.trace(MembersService.name + ': Throwing the error on');
+        this.logger.trace(`${MembersService.name}: Throwing the error on`);
         return throwError(err);
       }),
     );
@@ -101,7 +98,7 @@ export class MembersService {
    * - Throws an observable with an error if any response other than a successful response is received from the server.
    */
   getMember(id: number): Observable<IMember> {
-    this.logger.trace(MembersService.name + ': getMember called');
+    this.logger.trace(`${MembersService.name}: getMember called`);
 
     return this.membersDataProvider.getMember(id).pipe(
       tap((_) => {
@@ -109,7 +106,7 @@ export class MembersService {
       }),
 
       catchError((errReport: IErrReport) => {
-        this.logger.trace(MembersService.name + ': catchError called');
+        this.logger.trace(`${MembersService.name}: catchError called`);
 
         /* inform user */
         if (errReport.error && errReport.error.status === NOT_FOUND) {
@@ -123,7 +120,7 @@ export class MembersService {
         /* mark as handled */
         errReport.isHandled = true;
 
-        this.logger.trace(MembersService.name + ': Throwing the error on');
+        this.logger.trace(`${MembersService.name}: Throwing the error on`);
         return throwError(errReport);
       }),
     );
@@ -139,7 +136,7 @@ export class MembersService {
    * - Throws an observable with an error if any response other than a successful response is received from the server.
    */
   addMember(member: IMemberWithoutId): Observable<IMember> {
-    this.logger.trace(MembersService.name + ': addMember called');
+    this.logger.trace(`${MembersService.name}: addMember called`);
 
     return this.membersDataProvider.addMember(member).pipe(
       tap((newMember: IMember) => {
@@ -147,14 +144,14 @@ export class MembersService {
       }),
 
       catchError((err: IErrReport) => {
-        this.logger.trace(MembersService.name + ': catchError called');
+        this.logger.trace(`${MembersService.name}: catchError called`);
 
         /* inform user and mark as handled */
         this.log('ERROR: Failed to add member to server');
         this.toastr.error('ERROR!', this.toastrMessage);
         err.isHandled = true;
 
-        this.logger.trace(MembersService.name + ': Throwing the error on');
+        this.logger.trace(`${MembersService.name}: Throwing the error on`);
         return throwError(err);
       }),
     );
@@ -170,7 +167,7 @@ export class MembersService {
    * - Throws an observable with an error if any response other than a successful response is received from the server.
    */
   deleteMember(memberOrId: IMember | number): Observable<ICount> {
-    this.logger.trace(MembersService.name + ': deleteMember called');
+    this.logger.trace(`${MembersService.name}: deleteMember called`);
 
     const id = typeof memberOrId === 'number' ? memberOrId : memberOrId.id;
 
@@ -180,7 +177,7 @@ export class MembersService {
       }),
 
       catchError((errReport: IErrReport) => {
-        this.logger.trace(MembersService.name + ': catchError called');
+        this.logger.trace(`${MembersService.name}: catchError called`);
 
         /* inform user */
         if (errReport.error && errReport.error.status === NOT_FOUND) {
@@ -194,7 +191,7 @@ export class MembersService {
         /* mark as handled */
         errReport.isHandled = true;
 
-        this.logger.trace(MembersService.name + ': Throwing the error on');
+        this.logger.trace(`${MembersService.name}: Throwing the error on`);
         return throwError(errReport);
       }),
     );
@@ -210,7 +207,7 @@ export class MembersService {
    * - Throws an observable with an error if any response other than a successful response is received from the server.
    */
   updateMember(member: IMember): Observable<IMember> {
-    this.logger.trace(MembersService.name + ': updateMember called');
+    this.logger.trace(`${MembersService.name}: updateMember called`);
 
     return this.membersDataProvider.updateMember(member).pipe(
       tap((_) => {
@@ -218,7 +215,7 @@ export class MembersService {
       }),
 
       catchError((errReport: IErrReport) => {
-        this.logger.trace(MembersService.name + ': catchError called');
+        this.logger.trace(`${MembersService.name}: catchError called`);
 
         /* inform user */
         if (errReport.error && errReport.error.status === NOT_FOUND) {
@@ -232,7 +229,7 @@ export class MembersService {
         /* mark as handled */
         errReport.isHandled = true;
 
-        this.logger.trace(MembersService.name + ': Throwing the error on');
+        this.logger.trace(`${MembersService.name}: Throwing the error on`);
         return throwError(errReport);
       }),
     );
@@ -242,7 +239,7 @@ export class MembersService {
    * Displays a message on the web page message log.
    */
   private log(message: string): void {
-    this.logger.trace(MembersService.name + ': Reporting: ' + message);
+    this.logger.trace(`${MembersService.name}: Reporting: ${message}`);
     this.messageService.add(`MembersService: ${message}`);
   }
 }

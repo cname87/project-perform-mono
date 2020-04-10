@@ -18,7 +18,7 @@ export class CallbackComponent implements OnInit {
     );
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.logger.trace(
       `${CallbackComponent.name}: Calling authentication callback handler`,
     );

@@ -72,12 +72,15 @@ describe('InformationComponent', () => {
     get card() {
       return findTag<HTMLElement>(this.fixture, 'mat-card');
     }
+
     get header() {
       return findTag<HTMLElement>(this.fixture, 'mat-card-title');
     }
+
     get hint() {
       return findTag<HTMLElement>(this.fixture, 'mat-card-subtitle');
     }
+
     get goBackButton() {
       return findId<HTMLButtonElement>(this.fixture, 'goBackBtn');
     }
@@ -107,7 +110,7 @@ describe('InformationComponent', () => {
   /**
    * Create the InformationComponent, initialize it, set test variables.
    */
-  async function createComponent(isAuthenticated = true) {
+  function createComponent(isAuthenticated = true) {
     /* create the fixture */
     const fixture = TestBed.createComponent(InformationComponent);
 
@@ -152,7 +155,7 @@ describe('InformationComponent', () => {
     return createComponent(isAuthenticated);
   }
 
-  describe('component', async () => {
+  describe('component', () => {
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy();
@@ -187,7 +190,7 @@ describe('InformationComponent', () => {
       /* await asyncData call */
       await fixture.whenStable();
       /* test */
-      expect(component['mode']).toEqual(routeMode);
+      expect(component.mode).toEqual(routeMode);
     });
 
     it('should call goBack', async () => {
@@ -203,7 +206,7 @@ describe('InformationComponent', () => {
     });
   });
 
-  describe('page', async () => {
+  describe('page', () => {
     it('should show the not found values by default', async () => {
       const { fixture, page, activatedRouteStub } = await setup();
       /* set up route that the component will get */

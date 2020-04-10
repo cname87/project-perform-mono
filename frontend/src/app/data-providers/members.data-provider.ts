@@ -14,10 +14,11 @@ import { Observable, throwError } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 
 /* internal dependencies */
+import { catchError, tap } from 'rxjs/operators';
 import { membersConfiguration } from './configuration';
 import { CustomHttpUrlEncodingCodec } from './encoder';
 import { ICount, IMember, IMemberWithoutId } from './models/models';
-import { catchError, tap } from 'rxjs/operators';
+
 export { ICount, IMember, IMemberWithoutId };
 
 /**
@@ -29,13 +30,16 @@ export { ICount, IMember, IMemberWithoutId };
 export class MembersDataProvider {
   /* local variables */
   private basePath = membersConfiguration.basePath;
+
   private membersPath = membersConfiguration.servicePath;
+
   private defaultHeaders = membersConfiguration.defaultHeaders;
+
   private withCredentials = membersConfiguration.withCredentials;
 
   constructor(private httpClient: HttpClient, private logger: NGXLogger) {
     this.logger.trace(
-      MembersDataProvider.name + ': Starting MembersDataProvider',
+      `${MembersDataProvider.name}: Starting MembersDataProvider`,
     );
   }
 
@@ -47,7 +51,7 @@ export class MembersDataProvider {
    */
 
   public addMember(memberWithoutId: IMemberWithoutId): Observable<IMember> {
-    this.logger.trace(MembersDataProvider.name + ': addMember called');
+    this.logger.trace(`${MembersDataProvider.name}: addMember called`);
 
     if (memberWithoutId === null || memberWithoutId === undefined) {
       throw new Error(
@@ -62,8 +66,7 @@ export class MembersDataProvider {
     headers = headers.set('Content-Type', 'application/json');
 
     this.logger.trace(
-      MembersDataProvider.name +
-        `: Sending POST request to: ${this.basePath}/${this.membersPath}`,
+      `${MembersDataProvider.name}: Sending POST request to: ${this.basePath}/${this.membersPath}`,
     );
 
     return this.httpClient
@@ -73,13 +76,13 @@ export class MembersDataProvider {
       })
       .pipe(
         tap((_) => {
-          this.logger.trace(MembersDataProvider.name + ': Received response');
+          this.logger.trace(`${MembersDataProvider.name}: Received response`);
         }),
         catchError((errReport) => {
-          this.logger.trace(MembersDataProvider.name + ': catchError called');
+          this.logger.trace(`${MembersDataProvider.name}: catchError called`);
           /* rethrow all errors */
           this.logger.trace(
-            MembersDataProvider.name + ': Throwing the error on',
+            `${MembersDataProvider.name}: Throwing the error on`,
           );
           return throwError(errReport);
         }),
@@ -93,7 +96,7 @@ export class MembersDataProvider {
    * @returns An observable returning an array of the members retrieved.
    */
   public getMembers(name?: string): Observable<IMember[]> {
-    this.logger.trace(MembersDataProvider.name + ': getMembers called');
+    this.logger.trace(`${MembersDataProvider.name}: getMembers called`);
 
     /* set up query parameter */
     let queryParameters = new HttpParams();
@@ -110,8 +113,7 @@ export class MembersDataProvider {
     headers = headers.set('Accept', 'application/json');
 
     this.logger.trace(
-      MembersDataProvider.name +
-        `: Sending GET request to: ${this.basePath}/${this.membersPath}`,
+      `${MembersDataProvider.name}: Sending GET request to: ${this.basePath}/${this.membersPath}`,
     );
 
     return this.httpClient
@@ -122,13 +124,13 @@ export class MembersDataProvider {
       })
       .pipe(
         tap((_) => {
-          this.logger.trace(MembersDataProvider.name + ': Received response');
+          this.logger.trace(`${MembersDataProvider.name}: Received response`);
         }),
         catchError((errReport) => {
-          this.logger.trace(MembersDataProvider.name + ': catchError called');
+          this.logger.trace(`${MembersDataProvider.name}: catchError called`);
           /* rethrow all errors */
           this.logger.trace(
-            MembersDataProvider.name + ': Throwing the error on',
+            `${MembersDataProvider.name}: Throwing the error on`,
           );
           return throwError(errReport);
         }),
@@ -141,7 +143,7 @@ export class MembersDataProvider {
    * @returns An observable returning the members retrieved.
    */
   public getMember(id: number): Observable<IMember> {
-    this.logger.trace(MembersDataProvider.name + ': getMember called');
+    this.logger.trace(`${MembersDataProvider.name}: getMember called`);
 
     if (id === null || id === undefined) {
       throw new Error(
@@ -154,8 +156,7 @@ export class MembersDataProvider {
     headers = headers.set('Accept', 'application/json');
 
     this.logger.trace(
-      MembersDataProvider.name +
-        `: Sending GET request to: ${this.basePath}/${this.membersPath}/${id}`,
+      `${MembersDataProvider.name}: Sending GET request to: ${this.basePath}/${this.membersPath}/${id}`,
     );
 
     return this.httpClient
@@ -170,13 +171,13 @@ export class MembersDataProvider {
       )
       .pipe(
         tap((_) => {
-          this.logger.trace(MembersDataProvider.name + ': Received response');
+          this.logger.trace(`${MembersDataProvider.name}: Received response`);
         }),
         catchError((errReport) => {
-          this.logger.trace(MembersDataProvider.name + ': catchError called');
+          this.logger.trace(`${MembersDataProvider.name}: catchError called`);
           /* rethrow all errors */
           this.logger.trace(
-            MembersDataProvider.name + ': Throwing the error on',
+            `${MembersDataProvider.name}: Throwing the error on`,
           );
           return throwError(errReport);
         }),
@@ -191,7 +192,7 @@ export class MembersDataProvider {
    * @returns An observable returning the updated member.
    */
   public updateMember(member: IMember): Observable<IMember> {
-    this.logger.trace(MembersDataProvider.name + ': updateMember called');
+    this.logger.trace(`${MembersDataProvider.name}: updateMember called`);
 
     if (member === null || member === undefined) {
       throw new Error(
@@ -206,8 +207,7 @@ export class MembersDataProvider {
     headers = headers.set('Content-Type', 'application/json');
 
     this.logger.trace(
-      MembersDataProvider.name +
-        `: Sending PUT request to: ${this.basePath}/${this.membersPath}`,
+      `${MembersDataProvider.name}: Sending PUT request to: ${this.basePath}/${this.membersPath}`,
     );
 
     return this.httpClient
@@ -217,13 +217,13 @@ export class MembersDataProvider {
       })
       .pipe(
         tap((_) => {
-          this.logger.trace(MembersDataProvider.name + ': Received response');
+          this.logger.trace(`${MembersDataProvider.name}: Received response`);
         }),
         catchError((errReport) => {
-          this.logger.trace(MembersDataProvider.name + ': catchError called');
+          this.logger.trace(`${MembersDataProvider.name}: catchError called`);
           /* rethrow all errors */
           this.logger.trace(
-            MembersDataProvider.name + ': Throwing the error on',
+            `${MembersDataProvider.name}: Throwing the error on`,
           );
           return throwError(errReport);
         }),
@@ -236,7 +236,7 @@ export class MembersDataProvider {
    * @returns An observable returning a count of the members deleted, (which should always be 1).
    */
   public deleteMember(id: number): Observable<ICount> {
-    this.logger.trace(MembersDataProvider.name + ': deleteMember called');
+    this.logger.trace(`${MembersDataProvider.name}: deleteMember called`);
 
     if (id === null || id === undefined) {
       throw new Error(
@@ -249,8 +249,7 @@ export class MembersDataProvider {
     headers = headers.set('Accept', 'application/json');
 
     this.logger.trace(
-      MembersDataProvider.name +
-        `: Sending DELETE request to: ${this.basePath}/${this.membersPath}/${id}`,
+      `${MembersDataProvider.name}: Sending DELETE request to: ${this.basePath}/${this.membersPath}/${id}`,
     );
 
     return this.httpClient
@@ -265,13 +264,13 @@ export class MembersDataProvider {
       )
       .pipe(
         tap((_) => {
-          this.logger.trace(MembersDataProvider.name + ': Received response');
+          this.logger.trace(`${MembersDataProvider.name}: Received response`);
         }),
         catchError((errReport) => {
-          this.logger.trace(MembersDataProvider.name + ': catchError called');
+          this.logger.trace(`${MembersDataProvider.name}: catchError called`);
           /* rethrow all errors */
           this.logger.trace(
-            MembersDataProvider.name + ': Throwing the error on',
+            `${MembersDataProvider.name}: Throwing the error on`,
           );
           return throwError(errReport);
         }),
@@ -283,15 +282,14 @@ export class MembersDataProvider {
    * @returns An observable returning a count of the members deleted.
    */
   public deleteMembers(): Observable<ICount> {
-    this.logger.trace(MembersDataProvider.name + ': deleteMembers called');
+    this.logger.trace(`${MembersDataProvider.name}: deleteMembers called`);
 
     let headers = this.defaultHeaders;
     /* set Accept header - what content we will accept back */
     headers = headers.set('Accept', 'application/json');
 
     this.logger.trace(
-      MembersDataProvider.name +
-        `: Sending DELETE request to: ${this.basePath}/${this.membersPath}`,
+      `${MembersDataProvider.name}: Sending DELETE request to: ${this.basePath}/${this.membersPath}`,
     );
 
     return this.httpClient
@@ -301,13 +299,13 @@ export class MembersDataProvider {
       })
       .pipe(
         tap((_) => {
-          this.logger.trace(MembersDataProvider.name + ': Received response');
+          this.logger.trace(`${MembersDataProvider.name}: Received response`);
         }),
         catchError((errReport) => {
-          this.logger.trace(MembersDataProvider.name + ': catchError called');
+          this.logger.trace(`${MembersDataProvider.name}: catchError called`);
           /* rethrow all errors */
           this.logger.trace(
-            MembersDataProvider.name + ': Throwing the error on',
+            `${MembersDataProvider.name}: Throwing the error on`,
           );
           return throwError(errReport);
         }),

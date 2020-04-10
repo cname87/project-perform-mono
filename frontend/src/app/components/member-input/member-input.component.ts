@@ -13,14 +13,20 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class MemberInputComponent implements OnInit {
   @Input() mode = '';
+
   @Input() inputText = '';
+
   @Output() readonly inputEnter = new EventEmitter<string>();
 
   /* default is add mode */
   placeholder: string | undefined = '';
+
   label: 'Add Member' | 'Edit Member Name' = 'Add Member';
+
   ariaLabel: 'Save' = 'Save';
+
   icon: 'save' = 'save';
+
   hint:
     | 'Enter the new member name and click save or press Enter'
     | 'Edit the member name and click save or press Enter' =
@@ -28,7 +34,7 @@ export class MemberInputComponent implements OnInit {
 
   constructor(private logger: NGXLogger) {
     this.logger.trace(
-      MemberInputComponent.name + ': Starting MemberInputComponent',
+      `${MemberInputComponent.name}: Starting MemberInputComponent`,
     );
   }
 
@@ -51,7 +57,7 @@ export class MemberInputComponent implements OnInit {
    * @param value: The input box calls enter(inputBox.value) i.e. the value parameter passed in is the text in the input box when enter(inputBox.value) is called.
    */
   enter(value: string): void {
-    this.logger.trace(MemberInputComponent.name + ': Calling enter(value)');
+    this.logger.trace(`${MemberInputComponent.name}: Calling enter(value)`);
     /* clear the input box */
     this.inputText = '';
     /* if entry is not '' then emit it */

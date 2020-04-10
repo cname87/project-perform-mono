@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { browser } from 'protractor';
 import browserLogs from 'protractor-browser-logs';
 
@@ -11,15 +12,15 @@ import { getMemberDetailPage } from '../pages/memberDetail.page';
  */
 
 export const getHelpers = () => {
-  const onPreparePath = './onPrepare'
-  const mockMembers = require(onPreparePath).mockMembers;
-  const resetDatabase = require(onPreparePath).resetDatabase;
-  const awaitElementVisible = require(onPreparePath).awaitElementVisible;
-  const awaitElementInvisible = require(onPreparePath).awaitElementInvisible;
-  const loadRootPage = require(onPreparePath).loadRootPage;
-  const login = require(onPreparePath).login;
+  const onPreparePath = '../config/onPrepare';
+  const { mockMembers } = require(onPreparePath);
+  const { resetDatabase } = require(onPreparePath);
+  const { awaitElementVisible } = require(onPreparePath);
+  const { awaitElementInvisible } = require(onPreparePath);
+  const { loadRootPage } = require(onPreparePath);
+  const { login } = require(onPreparePath);
   const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-  const setTimeout = require(onPreparePath).setTimeout;
+  const { setTimeout } = require(onPreparePath);
   const resetTimeout = (original: number) => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = original;
   };
@@ -27,11 +28,16 @@ export const getHelpers = () => {
   /* set up the logs monitor to allow logs be tested against */
   const setupLogsMonitor = async (ignoreLogs = true) => {
     /* you must clear the browser logs before each test */
-    await browser
-      .manage()
-      .logs()
-      .get('browser');
-    const logs = browserLogs(browser);
+    await browser.manage().logs().get('browser');
+
+    /**
+     * TODO remove any when protractor-browser-logs is updated
+     * protractor-browser-logs uses protractor 5.4.3 and the protractor version is 5.4.4 and there is a type incompatibility.
+     */
+    // const browserVar: ProtractorBrowser = browser;
+    const browserVar: any = browser;
+
+    const logs = browserLogs(browserVar);
     /* ignore debug and info log messages */
     if (ignoreLogs) {
       logs.ignore(logs.DEBUG);
@@ -68,9 +74,10 @@ export const getHelpers = () => {
     await awaitElementVisible(getRootElements().messagesClearBtn);
     await getRootElements().messagesClearBtn.click();
     /* wait until zero messages displayed */
-    await browser.wait(async () => {
-      return (await getRootElements().messages.count()) === 0;
-    }, 5000);
+    await browser.wait(
+      async () => (await getRootElements().messages.count()) === 0,
+      5000,
+    );
   };
 
   const clearCache = async () => {
