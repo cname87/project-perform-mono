@@ -22,12 +22,12 @@
  *
  */
 
-console.log('Uploading secret files with GCP Local Storage');
-
 import path from 'path';
 import fs from 'fs';
 import findup from 'find-up';
 import { Storage } from '@google-cloud/storage';
+
+console.log('Uploading secret files with GCP Local Storage');
 const storage = new Storage();
 
 /* find directory (upwards) containing package.json */
@@ -112,13 +112,12 @@ const getUploadedTime = async (
     if (firstRead === FirstRead.TRUE) {
       /* if the file is not there before you upload the file then return an uploaded time of 0ms */
       return 0;
-    } else {
-      /* if an error is thrown on the attempt to get the upload metadata after you have uploaded the file then throw an error */
-      console.error(
-        `Error getting metadata on ${filename} from gs://${bucketName}.`,
-      );
-      throw err;
     }
+    /* if an error is thrown on the attempt to get the upload metadata after you have uploaded the file then throw an error */
+    console.error(
+      `Error getting metadata on ${filename} from gs://${bucketName}.`,
+    );
+    throw err;
   }
 };
 

@@ -1,62 +1,71 @@
 const findup = require('find-up');
 const path = require('path');
+const tsNode = require('ts-node');
+const puppeteer = require('puppeteer');
 
 /* required paths */
 const specDirPath = '../spec-files';
 const tsConfigPath = findup.sync('tsconfig.e2e.json');
-const onPrepare = '../helpers/onPrepare';
+const chromeWinPath =
+  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
+const chromeLinuxPath = '/usr/bin/google-chrome';
 
-const chromePath = (process.env.IS_LOCAL === 'true')
-  ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-  : require('puppeteer').executablePath();
+let chromeExe = '';
+switch (process.platform) {
+  case 'linux':
+    chromeExe = chromeLinuxPath;
+    break;
+  case 'win32':
+    chromeExe = chromeWinPath;
+    break;
+  default:
+    chromeExe = chromeLinuxPath;
+    break;
+}
 
-const showColors = (process.env.IS_LOCAL === 'true');
+const chromePath =
+  process.env.IS_LOCAL === 'true' ? chromeExe : puppeteer.executablePath();
+
+const showColors = process.env.IS_LOCAL === 'true';
 
 let chromeOptions = [
-  "--headless", // needed for Docker
-  "--no-sandbox", // needed for Docker
-  "--window-size=800,600",
-  "--incognito",
-  "--start-maximized",
-  "--new-window",
-  "--disable-popup-blocking",
-  "--disable-extensions",
+  '--headless', // needed for Docker
+  '--no-sandbox', // needed for Docker
+  '--window-size=800,600',
+  '--incognito',
+  '--start-maximized',
+  '--new-window',
+  '--disable-popup-blocking',
+  '--disable-extensions',
 ];
 
 if (process.env.IS_LOCAL === 'true') {
-  chromeOptions = chromeOptions.filter((item) => {
-    return (item !== "--headless" && item !== "--no-sandbox");
-  })
+  chromeOptions = chromeOptions.filter(
+    (item) => item !== '--headless' && item !== '--no-sandbox',
+  );
 }
 
 let specFiles = [
- 'app.e2e-spec.ts',
- 'auth.e2e-spec.ts',
- 'cache.e2e-spec.ts',
- 'errors.e2e-spec.ts',
+  'app.e2e-spec.ts',
+  'auth.e2e-spec.ts',
+  'cache.e2e-spec.ts',
+  'errors.e2e-spec.ts',
 ];
 
 /* filter test files per environment settings */
 specFiles = specFiles.filter((item) => {
-  const a = (
-    item === process.env.SPEC_FILE_1
-      ||
-    item === process.env.SPEC_FILE_2
-      ||
-    item === process.env.SPEC_FILE_3
-      ||
-    item === process.env.SPEC_FILE_4
-  );
+  const a =
+    item === process.env.SPEC_FILE_1 ||
+    item === process.env.SPEC_FILE_2 ||
+    item === process.env.SPEC_FILE_3 ||
+    item === process.env.SPEC_FILE_4;
   return a;
 });
 
-specFiles = specFiles.map((item) => {
-  return path.join(specDirPath, item)
-
-});
+specFiles = specFiles.map((item) => path.join(specDirPath, item));
 
 if (process.env.BASE_URL) {
-  console.log('Configured baseUrl: ' + process.env.BASE_URL);
+  console.log(`Configured baseUrl: ${process.env.BASE_URL}`);
 } else {
   throw new Error('No baseUrl configured. Possible .env file issue?');
 }
@@ -70,14 +79,14 @@ exports.config = {
 
   capabilities: {
     browserName: 'chrome',
-    'chromeOptions': {
-      'args': chromeOptions,
+    chromeOptions: {
+      args: chromeOptions,
       binary: chromePath,
     },
     /* enable browser logs for protractor-browser-logs */
     loggingPrefs: {
-      browser: 'ALL' // "OFF", "SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST", "ALL".
-    }
+      browser: 'ALL', // "OFF", "SEVERE", "WARNING", "INFO", "CONFIG", "FINE", "FINER", "FINEST", "ALL".
+    },
   },
 
   /* a base URL for your application under test. Calls to protractor.get() with relative paths will be resolved against this URL (via url.resolve) */
@@ -99,14 +108,14 @@ exports.config = {
     showColors,
     defaultTimeoutInterval: 60000,
     /* function called to print jasmine results */
-    print: function() {},
+    print() {},
   },
   /* set false to manage the control flow directly rather than having Protractor use its control flow */
   SELENIUM_PROMISE_MANAGER: false,
 
   /* a callback function called once configs are read but before any environment setup. This will only run once, and before onPrepare */
-  beforeLaunch: function() {
-    require('ts-node').register({
+  beforeLaunch() {
+    tsNode.register({
       project: tsConfigPath,
     });
   },
@@ -114,12 +123,12 @@ exports.config = {
   /* a callback function called once protractor is ready and available, and before the specs are executed */
   /* resets database and logs in */
   onPrepare: async () => {
-    await require(onPrepare).run();
+    // eslint-disable-next-line global-require
+    await require('./onPrepare').run();
   },
 
   /* a callback function called once tests are finished */
-  onComplete: function() {
+  onComplete() {
     console.log('E2e test complete');
-  }
-
+  },
 };

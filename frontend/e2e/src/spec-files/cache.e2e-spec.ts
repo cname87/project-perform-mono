@@ -34,12 +34,10 @@ describe('Cache', () => {
     const logs = await setupLogsMonitor(false);
 
     /* set up test logs to show that you've read from the server */
-    logs.ignore((message) => {
-      return (
-        message.message.indexOf('CachingInterceptor: reading from server') ===
-        -1
-      );
-    });
+    logs.ignore(
+      (message) =>
+        !message.message.includes('CachingInterceptor: reading from server'),
+    );
     logs.expect(/CachingInterceptor: reading from server/, logs.INFO);
 
     /* reopen root page to generate a read from server */
@@ -49,9 +47,10 @@ describe('Cache', () => {
     const dashboardPage = getDashboardPage();
 
     /* the top members should be shown */
-    await browser.wait(async () => {
-      return await dashboardPage.dashboardElements.topMembers.isDisplayed();
-    });
+    await browser.wait(
+      async () =>
+        await dashboardPage.dashboardElements.topMembers.isDisplayed(),
+    );
 
     await checkLogs(logs);
   });
@@ -60,11 +59,10 @@ describe('Cache', () => {
     const logs = await setupLogsMonitor(false);
 
     /* ignore all but the expected message */
-    logs.ignore(function(message) {
-      return (
-        message.message.indexOf('CachingInterceptor: reading from cache') === -1
-      );
-    });
+    logs.ignore(
+      (message) =>
+        !message.message.includes('CachingInterceptor: reading from cache'),
+    );
     /* test logs to show that you've read from the cache */
     logs.expect(/CachingInterceptor: reading from cache/);
 

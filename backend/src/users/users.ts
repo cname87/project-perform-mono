@@ -3,9 +3,10 @@
  */
 
 import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
 
 import { User } from './user';
+
+const { modulename, debug } = setupDebug(__filename);
 
 /* creates all users */
 const user1 = new User(
@@ -41,7 +42,7 @@ class Users {
    * Returns a user based on a supplied unique id or returns undefined if a matching user is not found.
    */
   getUser = (id: string) => {
-    debug(modulename + ': running findUser');
+    debug(`${modulename}: running findUser`);
 
     return this._users.find((user) => {
       return user.id === id;
@@ -53,4 +54,4 @@ class Users {
 }
 
 /* export the users findUser function */
-export const getUser = new Users(users).getUser;
+export const { getUser } = new Users(users);

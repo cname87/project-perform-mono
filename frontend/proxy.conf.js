@@ -1,4 +1,3 @@
-
 /* set proxy target dependent on whether calling environment is GCP Production, GCP staging or local development - the GCP production and staging environments set NODE_ENV */
 
 let target;
@@ -19,13 +18,11 @@ switch (process.env.E2E) {
 
 const config = [
   {
-    context: [
-      '/api-v1',
-    ],
+    context: ['/api-v1'],
     target,
     secure: false,
-    logLevel: "debug",
-  }
-]
+    logLevel: 'debug',
+  },
+];
 
 module.exports = config;

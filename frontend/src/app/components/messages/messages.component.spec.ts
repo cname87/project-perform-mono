@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
@@ -57,12 +58,15 @@ describe('messagesComponent', () => {
     get mainDiv() {
       return findCssOrNot<HTMLDivElement>(this.fixture, '#mainDiv');
     }
+
     get header() {
       return findCssOrNot<HTMLHeadingElement>(this.fixture, '#header');
     }
+
     get clearButton() {
       return findCssOrNot<HTMLButtonElement>(this.fixture, '#clearBtn');
     }
+
     get messagesContainer() {
       return findAllCssOrNot<HTMLDivElement>(
         this.fixture,
@@ -74,7 +78,7 @@ describe('messagesComponent', () => {
   }
 
   /* create the component, initialize it & return test variables */
-  async function createComponent() {
+  function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(MessagesComponent);
 
@@ -104,7 +108,7 @@ describe('messagesComponent', () => {
   }
 
   /* run the component-level tests */
-  describe('component', async () => {
+  describe('component', () => {
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component should be created');
@@ -116,7 +120,7 @@ describe('messagesComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       /* test */
-      expect(component['messageService']).toEqual(
+      expect(component.messageService).toEqual(
         fixture.debugElement.injector.get<MessageService>(MessageService),
       );
     });
@@ -130,7 +134,7 @@ describe('messagesComponent', () => {
   });
 
   /* run the page-level tests */
-  describe('page', async () => {
+  describe('page', () => {
     it('should not show when no messages', async () => {
       const { fixture, page } = await setup();
       /* initiate ngOnInit and view changes etc */
@@ -150,8 +154,8 @@ describe('messagesComponent', () => {
         messageServiceInjected,
       } = await setup();
       /* add messages to the displayed messages array */
-      component['messageService'].add('testMessage1');
-      component['messageService'].add('testMessage2');
+      component.messageService.add('testMessage1');
+      component.messageService.add('testMessage2');
       /* initiate ngOnInit and view changes etc */
       fixture.detectChanges();
       await fixture.whenStable();
@@ -162,7 +166,7 @@ describe('messagesComponent', () => {
       expect(page.messagesContainer![1].innerText).toEqual(
         messageServiceInjected.messages[1].toString(),
       );
-      // tslint:disable-next-line: no-magic-numbers
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(page.messagesContainer![2]).toBeFalsy;
       /* the close icon has 'close' as innerText */
       expect(page.clearButton!.innerText).toEqual('close');
@@ -176,8 +180,8 @@ describe('messagesComponent', () => {
         messageServiceInjected,
       } = await setup();
       /* add messages to the displayed messages array */
-      component['messageService'].add('testMessage1');
-      component['messageService'].add('testMessage2');
+      component.messageService.add('testMessage1');
+      component.messageService.add('testMessage2');
       /* initiate ngOnInit and view changes etc */
       fixture.detectChanges();
       await fixture.whenStable();
@@ -192,6 +196,7 @@ describe('messagesComponent', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       expect(messageServiceInjected.clear).toHaveBeenCalled();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(page.messagesContainer).toBeFalsy;
     });
   });

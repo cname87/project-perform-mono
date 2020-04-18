@@ -29,7 +29,7 @@ import {
   rollbarFactory,
 } from './shared/error-handler-service/error-handler.service';
 import { RequestCacheService } from './shared/caching.service/request-cache.service';
-import { httpInterceptorProviders } from './shared/http-interceptors/';
+import { httpInterceptorProviders } from './shared/http-interceptors';
 import { E2E_TESTING } from './config';
 import { CallbackComponent } from './components/callback/callback.component';
 import { ProfileComponent } from './components/user-profile/user-profile.component';
@@ -40,7 +40,7 @@ import { AppLoadService } from './shared/app-load.service/app-load.service';
 import { MemberDetailResolverService } from './shared/resolvers/member-detail-resolver.service';
 import { MembersListResolverService } from './shared/resolvers/members-list-resolver.service ';
 
-export function init_app(appLoadService: AppLoadService) {
+export function initApp(appLoadService: AppLoadService) {
   return () => appLoadService.initApp();
 }
 @NgModule({
@@ -92,7 +92,7 @@ export function init_app(appLoadService: AppLoadService) {
     { provide: E2E_TESTING, useValue: environment.e2eTesting },
     {
       provide: APP_INITIALIZER,
-      useFactory: init_app,
+      useFactory: initApp,
       deps: [AppLoadService],
       multi: true,
     },

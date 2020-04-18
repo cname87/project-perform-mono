@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { APP_BASE_HREF } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { NGXLogger } from 'ngx-logger';
 
+import { By } from '@angular/platform-browser';
 import { AppModule } from '../../app.module';
 import { NavComponent } from './nav.component';
 import { AuthService } from '../../shared/auth.service/auth.service';
@@ -11,8 +12,6 @@ import {
   findRouterLinks,
   RouterLinkDirectiveStub,
 } from '../../shared/test-helpers';
-import { By } from '@angular/platform-browser';
-import { AppRoutingModule } from '../../router/app.routing.module';
 
 /* spy interfaces */
 interface IAuthServiceSpy {
@@ -42,25 +41,14 @@ describe('NavComponent', () => {
       declarations: [],
       providers: [
         { provide: APP_BASE_HREF, useValue: '/' }, // avoids an error message
-        /*  stub AuthService with the MockAuthService helper */
         { provide: AuthService, useValue: authServiceSpy },
         { provide: NGXLogger, useValue: loggerSpy },
       ],
     })
       .overrideModule(AppModule, {
-        remove: {
-          /* removing router module and replacing it below to avoid spurious errors in authGuard etc */
-          imports: [AppRoutingModule],
-        },
         add: {
-          /* declare RouterLinkDirective in AppModule override (rather than declaring it in AppModule). Declaring locally whilst importing AppModule appears not to work) */
+          /* must declare RouterLinkDirective in AppModule override */
           declarations: [RouterLinkDirectiveStub],
-          /* adding RouterTestingModule and sending all paths to a dummy component */
-          imports: [
-            RouterTestingModule.withRoutes([
-              { path: '**', component: NavComponent },
-            ]),
-          ],
         },
       })
       .compileComponents();
@@ -94,12 +82,12 @@ describe('NavComponent', () => {
   }
 
   /* create the component, and get test variables */
-  async function createComponent() {
+  function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(NavComponent);
 
     /* get the injected instances */
-    const injector = fixture.debugElement.injector;
+    const { injector } = fixture.debugElement;
     authService = injector.get<IAuthServiceSpy>(AuthService as any);
 
     const expected = createExpected();
@@ -122,7 +110,7 @@ describe('NavComponent', () => {
   /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
   async function preSetup(isAuthenticated = true) {
     await mainSetup(isAuthenticated);
-    const testVars = await createComponent();
+    const testVars = createComponent();
     return testVars;
   }
 
@@ -137,7 +125,7 @@ describe('NavComponent', () => {
     return testVars;
   }
 
-  describe('after ngOnInit', async () => {
+  describe('after ngOnInit', () => {
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component created');
@@ -169,7 +157,8 @@ describe('NavComponent', () => {
       const dashboardLink = page.routerLinks[0];
 
       /* link is not disabled */
-      expect(await dashboardDe.attributes['ng-reflect-disabled']).toBeNull;
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(dashboardDe.attributes['ng-reflect-disabled']).toBeNull;
       expect(dashboardLink.navigatedTo).toBeNull(
         'should not have navigated yet',
       );
@@ -183,7 +172,7 @@ describe('NavComponent', () => {
 
       /* it attempts to route => dummy path configured above */
       expect(dashboardLink.navigatedTo).toBe(
-        `/${component['dashboard'].path}`,
+        `/${(component as any).dashboard.path}`,
         'dashboard route passed to routerLink',
       );
 
@@ -213,7 +202,7 @@ describe('NavComponent', () => {
 
       /* routerLink gets the route but it does not attempt to route (as disabled) => no dummy path configured above */
       expect(dashboardLink.navigatedTo).toEqual(
-        `/${component['dashboard'].path}`,
+        `/${(component as any).dashboard.path}`,
         'dashboard route passed to routerLink',
       );
 
@@ -227,6 +216,7 @@ describe('NavComponent', () => {
       const membersLink = page.routerLinks[1];
 
       /* link is not disabled */
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(membersLinkDe.attributes['ng-reflect-disabled']).toBeNull;
       expect(membersLink.navigatedTo).toBeNull('should not have navigated yet');
 
@@ -239,7 +229,7 @@ describe('NavComponent', () => {
 
       /* it attempts to route => dummy path configured above */
       expect(membersLink.navigatedTo).toBe(
-        `/${component['membersList'].path}`,
+        `/${(component as any).membersList.path}`,
         'members route passed to routerLink',
       );
 
@@ -266,7 +256,7 @@ describe('NavComponent', () => {
 
       /* routerLink gets the route but it does not attempt to route (as disabled) => no dummy path configured above */
       expect(detailLink.navigatedTo).toEqual(
-        `/${component['detail'].path}`,
+        `/${(component as any).detail.path}`,
         'detail route passed to routerLInk',
       );
 

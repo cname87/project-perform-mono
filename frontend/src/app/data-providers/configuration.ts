@@ -17,12 +17,19 @@ interface IConfigurationParameters {
 class Configuration {
   /* note that the same server is assumed e.g. a basePath of /api is added to localhost:8080 or whatever the host domain that is running */
   basePath: string;
+
   servicePath: string;
+
   defaultHeaders: HttpHeaders;
+
   apiKeys?: { [key: string]: string };
+
   username?: string;
+
   password?: string;
+
   accessToken?: string | (() => string);
+
   /* indicates whether or not cross-site Access-Control requests should be made using credentials -defaults to false */
   withCredentials?: boolean;
 

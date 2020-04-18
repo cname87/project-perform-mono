@@ -45,11 +45,8 @@ describe('MembersListResolverService', () => {
   ) {
     const getMembersSpy = memberServiceSpy.getMembers.and.callFake(
       /* returns the mock members array unless an input flag parameter is set in which case an error is thrown. */
-      () => {
-        return isError
-          ? asyncError(new Error('Test Error'))
-          : asyncData(members);
-      },
+      () =>
+        isError ? asyncError(new Error('Test Error')) : asyncData(members),
     );
     const handleErrorSpy = errorHandlerSpy.handleError.and.stub();
 
@@ -60,7 +57,7 @@ describe('MembersListResolverService', () => {
     };
   }
 
-  async function getService(isError = false) {
+  function getService(isError = false) {
     const membersListResolverService = TestBed.get(MembersListResolverService);
     const membersServiceSpy = TestBed.get(MembersService);
     const errorHandlerSpy = TestBed.get(ErrorHandler);

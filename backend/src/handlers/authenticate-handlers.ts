@@ -2,13 +2,13 @@
  * Checks the token attached to a request.
  */
 
-import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
 import ms from 'ms';
 import jwt from 'express-jwt';
 import jwksRsa from 'jwks-rsa';
 import { Request, Response, NextFunction } from 'express';
+import { setupDebug } from '../utils/src/debugOutput';
+
+const { modulename, debug } = setupDebug(__filename);
 
 /**
  * Verifies the jwt token.
@@ -20,7 +20,7 @@ export const authenticateHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  debug(modulename + ': running authenticateHandler');
+  debug(`${modulename}: running authenticateHandler`);
 
   /* retrieves the rsa signing key */
   const secret = jwksRsa.expressJwtSecret({

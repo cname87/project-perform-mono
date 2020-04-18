@@ -1,22 +1,23 @@
-import { setupDebug } from '../../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
+import { setupDebug } from '../src/debugOutput';
 
 /* set up mocha, sinon & chai */
 import chai from 'chai';
 import 'mocha';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-chai.use(sinonChai);
-const expect = chai.expect;
-sinon.assert.expose(chai.assert, {
-  prefix: '',
-});
 
 import proxyquire from 'proxyquire';
 import intercept from 'intercept-stdout';
 import winston from 'winston';
-const { transports } = winston;
 import Transport from 'winston-transport';
+
+const { modulename, debug } = setupDebug(__filename);
+chai.use(sinonChai);
+const { expect } = chai;
+sinon.assert.expose(chai.assert, {
+  prefix: '',
+});
+const { transports } = winston;
 
 /* set up path to logger.ts for proxyquire */
 const loggerPath = '../src/logger';
@@ -38,7 +39,7 @@ describe('logger', () => {
    * @returns A new logger instance.
    */
   function setupLogger(stubObject = {}) {
-    debug(modulename + ': running setupLogger');
+    debug(`${modulename}: running setupLogger`);
 
     /* use proxyquire to reload Logger */
     const { Logger } = proxyquire(loggerPath, stubObject);
@@ -106,7 +107,10 @@ describe('logger', () => {
       constructor(opts: any) {
         super(opts);
       }
-      log = () => {};
+
+      log = () => {
+        // empty
+      };
     };
     const stubObject = {
       '@google-cloud/logging-winston': {
@@ -187,7 +191,7 @@ describe('logger', () => {
     /* log a message at the info level */
     logger.info(infoMessage);
 
-    /* test that it logged*/
+    /* test that it logged */
     expect(
       capturedConsoleLog.includes(infoMessage),
       'console.log output includes info message',
@@ -243,7 +247,7 @@ describe('logger', () => {
     /* log a message at the info level */
     logger.info(infoMessage);
 
-    /* test that it is not logged*/
+    /* test that it is not logged */
     expect(
       capturedConsoleLog.includes(infoMessage),
       'console.log output includes info message',
@@ -276,7 +280,7 @@ describe('logger', () => {
     process.env.NODE_ENV = 'development';
 
     debug('set up logger instance');
-    /* stub GCP LoggingWinton to throw an error if called*/
+    /* stub GCP LoggingWinton to throw an error if called */
     const stubObject = {
       '@google-cloud/logging-winston': {
         LoggingWinston: class Error {},

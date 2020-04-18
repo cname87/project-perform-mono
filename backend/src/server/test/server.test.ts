@@ -1,5 +1,4 @@
 import { setupDebug } from '../../utils/src/debugOutput';
-setupDebug(__filename);
 
 import { configServer } from '../../configServer';
 import { Server } from '../server';
@@ -9,14 +8,16 @@ import chai from 'chai';
 import 'mocha';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-chai.use(sinonChai);
-const expect = chai.expect;
-sinon.assert.expose(chai.assert, {
-  prefix: '',
-});
 
 import http from 'http';
 import express from 'express';
+
+setupDebug(__filename);
+chai.use(sinonChai);
+const { expect } = chai;
+sinon.assert.expose(chai.assert, {
+  prefix: '',
+});
 
 describe('Server operations tests', () => {
   /* shared variables */
@@ -227,7 +228,7 @@ describe('Server operations tests', () => {
   it('Shuts down a server', async () => {
     const serverType = http;
     const serverOptions = null;
-    const serverPort = 80;
+    const serverPort = configServer.PORT;
 
     const server1 = new Server();
     server1.setupServer(serverType, serverOptions, app, serverPort);
@@ -243,7 +244,7 @@ describe('Server operations tests', () => {
   it('Shuts down a non-open server', async () => {
     const serverType = http;
     const serverOptions = null;
-    const serverPort = 80;
+    const serverPort = configServer.PORT;
 
     /* create a listening server */
     const server1 = new Server();

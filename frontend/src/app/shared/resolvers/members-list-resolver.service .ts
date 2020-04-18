@@ -21,7 +21,7 @@ export class MembersListResolverService implements Resolve<IMember[]> {
     private errorHandler: ErrorHandler,
   ) {
     this.logger.trace(
-      MembersListResolverService.name + ': Starting MembersListResolverService',
+      `${MembersListResolverService.name}: Starting MembersListResolverService`,
     );
   }
 
@@ -34,7 +34,7 @@ export class MembersListResolverService implements Resolve<IMember[]> {
     _route: ActivatedRouteSnapshot,
     _state: RouterStateSnapshot,
   ): Observable<IMember[]> {
-    this.logger.trace(MembersListResolverService.name + ': Calling getMembers');
+    this.logger.trace(`${MembersListResolverService.name}: Calling getMembers`);
 
     let errorHandlerCalled = false;
     const dummyMembers: IMember[] = [];
@@ -46,7 +46,7 @@ export class MembersListResolverService implements Resolve<IMember[]> {
       catchError((error: any) => {
         if (!errorHandlerCalled) {
           this.logger.trace(
-            MembersListResolverService.name + ': getMembers catchError called',
+            `${MembersListResolverService.name}: getMembers catchError called`,
           );
           errorHandlerCalled = true;
           this.errorHandler.handleError(error);

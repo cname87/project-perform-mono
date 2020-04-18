@@ -5,9 +5,9 @@
  *
  * @params
  * - numTries: The number of attempts to be made can be sent as an argument in the function call.  The default is 10 attempts.
- * - url: The url of the backend server to be pinged.  the default is 'http://localhost:8080/'
+ * - url: The url of the backend server to be pinged.  The default is 'http://localhost:8080/'
  *
- * @returns a promise that resolves to the http response once the server responds or rejects with an error with err.message = 'Connection failed if it fails to connect.
+ * @returns a promise that resolves to the http response once the server responds or rejects with an error with err.message = 'Connection failed' if it fails to connect.
  *
  * Usage
  * This function is imported, run, and the returned promise from the function is actioned as desired.
@@ -19,6 +19,7 @@ import '../src/utils/src/loadEnvFile';
 /* external dependencies */
 import request from 'request-promise-native';
 import util from 'util';
+
 const sleep = util.promisify(setTimeout);
 
 const pingServer = (numRetries = 10, url = 'http://localhost:8080/') => {

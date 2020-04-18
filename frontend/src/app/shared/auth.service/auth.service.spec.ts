@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { APP_BASE_HREF } from '@angular/common';
 import { TestBed, getTestBed } from '@angular/core/testing';
 import { NGXLogger } from 'ngx-logger';
@@ -6,23 +7,26 @@ import { take } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { AppModule } from '../../app.module';
 import { AuthService, CREATE_AUTH0_CLIENT } from './auth.service';
 import { auth0Config, routes, IErrReport, errorTypes } from '../../config';
-import { HttpErrorResponse } from '@angular/common/http';
 
 describe('AuthService', () => {
   /* set any expected values */
   function createExpected() {
     const loginRedirectDefault = {
+      /* eslint-disable-next-line @typescript-eslint/camelcase, camelcase */
       redirect_uri: `${window.location.origin}${routes.callback.path}`,
       appState: { target: '/' },
     };
     const loginRedirectPath = {
+      /* eslint-disable-next-line @typescript-eslint/camelcase, camelcase */
       redirect_uri: `${window.location.origin}${routes.callback.path}`,
       appState: { target: '/testPath' },
     };
     const logoutParameter = {
+      /* eslint-disable-next-line @typescript-eslint/camelcase, camelcase */
       client_id: auth0Config.client_id,
       returnTo: `${window.location.origin}`,
     };
@@ -132,9 +136,8 @@ describe('AuthService', () => {
     const expected = createExpected();
 
     /* helper function to allow an event loop turn */
-    const sleep = (ms: number) => {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    };
+    const sleep = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
 
     return {
       authService,
@@ -165,7 +168,7 @@ describe('AuthService', () => {
     authService.localAuthSetup();
     await sleep(0);
     expect(authService.isLoggedIn).toEqual(true);
-    const userProfile = await authService['userProfile$']
+    const userProfile = await authService.userProfile$
       .pipe(take(1))
       .toPromise();
     expect(userProfile!.name).toEqual('testName');
@@ -177,7 +180,7 @@ describe('AuthService', () => {
     authService.localAuthSetup();
     await sleep(0);
     expect(authService.isLoggedIn).toEqual(false);
-    const userProfile = await authService['userProfile$']
+    const userProfile = await authService.userProfile$
       .pipe(take(1))
       .toPromise();
     expect(userProfile).toBeNull();
@@ -186,7 +189,7 @@ describe('AuthService', () => {
   it('authClient$ can catch a Auth client creation error', async () => {
     const { authService } = await setup(true, '', true);
     try {
-      await authService['auth0Client$'].toPromise();
+      await (authService as any).auth0Client$.toPromise();
       fail('Should not reach this path');
     } catch (err) {
       expect(err.isHandled).toEqual(false); // was initially 'true'
@@ -228,7 +231,7 @@ describe('AuthService', () => {
     await sleep(0);
     expect(handleRedirectCallbackSpy).toHaveBeenCalledWith();
     expect(authService.isLoggedIn).toEqual(true);
-    const userProfile = await authService['userProfile$']
+    const userProfile = await authService.userProfile$
       .pipe(take(1))
       .toPromise();
     expect(userProfile!.name).toEqual('testName');
@@ -245,7 +248,7 @@ describe('AuthService', () => {
     authService.handleAuthCallback();
     await sleep(0);
     expect(handleRedirectCallbackSpy).toHaveBeenCalledWith();
-    const userProfile = await authService['userProfile$']
+    const userProfile = await authService.userProfile$
       .pipe(take(1))
       .toPromise();
     expect(userProfile!.name).toEqual('testName');

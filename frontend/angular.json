@@ -137,19 +137,18 @@
               "karmaConfig": "src/karma-staging.conf.js",
               "watch": false,
               "codeCoverage": false,
-              "browsers": "ChromeHeadless_NoSandbox"
+              "browsers": "ChromeHeadlessNoSandbox"
             }
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tslintConfig": "src/tslint.json",
+            "eslintConfig": ".eslintrc.js",
             "tsConfig": [
               "src/tsconfig.app.json",
               "src/tsconfig.spec.json"
             ],
-            "typeCheck": true,
             "exclude": [
               "**/node_modules/**"
             ]

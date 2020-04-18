@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * This utility resets the test database.  It deletes all members and loads 10 mock members including one with a configured name that will cause an error when test mode is enabled.
  * Note: The server must be running before this is run.
@@ -10,15 +11,15 @@ import fs from 'fs';
 import path from 'path';
 
 import { environment } from '../src/environments/environment';
+/* import the member that is configured to trigger an error */
+import { errorMember } from '../src/app/config';
 
 /* need to set a dummy client-side window global as it is referenced in auth0 configuration in config.ts */
-global['window'] = {
+(global as any).window = {
   location: {
     origin: 'dummy',
   },
 };
-/* import the member that is configured to trigger an error */
-import { errorMember } from '../src/app/config';
 
 const certFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem');
 const keyFile = path.resolve(__dirname, '../certs/nodeKeyAndCert.pem');
@@ -43,7 +44,7 @@ async function askServer(
   url: string,
   method: 'GET' | 'POST' | 'DELETE',
   body = {},
-) {
+): Promise<request.RequestPromise> {
   const options = {
     url,
     method,
@@ -57,7 +58,7 @@ async function askServer(
 }
 
 /* clear database, load mockmembers and load start page */
-export const resetDatabase = async () => {
+export const resetDatabase = async (): Promise<void> => {
   console.log('Running reset and load test database');
 
   /* the response is { isTestDatabase: <true | false> } */

@@ -8,14 +8,15 @@
  */
 
 /* output a header */
-import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
 
 /* external dependencies */
 import { ConnectionOptions } from 'mongoose';
 import { format } from 'util';
 import fs from 'fs';
 import { resolve } from 'path';
+import { setupDebug } from '../utils/src/debugOutput';
+
+const { modulename, debug } = setupDebug(__filename);
 
 export const configDatabase = {
   /* the name of the individual databases within the mongoDB server */
@@ -28,7 +29,7 @@ export const configDatabase = {
    */
   getMongoUri: (): string => {
     const server = process.env.DB_IS_LOCAL === 'true' ? 'local' : 'remote';
-    debug(modulename + ` : ${server} database server in use`);
+    debug(`${modulename} : ${server} database server in use`);
 
     /* local or remote mongoDB server - local is only used if DB_IS_LOCAL is true */
     const scheme =
@@ -55,7 +56,7 @@ export const configDatabase = {
       process.env.DB_MODE === 'production'
         ? (configDatabase.DB_DATABASE as string)
         : (configDatabase.DB_DATABASE_TEST as string);
-    debug(modulename + ` : database \'${db}\' in use`);
+    debug(`${modulename} : database \'${db}\' in use`);
     const ssl = 'true';
     const authSource = 'admin';
     const authMechanism = 'DEFAULT';
@@ -89,7 +90,7 @@ export const configDatabase = {
     );
     const key = fs.readFileSync(HTTPS_KEY);
     const cert = key;
-    const sslValidate = process.env.DB_IS_LOCAL === 'true' ? true : false;
+    const sslValidate = process.env.DB_IS_LOCAL === 'true';
 
     return {
       sslCA: ca,

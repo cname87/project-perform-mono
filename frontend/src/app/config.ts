@@ -6,7 +6,9 @@ import { environment } from '../environments/environment';
 /* auth0 application configuration */
 export const auth0Config = {
   domain: 'projectperform.eu.auth0.com',
+  /* eslint-disable-next-line @typescript-eslint/camelcase, camelcase */
   client_id: 'GNnNi0E0Bg5F3jAuFkDhKULWVgv3S21I',
+  /* eslint-disable-next-line @typescript-eslint/camelcase, camelcase */
   redirect_uri: `${window.location.origin}/callback`,
   audience: `${environment.apiUrl}`,
 };

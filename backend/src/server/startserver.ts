@@ -5,15 +5,14 @@
  * parameter, (so the server can be closed later).
  */
 
-import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
-import { Server } from './server';
-
 /* external dependencies */
 import express from 'express';
 import http from 'http';
 import winston from 'winston';
+import { Server } from './server';
+import { setupDebug } from '../utils/src/debugOutput';
+
+const { modulename, debug } = setupDebug(__filename);
 
 /**
  * Starts the http server.
@@ -36,7 +35,7 @@ async function startServer(
   logger: winston.Logger,
   dumpError: Perform.DumpErrorFunction,
 ) {
-  debug(modulename + ': running startServer');
+  debug(`${modulename}: running startServer`);
 
   /**
    * This function sets up the required http server listening on the appropriate port.
@@ -56,7 +55,7 @@ async function startServer(
     try {
       await server.listenServer(svrPort, listenRetries, listenTimeout);
     } catch (err) {
-      logger.error(modulename + ': server listen error reported');
+      logger.error(`${modulename}: server listen error reported`);
       dumpError(err);
       throw err;
     }
@@ -82,7 +81,7 @@ async function startServer(
     config.SVR_LISTEN_TIMEOUT,
   );
 
-  debug(modulename + ': http server up and listening');
+  debug(`${modulename}: http server up and listening`);
 }
 
 /* export the start server function */

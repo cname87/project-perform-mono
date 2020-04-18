@@ -2,15 +2,15 @@
  * This module exports a function that connects to an MongoDB database server..
  */
 
-import { setupDebug } from '../../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
 /* external dependencies */
 import winston from 'winston';
 import { ConnectionOptions } from 'mongoose';
+import { setupDebug } from '../../utils/src/debugOutput';
 
 import { configDatabase } from '../configDatabase';
 import { Database } from './database';
+
+const { modulename, debug } = setupDebug(__filename);
 
 /**
  * This function connects to a MongoDB server database.
@@ -34,7 +34,7 @@ async function startDatabase(
   logger: winston.Logger | Console = console,
   dumpError: Perform.DumpErrorFunction = console.error,
 ): Promise<Perform.Database> {
-  debug(modulename + ': running startDatabase');
+  debug(`${modulename}: running startDatabase`);
 
   try {
     const connectionUrl = config.getMongoUri();
@@ -51,7 +51,7 @@ async function startDatabase(
     /* return database instance */
     return database;
   } catch (err) {
-    logger.error(modulename + ': database failed to setup');
+    logger.error(`${modulename}: database failed to setup`);
     dumpError(err);
     throw err;
   }

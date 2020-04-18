@@ -1,10 +1,8 @@
 import { setupDebug } from '../../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
 
 /* set up mocha, sinon & chai */
 import chai from 'chai';
 import 'mocha';
-const expect = chai.expect;
 
 /* external dependencies */
 import { Document, Model } from 'mongoose';
@@ -12,6 +10,9 @@ import { Document, Model } from 'mongoose';
 /* internal dependencies */
 import { startDatabase } from '../../database/src/startDatabase';
 import { createModelTests } from './tests';
+
+const { modulename, debug } = setupDebug(__filename);
+const { expect } = chai;
 
 /* tests */
 describe('Database models operations', () => {
@@ -50,7 +51,7 @@ describe('Database models operations', () => {
   it('creates the tests model', async () => {
     debug(`Running ${modulename} it - creates the test model`);
 
-    debug(modulename + ': create tests model');
+    debug(`${modulename}: create tests model`);
     modelTests = createModelTests(database);
     expect(modelTests.collection.name, 'Should return the model').to.eql(
       'tests',
@@ -60,7 +61,7 @@ describe('Database models operations', () => {
   it('deletes docs', async () => {
     debug(`Running ${modulename} it - deletes docs`);
 
-    debug(modulename + ': delete tests docs');
+    debug(`${modulename}: delete tests docs`);
     await modelTests.deleteMany({
       _id: {
         $exists: true,
@@ -74,7 +75,7 @@ describe('Database models operations', () => {
   it('creates and saves docs', async () => {
     debug(`Running ${modulename} it - creates and saves docs`);
 
-    debug(modulename + ': create and save docs');
+    debug(`${modulename}: create and save docs`);
     const testDoc1 = new modelTests(docContent1);
     const returnedDoc1 = await testDoc1.save();
     const testDoc2 = new modelTests(docContent2);
@@ -93,7 +94,7 @@ describe('Database models operations', () => {
   it('finds docs', async () => {
     debug(`Running ${modulename} it - finds docs`);
 
-    debug(modulename + ': find docs');
+    debug(`${modulename}: find docs`);
     const foundDocs = await modelTests.find();
 
     expect(foundDocs.length, 'to equal').to.eql(2);
@@ -102,7 +103,7 @@ describe('Database models operations', () => {
   it('finds a doc', async () => {
     debug(`Running ${modulename} it - finds a doc`);
 
-    debug(modulename + ': find a doc');
+    debug(`${modulename}: find a doc`);
     const foundDoc = await modelTests.findOne({ id: 21 });
 
     foundDoc
@@ -113,7 +114,7 @@ describe('Database models operations', () => {
   it('updates a doc', async () => {
     debug(`Running ${modulename} it - updates a doc`);
 
-    debug(modulename + ': update a doc');
+    debug(`${modulename}: update a doc`);
     let foundDoc = await modelTests.findOne({ id: 11 });
     await modelTests.updateMany(
       {
@@ -135,7 +136,7 @@ describe('Database models operations', () => {
   it('fails to access a database that is down', async () => {
     debug(`Running ${modulename} it - fails to access a database that is down`);
 
-    debug(modulename + ': close database');
+    debug(`${modulename}: close database`);
     /* note pass force = true to clean up after error or mocha won't close */
     await database.closeConnection(database.dbConnection, true);
 

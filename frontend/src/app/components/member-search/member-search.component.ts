@@ -27,16 +27,22 @@ import { routes } from '../../config';
 export class MemberSearchComponent implements OnInit {
   /* main title */
   header = 'Member Search';
+
   /* initialises search hint */
   isStart = true;
+
   /* observable of array of members returned from search */
   members$: Observable<IMember[]> = of([]);
+
   /* subject observable to initiate search */
   private searchTerms$ = new Subject<string>();
+
   /* search debounce time in ms */
   private debounce = 300;
+
   /* base route to get member detail */
   detail = routes.detail;
+
   /* member property to display in the list of found members */
   propertyToDisplay = 'name';
 
@@ -47,7 +53,7 @@ export class MemberSearchComponent implements OnInit {
     private isLoadingService: IsLoadingService,
   ) {
     this.logger.trace(
-      MemberSearchComponent.name + ': Starting MemberSearchComponent',
+      `${MemberSearchComponent.name}: Starting MemberSearchComponent`,
     );
   }
 
@@ -81,7 +87,7 @@ export class MemberSearchComponent implements OnInit {
       catchError((error: any) => {
         this.isLoadingService.remove();
         if (!errorHandlerCalled) {
-          this.logger.trace(MemberSearchComponent.name + ': catchError called');
+          this.logger.trace(`${MemberSearchComponent.name}: catchError called`);
           errorHandlerCalled = true;
           this.errorHandler.handleError(error);
         }
@@ -94,7 +100,7 @@ export class MemberSearchComponent implements OnInit {
    * Pushes a search term into the searchTerms$ observable.
    */
   search(term: string): void {
-    this.logger.trace(MemberSearchComponent.name + `: Calling search(${term})`);
+    this.logger.trace(`${MemberSearchComponent.name}: Calling search(${term})`);
     this.searchTerms$.next(term);
   }
 
@@ -102,7 +108,7 @@ export class MemberSearchComponent implements OnInit {
    * Clears the input box and the list of displayed members.
    */
   clear(): void {
-    this.logger.trace(MemberSearchComponent.name + ': Calling clear()');
+    this.logger.trace(`${MemberSearchComponent.name}: Calling clear()`);
     /* getMembers('') returns an empty array without querying the backend */
     this.searchTerms$.next('');
   }

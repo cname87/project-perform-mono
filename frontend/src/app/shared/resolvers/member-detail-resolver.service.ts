@@ -21,8 +21,7 @@ export class MemberDetailResolverService implements Resolve<IMember> {
     private errorHandler: ErrorHandler,
   ) {
     this.logger.trace(
-      MemberDetailResolverService.name +
-        ': Starting MemberDetailResolverService',
+      `${MemberDetailResolverService.name}: Starting MemberDetailResolverService`,
     );
   }
 
@@ -30,10 +29,10 @@ export class MemberDetailResolverService implements Resolve<IMember> {
     route: ActivatedRouteSnapshot,
     _state: RouterStateSnapshot,
   ): Observable<IMember> {
-    this.logger.trace(MemberDetailResolverService.name + ': Calling getMember');
+    this.logger.trace(`${MemberDetailResolverService.name}: Calling getMember`);
 
     /* get id of member to be displayed from the route */
-    const id = +route.paramMap.get('id')!;
+    const id = +(route.paramMap.get('id') || '0');
 
     let errorHandlerCalled = false;
     const dummyMember = {
@@ -49,7 +48,7 @@ export class MemberDetailResolverService implements Resolve<IMember> {
       catchError((error: any) => {
         if (!errorHandlerCalled) {
           this.logger.trace(
-            MemberDetailResolverService.name + ': catchError called',
+            `${MemberDetailResolverService.name}: catchError called`,
           );
           errorHandlerCalled = true;
           this.errorHandler.handleError(error);

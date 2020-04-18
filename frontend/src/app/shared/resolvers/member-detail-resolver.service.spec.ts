@@ -6,8 +6,8 @@ import { NGXLogger } from 'ngx-logger';
 import { MemberDetailResolverService } from './member-detail-resolver.service';
 import { AppModule } from '../../app.module';
 import { asyncError, asyncData } from '../test-helpers';
-import { members } from '../../shared/mocks/mock-members';
-import { MembersService } from '../../shared/members-service/members.service';
+import { members } from '../mocks/mock-members';
+import { MembersService } from '../members-service/members.service';
 
 interface IMembersServiceSpy {
   getMember: jasmine.Spy;
@@ -45,11 +45,8 @@ describe('MemberDetailResolverService', () => {
   ) {
     const getMembersSpy = memberServiceSpy.getMember.and.callFake(
       /* returns the mock members array unless an input flag parameter is set in which case an error is thrown. */
-      (id: number) => {
-        return isError
-          ? asyncError(new Error('Test Error'))
-          : asyncData(members[id]);
-      },
+      (id: number) =>
+        isError ? asyncError(new Error('Test Error')) : asyncData(members[id]),
     );
     const handleErrorSpy = errorHandlerSpy.handleError.and.stub();
 
@@ -60,7 +57,7 @@ describe('MemberDetailResolverService', () => {
     };
   }
 
-  async function getService(isError = false) {
+  function getService(isError = false) {
     const memberDetailResolverService = TestBed.get(
       MemberDetailResolverService,
     );

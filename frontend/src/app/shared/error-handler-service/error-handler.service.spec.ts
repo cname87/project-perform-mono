@@ -135,11 +135,9 @@ describe('ErrorHandlerService', () => {
     const traceLoggerSpy = ngxLoggerSpy.trace.and.stub();
     const errorLoggerSpy = ngxLoggerSpy.error.and.stub();
     const getConfigSnapshotSpy = ngxLoggerSpy.getConfigSnapshot.and.callFake(
-      () => {
-        return {
-          level: 0,
-        };
-      },
+      () => ({
+        level: 0,
+      }),
     );
     const updateConfigSpy = ngxLoggerSpy.updateConfig.and.stub();
     const addMessageSpy = messageServiceSpy.add.and.stub();
@@ -167,7 +165,7 @@ describe('ErrorHandlerService', () => {
   /**
    * Get the service, initialize it, set test variables.
    */
-  async function getService(e2eTesting = false) {
+  function getService(e2eTesting = false) {
     /* create the fixture */
     const errorHandlerService = TestBed.get(ErrorHandlerService);
 
@@ -215,7 +213,7 @@ describe('ErrorHandlerService', () => {
     };
   }
 
-  describe('service', async () => {
+  describe('service', () => {
     /* setup function run by each sub test function */
     async function setup(e2eTesting = false) {
       await mainSetup();
@@ -233,7 +231,7 @@ describe('ErrorHandlerService', () => {
         traceLoggerSpy,
         addMessageSpy,
       } = await setup();
-      errorHandlerService['log']('test string');
+      errorHandlerService.log('test string');
       expect(traceLoggerSpy).toHaveBeenCalledWith(
         'ErrorHandlerService: Reporting: test string',
       );
@@ -249,7 +247,7 @@ describe('ErrorHandlerService', () => {
     });
   });
 
-  describe('has a handleError function that', async () => {
+  describe('has a handleError function that', () => {
     /* setup function run by each sub test function */
     async function setup(e2eTesting = false) {
       await mainSetup();

@@ -2,13 +2,13 @@
  * This module creates a test database model.
  */
 
+import { Document, DocumentToObjectOptions, Model, Schema } from 'mongoose';
 import { setupDebug } from '../../utils/src/debugOutput';
+
 const { modulename, debug } = setupDebug(__filename);
 
-import { Document, DocumentToObjectOptions, Model, Schema } from 'mongoose';
-
 function createModel(database: Perform.Database): Model<Document> {
-  debug(modulename + ': running createModel');
+  debug(`${modulename}: running createModel`);
 
   /* set up schema, collection, and model name */
   const schema = new Schema({

@@ -30,7 +30,7 @@ describe('MembersDataProvider', () => {
     const httpClientStub: IHttpClientStub = {
       post: jasmine.createSpy('post').and.callFake(
         (url: string, m: IMemberWithoutId, _opt: any): Observable<IMember> => {
-          if (url.slice(0, 'error'.length) === 'error') {
+          if (url.startsWith('error')) {
             return asyncError(new Error('Test Error'));
           }
           return asyncData({ id: 21, name: m.name });
@@ -38,7 +38,7 @@ describe('MembersDataProvider', () => {
       ),
       get: jasmine.createSpy('get').and.callFake(
         (url: string, opts: any): Observable<IMember | IMember[]> => {
-          if (url.slice(0, 'error'.length) === 'error') {
+          if (url.startsWith('error')) {
             return asyncError(new Error('Test Error'));
           }
           if (opts.params) {
@@ -46,14 +46,13 @@ describe('MembersDataProvider', () => {
               { id: 21, name: 'test21' },
               { id: 22, name: 'test22' },
             ]);
-          } else {
-            return asyncData({ id: 21, name: 'test21' });
           }
+          return asyncData({ id: 21, name: 'test21' });
         },
       ),
       put: jasmine.createSpy('put').and.callFake(
         (url: string, m: IMember, _opt: any): Observable<IMember> => {
-          if (url.slice(0, 'error'.length) === 'error') {
+          if (url.startsWith('error')) {
             return asyncError(new Error('Test Error'));
           }
           return asyncData({ id: 21, name: m.name });
@@ -61,7 +60,7 @@ describe('MembersDataProvider', () => {
       ),
       delete: jasmine.createSpy('delete').and.callFake(
         (url: string, _opts: any): Observable<ICount> => {
-          if (url.slice(0, 'error'.length) === 'error') {
+          if (url.startsWith('error')) {
             return asyncError(new Error('Test Error'));
           }
           return asyncData({ count: 3 });
@@ -108,10 +107,7 @@ describe('MembersDataProvider', () => {
     /* first argument is the url */
     const idUrl = isIdInUrl ? '/9' : '';
     expect(argsArray[0]).toEqual(
-      membersConfiguration.basePath +
-        '/' +
-        membersConfiguration.servicePath +
-        idUrl,
+      `${membersConfiguration.basePath}/${membersConfiguration.servicePath}${idUrl}`,
       'Http method called with configured url',
     );
 
@@ -411,10 +407,8 @@ describe('MembersDataProvider', () => {
   describe('getMembers', testGetMembers('testName', 'testName'));
   /* test custom encoder */
   describe('getMembers', testGetMembers('test+1', 'test%2B1'));
-  // tslint:disable-next-line: no-magic-numbers
   describe('getMember', testGetMember(9));
   describe('updateMember', testUpdateMember({ id: 21, name: 'test21' }));
-  // tslint:disable-next-line: no-magic-numbers
   describe('deleteMember', testDeleteMember(9));
   describe('deleteMembers', testDeleteMembers());
 });

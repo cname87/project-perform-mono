@@ -11,15 +11,15 @@
  * Note: The GCP host is expected to supply a request logger so none is provided.
  */
 
-import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
 /* external dependencies */
 import path from 'path';
 import compression from 'compression';
 import express, { Application } from 'express';
 import urlParser from 'url';
 import util from 'util';
+import { setupDebug } from '../utils/src/debugOutput';
+
+const { modulename, debug } = setupDebug(__filename);
 
 /**
  * Sets up express middleware and responds to incoming requests.  See the module description.
@@ -28,7 +28,7 @@ import util from 'util';
  */
 
 async function runServer(app: Application) {
-  debug(modulename + ': running runServer');
+  debug(`${modulename}: running runServer`);
 
   const instanceStarted = new Date().toUTCString();
 
@@ -46,14 +46,14 @@ async function runServer(app: Application) {
 
     const { configServer, database, logger, dumpError } = app.appLocals;
 
-    debug(modulename + ': calling database ping');
+    debug(`${modulename}: calling database ping`);
     /* if ping returns within a configured time then no error is logged */
     let isRestartRequired = true;
     const ping = database.dbConnection.db.command({ ping: 1 });
     ping
       .then((result) => {
         const pingReturn = result.ok === 1 ? 'ok' : 'an unexpected value';
-        debug(modulename + `: database ping returned \'${pingReturn}\'`);
+        debug(`${modulename}: database ping returned \'${pingReturn}\'`);
         isRestartRequired = false;
         res.status(200).json({
           started: instanceStarted,
@@ -61,15 +61,14 @@ async function runServer(app: Application) {
       })
       .catch((err) => {
         /* rely on 'disconnect' event handling to restart the server - just log an error here for diagnostic purposes */
-        logger.error(modulename + ': database ping returned an error');
+        logger.error(`${modulename}: database ping returned an error`);
         return dumpError(err);
       });
     setTimeout(async () => {
       if (isRestartRequired) {
         /* rely on 'disconnect' event handling to restart the server - just log an error here for diagnostic purposes */
-        logger.error(modulename + ': database ping failed to return');
+        logger.error(`${modulename}: database ping failed to return`);
       }
-      return;
     }, configServer.DB_PING_TIME);
   });
 
@@ -93,20 +92,20 @@ async function runServer(app: Application) {
   /* log basic information from the request */
   if (debug.enabled) {
     app.use((req, _res, next) => {
-      debug(modulename + ': *** Request received ***');
-      debug(modulename + ': req.url: ' + req.url);
-      debug(modulename + ': req.baseUrl: ' + req.baseUrl);
-      debug(modulename + ': req.originalUrl: ' + req.originalUrl);
-      debug(modulename + ': req.method: ' + req.method);
+      debug(`${modulename}: *** Request received ***`);
+      debug(`${modulename}: req.url: ${req.url}`);
+      debug(`${modulename}: req.baseUrl: ${req.baseUrl}`);
+      debug(`${modulename}: req.originalUrl: ${req.originalUrl}`);
+      debug(`${modulename}: req.method: ${req.method}`);
       debug(
-        modulename +
-          ': url query string: ' +
-          urlParser.parse(req.originalUrl).search,
+        `${modulename}: url query string: ${
+          urlParser.parse(req.originalUrl).search
+        }`,
       );
-      debug(modulename + ': body query string: ' + util.inspect(req.query));
-      debug(modulename + ': body: ' + util.inspect(req.body));
+      debug(`${modulename}: body query string: ${util.inspect(req.query)}`);
+      debug(`${modulename}: body: ${util.inspect(req.body)}`);
       debug(
-        modulename + ': signed cookies: ' + util.inspect(req.signedCookies),
+        `${modulename}: signed cookies: ${util.inspect(req.signedCookies)}`,
       );
       next();
     });
@@ -136,7 +135,7 @@ async function runServer(app: Application) {
 
     /* respond to a request asking whether test database is in use */
     app.use('/testServer/isTestDatabase', (_req, res, _next) => {
-      debug(modulename + ': calling isTestDatabase');
+      debug(`${modulename}: calling isTestDatabase`);
       const result = {
         isTestDatabase:
           app.appLocals.database.dbConnection.db.databaseName ===
@@ -147,13 +146,13 @@ async function runServer(app: Application) {
 
     /* use fail controller to test errorhandling */
     app.use('/testServer/fail', (req, res, next) => {
-      debug(modulename + ': calling the fail controller');
+      debug(`${modulename}: calling the fail controller`);
       app.appLocals.controllers.fail(req, res, next);
     });
 
     /* respond to posted raiseEvents from test pages */
     app.post('/raiseEvent', (req, res, next) => {
-      debug(modulename + ': calling raiseEvent handler');
+      debug(`${modulename}: calling raiseEvent handler`);
       app.appLocals.handlers.miscHandlers.raiseEvent(req, res, next);
     });
   }
@@ -163,7 +162,7 @@ async function runServer(app: Application) {
     /* use for api paths only */
     app.appLocals.configServer.API_BASE_PATH,
     (req, res, next) => {
-      debug(modulename + ': calling the api controller');
+      debug(`${modulename}: calling the api controller`);
       app.appLocals.controllers.api(req, res, next);
     },
   );
@@ -190,7 +189,7 @@ async function runServer(app: Application) {
         app.appLocals.configServer.CLIENT_APP_PATH,
         'index.html',
       );
-      debug(modulename + ' : serving index.html for an unknown path');
+      debug(`${modulename} : serving index.html for an unknown path`);
       res.sendFile(filepath);
     }
   });

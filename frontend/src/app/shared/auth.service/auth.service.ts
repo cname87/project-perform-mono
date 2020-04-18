@@ -42,7 +42,7 @@ import {
  */
 
 /* inject auth0-spa-js create auth0 client instance function via DI for ease of testing */
-type TCreateAuth0Client = (options: Auth0ClientOptions) => Promise<Auth0Client>;
+type TCreateAuth0Client = (options: any) => Promise<Auth0Client>;
 export const CREATE_AUTH0_CLIENT = new InjectionToken<TCreateAuth0Client>(
   'createAuth0Client',
   {
@@ -77,7 +77,7 @@ export class AuthService {
   private auth0Client$ = from(this.createAuth0Client(auth0Config)).pipe(
     shareReplay(1),
     catchError((err: IErrReport) => {
-      this.logger.trace(AuthService.name + ': auth0Client$ catchError called');
+      this.logger.trace(`${AuthService.name}: auth0Client$ catchError called`);
       /* fail with warning */
       err.isHandled = false;
       return throwError(err);
@@ -93,7 +93,7 @@ export class AuthService {
     tap((res) => (this.isLoggedIn = res)),
     catchError((err: IErrReport) => {
       this.logger.trace(
-        AuthService.name + ': isAuthenticated$ catchError called',
+        `${AuthService.name}: isAuthenticated$ catchError called`,
       );
       /* fail with warning */
       err.isHandled = false;
@@ -111,7 +111,7 @@ export class AuthService {
     concatMap((client: Auth0Client) => from(client.handleRedirectCallback())),
     catchError((err: IErrReport) => {
       this.logger.trace(
-        AuthService.name + ': handleRedirectCallback$ catchError called',
+        `${AuthService.name}: handleRedirectCallback$ catchError called`,
       );
       /* fail silently */
       err.isHandled = true;
@@ -127,23 +127,23 @@ export class AuthService {
    */
   /* behaviour subject sends last emitted value to new subscribers and also send new emitted values to all subscribers */
   private userProfileSubject$ = new BehaviorSubject<IUserProfile | null>(null);
+
   public userProfile$ = this.userProfileSubject$.asObservable();
 
   /**
    * Causes the client instance getUser function to be called returning an observable emitting the user profile.
    */
-  private getUser$ = (options?: any): Observable<IUserProfile> => {
-    return this.auth0Client$.pipe(
+  private getUser$ = (options?: any): Observable<IUserProfile> =>
+    this.auth0Client$.pipe(
       concatMap((client: Auth0Client) => from(client.getUser(options))),
       tap((user) => this.userProfileSubject$.next(user)),
       catchError((err: IErrReport) => {
-        this.logger.trace(AuthService.name + ': getUser$ catchError called');
+        this.logger.trace(`${AuthService.name}: getUser$ catchError called`);
         /* fail with warning */
         err.isHandled = false;
         return throwError(err);
       }),
     );
-  };
 
   /**
    * Sets isLoggedIn to true if the user is authenticated, otherwise it sets isLoggedIn to false.
@@ -156,12 +156,11 @@ export class AuthService {
         if (loggedIn) {
           /* Note: concatMap with return ensures that the getUser observable is subscribed */
           return this.getUser$();
-        } else {
-          return of(false);
         }
+        return of(false);
       }),
       catchError((err: IErrReport) => {
-        this.logger.trace(AuthService.name + ': checkAuth$ catchError called');
+        this.logger.trace(`${AuthService.name}: checkAuth$ catchError called`);
         /* fail with warning */
         err.isHandled = false;
         return throwError(err);
@@ -187,12 +186,10 @@ export class AuthService {
           cbRes.appState && cbRes.appState.target ? cbRes.appState.target : '/';
       }),
       /* concatMap return ensures getUser$ and isAuthenticated$ observables are subscribed */
-      concatMap(() => {
-        return combineLatest([this.getUser$(), this.isAuthenticated$]);
-      }),
+      concatMap(() => combineLatest([this.getUser$(), this.isAuthenticated$])),
       catchError((err: IErrReport) => {
         this.logger.trace(
-          AuthService.name + ': authComplete$ catchError called',
+          `${AuthService.name}: authComplete$ catchError called`,
         );
         /* fail with warning */
         err.isHandled = false;
@@ -210,16 +207,17 @@ export class AuthService {
    * Note: Called when the user click 'login'.
    * @param redirectPath: The target redirect path supplied to the Auth loginWithRedirect function.  It defaults to '/', i.e. the app is ultimately redirected to the home page.
    */
-  public login = (redirectPath: string = '/') => {
+  public login = (redirectPath = '/') => {
     this.auth0Client$.subscribe(
       (client: Auth0Client) => {
         client.loginWithRedirect({
+          /* eslint-disable-next-line @typescript-eslint/camelcase, camelcase */
           redirect_uri: `${window.location.origin}${routes.callback.path}`,
           appState: { target: redirectPath },
         });
       },
       (err: IErrReport) => {
-        this.logger.trace(AuthService.name + ': login error called');
+        this.logger.trace(`${AuthService.name}: login error called`);
         /* fail with warning */
         err.isHandled = false;
       },
@@ -235,12 +233,13 @@ export class AuthService {
     this.auth0Client$.subscribe(
       (client: Auth0Client) => {
         client.logout({
+          /* eslint-disable-next-line @typescript-eslint/camelcase, camelcase */
           client_id: auth0Config.client_id,
           returnTo: `${window.location.origin}`,
         });
       },
       (err: IErrReport) => {
-        this.logger.trace(AuthService.name + ': logout error called');
+        this.logger.trace(`${AuthService.name}: logout error called`);
         /* fail with warning */
         err.isHandled = false;
         throw err;
@@ -253,19 +252,18 @@ export class AuthService {
    * @param options: Parameter to be supplied to the Auth0 function - see documentation.  Optional and not currently used.
    * Note: Called by auth.interceptor to add a token to the request.
    */
-  public getTokenSilently$ = (options?: any): Observable<string> => {
-    return this.auth0Client$.pipe(
+  public getTokenSilently$ = (options?: any): Observable<string> =>
+    this.auth0Client$.pipe(
       concatMap((client: Auth0Client) =>
         from(client.getTokenSilently(options)),
       ),
       catchError((err: IErrReport) => {
         this.logger.trace(
-          AuthService.name + ': getTokenSilently$ catchError called',
+          `${AuthService.name}: getTokenSilently$ catchError called`,
         );
         /* fail with warning */
         err.isHandled = false;
         return throwError(err);
       }),
     );
-  };
 }

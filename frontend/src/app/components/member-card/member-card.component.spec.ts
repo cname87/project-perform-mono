@@ -43,7 +43,7 @@ describe('memberCardComponent', () => {
   /**
    * Create the component, initialize it, set test variables.
    */
-  async function createComponent() {
+  function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(MemberCardComponent);
 
@@ -63,7 +63,7 @@ describe('memberCardComponent', () => {
     };
   }
 
-  describe('component', async () => {
+  describe('component', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -79,10 +79,7 @@ describe('memberCardComponent', () => {
       const { fixture, component, page } = await setup();
       component.name = 'test name';
       fixture.detectChanges();
-      expect(await page.content.innerText).toBe(
-        'Name: test name',
-        'name shown',
-      );
+      expect(page.content.innerText).toBe('Name: test name', 'name shown');
     });
   });
 });

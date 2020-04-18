@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -31,15 +32,19 @@ describe('memberInputComponent', () => {
     get input() {
       return findCssOrNot<HTMLInputElement>(this.fixture, '#inputBox');
     }
+
     get label() {
       return findCssOrNot<HTMLElement>(this.fixture, 'mat-label');
     }
+
     get actionBtn() {
       return findCssOrNot<HTMLButtonElement>(this.fixture, '#actionBtn');
     }
+
     get icon() {
       return findCssOrNot<HTMLElement>(this.fixture, 'mat-icon');
     }
+
     get hint() {
       return findCssOrNot<HTMLElement>(this.fixture, 'mat-hint');
     }
@@ -71,7 +76,7 @@ describe('memberInputComponent', () => {
   /**
    * Create the MemberInputComponent, initialize it, set test variables.
    */
-  async function createComponent() {
+  function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(MemberInputComponent);
 
@@ -99,7 +104,7 @@ describe('memberInputComponent', () => {
     };
   }
 
-  describe('component', async () => {
+  describe('component', () => {
     /* setup function run by each sub test function */
     async function setup() {
       await mainSetup();
@@ -117,9 +122,11 @@ describe('memberInputComponent', () => {
       component.mode = 'add';
       component.inputText = '';
       /* initiate ngOnInit */
-      await fixture.detectChanges();
+      fixture.detectChanges();
       /* await button appearance */
-      await fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      await fixture.whenStable();
       /* test all elements, including button not displaying */
       expect(page.input!.value).toBe('', 'initial input value');
       expect(page.input!.getAttribute('placeholder')).toBe(
@@ -169,9 +176,9 @@ describe('memberInputComponent', () => {
       /* listen for enter() event emit */
       component.inputEnter.subscribe(eventHandlerSpy);
       /* initiate ngOnInit */
-      await fixture.detectChanges();
+      fixture.detectChanges();
       /* await button appearance */
-      await fixture.detectChanges();
+      await fixture.whenStable();
       /* manually call enter() with no text */
       component.enter('');
       /* test that inputText cleared and no event emitted */
@@ -187,9 +194,9 @@ describe('memberInputComponent', () => {
       /* listen for enter() event emit */
       component.inputEnter.subscribe(eventHandlerSpy);
       /* initiate ngOnInit */
-      await fixture.detectChanges();
+      fixture.detectChanges();
       /* await button appearance */
-      await fixture.detectChanges();
+      await fixture.whenStable();
       /* manually call enter() with test text */
       component.enter('test input text');
       /* test that inputText cleared and event emitted */
@@ -205,12 +212,15 @@ describe('memberInputComponent', () => {
       /* listen for enter() event emit */
       component.inputEnter.subscribe(eventHandlerSpy);
       /* initiate ngOnInit */
-      await fixture.detectChanges();
+      fixture.detectChanges();
+      await fixture.whenStable();
       /* await button appearance */
-      await fixture.detectChanges();
+      fixture.detectChanges();
+      await fixture.whenStable();
       /* call enter() with the button */
       page.actionBtn!.click();
-      await fixture.detectChanges();
+      fixture.detectChanges();
+      await fixture.whenStable();
       /* test that inputText cleared and event emitted */
       expect(component.inputText).toBe('', 'inputText cleared');
       expect(eventHandlerSpy).toHaveBeenCalledWith('initial input text');
@@ -224,13 +234,13 @@ describe('memberInputComponent', () => {
       /* listen for enter() event emit */
       component.inputEnter.subscribe(eventHandlerSpy);
       /* initiate ngOnInit */
-      await fixture.detectChanges();
+      fixture.detectChanges();
       /* await button appearance */
-      await fixture.detectChanges();
+      await fixture.whenStable();
       /* add text to input */
       sendInput(fixture, page.input!, 'added', true);
-      await fixture.detectChanges();
-      await fixture.detectChanges();
+      fixture.detectChanges();
+      await fixture.whenStable();
       expect(page.input!.value).toBe('initialadded', 'confirm input text');
       /* text added to inputText variable via ngModel binding */
       expect(component.inputText).toBe('initialadded', 'confirm binding');
@@ -241,7 +251,7 @@ describe('memberInputComponent', () => {
         key: 'enter',
       });
       page.input!.dispatchEvent(keyupEnterEvent);
-      await fixture.detectChanges();
+      fixture.detectChanges();
       /* input has been cleared and event handler called */
       expect(component.inputText).toBe('', 'inputText cleared');
       expect(eventHandlerSpy).toHaveBeenCalledWith('initialadded');

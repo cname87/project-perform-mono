@@ -2,6 +2,27 @@
   // See https://go.microsoft.com/fwlink/?LinkId=733558
   // for the documentation about the tasks.json format
   "version": "2.0.0",
+  "presentation": {
+    "panel": "dedicated"
+  },
+  "windows": {
+    "options": {
+      "shell": {
+        "executable": "cmd.exe",
+        "args": [
+            "/d", "/c"
+        ]
+      }
+    }
+  },
+  "inputs": [
+    {
+      "id": "terminate",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "terminateAll"
+    }
+  ],
   "tasks": [
     {
       "label": "Serve Frontend with Backend",
@@ -10,19 +31,14 @@
       "args": [
         "run",
         "--prefix",
-        "${workspaceRoot}/frontend",
+        "${workspaceFolder}/frontend",
         "serveWithBackend"
       ],
-      "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
       "group": {
         "kind": "build",
         "isDefault": true
       },
+      "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
         "source": "ts",
@@ -50,19 +66,11 @@
       "args": [
         "run",
         "--prefix",
-        "${workspaceRoot}/frontend",
+        "${workspaceFolder}/frontend",
         "test:dev"
       ],
+      "group": "build",
       "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
       "problemMatcher": {
         "owner": "typescript",
         "source": "ts",
@@ -85,66 +93,24 @@
     },
     {
       "label": "npm start backend index.js",
-      "type": "shell",
-      "command": "npm",
-      "args": [
-        "run",
-        "--prefix",
-        "${workspaceRoot}/backend",
-        "start"
-      ],
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
+      "type": "npm",
+      "script": "start",
+      "group": "build",
       "problemMatcher": []
     },
     {
       "label": "npm backend server-side watch",
       "type": "npm",
       "script": "tscBackendWatch",
-      "path": "backend/",
-      "problemMatcher": [],
       "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      }
-    },
-    {
-      "label": "npm backend client-side watch",
-      "type": "npm",
-      "script": "tscBackendClientWatch",
-      "path": "backend/",
-      "problemMatcher": [],
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      }
+      "problemMatcher": []
     },
     {
       "label": "npm build backend",
       "type": "npm",
       "script": "build",
-      "path": "backend/",
-      "problemMatcher": [],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      }
+      "group": "build",
+      "problemMatcher": []
     },
     {
       "label": "npm build:dev frontend",
@@ -153,15 +119,11 @@
       "args": [
         "run",
         "--prefix",
-        "${workspaceRoot}/frontend",
+        "${workspaceFolder}/frontend",
         "build:dev"
       ],
-      "isBackground": true,
-      "presentation": {
-        "focus": true,
-        "panel": "dedicated"
-      },
       "group": "build",
+      "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
         "source": "ts",
@@ -177,7 +139,7 @@
             "regexp": "(.*?)"
           },
           "endsPattern": {
-            "regexp": "Compiled |Failed to compile."
+            "regexp": "Compiled | Failed to compile."
           }
         }
       }
@@ -189,15 +151,11 @@
       "args": [
         "run",
         "--prefix",
-        "${workspaceRoot}/frontend",
+        "${workspaceFolder}/frontend",
         "build:e2e"
       ],
-      "isBackground": true,
-      "presentation": {
-        "focus": true,
-        "panel": "dedicated"
-      },
       "group": "build",
+      "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
         "source": "ts",
@@ -213,37 +171,51 @@
             "regexp": "(.*?)"
           },
           "endsPattern": {
-            "regexp": "Compiled |Failed to compile."
+            "regexp": "Compiled | Failed to compile."
           }
         }
       }
     },
     {
-      "label": "Taskkill node.exe",
+      "label": "npm build:prod frontend",
       "type": "shell",
-      "windows": {
-        "command": "${workspaceFolder}/backend/utils-build/taskkillNode.bat"
-      },
-      "group": "test",
-      "presentation": {
-        "reveal": "silent",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
+      "command": "npm",
+      "args": [
+        "run",
+        "--prefix",
+        "${workspaceFolder}/frontend",
+        "build:prod"
+      ],
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": [
+          "relative",
+          "${cwd}"
+        ],
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "(.*?)"
+          },
+          "endsPattern": {
+            "regexp": "Compiled | Failed to compile."
+          }
+        }
+      }
     },
     {
-      "label": "gcloudBuild.bat",
-      "type": "shell",
-      "windows": {
-        "command": "${workspaceFolder}/backend/utils-build/gcloudBuild.bat"
-      },
+      "label": "gcloudBuild",
+      "type": "process",
+      "command": "node",
+      "args": [
+        "backend/utils-build/gcloudBuild.mjs"
+      ],
       "group": "test",
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "shared"
-      },
       "problemMatcher": []
     },
     {
@@ -253,15 +225,10 @@
       "args": [
         "run",
         "--prefix",
-        "${workspaceRoot}",
+        "${workspaceFolder}",
         "isServerUp"
       ],
       "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
       "problemMatcher": {
         "pattern": {
           "regexp": ".",
@@ -272,7 +239,7 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": ".",
-          "endsPattern": "Connected to",
+          "endsPattern": "Connected to"
         }
       }
     },
@@ -283,15 +250,10 @@
       "args": [
         "run",
         "--prefix",
-        "${workspaceRoot}",
+        "${workspaceFolder}",
         "checkServer"
       ],
       "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated"
-      },
       "group": "test",
       "problemMatcher": {
         "pattern": {
@@ -303,9 +265,91 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": ".",
-          "endsPattern": "Connected to",
+          "endsPattern": "Connected | Failed "
         }
       }
+    },
+    {
+      "label": "Start local mongoDB database server",
+      "type": "shell",
+      "presentation": {
+        "focus": true
+      },
+      "linux": {
+        "command": "sudo systemctl start mongod"
+      },
+      "windows": {
+        "command": "C:\\Program Files\\MongoDB\\Server\\4.2\\bin\\mongod.exe",
+        "args": [
+          "--config",
+          "C:\\Users\\cname\\Dropbox\\software\\mongodb\\config\\.mongo.conf"
+        ]
+      },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop local mongoDB database server",
+      "type": "shell",
+      "presentation": {
+        "focus": true
+      },
+      "linux": {
+        "command": "sudo systemctl stop mongod"
+      },
+      "windows": {
+        "command": "C:\\Program Files\\MongoDB\\Server\\4.2\\bin\\mongo.exe",
+        "args": [
+          "--host",
+          "localhost",
+          "--port",
+          "27017",
+          "-u",
+          "syPerformAdmin",
+          "-p",
+          "performMongo_1",
+          "--authenticationDatabase",
+          "admin",
+          "--tls",
+          "--tlsCertificateKeyFile",
+          "C:\\Users\\cname\\Dropbox\\software\\mongodb\\config\\certs\\nodeKeyAndCert.pem",
+          "--tlsCAFile",
+          "C:\\Users\\cname\\Dropbox\\software\\mongodb\\config\\certs\\rootCA.crt",
+          "admin",
+          "--eval",
+          "db.shutdownServer()"
+        ]
+      },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Taskkill node.exe",
+      "type": "shell",
+      "windows": {
+        "command": "TASKKILL",
+        "args": [
+          "/IM",
+          "node.exe",
+          "/F"
+        ]
+      },
+      "linux": {
+        "command": "killall",
+        "args": [
+          "node"
+        ]
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "group": "test",
+      "problemMatcher": []
     },
     {
       "label": "Terminate All Tasks",
@@ -314,12 +358,4 @@
       "problemMatcher": []
     }
   ],
-  "inputs": [
-    {
-      "id": "terminate",
-      "type": "command",
-      "command": "workbench.action.tasks.terminate",
-      "args": "terminateAll"
-    }
-  ]
 }

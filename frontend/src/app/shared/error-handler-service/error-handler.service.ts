@@ -51,7 +51,7 @@ export function rollbarFactory() {
 export class ErrorHandlerService implements ErrorHandler {
   constructor(private injectors: Injector) {
     this.logger.trace(
-      ErrorHandlerService.name + ': Starting ErrorHandlerService',
+      `${ErrorHandlerService.name}: Starting ErrorHandlerService`,
     );
   }
 
@@ -88,8 +88,8 @@ export class ErrorHandlerService implements ErrorHandler {
    * Displays a message on the web page message log.
    */
   private log(message: string): void {
-    this.logger.trace(ErrorHandlerService.name + ': Reporting: ' + message);
-    this.messageService.add(ErrorHandlerService.name + `: ${message}`);
+    this.logger.trace(`${ErrorHandlerService.name}: Reporting: ${message}`);
+    this.messageService.add(`${ErrorHandlerService.name}: ${message}`);
   }
 
   /**
@@ -104,21 +104,21 @@ export class ErrorHandlerService implements ErrorHandler {
       this.logger.updateConfig({ level: NgxLoggerLevel.TRACE });
     }
 
-    this.logger.trace(ErrorHandlerService.name + ': handleError called');
+    this.logger.trace(`${ErrorHandlerService.name}: handleError called`);
 
     /* categorize error based on allocatedType property */
     switch (errReport.allocatedType) {
       case errorTypes.httpClientSide:
       case errorTypes.httpServerSide: {
-        this.logger.trace(ErrorHandlerService.name + ': Http error reported');
+        this.logger.trace(`${ErrorHandlerService.name}: Http error reported`);
         break;
       }
       case errorTypes.auth0Redirect: {
         this.logger.trace(
-          ErrorHandlerService.name + ': Auth0 redirect error reported',
+          `${ErrorHandlerService.name}: Auth0 redirect error reported`,
         );
         this.logger.trace(
-          ErrorHandlerService.name + ': Redirecting to /information/login',
+          `${ErrorHandlerService.name}: Redirecting to /information/login`,
         );
         /* redirects to the login page (which will show 'login' or 'logout') */
         this.zone.run(() => {
@@ -129,17 +129,17 @@ export class ErrorHandlerService implements ErrorHandler {
       default: {
         /* this was an unexpected error */
         this.logger.trace(
-          ErrorHandlerService.name + ': Unexpected error reported',
+          `${ErrorHandlerService.name}: Unexpected error reported`,
         );
       }
     }
 
     /* log an error report to console */
-    this.logger.trace(ErrorHandlerService.name + ': Logging the error');
+    this.logger.trace(`${ErrorHandlerService.name}: Logging the error`);
     this.logger.error(errReport);
 
     /* send the error to rollbar */
-    this.logger.trace(ErrorHandlerService.name + ': Sending error to Rollbar');
+    this.logger.trace(`${ErrorHandlerService.name}: Sending error to Rollbar`);
     this.rollbar.error(errReport);
 
     /* navigate to an error page if the error has not been handled */
@@ -151,7 +151,7 @@ export class ErrorHandlerService implements ErrorHandler {
         /* navigate to error information page and then show toastr message */
         this.router.navigateByUrl(routes.errorPage.path).then(() => {
           this.logger.trace(
-            ErrorHandlerService.name + ': Showing toastr message',
+            `${ErrorHandlerService.name}: Showing toastr message`,
           );
           this.toastr.error('ERROR!', 'An unknown error has occurred');
           /* if e2e testing reset logger level */

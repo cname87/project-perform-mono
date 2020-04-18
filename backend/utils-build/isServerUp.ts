@@ -11,13 +11,11 @@
 
 import { pingServer } from './pingServer';
 
-/* try connect to server until it's up and then return and exit */
-pingServer()
+/* try connect to server (for a number of pings) and then return and exit */
+pingServer(10)
   .then(() => {
     console.log('Connected to server');
-    return;
   })
   .catch((err) => {
     console.error(err.message);
-    return;
   });

@@ -5,7 +5,13 @@
     "**/*.spec.ts",
     "test.ts",
   ],
-
+  "files": [
+    "main.ts",
+    "polyfills.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ],
   "compilerOptions": {
 
     "outDir": "../out-tsc/app",

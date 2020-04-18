@@ -2,10 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
 
+import { Type } from '@angular/core';
 import { AppModule } from '../../app.module';
 import { E2eTestInterceptor } from './e2e-test.interceptor';
 import { errorMember, errorTestUrls, E2E_TESTING } from '../../config';
-import { Type } from '@angular/core';
 
 interface INgxLoggerSpy {
   trace: jasmine.Spy;
@@ -62,7 +62,7 @@ describe('E2eTestInterceptor', () => {
   /**
    * Get the service, initialize it, set test variables.
    */
-  async function getService() {
+  function getService() {
     /* create the service */
     const e2eTestInterceptor: E2eTestInterceptor = TestBed.get(
       E2eTestInterceptor as Type<E2eTestInterceptor>,
@@ -89,14 +89,14 @@ describe('E2eTestInterceptor', () => {
     return getService();
   }
 
-  describe('interceptor', async () => {
+  describe('interceptor', () => {
     it('should be created', async () => {
       const { e2eTestInterceptor } = await setup();
       expect(e2eTestInterceptor).toBeTruthy();
     });
   });
 
-  describe('has a intercept function that', async () => {
+  describe('has a intercept function that', () => {
     it('traces that it has been called', async () => {
       const { e2eTestInterceptor, traceLoggerSpy, nextSpy } = await setup();
       const req: any = {};

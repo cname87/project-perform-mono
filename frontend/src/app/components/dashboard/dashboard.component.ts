@@ -3,8 +3,8 @@ import { NGXLogger } from 'ngx-logger';
 import { map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
-import { IMember } from '../../data-providers/members.data-provider';
 import { ActivatedRoute, Data } from '@angular/router';
+import { IMember } from '../../data-providers/members.data-provider';
 
 /**
  * This component displays a dashboard showing key information on a number of members.
@@ -17,12 +17,14 @@ import { ActivatedRoute, Data } from '@angular/router';
 export class DashboardComponent implements OnInit {
   /* array of members from server */
   members$: Observable<IMember[]> = of([]);
+
   private firstMemberOnDisplay = 1;
+
   private lastMemberOnDisplay = 4;
 
   constructor(private route: ActivatedRoute, private logger: NGXLogger) {
     this.logger.trace(
-      DashboardComponent.name + ': Starting DashboardComponent',
+      `${DashboardComponent.name}: Starting DashboardComponent`,
     );
   }
 
@@ -30,12 +32,12 @@ export class DashboardComponent implements OnInit {
     /* get the data as supplied from the route resolver */
     this.route.data.subscribe((data: Data) => {
       this.members$ = of(data.members).pipe(
-        map((members) => {
-          return members.slice(
+        map((members) =>
+          members.slice(
             this.firstMemberOnDisplay - 1,
             this.lastMemberOnDisplay,
-          );
-        }),
+          ),
+        ),
       );
     });
   }

@@ -3,13 +3,13 @@
  * It is to serve all api requests.
  */
 
-import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
 /* external dependencies */
 import { Router, Request, NextFunction, Response } from 'express';
 import OpenAPIBackend from 'openapi-backend';
 import util from 'util';
+import { setupDebug } from '../utils/src/debugOutput';
+
+const { modulename, debug } = setupDebug(__filename);
 
 const router = Router();
 
@@ -17,14 +17,13 @@ const router = Router();
 /* this takes a long time to run => run once only for performance - called during server startup, (e.g. from GCP _ah/warmup request) so does not have to run when client makes its first call */
 let api: OpenAPIBackend;
 export const initOpenApi = (appLocals: Perform.IAppLocals) => {
-  debug(modulename + ': running initOpenApi');
+  debug(`${modulename}: running initOpenApi`);
   /* route paths as per the api file */
   api = new OpenAPIBackend({
     definition: appLocals.configServer.OPENAPI_FILE,
     apiRoot: '/api-v1',
     strict: true,
     validate: true,
-    withContext: true,
     ajvOpts: {
       unknownFormats: ['int32', 'string'],
       verbose: true,
@@ -128,9 +127,9 @@ export const initOpenApi = (appLocals: Perform.IAppLocals) => {
         _response: Response,
         nextFunction: NextFunction,
       ) => {
-        debug(modulename + ': running validationFail');
+        debug(`${modulename}: running validationFail`);
 
-        appLocals.logger.error(modulename + ': API validation fail');
+        appLocals.logger.error(`${modulename}: API validation fail`);
         const err: Perform.IErr = {
           name: 'REQUEST_VALIDATION_FAIL',
           message: 'API validation fail',
@@ -141,14 +140,15 @@ export const initOpenApi = (appLocals: Perform.IAppLocals) => {
         if (!(context && context.validation && context.validation.errors)) {
           /* openapi-backend types require this test */
           /* unexpected error if context.validation.errors returned */
-          err.message = err.message + ': unexpected openapi error';
+          err.message += ': unexpected openapi error';
           err.statusCode = 500;
           return nextFunction(err);
         }
 
         /* dump detail and then strip back message to send to the client */
-        err.message =
-          'API validation fail\n' + util.inspect(context.validation.errors);
+        err.message = `API validation fail\n${util.inspect(
+          context.validation.errors,
+        )}`;
         appLocals.dumpError(err);
         err.message = 'API validation fail';
         nextFunction(err);
@@ -160,15 +160,15 @@ export const initOpenApi = (appLocals: Perform.IAppLocals) => {
         _response: Response,
         nextFunction: NextFunction,
       ) => {
-        debug(modulename + ': api handler running notFound');
+        debug(`${modulename}: api handler running notFound`);
 
-        /* let angular or error handler deal with not founds */
+        /* let angular or error handler deal with not-founds */
         nextFunction();
       },
     },
   });
   api.init();
-  debug(modulename + ': openApi initialised');
+  debug(`${modulename}: openApi initialised`);
 };
 
 /* middleware functions below */
@@ -184,7 +184,7 @@ const createDbCollectionConnection = (
   _res: Response,
   next: NextFunction,
 ) => {
-  debug(modulename + ': running createCollectionConnection');
+  debug(`${modulename}: running createCollectionConnection`);
 
   /* check that the database is connected */
   const { dbConnection } = req.app.appLocals;
@@ -192,7 +192,7 @@ const createDbCollectionConnection = (
     !dbConnection ||
     dbConnection.readyState !== Perform.DbReadyState.Connected
   ) {
-    req.app.appLocals.logger.error(modulename + ': Database not connected');
+    req.app.appLocals.logger.error(`${modulename}: Database not connected`);
     const errDb: Perform.IErr = {
       name: 'DATABASE_ACCESS',
       message: 'The database service is unavailable',
@@ -203,7 +203,7 @@ const createDbCollectionConnection = (
   }
 
   /* connect to database collection only if the stored model does not already match the user */
-  const appLocals = req.app.appLocals;
+  const { appLocals } = req.app;
   if (
     !(
       appLocals.models.members &&
@@ -214,7 +214,7 @@ const createDbCollectionConnection = (
       ) === `${req.user!.dbCollection}`
     )
   ) {
-    debug(modulename + ': creating connection to user database collection');
+    debug(`${modulename}: creating connection to user database collection`);
     appLocals.models.members = appLocals.createModelMembers(
       appLocals.database,
       `${req.user!.dbCollection}_Member`,
@@ -228,7 +228,7 @@ const createDbCollectionConnection = (
  * Gets the user (or throws an error) and, if not already created, creates the connection to the user collection on the database.
  */
 const findUser = (req: Request, res: Response, next: NextFunction) => {
-  debug(modulename + ': running findUser');
+  debug(`${modulename}: running findUser`);
 
   let user: Perform.User | undefined;
 
@@ -259,11 +259,11 @@ const findUser = (req: Request, res: Response, next: NextFunction) => {
  * Calls the api handler function based on the url path.
  */
 const callApiHandler = (req: Request, res: Response, next: NextFunction) => {
-  debug(modulename + ': running callApiHandler');
+  debug(`${modulename}: running callApiHandler`);
 
   /* initialise OpenApi if not already done */
   if (!api) {
-    debug(modulename + ': initialising OpenApi');
+    debug(`${modulename}: initialising OpenApi`);
     initOpenApi(req.app.appLocals);
   }
 
@@ -271,9 +271,11 @@ const callApiHandler = (req: Request, res: Response, next: NextFunction) => {
     /* the first parameter is passed to openapi-backend middleware - the others are passed to the called handler function */
     {
       method: req.method,
-      path: req.path,
+      /* path must include the api root passed when initializing openAPIBackend.
+      Requests are routed based on the api root (baseUrl) so req.path does not include the baseUrl.*/
+      path: req.baseUrl + req.path,
       body: req.body,
-      query: req.query,
+      query: req.query as { [key: string]: string | string[] },
       headers: req.headers as { [key: string]: string | string[] },
     },
     req,
@@ -288,7 +290,7 @@ export const checkError = (
   _res: Response,
   next: NextFunction,
 ) => {
-  req.app.appLocals.logger.error(modulename + ': Authorization fail');
+  req.app.appLocals.logger.error(`${modulename}: Authorization fail`);
   /* apply code 401 meaning there was a problem with credentials */
   error.statusCode = 401;
   error.dumped = false;

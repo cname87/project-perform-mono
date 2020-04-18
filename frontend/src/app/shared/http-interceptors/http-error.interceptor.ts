@@ -26,12 +26,13 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     private requestCache: RequestCacheService,
   ) {
     this.logger.trace(
-      HttpErrorInterceptor.name + ': Starting HttpErrorInterceptor',
+      `${HttpErrorInterceptor.name}: Starting HttpErrorInterceptor`,
     );
   }
 
   /* retry parameters */
   private totalTries = 3;
+
   private retryDelay = 500; // retry delay in ms
 
   /**
@@ -46,24 +47,23 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
-    this.logger.trace(HttpErrorInterceptor.name + ': intercept called');
+    this.logger.trace(`${HttpErrorInterceptor.name}: intercept called`);
 
     return next.handle(request).pipe(
       /* only an error is passed into retryWhen */
-      retryWhen((errors) => {
-        return errors.pipe(
+      retryWhen((errors) =>
+        errors.pipe(
           /* concat map keeps errors in order and makes sure they aren't executed in parallel */
           concatMap((e, i) => {
             const errorsReceived = i + 1; // index is zero-based
             this.logger.trace(
-              HttpErrorInterceptor.name +
-                `: Error ${errorsReceived} received on try ${errorsReceived} of ${this.totalTries} to ${request.url}`,
+              // eslint-disable-next-line max-len
+              `${HttpErrorInterceptor.name}: Error ${errorsReceived} received on try ${errorsReceived} of ${this.totalTries} to ${request.url}`,
             );
             return iif(
-              () => {
+              () =>
                 /* test for which function to run */
-                return errorsReceived === this.totalTries;
-              },
+                errorsReceived === this.totalTries,
               /* if true we throw the last error */
               throwError(e),
               /* issuing any non-error event trigger the retry */
@@ -73,10 +73,10 @@ export class HttpErrorInterceptor implements HttpInterceptor {
               ),
             );
           }),
-        );
-      }),
+        ),
+      ),
       catchError((caughtError: HttpErrorResponse) => {
-        this.logger.trace(HttpErrorInterceptor.name + ': catchError called');
+        this.logger.trace(`${HttpErrorInterceptor.name}: catchError called`);
 
         /* clear the cache */
         this.requestCache.clearCache();
@@ -91,7 +91,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         if (caughtError.error instanceof ErrorEvent) {
           /* the caught error will be of type HttpErrorResponse and its error property will be an instance of ErrorEvent if the error is client-side e.g. a network error */
           this.logger.trace(
-            HttpErrorInterceptor.name + ': Client-side or network error',
+            `${HttpErrorInterceptor.name}: Client-side or network error`,
           );
 
           errReport.allocatedType = errorTypes.httpClientSide;
@@ -100,15 +100,14 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         } else if (caughtError.status) {
           /* if the caught error's error property is not of type ErrorEvent then the error is a server response e.g 500 error */
           this.logger.trace(
-            HttpErrorInterceptor.name +
-              ': Server returned an unsuccessful response code',
+            `${HttpErrorInterceptor.name}: Server returned an unsuccessful response code`,
           );
 
           errReport.allocatedType = errorTypes.httpServerSide;
         }
 
         this.logger.trace(
-          HttpErrorInterceptor.name + ': Throwing error report on',
+          `${HttpErrorInterceptor.name}: Throwing error report on`,
         );
         return throwError(errReport);
       }),

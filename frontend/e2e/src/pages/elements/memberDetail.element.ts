@@ -11,14 +11,12 @@ export function getMemberDetailElements() {
   const goBackBtn = element(by.css('#goBackBtn'));
 
   /* get member name from header */
-  const getHeaderName = async (): Promise<string> => {
-    return await header.getText();
-  };
+  const getHeaderName = async (): Promise<string> => await header.getText();
 
   /* get the member object from the page */
   const getMember = async (): Promise<IMember> => {
-    let _name = await memberName.getText();
-    let _id = await memberId.getText();
+    const _name = await memberName.getText();
+    const _id = await memberId.getText();
     return {
       id: +_id.slice(4),
       name: _name.slice(6),

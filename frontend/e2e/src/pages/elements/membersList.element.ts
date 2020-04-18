@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { by, element, ElementFinder } from 'protractor';
 
 import { IMember } from 'src/app/data-providers/models/member';
@@ -11,13 +12,13 @@ export function getMembersListElement() {
   const allMemberNames = element.all(by.css('app-members #memberName'));
   const allDeleteBtns = element.all(by.css('app-members #deleteBtn'));
 
-  /**ng
+  /** ng
    * Assumes member list page is displayed.
    * Selects a member from the members list page based on a supplied id.
    * @param id The id of the member to select - must correspond to a displayed member.
    */
   const selectMemberById = (id: number): { [key: string]: ElementFinder } => {
-    let memberId = list.element(by.linkText(id.toString()));
+    const memberId = list.element(by.linkText(id.toString()));
     const memberListElement = memberId.element(by.xpath('..'));
     const memberName = memberListElement.element(by.css('#memberName'));
     const deleteButton = memberListElement.element(by.css('#deleteBtn'));
@@ -38,7 +39,7 @@ export function getMembersListElement() {
       return { id: +id, name };
     };
 
-    let promisedMembers: IMember[] = await allListItems.map(fromListItem);
+    const promisedMembers: IMember[] = await allListItems.map(fromListItem);
     return Promise.all(promisedMembers);
   }
 

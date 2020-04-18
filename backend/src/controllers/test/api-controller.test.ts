@@ -17,18 +17,12 @@
 import '../../utils/src/loadEnvFile';
 
 import { setupDebug } from '../../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
 
 /* set up mocha, sinon & chai */
 import chai from 'chai';
 import 'mocha';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-chai.use(sinonChai);
-const expect = chai.expect;
-sinon.assert.expose(chai.assert, {
-  prefix: '',
-});
 
 /* use proxyquire for index.js module loading */
 import proxyquire from 'proxyquire';
@@ -39,6 +33,13 @@ import { Request } from 'express';
 
 /* internal dependencies */
 import { configServer } from '../../configServer';
+
+const { modulename, debug } = setupDebug(__filename);
+chai.use(sinonChai);
+const { expect } = chai;
+sinon.assert.expose(chai.assert, {
+  prefix: '',
+});
 
 /* variables */
 const indexPath = '../../index';
@@ -66,7 +67,7 @@ describe('server API', () => {
 
   /* awaits that server index.ts has run and fired the completion event */
   const serverIndexStart = (): Promise<Perform.IServerIndex> => {
-    debug(modulename + ': awaiting server up');
+    debug(`${modulename}: awaiting server up`);
     return new Promise(async (resolve, reject) => {
       /* use proxyquire in case index.js already required */
       const { index: serverIndex } = proxyquire(indexPath, {});
@@ -76,13 +77,13 @@ describe('server API', () => {
         (arg: { message: string }) => {
           if (arg.message === 'Server running 0') {
             debug(
-              modulename + ': server running message caught: ' + arg.message,
+              `${modulename}: server running message caught: ${arg.message}`,
             );
             resolve(serverIndex);
           } else {
-            debug(modulename + ': server running error caught: ' + arg.message);
+            debug(`${modulename}: server running error caught: ${arg.message}`);
             reject(
-              new Error('Server running rejected message: ' + arg.message),
+              new Error(`Server running rejected message: ${arg.message}`),
             );
           }
         },
@@ -119,15 +120,15 @@ describe('server API', () => {
 
   /* awaits that index.ts has shut and fired the completion event */
   const serverIndexShutdown = (serverIndex: Perform.IServerIndex) => {
-    debug(modulename + ': awaiting server shutdown');
+    debug(`${modulename}: awaiting server shutdown`);
     return new Promise((resolve, reject) => {
       serverIndex.appLocals.event.once(indexSigint, (arg) => {
         if (arg.message === 'Server exit 0') {
-          debug(modulename + ': server close message caught: ' + arg.message);
+          debug(`${modulename}: server close message caught: ${arg.message}`);
           resolve();
         } else {
-          debug(modulename + ': server close error caught: ' + arg.message);
-          reject(new Error('Server close rejected message: ' + arg.message));
+          debug(`${modulename}: server close error caught: ${arg.message}`);
+          reject(new Error(`Server close rejected message: ${arg.message}`));
         }
       });
       /* fires sigint which fires the above event */
@@ -135,7 +136,7 @@ describe('server API', () => {
     });
   };
 
-  before('set up spies', async () => {
+  before('Set up spies', async () => {
     debug(`Running ${modulename} before - set up spies`);
     await runServerAndSetupSpies();
   });

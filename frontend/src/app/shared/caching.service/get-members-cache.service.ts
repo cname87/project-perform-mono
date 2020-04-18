@@ -15,7 +15,7 @@ export class GetMembersCache {
   private _response: HttpResponse<IMember[]> | undefined = undefined;
 
   constructor(private logger: NGXLogger) {
-    this.logger.trace(GetMembersCache.name + ': Starting GetMemberCache');
+    this.logger.trace(`${GetMembersCache.name}: Starting GetMemberCache`);
   }
 
   /**
@@ -29,7 +29,7 @@ export class GetMembersCache {
    * Clears the cache by setting the cached response to undefined.
    */
   clearCache(): void {
-    this.logger.trace(GetMembersCache.name + ': clearing cache');
+    this.logger.trace(`${GetMembersCache.name}: clearing cache`);
     this._response = undefined;
   }
 
@@ -166,7 +166,7 @@ export class GetMembersCache {
     if (this._response && this._response.body) {
       /* get the current members array from the cached getMembers response */
       let cachedBody: IMember[] = this._response.body;
-      /* delete the member list*/
+      /* delete the member list */
       cachedBody = [];
       /* clone the cached response replacing the body */
       const newCachedResponse = this._response.clone({

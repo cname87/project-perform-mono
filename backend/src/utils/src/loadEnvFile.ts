@@ -28,7 +28,11 @@ switch (process.env.NODE_ENV) {
 }
 
 dotenv.config({ path: envPath });
-import { setupDebug } from '../../utils/src/debugOutput';
+
+/* set up debug function after DEBUG variable is set */
+import { setupDebug } from './debugOutput';
+
+/* output a header */
 setupDebug(__filename);
 
 /* test that DB_HOST has been set, and abort if not */

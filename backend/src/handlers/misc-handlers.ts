@@ -3,15 +3,15 @@
  * controllers.
  */
 
-import { setupDebug } from '../utils/src/debugOutput';
-const { modulename, debug } = setupDebug(__filename);
-
 /**
  * Import external dependencies.
  */
 import { Request, Response, NextFunction } from 'express';
 import util from 'util';
 import { Context, ValidationResult } from 'openapi-backend';
+import { setupDebug } from '../utils/src/debugOutput';
+
+const { modulename, debug } = setupDebug(__filename);
 
 /**
  * This handler emits an event.
@@ -24,7 +24,7 @@ import { Context, ValidationResult } from 'openapi-backend';
  * Note: There is no checking of the request body data.
  */
 function raiseEvent(req: Request, res: Response, _next: NextFunction) {
-  debug(modulename + ': handler raiseEvent was called');
+  debug(`${modulename}: handler raiseEvent was called`);
 
   /* retrieve data sent via POST */
   /* default to 0 and '' */
@@ -42,7 +42,7 @@ function raiseEvent(req: Request, res: Response, _next: NextFunction) {
   };
 
   /* raise an event */
-  const event = req.app.appLocals.event;
+  const { event } = req.app.appLocals;
   event.emit('handlersRaiseEvent', arg);
 
   res.status(200);
@@ -57,7 +57,7 @@ const isResponseValid = (
   payload: any,
   statusCode: number,
 ): ValidationResult => {
-  debug(modulename + ': running postResponseHandler');
+  debug(`${modulename}: running postResponseHandler`);
 
   if (!(context && context.operation && context.operation.responses)) {
     /* return invalid */
@@ -77,7 +77,7 @@ const isResponseValid = (
 
   /* manual validation required if body is empty */
   if (!payload) {
-    debug(modulename + ': empty body reported');
+    debug(`${modulename}: empty body reported`);
 
     /* match content for status code and return valid if no content -  otherwise proceed */
     const responseObject: any = context.operation.responses[statusCode];
@@ -103,7 +103,7 @@ const writeJson = (
   code: number,
   payload?: object,
 ) => {
-  debug(modulename + ': running writeJson');
+  debug(`${modulename}: running writeJson`);
 
   const validationResult = isResponseValid(context, payload, code);
 
@@ -111,11 +111,9 @@ const writeJson = (
     // response validation failed
     const err: Perform.IErr = {
       name: 'RESPONSE_VALIDATION_FAIL',
-      message:
-        'Response validation fail error:\n' +
-        util.inspect(validationResult.errors) +
-        '\nResponse payload:\n' +
-        util.inspect(payload),
+      message: `Response validation fail error:\n${util.inspect(
+        validationResult.errors,
+      )}\nResponse payload:\n${util.inspect(payload)}`,
       statusCode: 502,
       dumped: false,
     };

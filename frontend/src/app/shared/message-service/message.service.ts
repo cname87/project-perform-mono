@@ -11,16 +11,16 @@ export class MessageService {
   messages: string[] = [];
 
   constructor(private logger: NGXLogger) {
-    this.logger.trace(MessageService.name + ': Starting message service');
+    this.logger.trace(`${MessageService.name}: Starting message service`);
   }
 
   add(message: string) {
-    this.logger.trace(MessageService.name + ': Displaying: ' + message);
+    this.logger.trace(`${MessageService.name}: Displaying: ${message}`);
     this.messages.push(message);
   }
 
   clear(): void {
-    this.logger.trace(MessageService.name + ': Clearing displayed messages');
+    this.logger.trace(`${MessageService.name}: Clearing displayed messages`);
     this.messages = [];
   }
 }

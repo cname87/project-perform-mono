@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { APP_BASE_HREF } from '@angular/common';
 import { NGXLogger } from 'ngx-logger';
@@ -31,13 +32,13 @@ describe('AppComponent', () => {
       const htmlTags = htmlElements!
         .filter(
           /* it APPEARS that parentElement.id will be 'root0' or 'root1' for the top-level element i.e. the karma page uses a div with id="root0" or "root1" to hold the component page */
-          (element) =>
-            element.parentElement!.id.slice(0, 'root'.length) === 'root',
+          (element) => element.parentElement!.id.startsWith('root'),
         )
         /* return the element tag name */
         .map((element) => element.tagName);
       return htmlTags;
     }
+
     constructor(readonly fixture: ComponentFixture<AppComponent>) {}
   }
 

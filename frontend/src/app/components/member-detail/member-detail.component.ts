@@ -17,7 +17,7 @@ import { IMember } from '../../data-providers/members.data-provider';
   styleUrls: ['./member-detail.component.scss'],
 })
 export class MemberDetailComponent implements OnInit {
-  /* member to display*/
+  /* member to display */
   member$!: Observable<IMember>;
 
   /* mode for input box */
@@ -31,7 +31,7 @@ export class MemberDetailComponent implements OnInit {
     private isLoadingService: IsLoadingService,
   ) {
     this.logger.trace(
-      MemberDetailComponent.name + ': Starting MemberDetailComponent',
+      `${MemberDetailComponent.name}: Starting MemberDetailComponent`,
     );
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { APP_BASE_HREF, Location } from '@angular/common';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -21,7 +22,7 @@ interface ILocationSpy {
 }
 
 describe('ProfileComponent', () => {
-  /* setup function run by each sub test suite*/
+  /* setup function run by each sub test suite */
   async function mainSetup() {
     /* stub logger to avoid console logs */
     const loggerSpy = jasmine.createSpyObj('NGXLogger', ['trace', 'error']);
@@ -57,12 +58,15 @@ describe('ProfileComponent', () => {
     get title() {
       return findCssOrNot<HTMLElement>(this.fixture, 'mat-card-title');
     }
+
     get name() {
       return findCssOrNot<HTMLSpanElement>(this.fixture, '#profileName');
     }
+
     get email() {
       return findCssOrNot<HTMLSpanElement>(this.fixture, '#profileEmail');
     }
+
     get goBackButton() {
       return findCssOrNot<HTMLButtonElement>(this.fixture, '#goBackBtn');
     }
@@ -89,7 +93,7 @@ describe('ProfileComponent', () => {
   }
 
   /* create the component, and get test variables */
-  async function createComponent() {
+  function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(ProfileComponent);
 
@@ -134,7 +138,7 @@ describe('ProfileComponent', () => {
   /* setup function run by each it test function that needs to test before ngOnInit is run - none in this file */
   async function preSetup() {
     await mainSetup();
-    const testVars = await createComponent();
+    const testVars = createComponent();
     return testVars;
   }
 
@@ -153,7 +157,7 @@ describe('ProfileComponent', () => {
     return testVars;
   }
 
-  describe('before initialization', async () => {
+  describe('before initialization', () => {
     it('should be created', async () => {
       const { component } = await preSetup();
       expect(component).toBeTruthy('component created');
@@ -164,14 +168,14 @@ describe('ProfileComponent', () => {
     });
   });
 
-  describe('after ngOnInit', async () => {
+  describe('after ngOnInit', () => {
     it('should be created', async () => {
       const { component } = await setup();
       expect(component).toBeTruthy('component created');
     });
   });
 
-  describe('page', async () => {
+  describe('page', () => {
     it('should have the expected profile', async () => {
       const { page } = await setup();
       expect(page.title!.innerText).toEqual('MY ACCOUNT');
@@ -180,7 +184,7 @@ describe('ProfileComponent', () => {
     });
   });
 
-  describe('user actions', async () => {
+  describe('user actions', () => {
     it('should call go back on clicking go back button', async () => {
       const { page, backSpy, activatedRouteStub } = await setup();
       /* set up route that the component will get */

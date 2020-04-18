@@ -14,11 +14,11 @@
  *
  */
 
-console.log('Deleting dist directory');
-
 import fs from 'fs';
 import rimraf from 'rimraf';
 import { resolve } from 'path';
+
+console.log('Deleting dist directory');
 
 /* confirm that the passed in path ends in /dist/ */
 if (process.argv[2].slice(-6) !== '/dist/') {

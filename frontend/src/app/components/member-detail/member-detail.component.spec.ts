@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { APP_BASE_HREF, Location } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -68,15 +69,19 @@ describe('MemberDetailComponent', () => {
     get header() {
       return findTag<HTMLElement>(this.fixture, 'mat-card-title');
     }
+
     get nameDisplay() {
       return findId<HTMLSpanElement>(this.fixture, 'memberName');
     }
+
     get idDisplay() {
       return findId<HTMLSpanElement>(this.fixture, 'memberId');
     }
+
     get goBackButton() {
       return findId<HTMLButtonElement>(this.fixture, 'goBackBtn');
     }
+
     get memberInput() {
       return findTag<HTMLElement>(this.fixture, 'app-member-input');
     }
@@ -98,10 +103,10 @@ describe('MemberDetailComponent', () => {
     locationSpy: ILocationSpy,
     errorHandlerSpy: IErrorHandlerSpy,
   ) {
-    const updateMemberSpy = memberServiceSpy.updateMember.and.callFake(() => {
+    const updateMemberSpy = memberServiceSpy.updateMember.and.callFake(() =>
       /* return as expected */
-      return asyncData('');
-    });
+      asyncData(''),
+    );
 
     const backSpy = locationSpy.back.and.stub();
 
@@ -110,7 +115,7 @@ describe('MemberDetailComponent', () => {
     return { updateMemberSpy, backSpy, handleErrorSpy };
   }
 
-  async function createComponent() {
+  function createComponent() {
     /* create the fixture */
     const fixture = TestBed.createComponent(MemberDetailComponent);
 
@@ -155,7 +160,7 @@ describe('MemberDetailComponent', () => {
     };
   }
 
-  describe('component', async () => {
+  describe('component', () => {
     /* setup function run by each sub test function */
     async function setup(routeId = 0) {
       await mainSetup(routeId);
@@ -238,7 +243,7 @@ describe('MemberDetailComponent', () => {
     });
   });
 
-  describe('page', async () => {
+  describe('page', () => {
     /* setup function run by each sub test function */
     async function setup(routeId = 0) {
       await mainSetup(routeId);
@@ -262,11 +267,11 @@ describe('MemberDetailComponent', () => {
         'header',
       );
       expect(page.nameDisplay.innerText).toEqual(
-        'NAME: ' + members[routeId].name,
+        `NAME: ${members[routeId].name}`,
         'name',
       );
       expect(page.idDisplay.innerText).toEqual(
-        'ID: ' + members[routeId].id,
+        `ID: ${members[routeId].id}`,
         'id',
       );
       /* test the mode attribute in the member input element */

@@ -6,7 +6,9 @@ import { IUserProfile } from '../../config';
   providedIn: 'root',
 })
 export class MockAuthService {
-  constructor() {}
+  constructor() {
+    /* do nothing */
+  }
 
   public isLoggedIn = true;
 

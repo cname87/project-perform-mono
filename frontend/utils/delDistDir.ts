@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Utility to delete a dist directory
  *
@@ -19,7 +20,7 @@ import rimraf from 'rimraf';
 import { resolve } from 'path';
 
 /* confirm that the passed in path ends in /dist/ */
-if (process.argv[2].slice(-6) !== '/dist/') {
+if (!process.argv[2].endsWith('/dist/')) {
   console.error('ERROR: dist directory not provided');
   process.exit(1);
 }

@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { AuthService } from '../../shared/auth.service/auth.service';
 import { IsLoadingService } from '@service-work/is-loading';
 
-import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import {
   Router,
@@ -13,6 +11,8 @@ import {
   NavigationError,
 } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '../../shared/auth.service/auth.service';
+import { environment } from '../../../environments/environment';
 
 /**
  * This application displays various views of the members of a team stored on a server.  It allows for member creation, reading, updating and deletion.
@@ -33,16 +33,21 @@ export class AppComponent implements OnInit {
   }
 
   public isLoading$!: Observable<boolean>;
+
   private _isE2eTesting = false;
+
   private _production = false;
+
   private _logLevel = 0;
 
   get isE2eTesting() {
     return this._isE2eTesting;
   }
+
   get production() {
     return this._production;
   }
+
   get logLevel() {
     return this._logLevel;
   }

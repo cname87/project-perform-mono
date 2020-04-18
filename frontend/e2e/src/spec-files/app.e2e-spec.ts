@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { browser, ElementFinder } from 'protractor';
 
 import { getRootElements } from '../pages/elements/root.elements';
@@ -62,12 +63,9 @@ describe('Project Perform', () => {
       name: mockMembers[expected.selectedMemberIndex].name,
     };
     expected.newName = expected.selectedMember.name + expected.nameSuffix;
-    expected.messageFetchedId =
-      expected.messageFetchedId + expected.selectedMember.id;
-    expected.messageDeletedId =
-      expected.messageDeletedId + expected.selectedMember.id;
-    expected.messageUpdatedId =
-      expected.messageUpdatedId + expected.selectedMember.id;
+    expected.messageFetchedId += expected.selectedMember.id;
+    expected.messageDeletedId += expected.selectedMember.id;
+    expected.messageUpdatedId += expected.selectedMember.id;
     return {
       expected,
     };
@@ -104,7 +102,7 @@ describe('Project Perform', () => {
       /* clear messages list */
       await clearMessages();
 
-      /* saves the new member name and routes back to the last page*/
+      /* saves the new member name and routes back to the last page */
       await memberDetailPage.memberInputElements.actionBtn.click();
 
       /* await the appearance of the progress bar as should be loading from the database server */
@@ -115,9 +113,10 @@ describe('Project Perform', () => {
       await awaitElementVisible(getRootElements().messagesClearBtn);
 
       /* wait until 2 new messages appear - updated and fetch all */
-      await browser.wait(async () => {
-        return (await getRootElements().messages.count()) === 2;
-      }, 5000);
+      await browser.wait(
+        async () => (await getRootElements().messages.count()) === 2,
+        5000,
+      );
 
       /* get the first message (of tw0) */
       const message = await memberDetailPage.rootElements.messages
@@ -146,11 +145,11 @@ describe('Project Perform', () => {
     const readMember = await memberDetailPage.memberDetailElements.getMember();
     /* clear input box */
     await memberDetailPage.memberInputElements.inputBox.clear();
-    await browser.wait(async () => {
-      return (
-        (await memberDetailPage.memberInputElements.inputBox.getText()) === ''
-      );
-    }, 5000);
+    await browser.wait(
+      async () =>
+        (await memberDetailPage.memberInputElements.inputBox.getText()) === '',
+      5000,
+    );
     /* slice off the last character of the member name */
     await memberDetailPage.memberInputElements.inputBox.sendKeys(
       readMember.name.slice(0, -1),
@@ -164,13 +163,14 @@ describe('Project Perform', () => {
     await awaitElementVisible(dashboardPage.dashboardElements.tag);
 
     /* confirm name of member on dashboard has been updated */
-    await browser.wait(async () => {
-      return (
-        (await dashboardPage.dashboardElements.selectMember(
-          expected.selectedMemberIndex,
-        )).name === expected.selectedMember.name
-      );
-    });
+    await browser.wait(
+      async () =>
+        (
+          await dashboardPage.dashboardElements.selectMember(
+            expected.selectedMemberIndex,
+          )
+        ).name === expected.selectedMember.name,
+    );
   }
 
   /* Note: app must start in logged in state */
@@ -214,7 +214,7 @@ describe('Project Perform', () => {
       );
     });
 
-    it(`a nav element with the expected links`, async () => {
+    it('a nav element with the expected links', async () => {
       const { expected } = createExpected();
       const dashboardPage = getDashboardPage();
       const linkNames = await dashboardPage.rootElements.navElements.map(
@@ -253,7 +253,7 @@ describe('Project Perform', () => {
 
     it('a members list page which displays correctly styled buttons', async () => {
       /* the member detail page is still displayed */
-      let membersListPage = getMembersListPage();
+      const membersListPage = getMembersListPage();
       const deleteButtons = await membersListPage.memberListElements
         .allDeleteBtns;
       /* test all delete buttons */
@@ -288,18 +288,18 @@ describe('Project Perform', () => {
       ).toBeTruthy('shows error information - page not found page');
 
       /* wait the header and hint text */
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await pageErrorInformationPage.errorInformationElements.header.getText()) ===
-          expected.messageNotFound
-        );
-      }, 5000);
-      await browser.wait(async () => {
-        return (
+          expected.messageNotFound,
+        5000,
+      );
+      await browser.wait(
+        async () =>
           (await pageErrorInformationPage.errorInformationElements.hint.getText()) ===
-          expected.messageClickAbove
-        );
-      }, 5000);
+          expected.messageClickAbove,
+        5000,
+      );
     });
   });
 
@@ -308,7 +308,7 @@ describe('Project Perform', () => {
       await loadRootPage();
     });
 
-    it(`selects a member and routes to the members details page`, async () => {
+    it('selects a member and routes to the members details page', async () => {
       const { expected } = createExpected();
 
       /* the dashboard page is displayed */
@@ -368,7 +368,7 @@ describe('Project Perform', () => {
       await resetNameInMemberDetails(expected.selectedMemberIndex);
     });
 
-    it(`updates but cancels member detail name change and routes back to the dashboard page`, async () => {
+    it('updates but cancels member detail name change and routes back to the dashboard page', async () => {
       const { expected } = createExpected();
 
       /* the dashboard page is now displayed */
@@ -393,13 +393,14 @@ describe('Project Perform', () => {
       await awaitElementVisible(dashboardPage.dashboardElements.tag);
 
       /* confirm name of member on dashboard has been updated */
-      await browser.wait(async () => {
-        return (
-          (await dashboardPage.dashboardElements.selectMember(
-            expected.selectedMemberIndex,
-          )).name === expected.selectedMember.name
-        );
-      });
+      await browser.wait(
+        async () =>
+          (
+            await dashboardPage.dashboardElements.selectMember(
+              expected.selectedMemberIndex,
+            )
+          ).name === expected.selectedMember.name,
+      );
     });
   });
 
@@ -433,18 +434,16 @@ describe('Project Perform', () => {
       await awaitElementVisible(memberDetailPage.memberDetailElements.tag);
 
       /* confirm member detail page is being displayed */
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await memberDetailPage.memberDetailElements.getMember()).id ===
-          expected.selectedMember.id
-        );
-      });
-      await browser.wait(async () => {
-        return (
+          expected.selectedMember.id,
+      );
+      await browser.wait(
+        async () =>
           (await memberDetailPage.memberDetailElements.getMember()).name ===
-          expected.selectedMember.name
-        );
-      });
+          expected.selectedMember.name,
+      );
     });
 
     it('updates and saves a member name in members details page input box and routes back to members list which shows the updated name', async () => {
@@ -456,7 +455,7 @@ describe('Project Perform', () => {
       await awaitElementVisible(membersListPage.memberListElements.tag);
     });
 
-    it(`shows the member's new name in the members list page`, async () => {
+    it("shows the member's new name in the members list page", async () => {
       const { expected } = createExpected();
 
       /* the members list page is still displayed */
@@ -478,7 +477,7 @@ describe('Project Perform', () => {
       expect(await memberName.getText()).toEqual(expected.newName);
     });
 
-    it(`deletes a member from the members list page`, async () => {
+    it('deletes a member from the members list page', async () => {
       const { expected } = createExpected();
 
       /* the member list page is now displayed */
@@ -503,12 +502,11 @@ describe('Project Perform', () => {
       await awaitElementVisible(membersListPage.memberListElements.tag);
 
       /* confirm count of members displayed is down by one */
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await membersListPage.memberListElements.allMemberIds.count()) ===
-          expected.numMembers - 1
-        );
-      });
+          expected.numMembers - 1,
+      );
 
       /* get the updated list of members */
       const membersAfter = await membersListPage.memberListElements.getMembersArray();
@@ -523,7 +521,7 @@ describe('Project Perform', () => {
       const { expected } = createExpected();
 
       /* the member list page is displayed */
-      let membersListPage = getMembersListPage();
+      const membersListPage = getMembersListPage();
 
       /* get the messages showing in the message element */
       const count = await membersListPage.messagesElements.messages.count();
@@ -536,7 +534,7 @@ describe('Project Perform', () => {
 
     it('clears the messages list', async () => {
       /* the member list page is displayed */
-      let membersListPage = getMembersListPage();
+      const membersListPage = getMembersListPage();
       /* clear the messages list */
       await clearMessages();
       /* get the messages showing in the message element */
@@ -544,11 +542,11 @@ describe('Project Perform', () => {
       expect(count).toEqual(0, 'no messages');
     });
 
-    it(`adds a member on the members list page`, async () => {
+    it('adds a member on the members list page', async () => {
       const { expected } = createExpected();
 
       /* the members list page is still displayed */
-      let membersListPage = getMembersListPage();
+      const membersListPage = getMembersListPage();
 
       /* get the list of members */
       const membersBefore = await membersListPage.memberListElements.getMembersArray();
@@ -562,16 +560,15 @@ describe('Project Perform', () => {
       await membersListPage.memberInputElements.actionBtn.click();
 
       /* confirm added member is displayed */
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await membersListPage.memberListElements.getMembersArray())
             .length ===
-          numMembers + 1
-        );
-      });
+          numMembers + 1,
+      );
 
       /* slice last member of the new list and confirm previous list still there */
-      let membersAfter = await membersListPage.memberListElements.getMembersArray();
+      const membersAfter = await membersListPage.memberListElements.getMembersArray();
       expect(membersAfter.slice(0, numMembers)).toEqual(
         membersBefore,
         'old members are still there',
@@ -588,7 +585,7 @@ describe('Project Perform', () => {
       const { expected } = createExpected();
 
       /* the member list page is displayed */
-      let membersListPage = getMembersListPage();
+      const membersListPage = getMembersListPage();
 
       /* get the messages showing in the message element */
       const count = await membersListPage.messagesElements.messages.count();
@@ -605,7 +602,7 @@ describe('Project Perform', () => {
       await loadRootPage();
     });
 
-    it(`searches for 'test1'`, async () => {
+    it("searches for 'test1'", async () => {
       const { expected } = createExpected();
 
       /* the dashboard page should be displayed */
@@ -623,15 +620,15 @@ describe('Project Perform', () => {
       /* await the disappearance of the progress bar */
       await awaitElementInvisible(getRootElements().progressBar);
 
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await dashboardPage.memberSearchElement.searchResults.count()) ===
-          expected.searchTest1
-        );
-      }, 5000);
+          expected.searchTest1,
+        5000,
+      );
     });
 
-    it(`continues search with '1'`, async () => {
+    it("continues search with '1'", async () => {
       const { expected } = createExpected();
 
       /* the dashboard page is still displayed */
@@ -640,15 +637,15 @@ describe('Project Perform', () => {
       /* enter '1' in search box */
       await dashboardPage.memberSearchElement.searchBox.sendKeys('1');
 
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await dashboardPage.memberSearchElement.searchResults.count()) ===
-          expected.searchTest11
-        );
-      }, 5000);
+          expected.searchTest11,
+        5000,
+      );
     });
 
-    it(`continues search with '8' and gets 1 member`, async () => {
+    it("continues search with '8' and gets 1 member", async () => {
       const { expected } = createExpected();
 
       /* the dashboard page is still displayed */
@@ -656,14 +653,13 @@ describe('Project Perform', () => {
 
       /* enter '8' in search box */
       await dashboardPage.memberSearchElement.searchBox.sendKeys('8');
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await dashboardPage.memberSearchElement.searchResults.count()) ===
-          expected.searchTest18
-        );
-      });
+          expected.searchTest18,
+      );
       /* confirm member found */
-      let member = dashboardPage.memberSearchElement.searchResults.get(0);
+      const member = dashboardPage.memberSearchElement.searchResults.get(0);
       expect(await member.getText()).toEqual(expected.foundMember.name);
     });
 
@@ -688,18 +684,16 @@ describe('Project Perform', () => {
       await awaitElementVisible(memberDetailPage.memberDetailElements.tag);
 
       /* show the found member detail matches the expected member */
-      await browser.wait(async () => {
-        return (
+      await browser.wait(
+        async () =>
           (await memberDetailPage.memberDetailElements.getMember()).id ===
-          expected.foundMember.id
-        );
-      });
-      await browser.wait(async () => {
-        return (
+          expected.foundMember.id,
+      );
+      await browser.wait(
+        async () =>
           (await memberDetailPage.memberDetailElements.getMember()).name ===
-          expected.foundMember.name
-        );
-      });
+          expected.foundMember.name,
+      );
     });
   });
 });
